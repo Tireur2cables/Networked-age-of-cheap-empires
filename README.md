@@ -7,3 +7,5 @@ https://www.pierre-giraud.com/python-apprendre-programmer-cours/introduction-ori
 https://learnxinyminutes.com/docs/python/
 
 Tentative de Pull / Utilisation de VSCode Source Control par Thomas B.
+
+TESTTESTTEST
