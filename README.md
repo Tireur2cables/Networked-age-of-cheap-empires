@@ -9,3 +9,5 @@ https://learnxinyminutes.com/docs/python/
 Tentative de Pull / Utilisation de VSCode Source Control par Thomas B.
 
 TESTTESTTEST
+
+Test de VSCode avec Github par Kenzo (même chose que Thomas)
