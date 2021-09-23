@@ -18,21 +18,21 @@ Test de VSCode avec Github par Kenzo (même chose que Thomas)
 
 # Convention proposées
 Ces conventions sont calquées sur PEP 8 :
-- Noms de module ( = nom de fichiers) : exemple_de_nom (le nom doit être court)
+- Noms de module ( = nom de fichiers) : exemple_de_nom (le nom doit être court) // 
 - Noms de variables, fonctions & methode : exemple_de_nom 
 - Noms de classe : ExempleDeNom
 - Nom d'exceptions : ExempleDeNom (Toujours finir le nom par "Error" : ImportError)
 - Constantes : EXEMPLE_DE_NOM
 
 
-# Listes (non-exhaustives) des demandes du prof :
-Seules les demandes obligatoires & conseillées sont cités
+# Listes des demandes du prof :
 (rien de précisé = obligatoire)
 (c = conseillé)
 (f = facultatif)
 (d = proposé mais plutôt déconseillé, "casse-gueule")
 
-1 & 2) Python 3 avec framework GUI (Pygame, ...)
+1) Python 3
+2) Framework GUI (Pygame, ...)
 3) Graphical representation of the map
 4) Save & Load
 5) (c) thème à peu près équivalent à AoE (antique)
@@ -50,14 +50,15 @@ Seules les demandes obligatoires & conseillées sont cités
 17) Cheats code
 
 
---- Age Of Empires : Brainstorming ---
+# Brainstorming
+Age of Empires
 - Graphismes
 
 - Affichage
   - GUI (interface utilisateur)
   - Input (* lié aux mécanismes)
 
-(-> Sons)
+- Sons
 
 - Mécanisme de jeu
   - Commandes (* lié au GUI)
