@@ -18,7 +18,7 @@ Test de VSCode avec Github par Kenzo (même chose que Thomas)
 
 # Convention proposées
 Ces conventions sont calquées sur PEP 8 :
-- Noms de module ( = nom de fichiers) : exemple_de_nom (le nom doit être court) // 
+- Noms de module ( = nom de fichiers) : Zone_Buildable_TownCenter.py avec utilisation de sous-dossiers ? (PEP 8 : exemple_de_nom (le nom doit être court))
 - Noms de variables, fonctions & methode : exemple_de_nom 
 - Noms de classe : ExempleDeNom
 - Nom d'exceptions : ExempleDeNom (Toujours finir le nom par "Error" : ImportError)
