@@ -1,6 +1,6 @@
 import arcade 
 import pygame as pg
-
+#cc les puputes
 from map.game import Game
 import os
 
