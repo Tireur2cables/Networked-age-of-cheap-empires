@@ -42,17 +42,15 @@ class MyGame(arcade.Window):
         self.villager = DummyVillager(50, 50)
         self.villager_list.append(self.villager)
 
-        # Here we use the Simple Physics Engine, maybe we will change this later
+        # Here we use the Simple Physics Engine, maybe we will change this later.
+        # There is no wall so we just pass an empty SpriteList.
+        # A physics engine is necessary for "change_x" and "change_y" to work
         self.physics_engine = arcade.PhysicsEngineSimple(self.villager, arcade.SpriteList())
 
     def on_draw(self):
         """ Draw everything """
         arcade.start_render()
         self.villager_list.draw()
-
-        # Put the text on the screen.
-        output = "Hello World!"
-        arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
 
     def on_update(self, delta_time):
         """ Movement and game logic """
@@ -81,7 +79,7 @@ class DummyVillager(arcade.Sprite):
 
     def __init__(self, x, y):
         # coin image from kenney.nl
-        self.image = "test_arcadelibrary/coin_01.png"
+        self.image = "Movements/coin_01.png"  # This may cause an error depending on how the IDE is configurated. I now how to fix this but haven't implemented it for now.
         super().__init__(self.image, SPRITE_SCALING_COIN, hit_box_algorithm="None")  # Associe un sprite au personnage. Le hit_box_algorithm à non c'est pour éviter
         self.center_x = x  # Initial x coordinate
         self.center_y = y  # Initial y coordinate
@@ -93,14 +91,16 @@ class DummyVillager(arcade.Sprite):
     def update(self):
         if self.isMoving:
             if isalmost(self.center_x, self.aim_x, 3):
-                self.change_x = 0
+                self.change_x = 0  # If it is close to where it aims, stop moving.
             if isalmost(self.center_y, self.aim_y, 3):
                 self.change_y = 0
 
     def move_towards(self, x, y):
         distance = math.dist((x, y), (self.center_x, self.center_y))
-        self.change_x = self.speed * (x - self.center_x) / distance
-        self.change_y = self.speed * (y - self.center_y) / distance
+        # The following calculation is necessary to have uniform speeds :
+        # We want the same speed no matter what the distance between the villager and where he needs to go is.
+        self.change_x = self.speed * (x - self.center_x) / distance  # Creates the x coordinate of a unit vector. Then we multiply it by the speed.
+        self.change_y = self.speed * (y - self.center_y) / distance  # Creates the y coordinate of a unit vector. Then we multiply it by the speed.
         self.isMoving = True
         self.aim_x = x
         self.aim_y = y
@@ -113,5 +113,5 @@ def main():
     arcade.run()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # Python syntax that means "if you are launching from this file, run main()", useful if this file is going to be imported.
     main()
