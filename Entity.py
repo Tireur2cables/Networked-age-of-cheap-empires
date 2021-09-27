@@ -1,3 +1,5 @@
+from CONSTANTS import *
+
 class Entity:
     def __init__(self, x, y, health, damage):#constructeur : initialise les attributs
         self.x = x

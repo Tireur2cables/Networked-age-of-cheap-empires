@@ -9,9 +9,7 @@ class Unit(Entity):
 class Villager(Unit):#un Villageois est une Unit particuliere
     def __init__(self, x, y, health=25, damage=3):
         super().__init__(x, y, health, damage)#utilise le constructeur de la classe mere
-        #!!!!!!!! Faire une enumeration pour le nom des ressources
-        #avec un acces en faisant Resource.WOOD, Resource.FOOD ...
-        self.resource = {"bois" : 0, "nourriture" : 0, "pierre" : 0, "or" : 0}#initialise les attributs specifiques a cette classe
+        self.resource = {Resource.FOOD : 0, Resource.WOOD : 0, Resource.STONE : 0, Resource.GOLD : 0}#utilisation de l'enumeration Resource
         self.max_resource = 10
 
     def nb_resources(self):
