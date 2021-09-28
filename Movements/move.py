@@ -1,4 +1,4 @@
-""" Example for AoE-like movements """
+""" Example for AoE-like movements! """
 
 import arcade
 import math
