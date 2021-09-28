@@ -42,6 +42,7 @@ class Vector():
     def normalized(self):
         return self / self.norm()
 
+
 # def test():
 #     v = Vector(2, 3)
 #     w = Vector(4, 5)
