@@ -42,11 +42,6 @@ class MyGame(arcade.Window):
         self.villager = DummyVillager(50, 50)
         self.villager_list.append(self.villager)
 
-        # Here we use the Simple Physics Engine, maybe we will change this later.
-        # There is no wall so we just pass an empty SpriteList.
-        # A physics engine is necessary for "change_x" and "change_y" to work
-        self.physics_engine = arcade.PhysicsEngineSimple(self.villager, arcade.SpriteList())
-
     def on_draw(self):
         """ Draw everything """
         arcade.start_render()
@@ -56,7 +51,6 @@ class MyGame(arcade.Window):
         """ Movement and game logic """
         if self.selection:
             self.selection.update()
-        self.physics_engine.update()
 
     def on_mouse_motion(self, x, y, dx, dy):
         """ Handle Mouse Motion """
@@ -94,6 +88,8 @@ class DummyVillager(arcade.Sprite):
                 self.change_x = 0  # If it is close to where it aims, stop moving.
             if isalmost(self.center_y, self.aim_y, 3):
                 self.change_y = 0
+        self.center_x += self.change_x
+        self.center_y += self.change_y
 
     def move_towards(self, x, y):
         distance = math.dist((x, y), (self.center_x, self.center_y))
