@@ -5,9 +5,9 @@
 from enum import Enum, auto
 
 class Resource(Enum):
-    # On utilise les 4 ressources du jeu a de nombreux endroits dans le code
-    # Voici donc une enumeration pour harmoniser le tout
-    FOOD = auto()
-    WOOD = auto()
-    GOLD = auto()
-    STONE = auto()
+	# On utilise les 4 ressources du jeu a de nombreux endroits dans le code
+	# Voici donc une enumeration pour harmoniser le tout
+	FOOD = auto()
+	WOOD = auto()
+	GOLD = auto()
+	STONE = auto()
