@@ -21,3 +21,5 @@ while lol:
 		lol = False
 # Problème : Toujours présent à d'autres cases & donc gestion d'UID nécessaire !
 # Solution temporaire : Clean la map à chaque tour de gameloop
+# Avec systeme position Unit(Vector(2, 3), ...)
+#v.getposition().x
