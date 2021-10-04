@@ -1,4 +1,4 @@
-# Ceci est le readme ma gueeule
+# Ceci est le readme
 Calmez-vous
 
 https://www.pierre-giraud.com/python-apprendre-programmer-cours/introduction-oriente-objet/
