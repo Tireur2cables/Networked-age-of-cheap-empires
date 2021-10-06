@@ -1,6 +1,6 @@
 from objects.Entity import Entity
 from objects.Unit import Unit, Villager
-
+import arcade
 
 rows, cols = (10, 10)
 
@@ -9,11 +9,13 @@ rows, cols = (10, 10)
 
 vill = Villager(0,0)
 lol = True
+arr = [[(0,None) for i in range(cols)] for j in range(rows)]
+arr[vill.get_x()][vill.get_y()] = (0,vill)
 while lol:
-	arr = [[0 for i in range(cols)] for j in range(rows)]
-	arr[vill.get_x()][vill.get_y()] = vill
+	arr[vill.get_x()][vill.get_y()] = (0,None)
 	vill.set_x(vill.get_x() + 1)
 	vill.set_y(vill.get_y() + 1)
+	arr[vill.get_x()][vill.get_y()] = (0,vill)
 	for row in arr:
 		print(row)
 	print("\n\n")
