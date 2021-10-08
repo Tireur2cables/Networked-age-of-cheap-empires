@@ -15,11 +15,16 @@ class Entity:
 		self.line_sight = line_sight
 
 	# coordonnees
+	def get_x(self):
+		return self.position.x
+	def get_y(self):
+		return self.position.y
 	def get_position(self):
 		return self.position
 
-	def set_position(self, position):
-		self.position = position
+	def set_position(self, x, y):
+		self.position.x = x
+		self.position.y = y
 
 	# health
 	def get_health(self):
