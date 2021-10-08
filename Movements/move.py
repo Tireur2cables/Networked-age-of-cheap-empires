@@ -10,104 +10,142 @@ SCREEN_HEIGHT = 600
 
 
 def isalmost(n, m, d=5):
-    """Tests if n and m are close with a maximum distance of d"""
-    return abs(n - m) < d
+	"""Tests if n and m are close with a maximum distance of d"""
+	return abs(n - m) < d
 
 
-class MyGame(arcade.Window):
+class AoCE(arcade.Window):
 
-    def __init__(self):
-        """ Initializer """
-        # Call the initializer of arcade.Window
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Age Of Cheap Empires TEST")
+	def __init__(self):
+		""" Initializer """
+		# Call the initializer of arcade.Window
+		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Age Of Cheap Empires TEST")
+		self.model = Model(self)
+		self.view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
+		self.controller = Controller(self)
 
-        # Selection (will be a Villager: an arcade.Sprite)
-        self.selection = None
+		# Variables for communications between model, view and controller.
+		self.toDraw = []
 
-        # Variables that will hold sprite lists
-        self.villager_list = None
+	def setup(self):
+		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
+		self.model.setup()
+		self.view.setup()
+		self.controller.setup()
 
-        # Show the mouse cursor
-        self.set_mouse_visible(True)
+	def on_update(self, *args):  # Redirecting on_update to the Controller
+		self.controller.on_update(*args)
 
-        arcade.set_background_color(arcade.color.AMAZON)
+	def on_mouse_press(self, *args):  # Redirecting inputs to the controller
+		self.controller.on_mouse_press(*args)
 
-    def setup(self):
-        """ Set up the game and initialize the variables. """
 
-        # Sprite list
-        self.villager_list = arcade.SpriteList()
+class Model():
+	def __init__(self, aoce_game):
+		self.game = aoce_game
 
-        # Set up the villager
-        self.villager = DummyVillager(50, 50)
-        self.villager_list.append(self.villager)
+	def setup(self):
+		villager = DummyVillager(50, 50)
+		self.game.toDraw.append(villager)
 
-    def on_draw(self):
-        """ Draw everything """
-        arcade.start_render()
-        self.villager_list.draw()
 
-    def on_update(self, delta_time):
-        """ Movement and game logic """
-        if self.selection:
-            self.selection.update()
+class View():
+	def __init__(self, aoce_game):
+		self.game = aoce_game
 
-    def on_mouse_motion(self, x, y, dx, dy):
-        """ Handle Mouse Motion """
-        # May be useful to move the camera later. Keep in mind that this function is executed a lot of time per second when you move the mouse.
-        pass
+		# Variables that will hold sprite lists
+		self.villager_list = None
 
-    def on_mouse_press(self, x, y, button, key_modifiers):
-        villagers = arcade.get_sprites_at_point((x, y), self.villager_list)
+		# Show the mouse cursor
+		self.game.set_mouse_visible(True)
 
-        if self.selection:
-            self.selection.move_towards(x, y)
-            print(x, y)
+		arcade.set_background_color(arcade.color.AMAZON)
 
-        if villagers:
-            self.selection = villagers[0]  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
+	def setup(self):
+		# Sprite list
+		self.villager_list = arcade.SpriteList()
+
+		# Set up the villager
+		self.villager = DummyVillager(50, 50)
+		self.villager_list.append(self.villager)
+
+	def on_draw(self):
+		""" Draw everything """
+		arcade.start_render()
+		self.villager_list.draw()
+
+
+class Controller():
+	def __init__(self, aoce_game):
+		self.game = aoce_game
+
+		# Selection (will be a Villager: an arcade.Sprite)
+		self.selection = None
+
+	def setup(self):
+		pass
+
+	def on_update(self, delta_time):
+		""" Movement and game logic """
+		if self.selection:
+			self.selection.update()
+
+	def on_mouse_motion(self, x, y, dx, dy):
+		""" Handle Mouse Motion """
+		# May be useful to move the camera later. Keep in mind that this function is executed a lot of time per second when you move the mouse.
+		pass
+
+	def on_mouse_press(self, x, y, button, key_modifiers):
+		villagers = arcade.get_sprites_at_point((x, y), self.villager_list)
+
+		for i in self.selection:
+			self.selection.move_towards(x, y)
+			print(x, y)
+
+		if villagers:
+			self.selection = villagers[0]  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
 
 
 class DummyVillager(arcade.Sprite):
-    """Classe correspondant aux villageois, à fusionner avec la vraie classe correspondant aux villageois"""
+	"""Classe correspondant aux villageois, à fusionner avec la vraie classe correspondant aux villageois"""
 
-    def __init__(self, x, y):
-        # coin image from kenney.nl
-        self.image = "Movements/coin_01.png"  # This may cause an error depending on how the IDE is configurated. I now how to fix this but haven't implemented it for now.
-        super().__init__(self.image, SPRITE_SCALING_COIN, hit_box_algorithm="None")  # Associe un sprite au personnage. Le hit_box_algorithm à non c'est pour éviter
-        self.center_x = x  # Initial x coordinate
-        self.center_y = y  # Initial y coordinate
-        self.aim_x = 0  # x coordinate aimed by the user when he clicked
-        self.aim_y = 0  # y coordinate aimed by the user when he clicked
-        self.isMoving = False  # Verify if the villager is moving
-        self.speed = 3  # Speed of the villager (should probably be a constant)
+	def __init__(self, x, y):
+		# coin image from kenney.nl
+		self.image = "Movements/coin_01.png"  # This may cause an error depending on how the IDE is configurated. I now how to fix this but haven't implemented it for now.
+		super().__init__(self.image, SPRITE_SCALING_COIN, hit_box_algorithm="None")  # Associe un sprite au personnage. Le hit_box_algorithm à non c'est pour éviter
+		self.center_x = x  # Initial x coordinate
+		self.center_y = y  # Initial y coordinate
+		self.aim_x = 0  # x coordinate aimed by the user when he clicked
+		self.aim_y = 0  # y coordinate aimed by the user when he clicked
+		self.isMoving = False  # Verify if the villager is moving
+		self.speed = 3  # Speed of the villager (should probably be a constant)
 
-    def update(self):
-        if self.isMoving:
-            if isalmost(self.center_x, self.aim_x, 3):
-                self.change_x = 0  # If it is close to where it aims, stop moving.
-            if isalmost(self.center_y, self.aim_y, 3):
-                self.change_y = 0
-        self.center_x += self.change_x
-        self.center_y += self.change_y
+	def update(self):
+		if self.isMoving:
+			if isalmost(self.center_x, self.aim_x, 3):
+				self.change_x = 0  # If it is close to where it aims, stop moving.
+			if isalmost(self.center_y, self.aim_y, 3):
+				self.change_y = 0
+		self.center_x += self.change_x
+		self.center_y += self.change_y
 
-    def move_towards(self, x, y):
-        distance = math.dist((x, y), (self.center_x, self.center_y))
-        # The following calculation is necessary to have uniform speeds :
-        # We want the same speed no matter what the distance between the villager and where he needs to go is.
-        self.change_x = self.speed * (x - self.center_x) / distance  # Creates the x coordinate of a unit vector. Then we multiply it by the speed.
-        self.change_y = self.speed * (y - self.center_y) / distance  # Creates the y coordinate of a unit vector. Then we multiply it by the speed.
-        self.isMoving = True
-        self.aim_x = x
-        self.aim_y = y
+	def move_towards(self, x, y):
+		distance = math.dist((x, y), (self.center_x, self.center_y))
+		# The following calculation is necessary to have uniform speeds :
+		# We want the same speed no matter what the distance between the villager and where he needs to go is.
+		self.change_x = self.speed * (x - self.center_x) / distance  # Creates the x coordinate of a unit vector. Then we multiply it by the speed.
+		self.change_y = self.speed * (y - self.center_y) / distance  # Creates the y coordinate of a unit vector. Then we multiply it by the speed.
+		self.isMoving = True
+		self.aim_x = x
+		self.aim_y = y
 
 
 def main():
-    """ Main method """
-    window = MyGame()
-    window.setup()
-    arcade.run()
+	""" Main method """
+	game = AoCE()
+	game.setup()
+	arcade.run()
 
 
 if __name__ == "__main__":  # Python syntax that means "if you are launching from this file, run main()", useful if this file is going to be imported.
-    main()
+	main()
