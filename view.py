@@ -9,7 +9,7 @@ COIN_COUNT = 50
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Age Of Cheap Empire MGL"
+SCREEN_TITLE = "Age Of Cheap Empire"
 
 # Create a child class.
 class QuitButton(arcade.gui.UIFlatButton):
@@ -30,7 +30,7 @@ class MainView(arcade.View) :
 		#arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# ajoute l'image de background
-		self.texture = arcade.load_texture("./img/background.jpg")
+		self.texture = arcade.load_texture("./img/background.png")
 
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
@@ -106,7 +106,7 @@ class SettingsView(arcade.View) :
 		self.manager.enable()
 
 		# ajoute l'image de background
-		self.texture = arcade.load_texture("./img/background.jpg")
+		self.texture = arcade.load_texture("./img/background.png")
 
 		self.create_buttons()
 
