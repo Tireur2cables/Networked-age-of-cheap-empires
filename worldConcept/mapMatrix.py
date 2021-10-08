@@ -4,7 +4,9 @@ from objects.Unit import Unit, Villager
 from utils.vector import Vector
 
 rows, cols = (10, 10)
-
+# créer oobjet joueur joueur
+# on l'initialise avec début partie et ressources de base
+# créer objet map
 
 
 
