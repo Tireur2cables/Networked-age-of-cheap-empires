@@ -1,25 +1,33 @@
 from CONSTANTS import Resource
+from objects.EntityDisplay import Display
 
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, position, health, damage, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+	def __init__(self, position, health, damage, display, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
 		self.position = position
 		self.health = health
 		self.max_health = health
 		self.damage = damage
+		self.display = display #Nouveau Concept
 		self.rate_fire = rate_fire
 		self.range = range
 		self.melee_armor = melee_armor
 		self.pierce_armor = pierce_armor
 		self.line_sight = line_sight
+		
 
 	# coordonnees
+	def get_x(self):
+		return self.position.x
+	def get_y(self):
+		return self.position.y
 	def get_position(self):
 		return self.position
 
-	def set_position(self, position):
-		self.position = position
+	def set_position(self, x, y):
+		self.position.x = x
+		self.position.y = y
 
 	# health
 	def get_health(self):
