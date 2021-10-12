@@ -1,8 +1,5 @@
-import arcade as ar
-from arcade.color import COOL_GREY
-
+import arcade
 from .settings import TILE_SIZE
-
 
 
 
@@ -28,7 +25,26 @@ class World:
 
         return world
 
-    def grid_to_world(self):
+    def grid_to_world(self, grid_x, grid_y):
 
-        ar.create_isometric_grid_lines(800,600,8,8,COOL_GREY,4)
+        rect = [
+            (grid_x * TILE_SIZE, grid_y * TILE_SIZE),
+            (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE),
+            (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE),
+            (grid_x * TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE)
+        ]
 
+        iso_poly = [self.cart_to_iso(x, y) for x, y in rect]
+
+        out = {
+            "grid": [grid_x, grid_y],
+            "cart_rect": rect,
+            "iso_poly": iso_poly
+        }
+
+        return out
+
+    def cart_to_iso(self, x, y):
+        iso_x = x - y
+        iso_y = (x + y)/2
+        return iso_x, iso_y

@@ -1,8 +1,6 @@
 import arcade 
-import pygame as pg
-#cc les puputes
-from map.game import Game
 import os
+from arcade.color import BLUE, SKY_BLUE
 
 SPRITE_SCALING = 0.5
 
@@ -26,7 +24,7 @@ class MyGame(arcade.Window):
         """
         # Open a window in full screen mode. Remove fullscreen=True if
         # you don't want to start this way.
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, fullscreen=True)
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, fullscreen=False)
 
         # Set the working directory (where we expect to find files) to the same
         # directory this .py file is in. You can leave this out of your own
@@ -47,6 +45,7 @@ class MyGame(arcade.Window):
         """
         Render the screen.
         """
+        
 
         arcade.start_render()
 
@@ -54,16 +53,15 @@ class MyGame(arcade.Window):
         left, screen_width, bottom, screen_height = self.get_viewport()
 
         # Draw some boxes on the bottom so we can see how they change
-        for x in range(64, 800, 128):
-            y = 64
-            width = 128
-            height = 128
-            arcade.isometric_grid_to_screen(x,y,width,height,10,10)
+
+        
+
+        
             
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
-        if key == arcade.key.F10:
+        if key == arcade.key.F:
             # User hits f. Flip between full and not full screen.
             self.set_fullscreen(not self.fullscreen)
 
@@ -82,3 +80,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
