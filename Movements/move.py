@@ -10,8 +10,8 @@ SCREEN_HEIGHT = 600
 
 
 def isalmost(n, m, d=5):
-	"""Tests if n and m are close with a maximum distance of d"""
-	return abs(n - m) < d
+	"""Tests if vectors n and m are close with a maximum distance of d"""
+	return (n - m).norm() < d
 
 
 class AoCE(arcade.Window):
@@ -92,7 +92,11 @@ class Controller():
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 		for i in self.selection:
-			i.update()
+			print(i.change)
+			if not isalmost(i.pos, i.aim, i.speed): # If it is not close to where it aims, move.
+				i.center_x += i.change.x
+				i.center_y += i.change.y
+				i.pos = Vector(i.center_x, i.center_y)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		""" Handle Mouse Motion """
@@ -104,7 +108,7 @@ class Controller():
 		villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_villager_list())
 
 		for i in self.selection:
-			i.move_towards(mouse_position)
+			i.aim_towards(mouse_position)
 			print(mouse_position)
 
 		if villagers:
@@ -122,26 +126,13 @@ class DummyVillager(arcade.Sprite):
 		self.center_x, self.center_y = tuple(self.pos)  # Initial coordinates
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
 		self.change = Vector(0, 0)
-		self.isMoving = False  # Verify if the villager is moving
 		self.speed = 5  # Speed of the villager (should probably be a constant)
 
-	def update(self):
-		print(self.change)
-		if self.isMoving:
-			if isalmost(self.center_x, self.aim.x, self.speed):
-				self.change.x = 0  # If it is close to where it aims, stop moving.
-			if isalmost(self.center_y, self.aim.y, self.speed):
-				self.change.y = 0
-		self.center_x += self.change.x
-		self.center_y += self.change.y
-		self.pos = Vector(self.center_x, self.center_y)
-
-	def move_towards(self, v):
+	def aim_towards(self, aim):
+		self.aim = aim
 		# The following calculation is necessary to have uniform speeds :
-		self.aim = v
 		self.change = self.speed * ((self.aim - self.pos).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
-		self.isMoving = True
 
 
 def main():
