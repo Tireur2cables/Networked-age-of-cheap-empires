@@ -111,19 +111,50 @@ class SettingsView(arcade.View) :
 		self.create_buttons()
 
 	def create_buttons(self) :
-		# def button size
+		# def sizes
 		buttonsize = self.window.width / 6
-
+		checkboxsize = buttonsize / 2
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
 
-		music_button = arcade.gui.UIFlatButton(text="Activer/Désactiver la musique", width=buttonsize)# OR SettingsButton(...) but idk the goal this class (but it can be change without any pb)
-		self.v_box.add(music_button.with_space_around(bottom=20))
-		music_button.on_click = self.on_click_music # link the on_click method of the button with a fonction
+		# Create an UITextureButton
+		texture = arcade.load_texture("img/tick.png")
+		music_button = arcade.gui.UITextureButton(texture=texture, text="Musique", width=checkboxsize, height=checkboxsize)
+		self.music = True
 
-		retour_button = arcade.gui.UIFlatButton(text="Retour", width=buttonsize)# OR SettingsButton(...) but idk the goal this class (but it can be change without any pb)
+		# Handle Clicks
+		@music_button.event("on_click")
+		def on_click_music_button(event) :
+			print("Music checkbox pressed", event)
+			if self.music :
+				event.source.texture = arcade.load_texture("img/blanc.png")
+				self.music = False
+			else :
+				event.source.texture = arcade.load_texture("img/tick.png")
+				self.music = True
+
+		self.v_box.add(music_button.with_space_around(bottom=20))
+
+		fullscreen_button = arcade.gui.UITextureButton(texture=texture, text="Plein écran", width=checkboxsize, height=checkboxsize)
+		self.fullscreen = True
+
+		# Handle Clicks
+		@fullscreen_button.event("on_click")
+		def on_click_fullscreen_button(event) :
+			print("Fullscreen checkbox pressed", event)
+			if self.fullscreen :
+				event.source.texture = arcade.load_texture("img/blanc.png")
+				self.fullscreen = False
+			else :
+				event.source.texture = arcade.load_texture("img/tick.png")
+				self.fullscreen = True
+
+		self.v_box.add(fullscreen_button.with_space_around(bottom=20))
+
+
+		retour_button = arcade.gui.UIFlatButton(text="Retour", width=buttonsize)
 		self.v_box.add(retour_button.with_space_around(bottom=20))
-		retour_button.on_click = self.on_click_retour # link the on_click method of the button with a fonction
+		retour_button.on_click = self.on_click_retour # link the on_click method of the button to a fonction
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
