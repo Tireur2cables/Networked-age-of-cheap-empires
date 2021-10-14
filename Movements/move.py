@@ -1,7 +1,7 @@
 """ Example for AoE-like movements! """
 
 import arcade
-import math
+from utils.vector import Vector
 
 # --- Constants ---
 SPRITE_SCALING_COIN = 0.2
@@ -20,24 +20,28 @@ class AoCE(arcade.Window):
 		""" Initializer """
 		# Call the initializer of arcade.Window
 		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Age Of Cheap Empires TEST")
-		self.model = Model(self)
-		self.view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
-		self.controller = Controller(self)
+		self.game_model = Model(self)
+		self.game_view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
+		self.game_controller = Controller(self)
 
 		# Variables for communications between model, view and controller.
 		self.toDraw = []
+		arcade.set_background_color(arcade.color.AMAZON)
 
 	def setup(self):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		self.model.setup()
-		self.view.setup()
-		self.controller.setup()
+		self.game_model.setup()
+		self.game_view.setup()
+		self.game_controller.setup()
 
 	def on_update(self, *args):  # Redirecting on_update to the Controller
-		self.controller.on_update(*args)
+		self.game_controller.on_update(*args)
 
 	def on_mouse_press(self, *args):  # Redirecting inputs to the controller
-		self.controller.on_mouse_press(*args)
+		self.game_controller.on_mouse_press(*args)
+
+	def on_draw(self):
+		self.game_view.on_draw()
 
 
 class Model():
@@ -45,8 +49,7 @@ class Model():
 		self.game = aoce_game
 
 	def setup(self):
-		villager = DummyVillager(50, 50)
-		self.game.toDraw.append(villager)
+		pass
 
 
 class View():
@@ -59,14 +62,12 @@ class View():
 		# Show the mouse cursor
 		self.game.set_mouse_visible(True)
 
-		arcade.set_background_color(arcade.color.AMAZON)
-
 	def setup(self):
 		# Sprite list
 		self.villager_list = arcade.SpriteList()
 
 		# Set up the villager
-		self.villager = DummyVillager(50, 50)
+		self.villager = DummyVillager(Vector(50, 50))
 		self.villager_list.append(self.villager)
 
 	def on_draw(self):
@@ -74,21 +75,24 @@ class View():
 		arcade.start_render()
 		self.villager_list.draw()
 
+	def get_villager_list(self):
+		return self.villager_list
+
 
 class Controller():
 	def __init__(self, aoce_game):
 		self.game = aoce_game
 
 		# Selection (will be a Villager: an arcade.Sprite)
-		self.selection = None
+		self.selection = []
 
 	def setup(self):
 		pass
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
-		if self.selection:
-			self.selection.update()
+		for i in self.selection:
+			i.update()
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		""" Handle Mouse Motion """
@@ -96,48 +100,48 @@ class Controller():
 		pass
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
-		villagers = arcade.get_sprites_at_point((x, y), self.villager_list)
+		mouse_position = Vector(x, y)
+		villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_villager_list())
 
 		for i in self.selection:
-			self.selection.move_towards(x, y)
-			print(x, y)
+			i.move_towards(mouse_position)
+			print(mouse_position)
 
 		if villagers:
-			self.selection = villagers[0]  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
+			self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
 
 
 class DummyVillager(arcade.Sprite):
 	"""Classe correspondant aux villageois, à fusionner avec la vraie classe correspondant aux villageois"""
 
-	def __init__(self, x, y):
+	def __init__(self, pos):
 		# coin image from kenney.nl
 		self.image = "Movements/coin_01.png"  # This may cause an error depending on how the IDE is configurated. I now how to fix this but haven't implemented it for now.
 		super().__init__(self.image, SPRITE_SCALING_COIN, hit_box_algorithm="None")  # Associe un sprite au personnage. Le hit_box_algorithm à non c'est pour éviter
-		self.center_x = x  # Initial x coordinate
-		self.center_y = y  # Initial y coordinate
-		self.aim_x = 0  # x coordinate aimed by the user when he clicked
-		self.aim_y = 0  # y coordinate aimed by the user when he clicked
+		self.pos = pos
+		self.center_x, self.center_y = tuple(self.pos)  # Initial coordinates
+		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
+		self.change = Vector(0, 0)
 		self.isMoving = False  # Verify if the villager is moving
-		self.speed = 3  # Speed of the villager (should probably be a constant)
+		self.speed = 5  # Speed of the villager (should probably be a constant)
 
 	def update(self):
+		print(self.change)
 		if self.isMoving:
-			if isalmost(self.center_x, self.aim_x, 3):
-				self.change_x = 0  # If it is close to where it aims, stop moving.
-			if isalmost(self.center_y, self.aim_y, 3):
-				self.change_y = 0
-		self.center_x += self.change_x
-		self.center_y += self.change_y
+			if isalmost(self.center_x, self.aim.x, self.speed):
+				self.change.x = 0  # If it is close to where it aims, stop moving.
+			if isalmost(self.center_y, self.aim.y, self.speed):
+				self.change.y = 0
+		self.center_x += self.change.x
+		self.center_y += self.change.y
+		self.pos = Vector(self.center_x, self.center_y)
 
-	def move_towards(self, x, y):
-		distance = math.dist((x, y), (self.center_x, self.center_y))
+	def move_towards(self, v):
 		# The following calculation is necessary to have uniform speeds :
+		self.aim = v
+		self.change = self.speed * ((self.aim - self.pos).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
-		self.change_x = self.speed * (x - self.center_x) / distance  # Creates the x coordinate of a unit vector. Then we multiply it by the speed.
-		self.change_y = self.speed * (y - self.center_y) / distance  # Creates the y coordinate of a unit vector. Then we multiply it by the speed.
 		self.isMoving = True
-		self.aim_x = x
-		self.aim_y = y
 
 
 def main():
@@ -145,7 +149,3 @@ def main():
 	game = AoCE()
 	game.setup()
 	arcade.run()
-
-
-if __name__ == "__main__":  # Python syntax that means "if you are launching from this file, run main()", useful if this file is going to be imported.
-	main()
