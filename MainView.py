@@ -1,71 +1,33 @@
 # Imports
 import arcade
 import arcade.gui
-
+from CustomButtons import QuitButton, NextViewButton
 import random
-
-#############################################################
-#					Custom buttons							#
-#############################################################
-
-# Button to exit the game
-class QuitButton(arcade.gui.UIFlatButton):
-	def on_click(self, event: arcade.gui.UIOnClickEvent):
-		arcade.exit()
-
-# Button to return to the main menu
-class ReturnToMenuButton(arcade.gui.UIFlatButton):
-	def __init__(self, window, text, width):
-		super().__init__(text=text, width=width)
-		self.window = window
-
-	def on_click(self, event: arcade.gui.UIOnClickEvent):
-		print("Retour :", event)
-		main_view = MainView()
-		self.window.show_view(main_view)
-
 
 #############################################################
 #						Main View							#
 #############################################################
 
+# Constants
+BACKGROUND = "./img/background.png"
+
 # View d'accueil : première à etre affichée à l'écran
 class MainView(arcade.View) :
+
 	def on_show(self):
 		""" This is run once when we switch to this view """
 		#arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# ajoute l'image de background
-		self.texture = arcade.load_texture("./img/background.png")
+		self.texture = arcade.load_texture(BACKGROUND)
 
-		# a UIManager to handle the UI.
+		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 		self.manager.enable()
 
-		#on appel la fonction pour afficher les bouttons de bases
-		self.create_buttons()
+		self.setupButtons()
 
-
-	def on_draw(self):
-		""" Draw this view """
-		arcade.start_render()
-		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
-		#arcade.draw_text("Instructions Screen", self.window.width / 2, self.window.height / 2, arcade.color.WHITE, font_size=50, anchor_x="center")
-		#arcade.draw_text("Click to advance", self.window.width / 2, self.window.height / 2-75, arcade.color.WHITE, font_size=20, anchor_x="center")
-		self.manager.draw()
-
-	def on_hide_view(self) :
-		self.manager.disable()
-
-	def on_click_start(self, event):
-		print("Start:", event)
-		""" If the user presses the mouse button, start the game. """
-		game_view = GameView()
-		game_view.setup()
-		self.window.show_view(game_view)
-
-
-	def create_buttons(self):
+	def setupButtons(self):
 		# def button size
 		buttonsize = self.window.width / 6
 
@@ -73,13 +35,11 @@ class MainView(arcade.View) :
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the buttons
-		start_button = arcade.gui.UIFlatButton(text="Start Game", width=buttonsize)
+		start_button = NextViewButton(self.window, GameView(), text="Start Game", width=buttonsize)
 		self.v_box.add(start_button.with_space_around(bottom=20))
-		start_button.on_click = self.on_click_start # link the on_click method of the button with a fonction
 
-		settings_button = arcade.gui.UIFlatButton(text="Settings", width=buttonsize)# OR SettingsButton(...) but idk the goal this class (but it can be change without any pb)
+		settings_button = NextViewButton(self.window, SettingsView(), text="Settings", width=buttonsize)
 		self.v_box.add(settings_button.with_space_around(bottom=20))
-		settings_button.on_click = self.on_click_settings # link the on_click method of the button with a fonction
 
 		# Again, method 1. Use a child class to handle events.
 		quit_button = QuitButton(text="Quit", width=buttonsize)
@@ -88,17 +48,22 @@ class MainView(arcade.View) :
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
-				anchor_x = "left",
-				align_x = buttonsize,
-				anchor_y="center_y",
-				child=self.v_box
-			)
+			anchor_x = "left",
+			align_x = buttonsize,
+			anchor_y="center_y",
+			child=self.v_box
 		)
+	)
 
-	def on_click_settings(self, event):
-		print("Settings:", event)
-		settings_view = SettingsView()
-		self.window.show_view(settings_view)
+	def on_draw(self):
+		""" Draw this view """
+
+		arcade.start_render()
+		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
+		self.manager.draw()
+
+	def on_hide_view(self) :
+		self.manager.disable()
 
 #############################################################
 #						Settings View						#
@@ -110,20 +75,20 @@ class SettingsView(arcade.View) :
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
+		# ajoute l'image de background
+		self.texture = arcade.load_texture("./img/background.png")
 
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 		self.manager.enable()
 
-		# ajoute l'image de background
-		self.texture = arcade.load_texture("./img/background.png")
+		self.setupButtons()
 
-		self.create_buttons()
-
-	def create_buttons(self) :
+	def setupButtons(self) :
 		# def sizes
 		buttonsize = self.window.width / 6
 		checkboxsize = buttonsize / 2
+
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
 
@@ -161,7 +126,7 @@ class SettingsView(arcade.View) :
 
 		self.v_box.add(fullscreen_button.with_space_around(bottom=20))
 
-		retour_button = ReturnToMenuButton(self.window, text="Retour", width=buttonsize)
+		retour_button = NextViewButton(self.window, MainView(), text="Retour", width=buttonsize)
 		self.v_box.add(retour_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -183,9 +148,6 @@ class SettingsView(arcade.View) :
 
 		self.manager.draw()
 
-
-	def on_click_music(self, event) :
-		print("Music :", event)
 
 	def on_hide_view(self) :
 		self.manager.disable()
@@ -218,13 +180,12 @@ class GameView(arcade.View):
 		self.player_sprite = None
 		self.score = 0
 
+	def on_show(self):
+		""" Set up the game and initialize the variables. """
+		arcade.set_background_color(arcade.color.AMAZON)
+		
 		# Don't show the mouse cursor
 		self.window.set_mouse_visible(False)
-
-		arcade.set_background_color(arcade.color.AMAZON)
-
-	def setup(self):
-		""" Set up the game and initialize the variables. """
 
 		# Sprite lists
 		self.player_list = arcade.SpriteList()
