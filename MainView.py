@@ -1,7 +1,7 @@
 # Imports
 import arcade
 import arcade.gui
-from CustomButtons import QuitButton, NextViewButton
+from CustomButtons import QuitButton, NextViewButton, CheckboxButton
 import random
 
 #############################################################
@@ -93,37 +93,10 @@ class SettingsView(arcade.View) :
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create an UITextureButton
-		texture = arcade.load_texture("img/tick.png")
-		music_button = arcade.gui.UITextureButton(texture=texture, text="Musique", width=checkboxsize, height=checkboxsize)
-		self.music = True
-
-		# Handle Clicks
-		@music_button.event("on_click")
-		def on_click_music_button(event) :
-			print("Music checkbox pressed", event)
-			if self.music :
-				event.source.texture = arcade.load_texture("img/blanc.png")
-				self.music = False
-			else :
-				event.source.texture = arcade.load_texture("img/tick.png")
-				self.music = True
-
+		music_button = CheckboxButton(self.window, text="Musique", size=checkboxsize)
 		self.v_box.add(music_button.with_space_around(bottom=20))
 
-		fullscreen_button = arcade.gui.UITextureButton(texture=texture, text="Plein écran", width=checkboxsize, height=checkboxsize)
-		self.fullscreen = True
-
-		# Handle Clicks
-		@fullscreen_button.event("on_click")
-		def on_click_fullscreen_button(event) :
-			print("Fullscreen checkbox pressed", event)
-			if self.fullscreen :
-				event.source.texture = arcade.load_texture("img/blanc.png")
-				self.fullscreen = False
-			else :
-				event.source.texture = arcade.load_texture("img/tick.png")
-				self.fullscreen = True
-
+		fullscreen_button = CheckboxButton(self.window, text="Plein écran", size=checkboxsize)
 		self.v_box.add(fullscreen_button.with_space_around(bottom=20))
 
 		retour_button = NextViewButton(self.window, MainView(), text="Retour", width=buttonsize)
@@ -183,7 +156,7 @@ class GameView(arcade.View):
 	def on_show(self):
 		""" Set up the game and initialize the variables. """
 		arcade.set_background_color(arcade.color.AMAZON)
-		
+
 		# Don't show the mouse cursor
 		self.window.set_mouse_visible(False)
 
