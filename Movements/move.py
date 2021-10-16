@@ -45,45 +45,48 @@ class AoCE(arcade.Window):
 
 
 class Model():
+
 	def __init__(self, aoce_game):
 		self.game = aoce_game
+		self.entity_list = []
 
 	def setup(self):
-		pass
+		# Set up the villager and add it to the entity_list.
+		self.entity_list.append(DummyVillager(Vector(50, 50)))
 
 
 class View():
+
 	def __init__(self, aoce_game):
 		self.game = aoce_game
 
 		# Variables that will hold sprite lists
-		self.villager_list = None
+		self.sprite_list = arcade.SpriteList()
 
 		# Show the mouse cursor
 		self.game.set_mouse_visible(True)
 
 	def setup(self):
-		# Sprite list
-		self.villager_list = arcade.SpriteList()
-
-		# Set up the villager
-		self.villager = DummyVillager(Vector(50, 50))
-		self.villager_list.append(self.villager)
+		for index, item in enumerate(self.game.game_model.entity_list):
+			# coin image from kenney.nl
+			self.sprite_list.append(EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.pos.x, center_y=item.pos.y, hit_box_algorithm="None"))
+		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
+		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
 	def on_draw(self):
 		""" Draw everything """
 		arcade.start_render()
-		self.villager_list.draw()
+		self.sprite_list.draw()
 
-	def get_villager_list(self):
-		return self.villager_list
+	def get_sprite_list(self):
+		return self.sprite_list
 
 
 class Controller():
 	def __init__(self, aoce_game):
 		self.game = aoce_game
 
-		# Selection (will be a Villager: an arcade.Sprite)
+		# Selection (will be an EntitySprite)
 		self.selection = []
 
 	def setup(self):
@@ -91,12 +94,12 @@ class Controller():
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
-		for i in self.selection:
-			print(i.change)
-			if not isalmost(i.pos, i.aim, i.speed): # If it is not close to where it aims, move.
-				i.center_x += i.change.x
-				i.center_y += i.change.y
-				i.pos = Vector(i.center_x, i.center_y)
+		print(delta_time)
+		for sprite in self.selection:
+			entity = sprite.entity
+			if not isalmost(entity.pos, entity.aim, entity.speed):  # If it is not close to where it aims, move.
+				entity.pos += entity.change
+				sprite.center_x, sprite.center_y = tuple(entity.pos)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		""" Handle Mouse Motion """
@@ -104,24 +107,21 @@ class Controller():
 		pass
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
+		villagers = arcade.get_sprites_at_point(x, y, self.game.game_view.get_sprite_list())
 		mouse_position = Vector(x, y)
-		villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_villager_list())
 
 		for i in self.selection:
-			i.aim_towards(mouse_position)
+			i.entity.aim_towards(mouse_position)
 			print(mouse_position)
 
 		if villagers:
 			self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
 
 
-class DummyVillager(arcade.Sprite):
+class DummyVillager():
 	"""Classe correspondant aux villageois, à fusionner avec la vraie classe correspondant aux villageois"""
 
 	def __init__(self, pos):
-		# coin image from kenney.nl
-		self.image = "Movements/coin_01.png"  # This may cause an error depending on how the IDE is configurated. I now how to fix this but haven't implemented it for now.
-		super().__init__(self.image, SPRITE_SCALING_COIN, hit_box_algorithm="None")  # Associe un sprite au personnage. Le hit_box_algorithm à non c'est pour éviter
 		self.pos = pos
 		self.center_x, self.center_y = tuple(self.pos)  # Initial coordinates
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
@@ -133,6 +133,15 @@ class DummyVillager(arcade.Sprite):
 		# The following calculation is necessary to have uniform speeds :
 		self.change = self.speed * ((self.aim - self.pos).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
+
+
+# Wrapper for arcade.Sprite that enables us to access the entity from the sprite.
+class EntitySprite(arcade.Sprite):
+
+	def __init__(self, index, entity, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.entity = entity
+		self.index = index
 
 
 def main():
