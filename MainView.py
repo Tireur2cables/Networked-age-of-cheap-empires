@@ -42,7 +42,7 @@ class MainView(arcade.View) :
 		self.v_box.add(settings_button.with_space_around(bottom=20))
 
 		# Again, method 1. Use a child class to handle events.
-		quit_button = QuitButton(text="Quit", width=buttonsize)
+		quit_button = QuitButton(self.window, text="Quit", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -91,12 +91,12 @@ class SettingsView(arcade.View) :
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
-
+		print(self.window.media_player.playing)
 		# Create an UITextureButton
-		music_button = CheckboxButton(self.window, text="Musique", size=checkboxsize)
+		music_button = CheckboxButton(self.window, text="Musique", size=checkboxsize, ticked=self.window.media_player.playing, music=True)
 		self.v_box.add(music_button.with_space_around(bottom=20))
 
-		fullscreen_button = CheckboxButton(self.window, text="Plein écran", size=checkboxsize)
+		fullscreen_button = CheckboxButton(self.window, text="Plein écran", size=checkboxsize, ticked=self.window.fullscreen, fullscreen=True)
 		self.v_box.add(fullscreen_button.with_space_around(bottom=20))
 
 		retour_button = NextViewButton(self.window, MainView(), text="Retour", width=buttonsize)

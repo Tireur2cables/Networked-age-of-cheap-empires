@@ -11,8 +11,12 @@ textureEmpty = "img/empty.png"
 
 # Button to exit the game
 class QuitButton(arcade.gui.UIFlatButton) :
+	def __init__(self, window, text, width) :
+		super().__init__(text=text, width=width)
+		self.window = window
+
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		arcade.exit()
+		self.window.exit()
 
 # Button to return to the main menu
 class NextViewButton(arcade.gui.UIFlatButton) :
@@ -28,16 +32,21 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 
 # CheckboxButton
 class CheckboxButton(arcade.gui.UITextureButton) :
-	def __init__(self, window, text, size) :
-		super().__init__(texture=arcade.load_texture(textureTicked), text=text, width=size, height=size)
+	def __init__(self, window, text, size, ticked=True, music=False, fullscreen=False) :
+		super().__init__(texture=arcade.load_texture(textureTicked if ticked else textureEmpty), text=text, width=size, height=size)
 		self.window = window
-		self.ticked = True
+		self.ticked = ticked
+		self.music = music
+		self.fullscreen = fullscreen
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		print("Checkbox : ", event)
-		if self.ticked :
-			self.texture = arcade.load_texture(textureEmpty)
-			self.ticked = False
-		else :
-			self.texture = arcade.load_texture(textureTicked)
-			self.ticked = True
+
+		self.texture = arcade.load_texture(textureEmpty if self.ticked else textureTicked)
+
+		self.ticked = not self.ticked
+
+		if self.music :
+			self.window.triggerMusic()
+		elif self.fullscreen :
+			self.window.triggerFullscreen()

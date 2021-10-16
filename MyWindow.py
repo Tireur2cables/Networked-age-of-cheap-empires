@@ -15,21 +15,22 @@ class MyWindow(arcade.Window):
 		# Lance la musique
 		self.my_music = arcade.load_sound(MUSIC, streaming=True)
 		self.media_player = self.my_music.play(loop=True)
-		#self.media_player.push_handlers(on_eos=self.music_over)
-
-		# Stop la musique
-		#self.media_player.stop()
 
 		# affiche la souris
 		self.set_mouse_visible(True)
 
-	# def music_over(self):
-		# self.media_player.pop_handlers()
-		# self.media_player = None
-		# #self.sound_button_off()
-		# self.cur_song_index += 1
-		# if self.cur_song_index >= len(self.songs):
-		# 	self.cur_song_index = 0
-		# self.my_music = arcade.load_sound(MUSIC)
-		# self.media_player = self.my_music.play()
-		# self.media_player.push_handlers(on_eos=self.music_over)
+	# Stop all process and exit arcade
+	def exit(self) :
+		self.media_player.delete()
+		arcade.exit()
+
+	# Stop or play the music
+	def triggerMusic(self) :
+		if self.media_player.playing :
+			self.media_player.pause()
+		else :
+			self.media_player.play()
+
+	# Set fulllscreen or 800 x 600
+	def triggerFullscreen(self) :
+		self.set_fullscreen(not self.fullscreen)
