@@ -1,5 +1,3 @@
-""" Example for AoE-like movements! """
-
 import arcade
 from utils.vector import Vector
 from objects.Entity import Entity
@@ -117,23 +115,6 @@ class Controller():
 
 		if villagers:
 			self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
-
-
-# class DummyVillager():
-# 	"""Classe correspondant aux villageois, à fusionner avec la vraie classe correspondant aux villageois"""
-
-# 	def __init__(self, position):
-# 		self.position = position
-# 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
-# 		self.change = Vector(0, 0)
-# 		self.speed = 5  # Speed of the villager (should probably be a constant)
-
-# 	def aim_towards(self, aim):
-# 		self.aim = aim
-# 		# The following calculation is necessary to have uniform speeds :
-# 		self.change = self.speed * ((self.aim - self.position).normalized())
-# 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
-
 
 def main():
 	""" Main method """
