@@ -2,6 +2,8 @@
 
 import arcade
 from utils.vector import Vector
+from objects.Entity import Entity
+from objects.EntitySprite import EntitySprite
 
 # --- Constants ---
 SPRITE_SCALING_COIN = 0.2
@@ -52,7 +54,7 @@ class Model():
 
 	def setup(self):
 		# Set up the villager and add it to the entity_list.
-		self.entity_list.append(DummyVillager(Vector(50, 50)))
+		self.entity_list.append(Entity(Vector(50, 50), 10, 10))
 
 
 class View():
@@ -69,7 +71,7 @@ class View():
 	def setup(self):
 		for index, item in enumerate(self.game.game_model.entity_list):
 			# coin image from kenney.nl
-			self.sprite_list.append(EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.pos.x, center_y=item.pos.y, hit_box_algorithm="None"))
+			self.sprite_list.append(EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None"))
 		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
 		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
@@ -94,12 +96,11 @@ class Controller():
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
-		print(delta_time)
 		for sprite in self.selection:
 			entity = sprite.entity
-			if not isalmost(entity.pos, entity.aim, entity.speed):  # If it is not close to where it aims, move.
-				entity.pos += entity.change
-				sprite.center_x, sprite.center_y = tuple(entity.pos)
+			if not isalmost(entity.position, entity.aim, entity.speed):  # If it is not close to where it aims, move.
+				entity.position += entity.change
+				sprite.center_x, sprite.center_y = tuple(entity.position)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		""" Handle Mouse Motion """
@@ -107,8 +108,8 @@ class Controller():
 		pass
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
-		villagers = arcade.get_sprites_at_point(x, y, self.game.game_view.get_sprite_list())
 		mouse_position = Vector(x, y)
+		villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_sprite_list())
 
 		for i in self.selection:
 			i.entity.aim_towards(mouse_position)
@@ -118,30 +119,20 @@ class Controller():
 			self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
 
 
-class DummyVillager():
-	"""Classe correspondant aux villageois, à fusionner avec la vraie classe correspondant aux villageois"""
+# class DummyVillager():
+# 	"""Classe correspondant aux villageois, à fusionner avec la vraie classe correspondant aux villageois"""
 
-	def __init__(self, pos):
-		self.pos = pos
-		self.center_x, self.center_y = tuple(self.pos)  # Initial coordinates
-		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
-		self.change = Vector(0, 0)
-		self.speed = 5  # Speed of the villager (should probably be a constant)
+# 	def __init__(self, position):
+# 		self.position = position
+# 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
+# 		self.change = Vector(0, 0)
+# 		self.speed = 5  # Speed of the villager (should probably be a constant)
 
-	def aim_towards(self, aim):
-		self.aim = aim
-		# The following calculation is necessary to have uniform speeds :
-		self.change = self.speed * ((self.aim - self.pos).normalized())
-		# We want the same speed no matter what the distance between the villager and where he needs to go is.
-
-
-# Wrapper for arcade.Sprite that enables us to access the entity from the sprite.
-class EntitySprite(arcade.Sprite):
-
-	def __init__(self, index, entity, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.entity = entity
-		self.index = index
+# 	def aim_towards(self, aim):
+# 		self.aim = aim
+# 		# The following calculation is necessary to have uniform speeds :
+# 		self.change = self.speed * ((self.aim - self.position).normalized())
+# 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
 
 
 def main():
