@@ -105,7 +105,6 @@ class Controller():
 			mouse_position = Vector(x, y)
 			villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_sprite_list())
 
-
 			for i in self.selection:
 				i.entity.aim_towards(mouse_position)
 				print(mouse_position)
