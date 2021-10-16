@@ -101,15 +101,17 @@ class Controller():
 		pass
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
-		mouse_position = Vector(x, y)
-		villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_sprite_list())
+		if button == arcade.MOUSE_BUTTON_LEFT:
+			mouse_position = Vector(x, y)
+			villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_sprite_list())
 
-		for i in self.selection:
-			i.entity.aim_towards(mouse_position)
-			print(mouse_position)
 
-		if villagers:
-			self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
+			for i in self.selection:
+				i.entity.aim_towards(mouse_position)
+				print(mouse_position)
+
+			if villagers:
+				self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
 
 
 def main():
