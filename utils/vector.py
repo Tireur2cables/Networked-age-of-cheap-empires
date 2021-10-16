@@ -61,3 +61,7 @@ class Vector():
 	def normalized(self):
 		"""Normalize the vector: Convert a vector into a unit vector."""
 		return self / self.norm()
+
+	def isalmost(self, other, d=5):
+		"""Tests if vectors n and m are close with a maximum distance of d"""
+		return (self - other).norm() < d

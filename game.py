@@ -9,11 +9,6 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 
-def isalmost(n, m, d=5):
-	"""Tests if vectors n and m are close with a maximum distance of d"""
-	return (n - m).norm() < d
-
-
 class AoCE(arcade.Window):
 
 	def __init__(self):
@@ -96,7 +91,7 @@ class Controller():
 		""" Movement and game logic """
 		for sprite in self.selection:
 			entity = sprite.entity
-			if not isalmost(entity.position, entity.aim, entity.speed):  # If it is not close to where it aims, move.
+			if not entity.position.isalmost(entity.aim, entity.speed):  # If it is not close to where it aims, move.
 				entity.position += entity.change
 				sprite.center_x, sprite.center_y = tuple(entity.position)
 
@@ -115,6 +110,7 @@ class Controller():
 
 		if villagers:
 			self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
+
 
 def main():
 	""" Main method """
