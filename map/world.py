@@ -1,5 +1,5 @@
 import arcade
-from .settings import TILE_SIZE
+from settings import TILE_SIZE
 
 
 

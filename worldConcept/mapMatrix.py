@@ -20,6 +20,7 @@ lol = True
 ##	Position : 
 ##
 #
+
 #vill.set_position(0,0)
 arr = [[(0,None,False) for i in range(cols)] for j in range(rows)]
 
