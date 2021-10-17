@@ -10,7 +10,7 @@ SPRITE_SCALING_COIN = 0.2
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
-MUSIC = "music/logon_aoe_music3s.wav"
+MUSIC = "./Ressources/music/logon_aoe_music3s.wav"
 
 #########################################################################
 #							MAIN CLASS									#
@@ -53,6 +53,10 @@ class AoCE() :
 		arcade.exit()
 
 
+#########################################################################
+#							MODEL CLASS									#
+#########################################################################
+
 class Model() :
 
 	def __init__(self, aoce_game) :
@@ -68,6 +72,9 @@ class Model() :
 		# self.entity_list.append(unit2)
 		pass
 
+#########################################################################
+#							VIEW CLASS									#
+#########################################################################
 
 class View(arcade.Window) :
 
@@ -123,6 +130,10 @@ class View(arcade.Window) :
 	# def get_sprite_list(self):
 	# 	return self.sprite_list
 
+#########################################################################
+#							CONTROLLER CLASS							#
+#########################################################################
+
 class Controller() :
 	def __init__(self, aoce_game) :
 		""" Initializer """
@@ -163,8 +174,8 @@ class Controller() :
 
 
 
-
-def main():
+# Main function to launche the game
+def main() :
 	""" Main method """
 	game = AoCE()
 	game.setup()

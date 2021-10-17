@@ -9,8 +9,7 @@ import random
 #############################################################
 
 # Constants
-BACKGROUND = "./img/background.png"
-SETTINGS_BACKGROUND = "./img/LastImageSettings.jpg"
+BACKGROUND = "./Ressources/img/background.png"
 
 # View d'accueil : première à etre affichée à l'écran
 class MainView(arcade.View) :
@@ -68,6 +67,9 @@ class MainView(arcade.View) :
 #############################################################
 #						Settings View						#
 #############################################################
+
+# Constants
+SETTINGS_BACKGROUND = "./Ressources/img/LastImageSettings.jpg"
 
 # View des paramètres accessible via ecran d'accueil
 class SettingsView(arcade.View) :
