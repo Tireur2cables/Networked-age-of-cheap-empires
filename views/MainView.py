@@ -1,7 +1,7 @@
 # Imports
 import arcade
 import arcade.gui
-from CustomButtons import QuitButton, NextViewButton, CheckboxButton
+from views.CustomButtons import QuitButton, NextViewButton, CheckboxButton
 import random
 
 #############################################################
@@ -91,22 +91,22 @@ class SettingsView(arcade.View) :
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
-		print(self.window.media_player.playing)
-		# Create an UITextureButton
-		music_button = CheckboxButton(self.window, text="Musique", size=checkboxsize, ticked=self.window.media_player.playing, music=True)
+
+		# Create checkboxes
+		music_button = CheckboxButton(self.window, text="Musique", size=checkboxsize, ticked=self.window.isPlayingMusic(), music=True)
 		self.v_box.add(music_button.with_space_around(bottom=20))
 
 		fullscreen_button = CheckboxButton(self.window, text="Plein écran", size=checkboxsize, ticked=self.window.fullscreen, fullscreen=True)
 		self.v_box.add(fullscreen_button.with_space_around(bottom=20))
 
+		# Create the return menu
 		retour_button = NextViewButton(self.window, MainView(), text="Retour", width=buttonsize)
 		self.v_box.add(retour_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
-				anchor_x = "left",
-				align_x = buttonsize,
+				anchor_x = "center_x",
 				anchor_y="center_y",
 				child=self.v_box
 			)
