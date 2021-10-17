@@ -12,16 +12,22 @@ CHARACTER_SCALING = 1
 TILE_SCALING = 1
 TILE_SIZE = 64
 
+CAMERA_MOVE_STEP = 15
+CAMERA_MOVE_EDGE = 50
+
 class MapView(arcade.View) :
 
 	def on_show(self) :
 		""" This is run once when we switch to this view """
 
 		self.camera = arcade.Camera(self.window.width, self.window.height)
-		initial_x, initial_y = self.cart_to_iso(0, 0)
-		self.mouse_x = initial_x
-		self.mouse_y = initial_y
+		initial_x, initial_y = self.cart_to_iso(0, 0)		
+		self.camera_x = initial_x
+		self.camera_y = initial_y
 
+		#coords of the mouse in the middle of the screen by default (and will be update when the mouse will move)
+		self.mouse_x = self.window.width/2
+		self.mouse_y = self.window.height/2
 		#self.set_mouse_visible(False)
 
 		arcade.set_background_color(arcade.csscolor.YELLOW_GREEN)
@@ -74,24 +80,30 @@ class MapView(arcade.View) :
 		iso_y = (x + y)/2
 		return iso_x, iso_y
 
+	def camera_move(self):
+		#update the camera coords if the mouse is on the edges
+		#the moving of the camera is in the on_draw() function with move_to()
+		if self.mouse_x >= self.window.width - CAMERA_MOVE_EDGE:
+			self.camera_x += CAMERA_MOVE_STEP
+		elif self.mouse_x <= CAMERA_MOVE_EDGE:
+			self.camera_x -= CAMERA_MOVE_STEP
+		if self.mouse_y <= CAMERA_MOVE_EDGE:
+			self.camera_y -= CAMERA_MOVE_STEP
+		elif self.mouse_y >= self.window.height - CAMERA_MOVE_EDGE:
+			self.camera_y += CAMERA_MOVE_STEP
+
 	def on_mouse_motion(self, x, y, dx, dy) :
 		"""Called whenever the mouse moves."""
-		if x >= self.window.width-5 :
-			self.mouse_x += 40
-		elif x == 0 :
-			self.mouse_x -= 40
-		elif y == 0 :
-			self.mouse_y -= 40
-		elif y >= self.window.height-5 :
-			self.mouse_y += 40
-
-		self.camera.move_to([self.mouse_x, self.mouse_y])
+		#update the coords of the mouse
+		self.mouse_x = x
+		self.mouse_y = y
 
 	def on_draw(self):
 		"""Render the screen."""
 		arcade.start_render()
 		self.camera.use()
-		self.camera.move([self.mouse_x, self.mouse_y])
+		self.camera_move()
+		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
 		self.ground_list.draw()
 		self.manager.draw()
 
