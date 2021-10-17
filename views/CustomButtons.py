@@ -2,8 +2,8 @@
 import arcade.gui
 
 # Constants
-textureTicked = "img/tick.png"
-textureEmpty = "img/empty.png"
+textureTicked = "Ressources/img/tick.png"
+textureEmpty = "Ressources/img/empty.png"
 
 #############################################################
 #					Custom buttons							#
