@@ -1,7 +1,7 @@
 import arcade
 import sys
-from .world import World
-from .settings import TILE_SIZE
+from world import World
+from settings import TILE_SIZE
 
 
 class Game:

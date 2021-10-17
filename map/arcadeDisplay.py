@@ -27,11 +27,12 @@ class MyGame(arcade.Window):
         """Render the screen."""
 
         arcade.start_render()
+        origin=[400, 300]
         # arcade.draw_polygon_outline(Coordinates(), BLACK, 3)
-        arcade.draw_polygon_outline(IsoCoordinates(), RED, 3)
-        arcade.draw_polygon_outline(borders(), GREEN, 4)
+        arcade.draw_polygon_outline(IsoCoordinates(origin), RED, 3)
+        arcade.draw_polygon_outline(borders(origin), GREEN, 4)
         # Code to draw the screen goes here
-        origin=[0, 0]
+        
         size=8
         cellSize=20
         hw = cellSize*size
