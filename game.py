@@ -96,6 +96,11 @@ class View(arcade.Window) :
 		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
 		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
+	# Trigger the exit function of the game
+	def exit(self) :
+		self.game.exit()
+
+	# Return if the game is playing music
 	def isPlayingMusic(self) :
 		return self.game.media_player.playing
 
