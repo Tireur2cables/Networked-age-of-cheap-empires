@@ -2,6 +2,7 @@
 import arcade
 import arcade.gui
 from views.CustomButtons import QuitButton, NextViewButton, CheckboxButton
+from map.displayTestDissi import MapView
 import random
 
 #############################################################
@@ -37,22 +38,24 @@ class MainView(arcade.View) :
 		start_button = NextViewButton(self.window, GameView(), text="Start Game", width=buttonsize)
 		self.v_box.add(start_button.with_space_around(bottom=20))
 
+		map_button = NextViewButton(self.window, MapView(), text="Show Map", width=buttonsize)
+		self.v_box.add(map_button.with_space_around(bottom=20))
+
 		settings_button = NextViewButton(self.window, SettingsView(), text="Settings", width=buttonsize)
 		self.v_box.add(settings_button.with_space_around(bottom=20))
 
-		# Again, method 1. Use a child class to handle events.
 		quit_button = QuitButton(self.window, text="Quit", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
-			anchor_x = "left",
-			align_x = buttonsize,
-			anchor_y="center_y",
-			child=self.v_box
+				anchor_x = "left",
+				align_x = buttonsize,
+				anchor_y = "center_y",
+				child = self.v_box
+			)
 		)
-	)
 
 	def on_draw(self):
 		""" Draw this view """
@@ -77,6 +80,7 @@ class SettingsView(arcade.View) :
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
+
 		# ajoute l'image de background
 		self.texture = arcade.load_texture(SETTINGS_BACKGROUND)
 
@@ -109,8 +113,8 @@ class SettingsView(arcade.View) :
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x = "center_x",
-				anchor_y="center_y",
-				child=self.v_box
+				anchor_y = "center_y",
+				child = self.v_box
 			)
 		)
 

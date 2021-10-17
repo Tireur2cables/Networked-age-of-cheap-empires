@@ -1,83 +1,99 @@
+# Imports
 import arcade
+import arcade.gui
+from views.CustomButtons import QuitButton
+
+#############################################################
+#					MAP VIEW								#
+#############################################################
 
 # Constants
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 768
-SCREEN_TITLE = "Display Test (by Thomas)"
 CHARACTER_SCALING = 1
 TILE_SCALING = 1
 TILE_SIZE = 64
-OFFSET = 4*SCREEN_WIDTH//3
-def cart_to_iso(x, y):
-        iso_x = x - y
-        iso_y = (x + y)/2
-        return iso_x, iso_y
-class MyGame(arcade.Window):
-    """
-    Main application class.
-    """
 
-    def __init__(self):
+class MapView(arcade.View) :
 
-        # Call the parent class and set up the window
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+	def on_show(self) :
+		""" This is run once when we switch to this view """
 
-        self.camera = None
-        self.mouse_x = None
-        self.mouse_y = None
-        self.set_mouse_visible(False)
+		self.camera = arcade.Camera(self.window.width, self.window.height)
+		initial_x, initial_y = self.cart_to_iso(0, 0)
+		self.mouse_x = initial_x
+		self.mouse_y = initial_y
 
-        arcade.set_background_color(arcade.csscolor.YELLOW_GREEN)
+		#self.set_mouse_visible(False)
 
-    def on_mouse_motion(self, x, y, dx, dy):
-        """
-        Called whenever the mouse moves.
-        """
-        self.x = x
-        self.y = y
-        self.camera.move_to([self.x,self.y])
+		arcade.set_background_color(arcade.csscolor.YELLOW_GREEN)
 
+		# a UIManager to handle the UI.
+		self.manager = arcade.gui.UIManager()
+		self.manager.enable()
 
-    def cart_to_iso(x, y):
-        iso_x = x - y
-        iso_y = (x + y)/2
-        return iso_x, iso_y
+		self.generateMap()
 
-    def setup(self):
-        """Set up the game here. Call this function to restart the game."""
-        self.ground_list = arcade.SpriteList(use_spatial_hash=True)
-        self.camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
-    
-        for x in range(0 + OFFSET, SCREEN_WIDTH + OFFSET, 40):
-            for y in range(0, SCREEN_WIDTH, 40):
-                isox, isoy = cart_to_iso(x,y)
-                ground = arcade.Sprite("./map/Tiles/Tiles/ts_grass0/straight/225/0.png", TILE_SCALING)
-                ground.center_x = isox
-                ground.center_y = isoy
-                self.ground_list.append(ground)
-        pass
-    def on_mouse_motion(self, x, y, dx, dy):
-        self.mouse_x = x
-        self.mouse_y = y
-        self.camera.move_to([self.mouse_x,self.mouse_y])
-    def on_draw(self):
-        """Render the screen."""
-        self.camera.use()
-        self.clear()
-        arcade.start_render()
-        self.ground_list.draw()
-        # Code to draw the screen goes here
-    # def on_update(self, delta_time):
-    #     self.camera.move_to([self.mouse_x,self.mouse_y])
-    #     self.camera.update()
+		self.addButton()
 
+	def generateMap(self) :
+		# def offset
+		#offset = 4 * self.window.width // 3
 
-def main():
-    """Main function"""
-    window = MyGame()
-    window.setup()
-    arcade.run()
+		self.ground_list = arcade.SpriteList(use_spatial_hash=True)
 
+		for x in range(0, self.window.width, 40) :
+			for y in range(0, self.window.width, 40) :
+				isox, isoy = self.cart_to_iso(x, y)
+				ground = arcade.Sprite("./map/Tiles/Tiles/ts_grass0/straight/225/0.png", TILE_SCALING)
+				ground.center_x = isox
+				ground.center_y = isoy
+				self.ground_list.append(ground)
 
-if __name__ == "__main__":
-    main()
+	def addButton(self) :
+		# def button size
+		buttonsize = self.window.width / 6
+
+		# Create a vertical BoxGroup to align buttons
+		self.v_box = arcade.gui.UIBoxLayout()
+
+		# Create the exit button
+		quit_button = QuitButton(self.window, text="Quit", width=buttonsize)
+		self.v_box.add(quit_button)
+
+		# Create a widget to hold the v_box widget, that will center the buttons
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x = "left",
+				anchor_y = "bottom",
+				child = self.v_box
+			)
+		)
+
+	# Convert cartesian coordinates to isometric
+	def cart_to_iso(self, x, y) :
+		iso_x = x - y
+		iso_y = (x + y)/2
+		return iso_x, iso_y
+
+	def on_mouse_motion(self, x, y, dx, dy) :
+		"""Called whenever the mouse moves."""
+		if x >= self.window.width-5 :
+			self.mouse_x += 40
+		elif x == 0 :
+			self.mouse_x -= 40
+		elif y == 0 :
+			self.mouse_y -= 40
+		elif y >= self.window.height-5 :
+			self.mouse_y += 40
+
+		self.camera.move_to([self.mouse_x, self.mouse_y])
+
+	def on_draw(self):
+		"""Render the screen."""
+		arcade.start_render()
+		self.camera.use()
+		self.camera.move([self.mouse_x, self.mouse_y])
+		self.ground_list.draw()
+		self.manager.draw()
+
+	def on_hide_view(self) :
+		self.manager.disable()
