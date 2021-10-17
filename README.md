@@ -1,22 +1,38 @@
-# Ceci est le readme
-Calmez-vous
+# Age Of Cheap Empires
 
-https://www.pierre-giraud.com/python-apprendre-programmer-cours/introduction-oriente-objet/
-https://learnxinyminutes.com/docs/python/
+## Prérequis pour lancer le jeu
 
-Tentative de Pull / Utilisation de VSCode Source Control par Thomas B.
+- Python 3 (version 3.X minimum)  
+- ```pip3 install arcade```
 
-TESTTESTTEST
+## Comment lancer le jeu
 
-Test de VSCode avec Github par Kenzo (même chose que Thomas)
+- ```python3 game.py ```
+
+## Description
+
+Ceci est une implémentation en Python du jeu Age of Empires, réalisée à l'occasion du cours Projet de Programmation durant premier semestre de la 3ème année en filière STI à l'INSA CVL.  
+
+Nous avons choisis le moteur graphique `The Arcade Library` pour réaliser la partie affichage graphique de notre jeu. (expliquer pourquoi)
+
+Vous pouvez retrouver tous les détails concernant l'architecture de notre jeu dans le fichier `ARCHITECTURE.md`.  
+
+## Difficultés rencontrées
+
+Voici les difficultés que nous avons rencontrées :
+
+## Sources POO python
+
+- https://www.pierre-giraud.com/python-apprendre-programmer-cours/introduction-oriente-objet/  
+- https://learnxinyminutes.com/docs/python/  
+
+## La Doc de Arcade Library
+
+- API officielle de The Arcade Library : https://api.arcade.academy/en/latest/index.html  
+- Pour apprendre The Arcade Library en même temps que Python (avec notamment une section sur l'orienté objet) : https://learn.arcade.academy/en/latest/index.html  
 
 
-# La Doc
-- API officielle de The Arcade Library : https://api.arcade.academy/en/latest/index.html
-- Pour apprendre The Arcade Library en même temps que Python (avec notamment une section sur l'orienté objet) : https://learn.arcade.academy/en/latest/index.html
-
-
-# Convention proposées
+## Convention proposées
 Ces conventions sont calquées sur PEP 8 :
 - Noms de module ( = nom de fichiers) : Zone_Buildable_TownCenter.py avec utilisation de sous-dossiers ? (PEP 8 : exemple_de_nom (le nom doit être court))
 - Noms de variables, fonctions & methode : exemple_de_nom
@@ -25,7 +41,7 @@ Ces conventions sont calquées sur PEP 8 :
 - Constantes : EXEMPLE_DE_NOM
 
 
-# Listes des demandes du prof :
+## Listes des demandes du prof :
 (rien de précisé = obligatoire)
 (c = conseillé)
 (f = facultatif)
@@ -49,8 +65,7 @@ Ces conventions sont calquées sur PEP 8 :
 16) Ressources de départs modifiables
 17) Cheats code
 
-
-# Brainstorming
+## Brainstorming
 Age of Empires
 - Graphismes
 
