@@ -11,6 +11,8 @@ MUSIC = "music/logon_aoe_music3s.wav"
 class MyWindow(arcade.Window):
 	def __init__(self):
 		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True)
+		
+		#arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# Lance la musique
 		self.my_music = arcade.load_sound(MUSIC, streaming=True)

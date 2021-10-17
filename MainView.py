@@ -17,7 +17,6 @@ class MainView(arcade.View) :
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
-		#arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# ajoute l'image de background
 		self.texture = arcade.load_texture(BACKGROUND)
