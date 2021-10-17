@@ -1,4 +1,3 @@
-from utils.vector import Vector
 
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
@@ -21,11 +20,6 @@ class Entity:
 		self.melee_armor = melee_armor
 		self.pierce_armor = pierce_armor
 		self.line_sight = line_sight
-
-		# Movement
-		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
-		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
-		self.speed = 5  # Speed of the villager (should probably be a constant)
 
 
 	# coordonnees
@@ -108,10 +102,3 @@ class Entity:
 
 	def set_line_sight(self, line_sight):
 		self.line_sight = line_sight
-
-	# Function for movement, may change in the future when pathfinding will be needed.
-	def aim_towards(self, aim):
-		self.aim = aim
-		# The following calculation is necessary to have uniform speeds :
-		self.change = self.speed * ((self.aim - self.position).normalized())
-		# We want the same speed no matter what the distance between the villager and where he needs to go is.

@@ -1,6 +1,6 @@
 import arcade
 from utils.vector import Vector
-from objects.Entity import Entity
+from objects.Unit import Unit
 from objects.EntitySprite import EntitySprite
 
 # --- Constants ---
@@ -47,7 +47,10 @@ class Model():
 
 	def setup(self):
 		# Set up the villager and add it to the entity_list.
-		self.entity_list.append(Entity(Vector(50, 50), 10, 10))
+		unit1 = Unit(Vector(50, 50), 10, 10)
+		unit2 = Unit(Vector(100, 100), 10, 10)
+		self.entity_list.append(unit1)
+		self.entity_list.append(unit2)
 
 
 class View():
@@ -101,16 +104,20 @@ class Controller():
 		pass
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
-		if button == arcade.MOUSE_BUTTON_LEFT:
-			mouse_position = Vector(x, y)
-			villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_sprite_list())
+		mouse_position = Vector(x, y)
 
+		if button == arcade.MOUSE_BUTTON_RIGHT:
 			for i in self.selection:
 				i.entity.aim_towards(mouse_position)
 				print(mouse_position)
 
+		elif button == arcade.MOUSE_BUTTON_LEFT:
+			self.selection.clear()
+			villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_sprite_list())
 			if villagers:
 				self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
+
+
 
 
 def main():
