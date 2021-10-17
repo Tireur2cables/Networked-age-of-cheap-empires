@@ -10,6 +10,7 @@ import random
 
 # Constants
 BACKGROUND = "./img/background.png"
+SETTINGS_BACKGROUND = "./img/LastImageSettings.jpg"
 
 # View d'accueil : première à etre affichée à l'écran
 class MainView(arcade.View) :
@@ -76,7 +77,7 @@ class SettingsView(arcade.View) :
 	def on_show(self):
 		""" This is run once when we switch to this view """
 		# ajoute l'image de background
-		self.texture = arcade.load_texture("./img/background.png")
+		self.texture = arcade.load_texture(SETTINGS_BACKGROUND)
 
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
@@ -117,7 +118,7 @@ class SettingsView(arcade.View) :
 		arcade.start_render()
 
 		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
-		arcade.draw_text("Settings Screen", self.window.width / 3, self.window.height * 4 / 6, arcade.color.WHITE, font_size=50, anchor_x="center")
+		arcade.draw_text("Settings Screen", self.window.width / 2, self.window.height * 5 / 6, arcade.color.WARM_BLACK, font_size=50, anchor_x="center")
 
 		self.manager.draw()
 
