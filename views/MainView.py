@@ -43,10 +43,10 @@ class MainView(arcade.View) :
 
 		# Create the buttons
 
-		start_button = NextViewButton(self.window, PreGameView(), text="Start Game VS IA", width=buttonsize)
+		start_button = NextViewButton(self.window, PreGameView(self), text="Start Game VS IA", width=buttonsize)
 		self.v_box.add(start_button.with_space_around(bottom=20))
 
-		ia_match_button = NextViewButton(self.window,IAPreGameView(), text="IA VS IA Game",width=buttonsize)
+		ia_match_button = NextViewButton(self.window,IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
 		map_button = NextViewButton(self.window, self.game_view, text="Show Map", width=buttonsize)
@@ -159,6 +159,10 @@ class SettingsView(arcade.View) :
 BACKGROUND_PREGAME = "./Ressources/img/ImageSettings.png" #A changer, c'est moche
 
 class PreGameView(arcade.View):
+	def __init__(self, main_view) :
+		super().__init__()
+		self.main_view = main_view
+
 	def setup(self) :
 		pass
 
@@ -186,8 +190,8 @@ class PreGameView(arcade.View):
 		# Create the buttons of incrementation
 		you_civil_button = SelctCivilButton(self.window,text="Vous : Civilisation", size=buttonsize,name="Vous")
 		self.v_box.add(you_civil_button.with_space_around(bottom=20))
-		
-		quit_button = NextViewButton(self.window,MainView(), text="Return", width=buttonsize)
+
+		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -211,7 +215,7 @@ class PreGameView(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = NextViewButton(self.window, PreGameView2(), text="Nombre d'adversaire : 0", width=buttonsize)
+		num_enem_button = NextViewButton(self.window, PreGameView2(self.main_view), text="Nombre d'adversaire : 0", width=buttonsize)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -254,7 +258,7 @@ class PreGameView(arcade.View):
 		arcade.start_render()
 		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
 		self.manager.draw()
-		
+
 
 	def on_hide_view(self) :
 		self.manager.disable()
@@ -263,6 +267,10 @@ class PreGameView(arcade.View):
 
 ####################################################### Second Window #######################################################
 class PreGameView2(arcade.View):
+	def __init__(self, main_view) :
+		super().__init__()
+		self.main_view = main_view
+
 	def setup(self) :
 		pass
 
@@ -278,7 +286,7 @@ class PreGameView2(arcade.View):
 		self.setupButtons()
 		self.NumEnemButton()
 		self.launch_game()
-		      
+
 	def setupButtons(self):
 		# def button size
 		buttonsize = self.window.width / 6
@@ -293,7 +301,7 @@ class PreGameView2(arcade.View):
 		adv1_civil_button = SelctCivilButton(self.window,text="Hugo : Civilisation", size=buttonsize,name="Hugo")
 		self.v_box.add(adv1_civil_button.with_space_around(bottom=20))
 
-		quit_button = NextViewButton(self.window,MainView(), text="Return", width=buttonsize)
+		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -306,7 +314,7 @@ class PreGameView2(arcade.View):
 				child = self.v_box
 			)
 		)
-	
+
 	#Button for numbers of ennemi, it will be at the bottom of the window and in every pregame view
 	def NumEnemButton(self):
 
@@ -317,7 +325,7 @@ class PreGameView2(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = NextViewButton(self.window, PreGameView3(), text="Nombre d'adversaire : 1", width=buttonsize)
+		num_enem_button = NextViewButton(self.window, PreGameView3(self.main_view), text="Nombre d'adversaire : 1", width=buttonsize)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -367,6 +375,10 @@ class PreGameView2(arcade.View):
 
 ####################################################### Third Window #######################################################
 class PreGameView3(arcade.View):
+	def __init__(self, main_view) :
+		super().__init__()
+		self.main_view = main_view
+
 	def setup(self) :
 		pass
 
@@ -382,7 +394,7 @@ class PreGameView3(arcade.View):
 		self.setupButtons()
 		self.NumEnemButton()
 		self.launch_game()
-		      
+
 	def setupButtons(self):
 		# def button size
 		buttonsize = self.window.width / 6
@@ -400,7 +412,7 @@ class PreGameView3(arcade.View):
 		adv2_civil_button = SelctCivilButton(self.window,text="Thomas : Civilisation", size=buttonsize,name="Thomas")
 		self.v_box.add(adv2_civil_button.with_space_around(bottom=20))
 
-		quit_button = NextViewButton(self.window,MainView(), text="Return", width=buttonsize)
+		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -413,7 +425,7 @@ class PreGameView3(arcade.View):
 				child = self.v_box
 			)
 		)
-	
+
 	#Button for numbers of ennemi, it will be at the bottom of the window and in every pregame view
 	def NumEnemButton(self):
 
@@ -424,7 +436,7 @@ class PreGameView3(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = NextViewButton(self.window, PreGameView4(), text="Nombre d'adversaire : 2", width=buttonsize)
+		num_enem_button = NextViewButton(self.window, PreGameView4(self.main_view), text="Nombre d'adversaire : 2", width=buttonsize)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -473,8 +485,13 @@ class PreGameView3(arcade.View):
 
 ####################################################### Fourth Window #######################################################
 class PreGameView4(arcade.View):
+	def __init__(self, main_view) :
+		super().__init__()
+		self.main_view = main_view
+
 	def setup(self) :
 		pass
+
 	def on_show(self):
 		""" This is run once when we switch to this view """
 
@@ -487,7 +504,7 @@ class PreGameView4(arcade.View):
 		self.setupButtons()
 		self.NumEnemButton()
 		self.launch_game()
-		      
+
 	def setupButtons(self):
 		# def button size
 		buttonsize = self.window.width / 6
@@ -508,7 +525,7 @@ class PreGameView4(arcade.View):
 		adv3_civil_button = SelctCivilButton(self.window,text="Nicolas : Civilisation", size=buttonsize,name="Nicolas")
 		self.v_box.add(adv3_civil_button.with_space_around(bottom=20))
 
-		quit_button = NextViewButton(self.window,MainView(), text="Return", width=buttonsize)
+		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -521,7 +538,7 @@ class PreGameView4(arcade.View):
 				child = self.v_box
 			)
 		)
-	
+
 	#Button for numbers of ennemi, it will be at the bottom of the window and in every pregame view
 	def NumEnemButton(self):
 
@@ -532,7 +549,7 @@ class PreGameView4(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = NextViewButton(self.window, PreGameView5(), text="Nombre d'adversaire : 3", width=buttonsize)
+		num_enem_button = NextViewButton(self.window, PreGameView5(self.main_view), text="Nombre d'adversaire : 3", width=buttonsize)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -581,8 +598,13 @@ class PreGameView4(arcade.View):
 
 ####################################################### Fifth Window #######################################################
 class PreGameView5(arcade.View):
+	def __init__(self, main_view) :
+		super().__init__()
+		self.main_view = main_view
+
 	def setup(self) :
 		pass
+
 	def on_show(self):
 		""" This is run once when we switch to this view """
 
@@ -595,7 +617,7 @@ class PreGameView5(arcade.View):
 		self.setupButtons()
 		self.NumEnemButton()
 		self.launch_game()
-		      
+
 	def setupButtons(self):
 		# def button size
 		buttonsize = self.window.width / 6
@@ -619,7 +641,7 @@ class PreGameView5(arcade.View):
 		adv4_civil_button = SelctCivilButton(self.window,text="Kenzo : Civilisation", size=buttonsize,name="Kenzo")
 		self.v_box.add(adv4_civil_button.with_space_around(bottom=20))
 
-		quit_button = NextViewButton(self.window,MainView(), text="Return", width=buttonsize)
+		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -632,7 +654,7 @@ class PreGameView5(arcade.View):
 				child = self.v_box
 			)
 		)
-	
+
 	#Button for numbers of ennemi, it will be at the bottom of the window and in every pregame view
 	def NumEnemButton(self):
 
@@ -643,7 +665,7 @@ class PreGameView5(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = NextViewButton(self.window, PreGameView(), text="Nombre d'adversaire : 4", width=buttonsize)
+		num_enem_button = NextViewButton(self.window, PreGameView(self.main_view), text="Nombre d'adversaire : 4", width=buttonsize)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -656,7 +678,7 @@ class PreGameView5(arcade.View):
 				child = self.v_box
 			)
 		)
-	
+
 	#Button to start the game
 	def launch_game(self):
 		# def button size
@@ -692,14 +714,19 @@ class PreGameView5(arcade.View):
 
 #############################################################
 #					IA VS IA View							#
-#############################################################		
+#############################################################
 
 #Constants
 BACKGROUND_IAPREGAME = "./Ressources/img/ImageSettings.png" #A changer, c'est moche
 
 class IAPreGameView(arcade.View):
+	def __init__(self, main_view) :
+		super().__init__()
+		self.main_view = main_view
+
 	def setup(self) :
 		pass
+
 	def on_show(self):
 		""" This is run once when we switch to this view """
 
@@ -726,8 +753,8 @@ class IAPreGameView(arcade.View):
 
 		ia2_civil_button = SelctCivilButton(self.window,text="IA2: Civilisation", size=buttonsize,name="IA2")
 		self.v_box.add(ia2_civil_button.with_space_around(bottom=20))
-		
-		quit_button = NextViewButton(self.window,MainView(), text="Return", width=buttonsize)
+
+		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -751,7 +778,7 @@ class IAPreGameView(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = NextViewButton(self.window, PreGameView2(), text="Nombre d'adversaire : 0", width=buttonsize)
+		num_enem_button = NextViewButton(self.window, PreGameView2(self.main_view), text="Nombre d'adversaire : 0", width=buttonsize)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -764,7 +791,7 @@ class IAPreGameView(arcade.View):
 				child = self.v_box
 			)
 		)
-	
+
 	#Button to start the game
 	def launch_game(self):
 		# def button size
@@ -794,7 +821,7 @@ class IAPreGameView(arcade.View):
 		arcade.start_render()
 		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
 		self.manager.draw()
-		
+
 
 	def on_hide_view(self) :
 		self.manager.disable()
