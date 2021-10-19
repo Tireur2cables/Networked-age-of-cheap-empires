@@ -27,6 +27,7 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		print("NextView :", event)
+		self.nextView.setup()
 		self.window.show_view(self.nextView)
 
 

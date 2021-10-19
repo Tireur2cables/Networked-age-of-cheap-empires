@@ -21,7 +21,7 @@ class MapView(arcade.View) :
 		""" This is run once when we switch to this view """
 
 		self.camera = arcade.Camera(self.window.width, self.window.height)
-		initial_x, initial_y = self.cart_to_iso(0, 0)		
+		initial_x, initial_y = self.cart_to_iso(0, 0)
 		self.camera_x = initial_x
 		self.camera_y = initial_y
 
