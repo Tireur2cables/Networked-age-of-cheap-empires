@@ -1,4 +1,6 @@
 # Imports
+from ctypes import string_at
+from arcade.arcade_types import Color
 import arcade.gui
 
 # Constants
@@ -30,7 +32,6 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 		self.nextView.setup()
 		self.window.show_view(self.nextView)
 
-
 # CheckboxButton
 class CheckboxButton(arcade.gui.UITextureButton) :
 	def __init__(self, window, text, size, ticked=True, music=False, fullscreen=False) :
@@ -51,3 +52,47 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 			self.window.triggerMusic()
 		elif self.fullscreen :
 			self.window.triggerFullscreen()
+
+# Selection Number Button (Used for count how many ennemies will their be)(aucune idée de l'exactitude de cette phrase en anglais)
+class IncreButton(arcade.gui.UIFlatButton):
+	def __init__(self, window, text, size):
+		super().__init__(text= text, width=size, height=size/2)
+		self.window = window
+		self.incr=0;
+	
+	
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		if (self.incr==8):
+			self.incr = 0
+		else :
+			self.incr = self.incr +1
+			print("Incre +1, incr = ", self.incr)
+		self.text= "Nombre d'adversaire : "+str(self.incr)
+		
+# Selection de sa civilisation (meme si on aura pas forcement autant de civilisation) //Inutile, on a besoin que d'une seule civilisation
+class SelctCivilButton(arcade.gui.UIFlatButton):
+	def __init__(self, window, text, size,name):
+		super().__init__(text= text, width=size*2, height=size/4)
+		self.window =window
+		self.count=0
+		self.name=name
+	
+	def on_click(self, event: arcade.gui.UIOnClickEvent):
+		if (self.count==4):
+			self.count = 0
+		else :
+			self.count = self.count +1
+		
+		if (self.count==0):
+			self.text= self.name + " 	:	 Romains "
+		elif (self.count==1):
+			self.text= self.name + " 	: 	Egyptiens "
+		elif (self.count==2):
+			self.text= self.name + " 	: 	Gaulois "
+		elif (self.count==3):
+			self.text= self.name + " 	: 	Vikings "
+		else :
+			self.text= self.name + " 	:	 GuiLeDavien "
+	
+
+	
