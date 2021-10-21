@@ -90,7 +90,7 @@ class GameView(arcade.View):
 		self.game_controller.on_update(*args)
 
 	def on_mouse_press(self, *args):  # Redirecting inputs to the controller
-		self.game_controller.on_mouse_press(*args)
+		self.game_view.on_mouse_press(*args)
 
 	def on_mouse_motion(self, *args):
 		self.game_view.on_mouse_motion(*args)
@@ -155,7 +155,7 @@ class View():
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
-		# self.sprite_list.draw()
+		self.sprite_list.draw()
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -200,8 +200,8 @@ class View():
 		)
 
 	def camera_move(self):
-		#update the camera coords if the mouse is on the edges
-		#the moving of the camera is in the on_draw() function with move_to()
+		# Update the camera coords if the mouse is on the edges
+		# The movement of the camera is handled in the on_draw() function with move_to()
 		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE:
 			self.camera_x += CAMERA_MOVE_STEP
 		elif self.mouse_x <= CAMERA_MOVE_EDGE:
@@ -211,14 +211,20 @@ class View():
 		elif self.mouse_y >= self.game.window.height - CAMERA_MOVE_EDGE:
 			self.camera_y += CAMERA_MOVE_STEP
 
+	def on_mouse_press(self, x, y, button, key_modifiers):
+		mouse_position = Vector(x + self.camera.position.x, y + self.camera.position.y)
+
+		if button == arcade.MOUSE_BUTTON_LEFT:
+			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.sprite_list))
+		elif button == arcade.MOUSE_BUTTON_RIGHT:
+			self.game.game_controller.move_selection(mouse_position)
+
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
-		#update the coords of the mouse
+		# Update the coords of the mouse
 		self.mouse_x = x
 		self.mouse_y = y
 
-	def get_sprite_list(self):
-		return self.sprite_list
 
 #########################################################################
 #							CONTROLLER CLASS							#
@@ -242,22 +248,17 @@ class Controller():
 			if not entity.position.isalmost(entity.aim, entity.speed):  # If it is not close to where it aims, move.
 				entity.position += entity.change
 				sprite.center_x, sprite.center_y = tuple(entity.position)
-		pass
 
-	def on_mouse_press(self, x, y, button, key_modifiers):
-		mouse_position = Vector(x, y)
+	def select(self, sprites_at_point):
+		self.selection.clear()
+		if sprites_at_point:
+			self.selection.append(sprites_at_point[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
 
-		if button == arcade.MOUSE_BUTTON_RIGHT:
-			for i in self.selection:
-				i.entity.aim_towards(mouse_position)
-				print(mouse_position)
-
-		elif button == arcade.MOUSE_BUTTON_LEFT:
-			self.selection.clear()
-			villagers = arcade.get_sprites_at_point(tuple(mouse_position), self.game.game_view.get_sprite_list())
-			if villagers:
-				self.selection.append(villagers[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
-		pass
+	def move_selection(self, mouse_position):
+		for i in self.selection:
+			print(i.entity.position)
+			i.entity.aim_towards(mouse_position)
+			print(mouse_position)
 
 
 # Main function to launche the game
