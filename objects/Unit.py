@@ -15,11 +15,10 @@ class Unit(Entity):
 		self.speed = speed  # Speed of the villager (should probably be a constant)
 
 	# Function for movement, may change in the future when pathfinding will be needed.
-	def aim_towards(self, aim):
+	def aim_towards(self, aim, change):
 		self.aim = aim
-		# The following calculation is necessary to have uniform speeds :
-		self.change = self.speed * ((self.aim - self.position).normalized())
-		# We want the same speed no matter what the distance between the villager and where he needs to go is.
+		self.change = change
+
 
 
 class Villager(Unit):#un Villageois est une Unit particuliere

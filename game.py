@@ -143,7 +143,8 @@ class View():
 	def setup(self):
 		for index, item in enumerate(self.game.game_model.entity_list):
 			# coin image from kenney.nl
-			self.sprite_list.append(EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None"))
+			es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
+			self.sprite_list.append(es)
 		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
 		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
@@ -151,11 +152,11 @@ class View():
 		""" Draw everything """
 		arcade.start_render()
 		self.ground_list.draw()
+		self.sprite_list.draw()
 		self.manager.draw()
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
-		self.sprite_list.draw()
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -256,9 +257,10 @@ class Controller():
 
 	def move_selection(self, mouse_position):
 		for i in self.selection:
-			print(i.entity.position)
-			i.entity.aim_towards(mouse_position)
-			print(mouse_position)
+			entity = i.entity
+			# The following calculation is necessary to have uniform speeds :
+			entity.aim_towards(mouse_position, entity.speed * ((mouse_position - entity.position).normalized()))
+			# We want the same speed no matter what the distance between the villager and where he needs to go is.
 
 
 # Main function to launche the game
