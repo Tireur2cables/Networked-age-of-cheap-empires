@@ -63,6 +63,7 @@ class AoCE(arcade.Window) :
 		else :
 			self.media_player.play()
 
+	# Active or not the vsync
 	def triggerVsync(self) :
 		self.set_vsync(not self.vsync)
 
