@@ -34,12 +34,13 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 
 # CheckboxButton
 class CheckboxButton(arcade.gui.UITextureButton) :
-	def __init__(self, window, text, size, ticked=True, music=False, fullscreen=False) :
+	def __init__(self, window, text, size, ticked=True, music=False, fullscreen=False, vsync=False) :
 		super().__init__(texture=arcade.load_texture(textureTicked if ticked else textureEmpty), text=text, width=size, height=size)
 		self.window = window
 		self.ticked = ticked
 		self.music = music
 		self.fullscreen = fullscreen
+		self.vsync = vsync
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		print("Checkbox : ", event)
@@ -52,6 +53,8 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 			self.window.triggerMusic()
 		elif self.fullscreen :
 			self.window.triggerFullscreen()
+		elif self.vsync :
+			self.window.triggerVsync()
 
 # Selection Number Button (Used for count how many ennemies will their be)(aucune idée de l'exactitude de cette phrase en anglais)
 class IncreButton(arcade.gui.UIFlatButton):

@@ -43,6 +43,9 @@ class SettingsView(arcade.View) :
 		fullscreen_button = CheckboxButton(self.window, text="Plein écran", size=checkboxsize, ticked=self.window.fullscreen, fullscreen=True)
 		self.v_box.add(fullscreen_button.with_space_around(bottom=20))
 
+		vsync_button = CheckboxButton(self.window, text="Vsync", size=checkboxsize, ticked=self.window.vsync, vsync=True)
+		self.v_box.add(vsync_button.with_space_around(bottom=20))
+
 		# Create the return menu
 		retour_button = NextViewButton(self.window, self.main_view, text="Retour", width=buttonsize)
 		self.v_box.add(retour_button.with_space_around(bottom=20))
