@@ -79,7 +79,7 @@ class SelctCivilButton(arcade.gui.UIFlatButton):
 			self.count = self.count +1
 
 		if (self.count==0):
-			self.text= self.name + " 	:	 Romains "
+			self.text= self.name + " 	:	Romains "
 		elif (self.count==1):
 			self.text= self.name + " 	: 	Egyptiens "
 		elif (self.count==2):
@@ -87,4 +87,4 @@ class SelctCivilButton(arcade.gui.UIFlatButton):
 		elif (self.count==3):
 			self.text= self.name + " 	: 	Vikings "
 		else :
-			self.text= self.name + " 	:	 GuiLeDavien "
+			self.text= self.name + " 	:	GuiLeDavien "
