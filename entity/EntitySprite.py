@@ -8,6 +8,7 @@ class EntitySprite(Sprite):
 		super().__init__(*args, **kwargs)
 		self.entity = entity
 		self.id = id
+		self.selected = False
 
 
 # class Villager(Unit): # Un Villageois est une Unit particuliere

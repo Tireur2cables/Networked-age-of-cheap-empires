@@ -2,8 +2,8 @@
 import arcade
 import arcade.gui
 from utils.vector import Vector
-from objects.Unit import Unit
-from objects.EntitySprite import EntitySprite
+from entity.Unit import Unit
+from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
 from map.map import Map
@@ -152,7 +152,10 @@ class View():
 		""" Draw everything """
 		arcade.start_render()
 		self.ground_list.draw()
-		self.sprite_list.draw()
+		for i in self.sprite_list:
+			if i.selected:
+				i.draw_hit_box((255, 0, 0), line_thickness=3)
+			i.draw()
 		self.manager.draw()
 		self.camera.use()
 		self.camera_move()
@@ -251,9 +254,16 @@ class Controller():
 				sprite.center_x, sprite.center_y = tuple(entity.position)
 
 	def select(self, sprites_at_point):
+		for i in self.selection:
+			i.selected = False
 		self.selection.clear()
-		if sprites_at_point:
-			self.selection.append(sprites_at_point[0])  # ou -1, jsp encore si c'est celui qui est tout derrière ou celui qui est tout devant là.
+		for i in sprites_at_point:
+			if i.entity and isinstance(i.entity, Unit):
+				sprite = i
+				break
+		if sprite:
+			sprite.selected = True
+			self.selection.append(sprite)
 
 	def move_selection(self, mouse_position):
 		for i in self.selection:
