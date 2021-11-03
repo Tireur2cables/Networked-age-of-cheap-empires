@@ -1,4 +1,4 @@
-from objects.Entity import Entity
+from entity.Entity import Entity
 from CONSTANTS import Resource
 from utils.vector import Vector
 
