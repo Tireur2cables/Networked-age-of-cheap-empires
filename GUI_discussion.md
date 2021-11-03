@@ -6,4 +6,8 @@
   enough, provided it is a bit versatile.
   
 # Joueur VS 2IA ou +
-# IA VS IA
+# IA VS IAP
+
+# Paramètre au démarrage
+- Ressources (Bois,Nourriture,Or,Pierre) : à la discrétion de l'user, input chiffre
+- Map (5 map différentes dont une aléatoire, les autres sont toujours les mêmes)
