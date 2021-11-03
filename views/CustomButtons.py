@@ -59,7 +59,7 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 # Selection Number Button (Used for count how many ennemies will their be)(aucune idée de l'exactitude de cette phrase en anglais)
 class IncreButton(arcade.gui.UIFlatButton):
 	def __init__(self, window, view, text, size):
-		super().__init__(text=text, width=size, height=size/2)
+		super().__init__(text=text, width=size, height=size/3)
 		self.window = window
 		self.view = view
 

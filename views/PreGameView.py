@@ -28,7 +28,6 @@ class PreGameView(arcade.View):
 		self.manager.enable()
 
 		self.setupButtons()
-		self.NumEnemButton()
 		self.launch_game()
 
 	def setupButtons(self):
@@ -45,7 +44,7 @@ class PreGameView(arcade.View):
 		name = ["Hugot", "Nico", "GuiLeDav", "Maxence", "Thomas", "Kenzo", "Nicolas"]
 
 		for i in range(self.nbAdv) :
-			adv1_civil_button = SelctCivilButton(self.window, text=name[i] + " : Civilisation", size=buttonsize,name="Hugo")
+			adv1_civil_button = SelctCivilButton(self.window, text=name[i] + " : Civilisation", size=buttonsize,name=name[i])
 			self.v_box.add(adv1_civil_button.with_space_around(bottom=20))
 
 		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
@@ -62,30 +61,6 @@ class PreGameView(arcade.View):
 			)
 		)
 
-	#Button for numbers of ennemi, it will be at the bottom of the window and in every pregame view
-	def NumEnemButton(self):
-
-		# def button size
-		buttonsize = self.window.width / 6
-
-		# Create a vertical BoxGroup to align buttons
-		self.v_box = arcade.gui.UIBoxLayout()
-
-		# Create the button
-		num_enem_button = IncreButton(self.window, PreGameView(self.main_view, self.nbAdv+1), text="Nombre d'adversaire : " + str(self.nbAdv), size=buttonsize)
-		self.v_box.add(num_enem_button.with_space_around(bottom=20))
-
-		# Create a widget to hold the v_box widget, that will center the buttons
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x = "left",
-				align_x = buttonsize,
-				anchor_y = "center_y",
-				align_y= -buttonsize,
-				child = self.v_box
-			)
-		)
-
 	#Button to start the game
 	def launch_game(self):
 		# def button size
@@ -95,6 +70,9 @@ class PreGameView(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
+		num_enem_button = IncreButton(self.window, PreGameView(self.main_view, self.nbAdv+1), text="Nombre d'adversaire : " + str(self.nbAdv), size=buttonsize*(3/2))
+		self.v_box.add(num_enem_button.with_space_around(bottom=20))
+
 		launch_button = NextViewButton(self.window, FakeGameView(), text="Lancer la partie", width=buttonsize*(3/2))
 		self.v_box.add(launch_button.with_space_around(bottom=20))
 
