@@ -15,12 +15,21 @@ class Map():
 		self.generateMap()
 
 	def updateGroundList(self):
+		self.view.ground_list.clear()
 		for x in range(MAP_SIZE-1,-1, -1):
 			for y in range(MAP_SIZE-1,-1, -1):
 				self.view.ground_list.append(self.tileArray[x][y].tileSprite)
 
-	#def placeAnEntity(self,x,y,pointerToEntity):
-	#	(self.tileArray[x][y]).setEntity(pointerToEntity)
+	# def updateEntityList(self):
+	# 	self.view.entity_list.clear()
+	# 	for x in range(MAP_SIZE-1,-1, -1):
+	# 		for y in range(MAP_SIZE-1,-1, -1):
+				
+	# 			#self.view.entity_list.append(self.tileArray[x][y].pointerToEntity)
+
+	# def placeAnEntity(self,x,y,pointerToEntity):
+	# 	(self.tileArray[x][y]).setEntity(pointerToEntity)
+	# 	self.updateEntityList()
 		
 
 	# Convert cartesian coordinates to isometric

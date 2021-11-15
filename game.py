@@ -139,6 +139,7 @@ class View():
 
 		# Variables that will hold sprite lists
 		self.sprite_list = arcade.SpriteList()
+		
 
 	def setup(self):
 		for index, item in enumerate(self.game.game_model.entity_list):
@@ -151,7 +152,10 @@ class View():
 	def on_draw(self):
 		""" Draw everything """
 		arcade.start_render()
+
 		self.ground_list.draw()
+		self.entity_list.draw()
+
 		for i in self.sprite_list:
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
@@ -164,7 +168,9 @@ class View():
 	def on_show(self):
 		""" This is run once when we switch to this view """
 		self.ground_list = arcade.SpriteList(use_spatial_hash=True)
-		#Should i add an entity list ???
+		#Should i add an entity list ??? YES !!!!
+		self.entity_list = arcade.SpriteList(use_spatial_hash=True)
+
 
 		self.map = Map(self)
 		self.camera = arcade.Camera(self.game.window.width, self.game.window.height)

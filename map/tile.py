@@ -28,6 +28,7 @@ class Tile():
 
 
 	def setEntity(self,pointerToEntity):
+		self.isLocked=True
 		self.pointerToEntity=pointerToEntity
 
 	@staticmethod  # This decorator means that the method below won't use information from the instance or the class (we don't use "self").
