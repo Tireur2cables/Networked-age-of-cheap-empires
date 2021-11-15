@@ -1,6 +1,6 @@
 # Imports
 import arcade
-from views.CustomButtons import SelctCivilButton, NextViewButton
+from views.CustomButtons import SelctCivilButton, NextViewButton, NumInput
 from views.FakeGameView import FakeGameView
 
 #Constants
@@ -28,6 +28,7 @@ class PreGameView(arcade.View):
 		self.manager.enable()
 
 		self.setupButtons()
+		self.ressourcesInput()
 		self.launch_game()
 
 	def setupButtons(self):
@@ -60,6 +61,24 @@ class PreGameView(arcade.View):
 				child = self.v_box
 			)
 		)
+
+	def ressourcesInput(self) :
+		# def button size
+		buttonsize = self.window.width / 6
+
+		bg_text = arcade.load_texture("Ressources/img/grey_fond.jpg")
+
+
+		or_input = arcade.gui.UITexturePane(
+			NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize, text="200", width=buttonsize, height=buttonsize/3, text_color=(1, 1, 1, 255)),
+			tex=bg_text
+		)
+
+		self.manager.add(
+			or_input
+		)
+
+
 
 	#Button to start the game
 	def launch_game(self):

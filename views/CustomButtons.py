@@ -80,3 +80,7 @@ class SelctCivilButton(arcade.gui.UIFlatButton):
 			self.text= self.name + " : Vikings "
 		else :
 			self.text= self.name + " : GuiLeDavien "
+
+class NumInput(arcade.gui.UIInputText) :
+	def __init__(self, x, y, text, width, height, text_color) :
+		super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
