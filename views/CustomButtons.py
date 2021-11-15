@@ -84,3 +84,10 @@ class SelctCivilButton(arcade.gui.UIFlatButton):
 class NumInput(arcade.gui.UIInputText) :
 	def __init__(self, x, y, text, width, height, text_color) :
 		super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
+
+	def on_event(self, event) :
+		if self._active and isinstance(event, arcade.gui.events.UITextEvent) and not (event.text.isnumeric() or event.text == "") :
+			pass
+
+		else :
+			super().on_event(event)
