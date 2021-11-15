@@ -164,6 +164,8 @@ class View():
 	def on_show(self):
 		""" This is run once when we switch to this view """
 		self.ground_list = arcade.SpriteList(use_spatial_hash=True)
+		#Should i add an entity list ???
+
 		self.map = Map(self)
 		self.camera = arcade.Camera(self.game.window.width, self.game.window.height)
 		initial_x, initial_y = self.map.cart_to_iso(0, 0)

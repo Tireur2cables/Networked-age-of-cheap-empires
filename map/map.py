@@ -1,30 +1,27 @@
 # Imports
 
 import arcade
-
+from map.tile import Tile
 # --- Constants ---
 CHARACTER_SCALING = 1
 TILE_SCALING = 1
-TILE_SIZE = 64
-TILE_DIST = TILE_SIZE // 2
+MAP_SIZE = 50
 
 
 class Map():
 	def __init__(self, view):
 		self.view = view
+		self.tileArray= [[Tile(None,False,i,j,None) for i in range(MAP_SIZE)] for j in range(MAP_SIZE)]
 		self.generateMap()
 
-	def generateMap(self):
-		# def offset
-		# offset = 4 * self.window.width // 3
+	def updateGroundList(self):
+		for x in range(MAP_SIZE-1,-1, -1):
+			for y in range(MAP_SIZE-1,-1, -1):
+				self.view.ground_list.append(self.tileArray[x][y].tileSprite)
 
-		for x in range(self.view.game.window.width, 0, -TILE_DIST):
-			for y in range(self.view.game.window.width, 0, -TILE_DIST):
-				isox, isoy = Map.cart_to_iso(x, y)  # Cette ligne ne recréer pas une map (testé et vérifié).
-				ground = arcade.Sprite("./map/Tiles/Tiles/ts_grass0/straight/225/0.png", TILE_SCALING)
-				ground.center_x = isox
-				ground.center_y = isoy
-				self.view.ground_list.append(ground)
+	#def placeAnEntity(self,x,y,pointerToEntity):
+	#	(self.tileArray[x][y]).setEntity(pointerToEntity)
+		
 
 	# Convert cartesian coordinates to isometric
 	@staticmethod  # This decorator means that the method below won't use information from the instance or the class (we don't use "self").
