@@ -1,6 +1,6 @@
 # Imports
 import arcade
-from views.CustomButtons import IncreButton, SelctCivilButton, NextViewButton
+from views.CustomButtons import SelctCivilButton, NextViewButton
 from views.FakeGameView import FakeGameView
 
 #Constants
@@ -70,7 +70,7 @@ class PreGameView(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = IncreButton(self.window, PreGameView(self.main_view, self.nbAdv+1), text="Nombre d'adversaire : " + str(self.nbAdv), size=buttonsize*(3/2))
+		num_enem_button = NextViewButton(self.window, PreGameView(self.main_view, self.nbAdv+1), text="Nombre d'adversaire : " + str(self.nbAdv), width=buttonsize*(3/2))
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
 		launch_button = NextViewButton(self.window, FakeGameView(), text="Lancer la partie", width=buttonsize*(3/2))

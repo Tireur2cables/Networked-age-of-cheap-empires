@@ -56,17 +56,6 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 		elif self.vsync :
 			self.window.triggerVsync()
 
-# Selection Number Button (Used for count how many ennemies will their be)(aucune idée de l'exactitude de cette phrase en anglais)
-class IncreButton(arcade.gui.UIFlatButton):
-	def __init__(self, window, view, text, size):
-		super().__init__(text=text, width=size, height=size/3)
-		self.window = window
-		self.view = view
-
-	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		self.view.setup()
-		self.window.show_view(self.view)
-
 # Selection de sa civilisation (meme si on aura pas forcement autant de civilisation) //Inutile, on a besoin que d'une seule civilisation
 class SelctCivilButton(arcade.gui.UIFlatButton):
 	def __init__(self, window, text, size,name):
