@@ -175,6 +175,9 @@ class View():
 		for i in self.sprite_list:
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
+				map_position = iso_to_map_pos(i.entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+				tile_below = self.game.game_model.map.get_tile_at(map_position.int())
+				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
 		self.manager.draw()
 		self.camera.use()
@@ -273,11 +276,10 @@ class Controller():
 				entity.position += entity.change
 				sprite.center_x, sprite.center_y = tuple(entity.position)
 
-			iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-
-			int_position = Vector(int(entity.position.x), int(entity.position.y))
-			int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
-			print(f"{int_position} -> {int_iso_position}")
+			# iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			# int_position = Vector(int(entity.position.x), int(entity.position.y))
+			# int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
+			# print(f"{int_position} -> {int_iso_position}")
 
 	def select(self, sprites_at_point):
 		sprite = None

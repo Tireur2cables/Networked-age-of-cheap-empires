@@ -7,6 +7,7 @@ class EntitySprite(Sprite):
 	def __init__(self, id, entity, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.entity = entity
+		entity.sprite = self
 		self.id = id
 		self.selected = False
 

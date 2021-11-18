@@ -21,18 +21,23 @@ class Entity:
 		self.pierce_armor = pierce_armor
 		self.line_sight = line_sight
 
+		# Sprite
+		self.sprite = None
+
 
 	# coordonnees
 	def get_x(self):
 		return self.position.x
 	def get_y(self):
 		return self.position.y
-	def get_position(self):
-		return self.position
-
-	def set_position(self, x, y):
+	def set_xy(self, x, y):
 		self.position.x = x
 		self.position.y = y
+
+	def get_position(self):
+		return self.position
+	def set_position(self, position):
+		self.position = position
 
 	# health
 	def get_health(self):

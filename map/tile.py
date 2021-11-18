@@ -11,6 +11,9 @@ class Tile():
 		self.y=y
 		self.pointerToEntity = pointerToEntity
 
+		# Sprite
+		self.sprite = None
+
 
 	def setEntity(self,pointerToEntity):
 		self.isLocked=True
