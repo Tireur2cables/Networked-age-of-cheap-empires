@@ -7,6 +7,7 @@ from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
 from map.map import Map
+from map.tileSprite import TileSprite
 
 # --- Constants ---
 SPRITE_SCALING_COIN = 0.2
@@ -114,9 +115,12 @@ class Model():
 		""" Initializer """
 		self.game = aoce_game
 		self.entity_list = []
+		self.ground_list = []
 
 	def setup(self):
+
 		# Set up the villager and add it to the entity_list.
+		self.map = Map(self)
 		unit1 = Unit(Vector(50, 50), 10, 10)
 		unit2 = Unit(Vector(100, 100), 10, 10)
 		self.entity_list.append(unit1)
@@ -139,13 +143,18 @@ class View():
 
 		# Variables that will hold sprite lists
 		self.sprite_list = arcade.SpriteList()
-		
+		self.tile_sprite_list = arcade.SpriteList()
+
 
 	def setup(self):
 		for index, item in enumerate(self.game.game_model.entity_list):
 			# coin image from kenney.nl
 			es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
 			self.sprite_list.append(es)
+
+		for index, item in enumerate(self.game.game_model.ground_list):
+			ts = TileSprite(index, item)
+			self.tile_sprite_list.append(ts)
 		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
 		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
@@ -153,8 +162,7 @@ class View():
 		""" Draw everything """
 		arcade.start_render()
 
-		self.ground_list.draw()
-		self.entity_list.draw()
+		self.tile_sprite_list.draw()
 
 		for i in self.sprite_list:
 			if i.selected:
@@ -167,14 +175,9 @@ class View():
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
-		self.ground_list = arcade.SpriteList(use_spatial_hash=True)
-		#Should i add an entity list ??? YES !!!!
-		self.entity_list = arcade.SpriteList(use_spatial_hash=True)
 
-
-		self.map = Map(self)
 		self.camera = arcade.Camera(self.game.window.width, self.game.window.height)
-		initial_x, initial_y = self.map.cart_to_iso(0, 0)
+		initial_x, initial_y = Map.cart_to_iso(0, 0)
 		self.camera_x = initial_x
 		self.camera_y = initial_y
 
@@ -262,6 +265,7 @@ class Controller():
 				sprite.center_x, sprite.center_y = tuple(entity.position)
 
 	def select(self, sprites_at_point):
+		sprite = None
 		for i in self.selection:
 			i.selected = False
 		self.selection.clear()
