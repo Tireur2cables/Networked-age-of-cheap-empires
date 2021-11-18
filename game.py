@@ -10,6 +10,10 @@ from views.CustomButtons import QuitButton
 from map.map import Map
 from map.tileSprite import TileSprite
 
+## @tidalwaave : 18/11, 22H30
+from entity.sampleOOPZones import *
+from entity.ZoneSprite import ZoneSprite
+
 # --- Constants ---
 SPRITE_SCALING_COIN = 0.2
 SCREEN_WIDTH = 800
@@ -122,6 +126,8 @@ class Model():
 		self.game = aoce_game
 		self.entity_list = []
 		self.ground_list = []
+		## @tidalwaave : 18/11, 22H30
+		self.zoneLayerList = []
 
 	def setup(self):
 
@@ -133,6 +139,14 @@ class Model():
 		self.entity_list.append(unit0)
 		self.entity_list.append(unit1)
 		self.entity_list.append(unit2)
+
+
+		## @tidalwaave : 18/11, 22H30
+		tCent = TownCenter(2,2)
+		self.zoneLayerList.append(tCent)
+
+
+
 		pass
 
 #########################################################################
@@ -153,6 +167,8 @@ class View():
 		self.sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
 
+		## @tidalwaave : 18/11, 22H30
+		self.zoneLayerSpriteList = arcade.SpriteList()
 
 	def setup(self):
 		for index, item in enumerate(self.game.game_model.entity_list):
@@ -163,6 +179,16 @@ class View():
 		for index, item in enumerate(self.game.game_model.ground_list):
 			ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
 			self.tile_sprite_list.append(ts)
+
+
+		## @tidalwaave : 18/11, 22H30
+		for index, item in enumerate(self.game.game_model.zoneLayerList):
+			tCentSpr = ZoneSprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.x, center_y=item.y, hit_box_algorithm="None")
+			self.zoneLayerSpriteList.append(tCentSpr)
+
+
+
+
 		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
 		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
@@ -171,6 +197,10 @@ class View():
 		arcade.start_render()
 
 		self.tile_sprite_list.draw()
+
+
+		## @tidalwaave : 18/11, 22H30
+		self.zoneLayerSpriteList.draw()
 
 		for i in self.sprite_list:
 			if i.selected:

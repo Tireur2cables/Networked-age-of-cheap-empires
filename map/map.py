@@ -22,14 +22,12 @@ class Map():
 	def get_tile_at(self, map_position):
 		return self.tileArray[map_position.x][map_position.y]
 
+####################################################################
+#
+##
+### @tidalwaave : trying to add Zones to map
+##
+#
+	def updateZoneLayer(self):
+		pass
 
-	# def updateEntityList(self):
-	# 	self.view.entity_list.clear()
-	# 	for x in range(self.map_size-1,-1, -1):
-	# 		for y in range(self.map_size-1,-1, -1):
-
-	# 			#self.view.entity_list.append(self.tileArray[x][y].pointerToEntity)
-
-	# def placeAnEntity(self,x,y,pointerToEntity):
-	# 	(self.tileArray[x][y]).setEntity(pointerToEntity)
-	# 	self.updateEntityList()

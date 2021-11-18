@@ -2,6 +2,7 @@ class Zone:
 	def __init__(self, x, y):#constructeur : initialise les attributs
 		self.x = x
 		self.y = y
+		self.sprite = None
 		
 # Getting and setting coordinates from the building
 	def set_x(self, x):
@@ -38,7 +39,7 @@ class Zone:
 	
 class Buildable(Zone):#Inherits from Zone class, thus has coordinates; Will have area when implemented on map
 	def __init__(self, x, y, health):
-		super().__init__(self, x, y) # Calls parent class constructor
+		super().__init__(x, y) # Calls parent class constructor
 		self.health = health
 		self.maxhealth = health
 
@@ -58,7 +59,7 @@ class Buildable(Zone):#Inherits from Zone class, thus has coordinates; Will have
 
 class TownCenter(Buildable):#Inherits from Zone class, thus has coordinates; Will have area when implemented on map
 	def __init__(self, x, y, health = 600):
-		super().__init__(self, x, y, health)
+		super().__init__(x, y, health)
 
 	def get_health(self):
 		return self.health
