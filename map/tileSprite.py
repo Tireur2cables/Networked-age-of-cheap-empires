@@ -1,16 +1,12 @@
 from arcade import Sprite
+from utils.isometric import map_xy_to_iso
 
+# --- Constants ---
 TILE_SCALING = 1
 
 class TileSprite(Sprite):
-	def __init__(self, id, tile):
+	def __init__(self, id, tile, width, height):
 		super().__init__("./map/Tiles/Tiles/ts_grass0/straight/225/0.png", TILE_SCALING)
-		isox, isoy = TileSprite.cart_to_iso(tile.x, tile.y)  # Cette ligne ne recréer pas une map (testé et vérifié).
+		isox, isoy = map_xy_to_iso(tile.x, tile.y, width//2, height//2)  # Cette ligne ne recréer pas une map (testé et vérifié).
 		self.center_x = isox
 		self.center_y = isoy
-
-	@staticmethod  # This decorator means that the method below won't use information from the instance or the class (we don't use "self").
-	def cart_to_iso(x, y):
-		iso_x = x - y
-		iso_y = (x + y) / 2
-		return iso_x, iso_y

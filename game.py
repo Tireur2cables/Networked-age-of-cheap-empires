@@ -2,6 +2,7 @@
 import arcade
 import arcade.gui
 from utils.vector import Vector
+from utils.isometric import iso_to_map_pos
 from entity.Unit import Unit
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
@@ -16,6 +17,11 @@ SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
 MUSIC = "./Ressources/music/Marked.mp3"
 
+DEFAULT_MAP_SIZE = 5
+
+TILE_WIDTH = 64
+TILE_HEIGHT = TILE_WIDTH // 2
+
 
 #########################################################################
 #							MAIN CLASS									#
@@ -26,7 +32,7 @@ class AoCE(arcade.Window):
 	def __init__(self):
 		""" Initializer """
 		# Call the initializer of arcade.Window
-		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True)
+		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=False)
 		# arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# Show the mouse cursor
@@ -120,9 +126,11 @@ class Model():
 	def setup(self):
 
 		# Set up the villager and add it to the entity_list.
-		self.map = Map(self)
+		self.map = Map(self, DEFAULT_MAP_SIZE)
+		unit0 = Unit(Vector(0, 0), 10, 10)
 		unit1 = Unit(Vector(50, 50), 10, 10)
 		unit2 = Unit(Vector(100, 100), 10, 10)
+		self.entity_list.append(unit0)
 		self.entity_list.append(unit1)
 		self.entity_list.append(unit2)
 		pass
@@ -153,7 +161,7 @@ class View():
 			self.sprite_list.append(es)
 
 		for index, item in enumerate(self.game.game_model.ground_list):
-			ts = TileSprite(index, item)
+			ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
 			self.tile_sprite_list.append(ts)
 		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
 		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
@@ -177,7 +185,7 @@ class View():
 		""" This is run once when we switch to this view """
 
 		self.camera = arcade.Camera(self.game.window.width, self.game.window.height)
-		initial_x, initial_y = Map.cart_to_iso(0, 0)
+		initial_x, initial_y = (0, 0)
 		self.camera_x = initial_x
 		self.camera_y = initial_y
 
@@ -217,6 +225,7 @@ class View():
 	def camera_move(self):
 		# Update the camera coords if the mouse is on the edges
 		# The movement of the camera is handled in the on_draw() function with move_to()
+		print(self.mouse_x)
 		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE:
 			self.camera_x += CAMERA_MOVE_STEP
 		elif self.mouse_x <= CAMERA_MOVE_EDGE:
@@ -263,6 +272,12 @@ class Controller():
 			if not entity.position.isalmost(entity.aim, entity.speed):  # If it is not close to where it aims, move.
 				entity.position += entity.change
 				sprite.center_x, sprite.center_y = tuple(entity.position)
+
+			iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+
+			int_position = Vector(int(entity.position.x), int(entity.position.y))
+			int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
+			print(f"{int_position} -> {int_iso_position}")
 
 	def select(self, sprites_at_point):
 		sprite = None

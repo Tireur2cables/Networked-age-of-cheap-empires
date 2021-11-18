@@ -1,6 +1,5 @@
 from math import dist
 
-
 class Vector():
 	"""2D Custom Vector Class"""
 
@@ -36,6 +35,10 @@ class Vector():
 	def __truediv__(self, other):
 		"""Dividing a vector by a real"""
 		return Vector(self.x / other, self.y / other) if isinstance(other, (int, float)) else NotImplemented
+
+	def __floordiv__(self, other):
+		"""Dividing a vector by a real"""
+		return Vector(self.x // other, self.y // other) if isinstance(other, (int, float)) else NotImplemented
 
 	def __eq__(self, other):
 		"""Equality between vectors"""
