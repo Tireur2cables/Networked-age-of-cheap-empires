@@ -10,7 +10,7 @@ class Map():
 	def __init__(self, view, map_size):
 		self.view = view
 		self.map_size = map_size
-		self.tileArray= [[Tile(None,False,x,y,None) for y in range(map_size)] for x in range(map_size)]
+		self.tileArray= [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
 		self.updateGroundList()
 
 	def updateGroundList(self):
@@ -20,7 +20,6 @@ class Map():
 				self.view.ground_list.append(self.tileArray[x][y])
 
 	def get_tile_at(self, map_position):
-		print(map_position)
 		return self.tileArray[map_position.x][map_position.y]
 
 

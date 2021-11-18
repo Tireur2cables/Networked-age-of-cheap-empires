@@ -228,7 +228,6 @@ class View():
 	def camera_move(self):
 		# Update the camera coords if the mouse is on the edges
 		# The movement of the camera is handled in the on_draw() function with move_to()
-		print(self.mouse_x)
 		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE:
 			self.camera_x += CAMERA_MOVE_STEP
 		elif self.mouse_x <= CAMERA_MOVE_EDGE:
@@ -272,7 +271,9 @@ class Controller():
 		""" Movement and game logic """
 		for sprite in self.selection:
 			entity = sprite.entity
-			if not entity.position.isalmost(entity.aim, entity.speed):  # If it is not close to where it aims, move.
+			next_map_position = iso_to_map_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
+			next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
+			if (not entity.position.isalmost(entity.aim, entity.speed)) and next_is_on_map:  # If it is not close to where it aims, move.
 				entity.position += entity.change
 				sprite.center_x, sprite.center_y = tuple(entity.position)
 
