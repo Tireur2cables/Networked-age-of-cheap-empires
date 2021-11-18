@@ -17,7 +17,7 @@ SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
 MUSIC = "./Ressources/music/Marked.mp3"
 
-DEFAULT_MAP_SIZE = 5
+DEFAULT_MAP_SIZE = 50
 
 TILE_WIDTH = 64
 TILE_HEIGHT = TILE_WIDTH // 2
