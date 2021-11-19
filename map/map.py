@@ -2,6 +2,7 @@
 
 import arcade
 from map.tile import Tile
+from map.defaultmap import default_map_2d
 # --- Constants ---
 CHARACTER_SCALING = 1
 TILE_SCALING = 1
@@ -10,7 +11,8 @@ class Map():
 	def __init__(self, view, map_size):
 		self.view = view
 		self.map_size = map_size
-		self.tileArray= [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
+		# self.tileArray = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
+		self.tileArray = [[Tile(default_map_2d[x][y], x, y, None) for y in range(map_size)] for x in range(map_size)]
 		self.updateGroundList()
 
 	def updateGroundList(self):
@@ -30,4 +32,3 @@ class Map():
 #
 	def updateZoneLayer(self):
 		pass
-
