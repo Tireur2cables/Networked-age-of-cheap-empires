@@ -1,6 +1,7 @@
 # Imports
 import arcade
-from views.CustomButtons import SelctCivilButton, NextViewButton
+from arcade.gui.widgets import UITextArea, UITexturePane
+from views.CustomButtons import NumInput, SelctCivilButton, NextViewButton
 from views.FakeGameView import FakeGameView
 
 #Constants
@@ -28,7 +29,9 @@ class IAPreGameView(arcade.View):
 		self.manager.enable()
 
 		self.setupButtons()
+		self.ressourcesInput()
 		self.launch_game()
+		
 ##
 #	def setupButtons(self):
 		# def button size
@@ -141,6 +144,58 @@ class IAPreGameView(arcade.View):
 				child = self.v_box
 			)
 		)
+
+	#New class ad by GuiLeDav 22/11/2021, affiche la gestion du nombre de ressources
+	def ressourcesInput(self) :
+		# def button size
+		buttonsize = self.window.width / 6
+
+		#Couleur de fond pour les espaces ressources modifiables
+		bg_text = arcade.load_texture("Ressources/img/grey_fond.jpg")
+
+		#Creation du text "Ressource :" 
+		ressource_text = UITextArea(x=self.window.width - buttonsize*(2),
+                               y=self.window.height - buttonsize*0.65,
+                               width=buttonsize/2,
+                               height=buttonsize/10,
+                               text="Ressources :",
+                               text_color=(0, 0, 0, 255))
+		
+		name_ressources = ["Or : ","Bois : ","Nourriture : ","Pierre : "]
+		
+		#COMPLETEMENT DINGUE : le nom de ressource sous format "" est écrasé mais après qu'on est
+		#deja implemente la valeur "" a notre fonction, diront nous.
+		for i in range(4) :
+			name_ressources[i]= UITextArea(x=self.window.width - buttonsize*2,
+                               y=self.window.height - buttonsize*(1+i*0.25),
+                               width=buttonsize/2.5,
+                               height=buttonsize/10,
+                               text= name_ressources[i],
+                               text_color=(0, 0, 0, 255))
+
+			self.manager.add(UITexturePane(
+                name_ressources[i].with_space_around(right=20),
+                tex=bg_text,
+                padding=(10, 10, 10, 10)
+            ))
+
+		#Creation des espaces ressources modifiables
+		name_input_ressources = ["Or_input","Bois_input","Nourriture_input","Pierre_input"]
+
+		for i in range(4) :
+			name_input_ressources[i] = arcade.gui.UITexturePane(
+				NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize*(1+i*0.25), text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
+				tex=bg_text
+			)
+			#Affichage des espaces ressources modifiables
+			self.manager.add(name_input_ressources[i])
+
+		#Affichage de "Ressource :"
+		self.manager.add(UITexturePane(
+                ressource_text.with_space_around(right=20),
+                tex=bg_text,
+                padding=(10, 10, 10, 10)
+            ))
 
 	def on_draw(self):
 		""" Draw this view """

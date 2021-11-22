@@ -63,6 +63,7 @@ class PreGameView(arcade.View):
 			)
 		)
 
+	#New class ad by GuiLeDav 22/11/2021, affiche la gestion du nombre de ressources
 	def ressourcesInput(self) :
 		# def button size
 		buttonsize = self.window.width / 6
@@ -96,33 +97,16 @@ class PreGameView(arcade.View):
                 padding=(10, 10, 10, 10)
             ))
 
+		#Creation des espaces ressources modifiables
+		name_input_ressources = ["Or_input","Bois_input","Nourriture_input","Pierre_input"]
 
-		#Creation des espaces ressources modifiables, a mettre sous le meme format qu au dessus
-		or_input = arcade.gui.UITexturePane(
-			NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize, text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
-			tex=bg_text
-		)
-
-		wood_input = arcade.gui.UITexturePane(
-			NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize*(1.25), text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
-		 	tex=bg_text
-		)
-
-		food_input = arcade.gui.UITexturePane(
-			NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize*(1.5), text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
-		 	tex=bg_text
-		)
-
-		stone_input = arcade.gui.UITexturePane(
-			NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize*(1.75), text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
-		 	tex=bg_text
-		)
-
-		#Affichage des espaces ressources modifiables
-		self.manager.add(or_input)
-		self.manager.add(wood_input)
-		self.manager.add(food_input)
-		self.manager.add(stone_input)
+		for i in range(4) :
+			name_input_ressources[i] = arcade.gui.UITexturePane(
+				NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize*(1+i*0.25), text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
+				tex=bg_text
+			)
+			#Affichage des espaces ressources modifiables
+			self.manager.add(name_input_ressources[i])
 
 		#Affichage de "Ressource :"
 		self.manager.add(UITexturePane(
