@@ -120,3 +120,34 @@ class House(Buildable):
 		return self.health
 
 
+
+#  ______                                                 
+#  | ___ \                                                
+#  | |_/ /  ___  ___   ___   _   _  _ __   ___   ___  ___ 
+#  |    /  / _ \/ __| / _ \ | | | || '__| / __| / _ \/ __|
+#  | |\ \ |  __/\__ \| (_) || |_| || |   | (__ |  __/\__ \
+#  \_| \_| \___||___/ \___/  \__,_||_|    \___| \___||___/
+#                                                         
+#                                                         
+class Resources(Zone):
+	def __init__(self, x, y, health, amount):
+		super().__init__(x, y) # Calls parent class constructor
+		self.health = health
+		self.maxhealth = health
+		self.amount = amount
+
+
+	def set_health(self, health):
+		self.health = health
+	def get_health(self):
+		return self.health
+
+	def set_maxhealth(self):
+		return self.maxhealth
+	def get_maxhealth(self):
+		return self.maxhealth
+
+	def set_amount(self, amount):
+		self.amount = amount
+	def get_amount(self):
+		return self.amount
