@@ -318,7 +318,7 @@ class View():
 			pos = iso_to_map_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
 			tCent = TownCenter(pos.x, pos.y)
 			print(pos)
-			self.game.game_model.zoneLayerList.append(tCent)
+			self.game.game_model.zone_list.append(tCent)
 			self.sync_zones()
 
 	def on_mouse_motion(self, x, y, dx, dy):
