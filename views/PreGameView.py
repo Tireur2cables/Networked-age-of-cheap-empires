@@ -5,7 +5,7 @@ from views.CustomButtons import SelctCivilButton, NextViewButton, NumInput
 from views.FakeGameView import FakeGameView
 
 #Constants
-BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint.png" #A changer, c'est moche
+BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
 
 class PreGameView(arcade.View):
 	def __init__(self, main_view, nbAdv=0) :
@@ -81,7 +81,7 @@ class PreGameView(arcade.View):
 				anchor_x = "left",
 				align_x = buttonsize/2,
 				anchor_y = "top",
-				align_y= -buttonsize/2,
+				align_y= -buttonsize*(3/5),
 				child = self.v_box
 			)
 		)
@@ -96,7 +96,7 @@ class PreGameView(arcade.View):
 
 		#Creation du text "Ressource :" 
 		ressource_text = UITextArea(x=self.window.width - buttonsize*(3/2),
-                               y=self.window.height - buttonsize*0.65,
+                               y=self.window.height - buttonsize*(0.75),
                                width=buttonsize/2,
                                height=buttonsize/10,
                                text="Ressources :",
@@ -108,7 +108,7 @@ class PreGameView(arcade.View):
 		#deja implemente la valeur "" a notre fonction, diront nous.
 		for i in range(4) :
 			name_ressources[i]= UITextArea(x=self.window.width - buttonsize*(3/2),
-                               y=self.window.height - buttonsize*(1+i*0.25),
+                               y=self.window.height - buttonsize*(1.25+i*0.25),
                                width=buttonsize/3,
                                height=buttonsize/11,
                                text= name_ressources[i],
@@ -125,7 +125,7 @@ class PreGameView(arcade.View):
 
 		for i in range(4) :
 			name_input_ressources[i] = arcade.gui.UITexturePane(
-				NumInput(x=self.window.width - buttonsize/(1.4), y=self.window.height - buttonsize*(1+i*0.25), text="200", width=buttonsize/(2.5), height=buttonsize/10, text_color=(1, 1, 1, 255)),
+				NumInput(x=self.window.width - buttonsize/(1.4), y=self.window.height - buttonsize*(1.25+i*0.25), text="200", width=buttonsize/(2.5), height=buttonsize/10, text_color=(1, 1, 1, 255)),
 				tex=bg_text
 			)
 			#Affichage des espaces ressources modifiables
