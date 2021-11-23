@@ -7,7 +7,6 @@ from entity.Unit import Unit
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
-from views.CustomButtons import CoordButton
 from map.map import Map
 from map.tileSprite import TileSprite
 
@@ -128,15 +127,15 @@ class Model():
 	def __init__(self, aoce_game):
 		""" Initializer """
 		self.game = aoce_game
+
 		self.entity_list = []
-		self.ground_list = []
-		## @tidalwaave : 18/11, 22H30
-		self.zoneLayerList = []
+		self.tile_list = []
+		self.zone_list = []
 
 	def setup(self):
 
 		# Set up the villager and add it to the entity_list.
-		self.map = Map(self, DEFAULT_MAP_SIZE)
+		self.map = Map(self.tile_list, DEFAULT_MAP_SIZE)
 		unit0 = Unit(Vector(100, 100), 10, 10)
 		unit1 = Unit(Vector(50, 50), 10, 10)
 		unit2 = Unit(Vector(100, 100), 10, 10)
@@ -144,14 +143,9 @@ class Model():
 		self.entity_list.append(unit1)
 		self.entity_list.append(unit2)
 
-
 		## @tidalwaave : 18/11, 22H30
 		# tCent = TownCenter(10, 10)
 		# self.zoneLayerList.append(tCent)
-
-
-
-		pass
 
 #########################################################################
 #							VIEW CLASS									#
@@ -168,11 +162,9 @@ class View():
 		self.game = aoce_game
 
 		# Variables that will hold sprite lists
-		self.sprite_list = arcade.SpriteList()
+		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
-
-		## @tidalwaave : 18/11, 22H30
-		self.zoneLayerSpriteList = arcade.SpriteList()
+		self.zone_sprite_list = arcade.SpriteList()
 
 	def setup(self):
 		self.sync_entities()
@@ -181,50 +173,65 @@ class View():
 
 
 	def sync_entities(self):
-		for index, item in enumerate(self.game.game_model.entity_list): # Sync self.game_model.entity_list with sprite_list
+		# Sync self.game_model.entity_list with sprite_list
+		for index, item in enumerate(self.game.game_model.entity_list):
 			if item.sprite is None:
 				es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
-				self.sprite_list.append(es)
+				self.entity_sprite_list.append(es)
 				# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
 				# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
-	def sync_ground(self): # Sync self.game_model.ground_list with tile_sprite_list
-		for index, item in enumerate(self.game.game_model.ground_list):
+	def sync_ground(self):
+		# Sync self.game_model.tile_list with tile_sprite_list
+		for index, item in enumerate(self.game.game_model.tile_list):
 			if item.sprite is None:
 				ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
 				self.tile_sprite_list.append(ts)
 
-	def sync_zones(self): # Sync self.game_model.zoneLayerList with zoneLayerSpriteList
+	def sync_zones(self):
+		# Sync self.game_model.zone_list with zone_sprite_list
 		## @tidalwaave : 18/11, 22H30
-		for index, item in enumerate(self.game.game_model.zoneLayerList):
+		for index, item in enumerate(self.game.game_model.zone_list):
 			if item.sprite is None:
 				zone_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
 				zone = ZoneSprite(index, item, "map/Tower.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
-				self.zoneLayerSpriteList.append(zone)
+				# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
+				self.zone_sprite_list.append(zone)
 
 	def on_draw(self):
 		""" Draw everything """
 		arcade.start_render()
 
+		#
+		# --- Object sprite lists : Tiles, Zones & Entities
+		#
 		self.tile_sprite_list.draw()
 
-		## @tidalwaave : 18/11, 22H30
-		self.zoneLayerSpriteList.draw()
+		self.zone_sprite_list.draw()
 
-		for i in self.sprite_list:
+		for i in self.entity_sprite_list:
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
 				map_position = iso_to_map_pos(i.entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
 				tile_below = self.game.game_model.map.get_tile_at(map_position.int())
 				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
+
+
+		#
+		# --- Manager and Camera ---
+		#
 		self.manager.draw()
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
 
-		self.coord_button.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
-		
+		#
+		# --- In-game GUI ---
+		#
+		self.coord_label.text = f"X = {self.mouse_x}  Y = {self.mouse_y}"
+		self.coord_label.fit_content()
+
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -246,7 +253,7 @@ class View():
 		self.manager.enable()
 
 		self.addButton()
-		self.addCoord()
+		self.addCoordLabel()
 
 	def addButton(self):
 		# def button size
@@ -268,13 +275,15 @@ class View():
 			)
 		)
 
-	def addCoord(self):
+	def addCoordLabel(self):
 		coordsize = self.game.window.width / 5
-	
+
 		coordsmouse = f"x = {self.mouse_x}  y = {self.mouse_y}"
-		self.coord_button = CoordButton(self.game.window, text = coordsmouse, width = coordsize)
+		self.coord_label = arcade.gui.UILabel(text = coordsmouse, width= 100, height = 100)
+		coord_label_bg = self.coord_label.with_space_around(5, 5, 5, 5, (20, 20, 20))
 		self.max_box = arcade.gui.UIBoxLayout()
-		self.max_box.add(self.coord_button)
+		self.max_box.add(self.coord_label)
+		self.max_box.add(coord_label_bg)
 		self.manager.add(
 				arcade.gui.UIAnchorWidget(
 				anchor_x = "left",
