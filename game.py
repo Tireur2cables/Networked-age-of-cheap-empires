@@ -2,7 +2,7 @@
 import arcade
 import arcade.gui
 from utils.vector import Vector
-from utils.isometric import iso_to_map_pos
+from utils.isometric import *
 from entity.Unit import Unit
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
@@ -100,6 +100,9 @@ class GameView(arcade.View):
 	def on_update(self, *args):  # Redirecting on_update to the Controller
 		self.game_controller.on_update(*args)
 
+	def on_key_press(self, *args):
+		self.game_view.on_key_press(*args)
+
 	def on_mouse_press(self, *args):  # Redirecting inputs to the controller
 		self.game_view.on_mouse_press(*args)
 
@@ -133,7 +136,7 @@ class Model():
 
 		# Set up the villager and add it to the entity_list.
 		self.map = Map(self, DEFAULT_MAP_SIZE)
-		unit0 = Unit(Vector(0, 0), 10, 10)
+		unit0 = Unit(Vector(100, 100), 10, 10)
 		unit1 = Unit(Vector(50, 50), 10, 10)
 		unit2 = Unit(Vector(100, 100), 10, 10)
 		self.entity_list.append(unit0)
@@ -142,8 +145,8 @@ class Model():
 
 
 		## @tidalwaave : 18/11, 22H30
-		tCent = TownCenter(2,2)
-		self.zoneLayerList.append(tCent)
+		# tCent = TownCenter(10, 10)
+		# self.zoneLayerList.append(tCent)
 
 
 
@@ -175,6 +178,8 @@ class View():
 			# coin image from kenney.nl
 			es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
 			self.sprite_list.append(es)
+			#La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
+			# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
 
 		for index, item in enumerate(self.game.game_model.ground_list):
 			ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
@@ -183,14 +188,16 @@ class View():
 
 		## @tidalwaave : 18/11, 22H30
 		for index, item in enumerate(self.game.game_model.zoneLayerList):
-			tCentSpr = ZoneSprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.x, center_y=item.y, hit_box_algorithm="None")
+			tCentSpr_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
+			tCentSpr = ZoneSprite(index, item, "map/Tower.png", 1, center_x=tCentSpr_position.x, center_y=tCentSpr_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
 			self.zoneLayerSpriteList.append(tCentSpr)
 
-
-
-
-		# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
-		# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
+	def refresh_zones(self, index, item):
+		for index, item in enumerate(self.game.game_model.zoneLayerList):
+			if item.sprite is None:
+				tCentSpr_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
+				tCentSpr = ZoneSprite(index, item, "map/Tower.png", 1, center_x=tCentSpr_position.x, center_y=tCentSpr_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
+				self.zoneLayerSpriteList.append(tCentSpr)
 
 	def on_draw(self):
 		""" Draw everything """
@@ -274,6 +281,15 @@ class View():
 			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			self.game.game_controller.move_selection(mouse_position)
+
+	def on_key_press(self, symbol, modifier):
+		if symbol == arcade.key.T:
+			mouse_position_on_map = Vector(self.mouse_x, self.mouse_y) + Vector(self.camera.position.x, self.camera.position.y)
+			pos = iso_to_map_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
+			tCent = TownCenter(pos.x, pos.y)
+			print(pos)
+			self.game.game_model.zoneLayerList.append(tCent)
+			self.refresh_zones(-1, tCent)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
