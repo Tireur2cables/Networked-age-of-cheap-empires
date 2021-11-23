@@ -5,7 +5,7 @@ from views.CustomButtons import SelctCivilButton, NextViewButton, NumInput
 from views.FakeGameView import FakeGameView
 
 #Constants
-BACKGROUND_PREGAME = "./Ressources/img/ImageSettings.png" #A changer, c'est moche
+BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint.png" #A changer, c'est moche
 
 class PreGameView(arcade.View):
 	def __init__(self, main_view, nbAdv=0) :
@@ -31,6 +31,29 @@ class PreGameView(arcade.View):
 		self.setupButtons()
 		self.ressourcesInput()
 		self.launch_game()
+		self.retourButton()
+
+	#Boutton retour
+	def retourButton(self):
+		buttonsize = self.window.width/6
+
+		# Create a vertical BoxGroup to align buttons
+		self.v_box = arcade.gui.UIBoxLayout()
+
+		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
+		self.v_box.add(quit_button)
+
+		# Create a widget to hold the v_box widget, that will center the buttons
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x = "left",
+				align_x = buttonsize*(0.1),
+				anchor_y = "top",
+				align_y= -buttonsize*(0.1),
+				child = self.v_box
+			)
+		)
+
 
 	def setupButtons(self):
 		# def button size
@@ -49,8 +72,8 @@ class PreGameView(arcade.View):
 			adv1_civil_button = SelctCivilButton(self.window, text=name[i] + " : Civilisation", size=buttonsize,name=name[i])
 			self.v_box.add(adv1_civil_button.with_space_around(bottom=20))
 
-		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
-		self.v_box.add(quit_button)
+		# quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
+		# self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
@@ -58,7 +81,7 @@ class PreGameView(arcade.View):
 				anchor_x = "left",
 				align_x = buttonsize/2,
 				anchor_y = "top",
-				align_y= -buttonsize/3,
+				align_y= -buttonsize/2,
 				child = self.v_box
 			)
 		)
@@ -72,7 +95,7 @@ class PreGameView(arcade.View):
 		bg_text = arcade.load_texture("Ressources/img/grey_fond.jpg")
 
 		#Creation du text "Ressource :" 
-		ressource_text = UITextArea(x=self.window.width - buttonsize*(2),
+		ressource_text = UITextArea(x=self.window.width - buttonsize*(3/2),
                                y=self.window.height - buttonsize*0.65,
                                width=buttonsize/2,
                                height=buttonsize/10,
@@ -84,10 +107,10 @@ class PreGameView(arcade.View):
 		#COMPLETEMENT DINGUE : le nom de ressource sous format "" est écrasé mais après qu'on est
 		#deja implemente la valeur "" a notre fonction, diront nous.
 		for i in range(4) :
-			name_ressources[i]= UITextArea(x=self.window.width - buttonsize*2,
+			name_ressources[i]= UITextArea(x=self.window.width - buttonsize*(3/2),
                                y=self.window.height - buttonsize*(1+i*0.25),
-                               width=buttonsize/2.5,
-                               height=buttonsize/10,
+                               width=buttonsize/3,
+                               height=buttonsize/11,
                                text= name_ressources[i],
                                text_color=(0, 0, 0, 255))
 
@@ -102,7 +125,7 @@ class PreGameView(arcade.View):
 
 		for i in range(4) :
 			name_input_ressources[i] = arcade.gui.UITexturePane(
-				NumInput(x=self.window.width - buttonsize, y=self.window.height - buttonsize*(1+i*0.25), text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
+				NumInput(x=self.window.width - buttonsize/(1.4), y=self.window.height - buttonsize*(1+i*0.25), text="200", width=buttonsize/(2.5), height=buttonsize/10, text_color=(1, 1, 1, 255)),
 				tex=bg_text
 			)
 			#Affichage des espaces ressources modifiables
@@ -137,7 +160,7 @@ class PreGameView(arcade.View):
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x = "right",
-				align_x = -buttonsize,
+				align_x = -buttonsize*(0.2),
 				anchor_y = "center_y",
 				align_y= -buttonsize,
 				child = self.v_box
