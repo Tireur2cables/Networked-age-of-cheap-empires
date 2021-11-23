@@ -7,7 +7,8 @@ from views.FakeGameView import FakeGameView
 #Constants
 BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
 
-class PreGameView(arcade.View):
+class PreGameView(arcade.View) :
+
 	def __init__(self, main_view, nbAdv=0) :
 		super().__init__()
 		self.main_view = main_view
@@ -17,7 +18,6 @@ class PreGameView(arcade.View):
 	def setup(self) :
 		if self.nbAdv == 8 :
 			self.nbAdv = 0
-		pass
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -43,7 +43,7 @@ class PreGameView(arcade.View):
 
 		quit_button = NextViewButton(
 			self.window, self.main_view,
-			text="Return",
+			text="Retour",
 			width=buttonsize
 		)
 		self.v_box.add(quit_button)
