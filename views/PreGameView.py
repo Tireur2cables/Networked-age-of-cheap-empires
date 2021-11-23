@@ -138,9 +138,6 @@ class PreGameView(arcade.View):
                 padding=(10, 10, 10, 10)
             ))
 
-
-
-
 	#Button to start the game
 	def launch_game(self):
 		# def button size
