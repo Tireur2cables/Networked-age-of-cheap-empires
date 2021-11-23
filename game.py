@@ -7,6 +7,7 @@ from entity.Unit import Unit
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
+from views.CustomButtons import CoordButton
 from map.map import Map
 from map.tileSprite import TileSprite
 
@@ -198,7 +199,6 @@ class View():
 
 		self.tile_sprite_list.draw()
 
-
 		## @tidalwaave : 18/11, 22H30
 		self.zoneLayerSpriteList.draw()
 
@@ -213,6 +213,9 @@ class View():
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
+
+		self.coord_button.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
+		
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -234,6 +237,7 @@ class View():
 		self.manager.enable()
 
 		self.addButton()
+		self.addCoord()
 
 	def addButton(self):
 		# def button size
@@ -252,6 +256,21 @@ class View():
 				anchor_x = "left",
 				anchor_y = "bottom",
 				child = self.v_box
+			)
+		)
+
+	def addCoord(self):
+		coordsize = self.game.window.width / 5
+	
+		coordsmouse = f"x = {self.mouse_x}  y = {self.mouse_y}"
+		self.coord_button = CoordButton(self.game.window, text = coordsmouse, width = coordsize)
+		self.max_box = arcade.gui.UIBoxLayout()
+		self.max_box.add(self.coord_button)
+		self.manager.add(
+				arcade.gui.UIAnchorWidget(
+				anchor_x = "left",
+				anchor_y = "top",
+				child = self.max_box
 			)
 		)
 
@@ -333,7 +352,7 @@ class Controller():
 			# We want the same speed no matter what the distance between the villager and where he needs to go is.
 
 
-# Main function to launche the game
+# Main function to launch the game
 def main():
 	""" Main method """
 	game = AoCE()
