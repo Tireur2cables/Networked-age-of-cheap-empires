@@ -11,7 +11,7 @@ from map.map import Map
 from map.tileSprite import TileSprite
 
 ## @tidalwaave : 18/11, 22H30
-from entity.sampleOOPZones import *
+from entity.Zone import *
 from entity.ZoneSprite import ZoneSprite
 
 # --- Constants ---

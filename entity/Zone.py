@@ -3,7 +3,7 @@ class Zone:
 		self.x = x
 		self.y = y
 		self.sprite = None
-		
+
 # Getting and setting coordinates from the building
 	def set_x(self, x):
 		self.x = x
@@ -18,16 +18,16 @@ class Zone:
 		return self.y
 # Zone : Base brick of something that is present on the map, and not IN the map
 #        Has a position, appears and disappears from the map
-#   
-# 
-# Subclasses of Zone : 
+#
+#
+# Subclasses of Zone :
 # Buildable : Civil, Military, Economic (no subclass & no need to differenciate)
-# Resources (Natural !) : Mines, trees, 
+# Resources (Natural !) : Mines, trees,
 # Between both : buildable resources (champs)
 
-# Tasklist : 
-# Town Center 
-# Buisson cueillette 
+# Tasklist :
+# Town Center
+# Buisson cueillette
 
 
 
@@ -36,7 +36,7 @@ class Zone:
 #FILE NAMING CONVENTION : Zone_Buildable_TownCenter.py IN SUBFOLDERS ????
 
 
-	
+
 class Buildable(Zone):#Inherits from Zone class, thus has coordinates; Will have area when implemented on map
 	def __init__(self, x, y, health):
 		super().__init__(x, y) # Calls parent class constructor
@@ -48,7 +48,7 @@ class Buildable(Zone):#Inherits from Zone class, thus has coordinates; Will have
 		self.health = health
 	def get_health(self):
 		return self.health
-	
+
 	def set_maxhealth(self):
 		return self.maxhealth
 	def get_maxhealth(self):
@@ -63,9 +63,3 @@ class TownCenter(Buildable):#Inherits from Zone class, thus has coordinates; Wil
 
 	def get_health(self):
 		return self.health
-	
-
-
-
-
-
