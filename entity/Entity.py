@@ -1,17 +1,36 @@
+                                                                                                             
+                                                                                                             
 
+#   ______           _     _   _           
+#  |  ____|         | |   (_) | |          
+#  | |__     _ __   | |_   _  | |_   _   _ 
+#  |  __|   | '_ \  | __| | | | __| | | | |
+#  | |____  | | | | | |_  | | | |_  | |_| |
+#  |______| |_| |_|  \__| |_|  \__|  \__, |
+#                                     __/ |
+#                                    |___/ 
+#                                                                                     yyyyyyy                
+                                                                                                                      
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
 	def __init__(self, position, health, damage, display=None, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+		
 		# Position
 		self.position = position
 
-		# Life
+
+
+		#
+		## Life
+		#
 		self.health = health
 		self.max_health = health
 		self.damage = damage
 
-		# Display
+		#
+		## Display
+		#
 		self.display = display # Nouveau Concept --- Ce concept n'est pas utilisé pour l'instant, peut-être dans le futur cependant
 
 		# Battle
