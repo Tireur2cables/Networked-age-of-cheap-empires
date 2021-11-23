@@ -91,3 +91,6 @@ class NumInput(arcade.gui.UIInputText) :
 
 		else :
 			super().on_event(event)
+
+		if self.text == "" :
+			self.caret.on_text("0")

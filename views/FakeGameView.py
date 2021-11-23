@@ -13,10 +13,14 @@ SCREEN_TITLE = "Age Of Cheap Empire"
 class FakeGameView(arcade.View):
 	""" Our custom Window Class"""
 
-	def __init__(self):
+	def __init__(self, ressources_list, nbIA, isPlayer):
 		""" Initializer """
 		# Call the parent class initializer
 		super().__init__()
+
+		self.ressources_list = ressources_list
+		self.nbIA = nbIA
+		self.isPlayer = isPlayer
 
 		# Variables that will hold sprite lists
 		self.player_list = None
@@ -27,7 +31,10 @@ class FakeGameView(arcade.View):
 		self.score = 0
 
 	def setup(self) :
-		pass
+		for b in self.ressources_list :
+			print("ressource 1 :", b.child.text)
+		print("nb ia :", self.nbIA)
+		print("is there player in the game :", self.isPlayer)
 
 	def on_show(self):
 		""" Set up the game and initialize the variables. """

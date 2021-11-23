@@ -13,6 +13,7 @@ class IAPreGameView(arcade.View) :
 		super().__init__()
 		self.main_view = main_view
 		self.nbAdv = nbAdv
+		self.isPlayer = False
 
 	def setup(self) :
 		if self.nbAdv == 7 :
@@ -127,7 +128,11 @@ class IAPreGameView(arcade.View) :
 
 		launch_button = NextViewButton(
 			self.window,
-			FakeGameView(),
+			FakeGameView(
+				self.name_input_ressources,
+				self.nbAdv+2,
+				self.isPlayer
+			),
 			text="Lancer la partie",
 			width=buttonsize*(3/2)
 		)
@@ -185,10 +190,10 @@ class IAPreGameView(arcade.View) :
 			)
 
 		#Creation des espaces ressources modifiables
-		name_input_ressources = ["Or_input", "Bois_input", "Nourriture_input", "Pierre_input"]
+		self.name_input_ressources = ["Or_input", "Bois_input", "Nourriture_input", "Pierre_input"]
 
-		for i in range(len(name_input_ressources)) :
-			name_input_ressources[i] = arcade.gui.UITexturePane(
+		for i in range(len(self.name_input_ressources)) :
+			self.name_input_ressources[i] = arcade.gui.UITexturePane(
 				NumInput(
 					x=self.window.width - buttonsize/(1.4),
 					y=self.window.height - buttonsize*(1.25+i*0.25),
@@ -199,7 +204,7 @@ class IAPreGameView(arcade.View) :
 				tex=bg_text
 			)
 			#Affichage des espaces ressources modifiables
-			self.manager.add(name_input_ressources[i])
+			self.manager.add(self.name_input_ressources[i])
 
 		#Affichage de "Ressource :"
 		self.manager.add(
