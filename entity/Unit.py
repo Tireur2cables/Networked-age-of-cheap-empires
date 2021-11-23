@@ -3,6 +3,16 @@ from CONSTANTS import Resource
 from utils.vector import Vector
 
 
+#   _    _           _   _   
+#  | |  | |         (_) | |  
+#  | |  | |  _ __    _  | |_ 
+#  | |  | | | '_ \  | | | __|
+#  | |__| | | | | | | | | |_ 
+#   \____/  |_| |_| |_|  \__|
+                           
+                           
+
+
 class Unit(Entity):
 	#une Unit est une Entity qui est mobile
 	#Liste des Unit: https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
@@ -19,6 +29,15 @@ class Unit(Entity):
 		self.aim = aim
 		self.change = change
 
+
+#  __      ___ _ _                       
+#  \ \    / (_) | |                      
+#   \ \  / / _| | | __ _  __ _  ___ _ __ 
+#    \ \/ / | | | |/ _` |/ _` |/ _ \ '__|
+#     \  /  | | | | (_| | (_| |  __/ |   
+#      \/   |_|_|_|\__,_|\__, |\___|_|   
+#                         __/ |          
+#                        |___/           
 
 
 class Villager(Unit):#un Villageois est une Unit particuliere
@@ -39,6 +58,17 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 	def is_full(self):#ne peut plus prendre de nouvelles resources
 		return self.nb_resources() == self.max_resource
 
+
+#   __  __ _ _ _ _                   
+#  |  \/  (_) (_) |                  
+#  | \  / |_| |_| |_ __ _ _ __ _   _ 
+#  | |\/| | | | | __/ _` | '__| | | |
+#  | |  | | | | | || (_| | |  | |_| |
+#  |_|  |_|_|_|_|\__\__,_|_|   \__, |
+#                               __/ |
+#                              |___/ 
+
+
 class Military(Unit):#un Militaire est une Unit particuliere
 	def __init__(self, position, health, damage, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4, speed=1):
 		super().__init__(position, health, damage, rate_fire=rate_fire, range=range, melee_armor=melee_armor, pierce_armor=pierce_armor, line_sight=line_sight, speed=speed)
@@ -48,7 +78,7 @@ class Military(Unit):#un Militaire est une Unit particuliere
 #Infantry
 class Clubman(Military):
 	def __init__(self, position, health=40, damage=3):
-		super().__init__(position, health, damage)
+		super().__init__(position, health, damage)a
 
 class Swordsman(Military):
 	def __init__(self, position, health=60, damage=7):

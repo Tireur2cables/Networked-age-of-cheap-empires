@@ -51,3 +51,9 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 			self.window.triggerMusic()
 		elif self.fullscreen :
 			self.window.triggerFullscreen()
+
+
+class CoordButton(arcade.gui.UIFlatButton) :
+	def __init__(self, window, text, width) :
+		super().__init__(text=text, width=width)
+		self.window = window
