@@ -174,30 +174,32 @@ class View():
 		self.zoneLayerSpriteList = arcade.SpriteList()
 
 	def setup(self):
-		for index, item in enumerate(self.game.game_model.entity_list):
-			# coin image from kenney.nl
-			es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
-			self.sprite_list.append(es)
-			#La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
-			# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
+		self.sync_entities()
+		self.sync_ground()
+		self.sync_zones()
 
+
+	def sync_entities(self):
+		for index, item in enumerate(self.game.game_model.entity_list): # Sync self.game_model.entity_list with sprite_list
+			if item.sprite is None:
+				es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
+				self.sprite_list.append(es)
+				# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
+				# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
+
+	def sync_ground(self): # Sync self.game_model.ground_list with tile_sprite_list
 		for index, item in enumerate(self.game.game_model.ground_list):
-			ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
-			self.tile_sprite_list.append(ts)
+			if item.sprite is None:
+				ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
+				self.tile_sprite_list.append(ts)
 
-
+	def sync_zones(self): # Sync self.game_model.zoneLayerList with zoneLayerSpriteList
 		## @tidalwaave : 18/11, 22H30
 		for index, item in enumerate(self.game.game_model.zoneLayerList):
-			tCentSpr_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
-			tCentSpr = ZoneSprite(index, item, "map/Tower.png", 1, center_x=tCentSpr_position.x, center_y=tCentSpr_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
-			self.zoneLayerSpriteList.append(tCentSpr)
-
-	def refresh_zones(self, index, item):
-		for index, item in enumerate(self.game.game_model.zoneLayerList):
 			if item.sprite is None:
-				tCentSpr_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
-				tCentSpr = ZoneSprite(index, item, "map/Tower.png", 1, center_x=tCentSpr_position.x, center_y=tCentSpr_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
-				self.zoneLayerSpriteList.append(tCentSpr)
+				zone_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
+				zone = ZoneSprite(index, item, "map/Tower.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
+				self.zoneLayerSpriteList.append(zone)
 
 	def on_draw(self):
 		""" Draw everything """
@@ -289,7 +291,7 @@ class View():
 			tCent = TownCenter(pos.x, pos.y)
 			print(pos)
 			self.game.game_model.zoneLayerList.append(tCent)
-			self.refresh_zones(-1, tCent)
+			self.sync_zones()
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
