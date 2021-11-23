@@ -176,7 +176,7 @@ class PreGameView(arcade.View) :
 				self.main_view,
 				self.nbAdv+1
 			),
-			text="Nombre d'adversaire : " + str(self.nbAdv),
+			text="Nombre d'IA : " + str(self.nbAdv),
 			width=buttonsize*(3/2)
 		)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
