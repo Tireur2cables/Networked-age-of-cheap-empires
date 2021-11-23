@@ -84,9 +84,6 @@ class PreGameView(arcade.View):
 			)
 			self.v_box.add(adv1_civil_button.with_space_around(bottom=20))
 
-		# quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
-		# self.v_box.add(quit_button)
-
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(

@@ -7,7 +7,8 @@ from views.FakeGameView import FakeGameView
 #Constants
 BACKGROUND_IAPREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
 
-class IAPreGameView(arcade.View):
+class IAPreGameView(arcade.View) :
+
 	def __init__(self, main_view,nbAdv=0) :
 		super().__init__()
 		self.main_view = main_view
@@ -18,7 +19,7 @@ class IAPreGameView(arcade.View):
 			self.nbAdv = 0
 		pass
 
-	def on_show(self):
+	def on_show(self) :
 		""" This is run once when we switch to this view """
 
 		# ajoute l'image de background
@@ -32,45 +33,21 @@ class IAPreGameView(arcade.View):
 		self.ressourcesInput()
 		self.launch_game()
 		self.retourButton()
-		
-##
-#	def setupButtons(self):
-		# def button size
-#		buttonsize = self.window.width / 6
 
-		# Create a vertical BoxGroup to align buttons
-#		self.v_box = arcade.gui.UIBoxLayout()
-
-		# Create the buttons of incrementation
-#		ia1_civil_button = SelctCivilButton(self.window,text="IA1: Civilisation", size=buttonsize,name="IA1")
-#		self.v_box.add(ia1_civil_button.with_space_around(bottom=20))
-
-#		ia2_civil_button = SelctCivilButton(self.window,text="IA2: Civilisation", size=buttonsize,name="IA2")
-#		self.v_box.add(ia2_civil_button.with_space_around(bottom=20))
-
-#		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
-#		self.v_box.add(quit_button)
-
-		# Create a widget to hold the v_box widget, that will center the buttons
-#		self.manager.add(
-#			arcade.gui.UIAnchorWidget(
-#				anchor_x = "left",
-#				align_x = buttonsize/2,
-#				anchor_y = "top",
-#				align_y= -buttonsize/3,
-#				child = self.v_box
-#			)
-#		)
-##
 
 	#Boutton retour
-	def retourButton(self):
+	def retourButton(self) :
 		buttonsize = self.window.width/6
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
 
-		quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
+		quit_button = NextViewButton(
+			self.window,
+			self.main_view,
+			text="Return",
+			width=buttonsize
+		)
 		self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -84,7 +61,7 @@ class IAPreGameView(arcade.View):
 			)
 		)
 
-	def setupButtons(self):
+	def setupButtons(self) :
 		# def button size
 		buttonsize = self.window.width / 6
 
@@ -92,20 +69,30 @@ class IAPreGameView(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the buttons of incrementation
-		ia1_civil_button = SelctCivilButton(self.window, text="IA1 : Civilisation", size=buttonsize,name="IA1")
+		ia1_civil_button = SelctCivilButton(
+			self.window,
+			text="IA1 : Civilisation",
+			size=buttonsize,name="IA1"
+		)
 		self.v_box.add(ia1_civil_button.with_space_around(bottom=20))
 
-		ia2_civil_button = SelctCivilButton(self.window, text="IA2 : Civilisation", size=buttonsize,name="IA2")
+		ia2_civil_button = SelctCivilButton(
+			self.window,
+			text="IA2 : Civilisation",
+			size=buttonsize,name="IA2"
+		)
 		self.v_box.add(ia2_civil_button.with_space_around(bottom=20))
 
 		name = ["IA3 ", "IA4", "IA5", "IA6", "IA7", "IA8"]
 
 		for i in range(self.nbAdv) :
-			adv1_civil_button = SelctCivilButton(self.window, text=name[i] + " : Civilisation", size=buttonsize,name=name[i])
+			adv1_civil_button = SelctCivilButton(
+				self.window,
+				text=name[i] + " : Civilisation",
+				size=buttonsize,
+				name=name[i]
+			)
 			self.v_box.add(adv1_civil_button.with_space_around(bottom=20))
-
-		# quit_button = NextViewButton(self.window, self.main_view, text="Return", width=buttonsize)
-		# self.v_box.add(quit_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
@@ -118,32 +105,8 @@ class IAPreGameView(arcade.View):
 			)
 		)
 
-	#Button for numbers of ennemi, it will be at the bottom of the window and in every pregame view
-#	def NumEnemButton(self):
-#
-#		# def button size
-#		buttonsize = self.window.width / 6
-
-		# Create a vertical BoxGroup to align buttons
-#		self.v_box = arcade.gui.UIBoxLayout()
-
-		# Create the button
-#		num_enem_button = NextViewButton(self.window, PreGameView(self.main_view), text="Nombre d'adversaire : 0", width=buttonsize)
-#		self.v_box.add(num_enem_button.with_space_around(bottom=20))
-
-		# Create a widget to hold the v_box widget, that will center the buttons
-#		self.manager.add(
-#			arcade.gui.UIAnchorWidget(
-#				anchor_x = "left",
-#				align_x = buttonsize,
-#				anchor_y = "center_y",
-#				align_y= -buttonsize,
-#				child = self.v_box
-#			)
-#		)
-
 	#Button to start the game
-	def launch_game(self):
+	def launch_game(self) :
 		# def button size
 		buttonsize = self.window.width / 6
 
@@ -151,10 +114,23 @@ class IAPreGameView(arcade.View):
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
-		num_enem_button = NextViewButton(self.window, IAPreGameView(self.main_view, self.nbAdv+1), text="Nombre d'IA : " + str(self.nbAdv), width=buttonsize*(3/2))
+		num_enem_button = NextViewButton(
+			self.window,
+			IAPreGameView(
+				self.main_view,
+				self.nbAdv+1
+			),
+			text="Nombre d'IA : " + str(self.nbAdv+2),
+			width=buttonsize*(3/2)
+		)
 		self.v_box.add(num_enem_button.with_space_around(bottom=20))
 
-		launch_button = NextViewButton(self.window, FakeGameView(), text="Lancer la partie", width=buttonsize*(3/2))
+		launch_button = NextViewButton(
+			self.window,
+			FakeGameView(),
+			text="Lancer la partie",
+			width=buttonsize*(3/2)
+		)
 		self.v_box.add(launch_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttonsS
@@ -176,53 +152,66 @@ class IAPreGameView(arcade.View):
 		#Couleur de fond pour les espaces ressources modifiables
 		bg_text = arcade.load_texture("Ressources/img/grey_fond.jpg")
 
-		#Creation du text "Ressource :" 
-		ressource_text = UITextArea(x=self.window.width - buttonsize*(3/2),
-                               y=self.window.height - buttonsize*0.75,
-                               width=buttonsize/2,
-                               height=buttonsize/10,
-                               text="Ressources :",
-                               text_color=(0, 0, 0, 255))
-		
-		name_ressources = ["Or : ","Bois : ","Nourriture : ","Pierre : "]
-		
+		#Creation du text "Ressource :"
+		ressource_text = UITextArea(
+			x=self.window.width - buttonsize*(3/2),
+			y=self.window.height - buttonsize*0.75,
+			width=buttonsize/2,
+			height=buttonsize/10,
+			text="Ressources :",
+			text_color=(0, 0, 0, 255)
+		)
+
+		name_ressources = ["Or : ", "Bois : ", "Nourriture : ", "Pierre : "]
+
 		#COMPLETEMENT DINGUE : le nom de ressource sous format "" est écrasé mais après qu'on est
 		#deja implemente la valeur "" a notre fonction, diront nous.
-		for i in range(4) :
-			name_ressources[i]= UITextArea(x=self.window.width - buttonsize*(3/2),
-                               y=self.window.height - buttonsize*(1.25+i*0.25),
-                               width=buttonsize/2.5,
-                               height=buttonsize/10,
-                               text= name_ressources[i],
-                               text_color=(0, 0, 0, 255))
+		for i in range(len(name_ressources)) :
+			name_ressources[i]= UITextArea(
+				x=self.window.width - buttonsize*(3/2),
+				y=self.window.height - buttonsize*(1.25+i*0.25),
+				width=buttonsize/2.5,
+				height=buttonsize/10,
+				text= name_ressources[i],
+				text_color=(0, 0, 0, 255)
+			)
 
-			self.manager.add(UITexturePane(
-                name_ressources[i].with_space_around(right=20),
-                tex=bg_text,
-                padding=(10, 10, 10, 10)
-            ))
+			self.manager.add(
+				UITexturePane(
+					name_ressources[i].with_space_around(right=20),
+					tex=bg_text,
+					padding=(10, 10, 10, 10)
+				)
+			)
 
 		#Creation des espaces ressources modifiables
-		name_input_ressources = ["Or_input","Bois_input","Nourriture_input","Pierre_input"]
+		name_input_ressources = ["Or_input", "Bois_input", "Nourriture_input", "Pierre_input"]
 
-		for i in range(4) :
+		for i in range(len(name_input_ressources)) :
 			name_input_ressources[i] = arcade.gui.UITexturePane(
-				NumInput(x=self.window.width - buttonsize/(1.4), y=self.window.height - buttonsize*(1.25+i*0.25), text="200", width=buttonsize/2.5, height=buttonsize/10, text_color=(1, 1, 1, 255)),
+				NumInput(
+					x=self.window.width - buttonsize/(1.4),
+					y=self.window.height - buttonsize*(1.25+i*0.25),
+					text="200", width=buttonsize/2.5,
+					height=buttonsize/10,
+					text_color=(1, 1, 1, 255)
+				),
 				tex=bg_text
 			)
 			#Affichage des espaces ressources modifiables
 			self.manager.add(name_input_ressources[i])
 
 		#Affichage de "Ressource :"
-		self.manager.add(UITexturePane(
-                ressource_text.with_space_around(right=20),
-                tex=bg_text,
-                padding=(10, 10, 10, 10)
-            ))
+		self.manager.add(
+			UITexturePane(
+				ressource_text.with_space_around(right=20),
+				tex=bg_text,
+				padding=(10, 10, 10, 10)
+			)
+		)
 
 	def on_draw(self):
 		""" Draw this view """
-
 		arcade.start_render()
 		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
 		self.manager.draw()
