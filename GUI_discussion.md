@@ -6,6 +6,12 @@
   enough, provided it is a bit versatile.
   
 # Joueur VS 2IA ou +
+
+# IA VS IAP
+
+# Paramètre au démarrage
+- Ressources (Bois,Nourriture,Or,Pierre) : à la discrétion de l'user, input chiffre
+- Map (5 map différentes dont une aléatoire, les autres sont toujours les mêmes)
   (12) e: More than 2 players.
   The minimum that must be implemented is Human vs AI, and since we eschew
   multiplayer, there is at most one human player. AoE games support up to 8 players.

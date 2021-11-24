@@ -13,7 +13,7 @@ SPRITE_SCALING_COIN = 0.2
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
-MUSIC = "./Ressources/music/logon_aoe_music3s.wav"
+MUSIC = "./Ressources/music/subaru.mp3"
 
 #########################################################################
 #							MAIN CLASS									#
@@ -24,7 +24,7 @@ class AoCE(arcade.Window) :
 	def __init__(self) :
 		""" Initializer """
 		# Call the initializer of arcade.Window
-		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True)
+		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True, vsync=True)
 		#arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# Show the mouse cursor
@@ -52,7 +52,9 @@ class AoCE(arcade.Window) :
 
 	# Set fulllscreen or defaults : SCREEN_WIDTH x SCREEN_HEIGHT
 	def triggerFullscreen(self) :
+		curr = self.current_view
 		self.set_fullscreen(not self.fullscreen)
+		self.show_view(curr)
 
 	# Stop or play the music
 	def triggerMusic(self) :
@@ -60,6 +62,10 @@ class AoCE(arcade.Window) :
 			self.media_player.pause()
 		else :
 			self.media_player.play()
+
+	# Active or not the vsync
+	def triggerVsync(self) :
+		self.set_vsync(not self.vsync)
 
 	def isPlayingMusic(self) :
 		return self.media_player.playing

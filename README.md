@@ -47,8 +47,8 @@ Ces conventions sont calquées sur PEP 8 :
 (f = facultatif)
 (d = proposé mais plutôt déconseillé, "casse-gueule")
 
-1) Python 3
-2) Framework GUI (Pygame, ...)
+1) Python 3 - Done
+2) Framework GUI (Pygame, ...) - Done
 3) Graphical representation of the map
 4) Save & Load
 5) (c) thème à peu près équivalent à AoE (antique)
