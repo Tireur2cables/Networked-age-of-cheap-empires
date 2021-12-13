@@ -166,10 +166,14 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
-	def setup(self):
+	def setup(self) :
+		self.static_menu()
 		self.sync_entities()
 		self.sync_ground()
 		self.sync_zones()
+
+	def static_menu(self) :
+		pass
 
 
 	def sync_entities(self):
