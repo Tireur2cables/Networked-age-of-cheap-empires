@@ -3,7 +3,7 @@ import arcade
 import arcade.gui
 from utils.vector import Vector
 from utils.isometric import *
-from entity.Unit import Unit
+from entity.Unit import *
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
@@ -15,14 +15,12 @@ from entity.Zone import *
 from entity.ZoneSprite import ZoneSprite
 
 # --- Constants ---
-SPRITE_SCALING_COIN = 0.2
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
 MUSIC = "./Ressources/music/Marked.mp3"
 
 DEFAULT_MAP_SIZE = 50
-
 TILE_WIDTH = 64
 TILE_HEIGHT = TILE_WIDTH // 2
 
@@ -136,9 +134,9 @@ class Model():
 
 		# Set up the villager and add it to the entity_list.
 		self.map = Map(self.tile_list, DEFAULT_MAP_SIZE)
-		unit0 = Unit(Vector(100, 100), 10, 10)
-		unit1 = Unit(Vector(50, 50), 10, 10)
-		unit2 = Unit(Vector(100, 100), 10, 10)
+		unit0 = Villager(Vector(100, 100))
+		unit1 = Villager(Vector(50, 50))
+		unit2 = Villager(Vector(100, 100))
 		self.entity_list.append(unit0)
 		self.entity_list.append(unit1)
 		self.entity_list.append(unit2)
@@ -161,32 +159,19 @@ class View():
 		""" Initializer """
 		self.game = aoce_game
 
-		# Variables that will hold sprite lists
 		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
 	def setup(self):
-		self.sync_entities()
-		self.sync_ground()
-		self.sync_zones()
 
-
-	def sync_entities(self):
-		# Sync self.game_model.entity_list with sprite_list
-		for index, item in enumerate(self.game.game_model.entity_list):
-			if item.sprite is None:
-				es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
-				self.entity_sprite_list.append(es)
-				# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
-				# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
-
-	def sync_ground(self):
-		# Sync self.game_model.tile_list with tile_sprite_list
-		for index, item in enumerate(self.game.game_model.tile_list):
-			if item.sprite is None:
-				ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
-				self.tile_sprite_list.append(ts)
+		# Variables that will hold sprite lists
+		for e in self.game.game_model.entity_list:
+			self.entity_sprite_list.append(e.sprite)
+		for t in self.game.game_model.tile_list:
+			self.tile_sprite_list.append(t.sprite)
+		for z in self.game.game_model.zone_list:
+			self.zone_sprite_list.append(z.sprite)
 
 	def sync_zones(self):
 		# Sync self.game_model.zone_list with zone_sprite_list
@@ -194,7 +179,7 @@ class View():
 		for index, item in enumerate(self.game.game_model.zone_list):
 			if item.sprite is None:
 				zone_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
-				zone = ZoneSprite(index, item, "map/Tower.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
+				zone = ZoneSprite(index, item, "map/Tower.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
 				# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
 				self.zone_sprite_list.append(zone)
 
@@ -205,9 +190,13 @@ class View():
 		#
 		# --- Object sprite lists : Tiles, Zones & Entities
 		#
+
 		self.tile_sprite_list.draw()
 
 		self.zone_sprite_list.draw()
+
+		# for e in self.game.game_model.entity_list:
+		# 	e.sprite.draw()
 
 		for i in self.entity_sprite_list:
 			if i.selected:
@@ -359,6 +348,7 @@ class Controller():
 			# print(f"{int_position} -> {int_iso_position}")
 
 	def select(self, sprites_at_point):
+		print(sprites_at_point)
 		sprite = None
 		for i in self.selection:
 			i.selected = False
@@ -384,3 +374,6 @@ def main():
 	""" Main method """
 	game = AoCE()
 	arcade.run()
+
+if __name__ == "__main__":  # Python syntax that means "if you are launching from this file, run main()", useful if this file is going to be imported.
+	main()

@@ -1,7 +1,4 @@
-
-import arcade
-from map.arcadeDisplay import cartToIso
-
+from map.tileSprite import TileSprite
 
 class Tile():
 	def __init__(self, blockID, x, y, pointerToEntity):
@@ -16,7 +13,7 @@ class Tile():
 			self.isLocked = True
 
 		# Sprite
-		self.sprite = None
+		self.sprite = TileSprite(self)
 
 
 	def setEntity(self,pointerToEntity):

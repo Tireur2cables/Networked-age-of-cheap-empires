@@ -1,25 +1,28 @@
-                                                                                                             
-                                                                                                             
+from entity.EntitySprite import EntitySprite
 
-#   ______           _     _   _           
-#  |  ____|         | |   (_) | |          
-#  | |__     _ __   | |_   _  | |_   _   _ 
+
+#   ______           _     _   _
+#  |  ____|         | |   (_) | |
+#  | |__     _ __   | |_   _  | |_   _   _
 #  |  __|   | '_ \  | __| | | | __| | | | |
 #  | |____  | | | | | |_  | | | |_  | |_| |
 #  |______| |_| |_|  \__| |_|  \__|  \__, |
 #                                     __/ |
-#                                    |___/ 
-#                                                                                     yyyyyyy                
-                                                                                                                      
+#                                    |___/
+#
+
+SPRITE_SCALING_COIN = 0.2
+
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, position, health, damage, display=None, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
-		
+	def __init__(self, position, sprite_image, health=1, damage=0, display=None, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+
+		# Sprite
+		self.sprite = EntitySprite(self, filename=sprite_image, scale=SPRITE_SCALING_COIN, center_x=position.x, center_y=position.y, hit_box_algorithm="None")
+
 		# Position
 		self.position = position
-
-
 
 		#
 		## Life
@@ -39,9 +42,6 @@ class Entity:
 		self.melee_armor = melee_armor
 		self.pierce_armor = pierce_armor
 		self.line_sight = line_sight
-
-		# Sprite
-		self.sprite = None
 
 
 	# coordonnees

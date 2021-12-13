@@ -2,6 +2,7 @@
 
 import arcade
 from map.tile import Tile
+from entity.Zone import Zone
 from map.defaultmap import default_map_2d
 # --- Constants ---
 CHARACTER_SCALING = 1
@@ -13,6 +14,12 @@ class Map():
 		self.map_size = map_size
 		# self.tileArray = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
 		self.tileArray = [[Tile(default_map_2d[x][y], x, y, None) for y in range(map_size)] for x in range(map_size)]
+
+		# for x in range(map_size):
+		# 	for y in range(map_size):
+		# 		if default_map_2d[x][y] == "tree":
+		# 			self.zoneArray = [[Zone(x, y)]]
+
 		self.update_tile_list()
 
 	def update_tile_list(self):
