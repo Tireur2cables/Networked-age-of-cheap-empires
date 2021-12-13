@@ -1,21 +1,10 @@
-class Zone:
-	def __init__(self, x, y):#constructeur : initialise les attributs
-		self.x = x
-		self.y = y
+from entity.Entity import Entity
+class Zone(Entity):
+	def __init__(self, x, y, tileSize):#constructeur : initialise les attributs
+		self.tileSize=tileSize
 		self.sprite = None
 
-# Getting and setting coordinates from the building
-	def set_x(self, x):
-		self.x = x
 
-	def get_x(self):
-		return self.x
-
-	def set_y(self, y):
-		self.y = y
-
-	def get_y(self):
-		return self.y
 # Zone : Base brick of something that is present on the map, and not IN the map
 #        Has a position, appears and disappears from the map
 #
@@ -72,8 +61,9 @@ class TownCenter(Buildable):
 	#Size: 3x3
 	#LineOfSight : 7
 	def __init__(self, x, y, health = 600):
-		super().__init__(x, y, health)
-
+		super().__init__(x, y, health, tileSize=(3,3))
+		self.set_line_sight(7)
+ 
 	def get_health(self):
 		return self.health
 
@@ -151,3 +141,7 @@ class Resources(Zone):
 		self.amount = amount
 	def get_amount(self):
 		return self.amount
+
+class Wood(Resources):
+	def __init__(self, x, y):
+		super().__init__(x,y,25,75)
