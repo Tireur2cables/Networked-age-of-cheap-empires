@@ -229,7 +229,7 @@ class View():
 		#
 		# --- In-game GUI ---
 		#
-		self.coord_label.text = f"X = {self.mouse_x}  Y = {self.mouse_y}"
+		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
 		self.coord_label.fit_content()
 
 
@@ -279,7 +279,7 @@ class View():
 		coordsize = self.game.window.width / 5
 
 		coordsmouse = f"x = {self.mouse_x}  y = {self.mouse_y}"
-		self.coord_label = arcade.gui.UILabel(text = coordsmouse, width= 100, height = 100)
+		self.coord_label = arcade.gui.UILabel(text = coordsmouse, width= 100, height = 100, anchor_y="bottom")
 		coord_label_bg = self.coord_label.with_space_around(5, 5, 5, 5, (20, 20, 20))
 		self.max_box = arcade.gui.UIBoxLayout()
 		self.max_box.add(self.coord_label)
@@ -308,7 +308,7 @@ class View():
 		mouse_position = Vector(x + self.camera.position.x, y + self.camera.position.y)
 
 		if button == arcade.MOUSE_BUTTON_LEFT:
-			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.sprite_list))
+			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.entity_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			self.game.game_controller.move_selection(mouse_position)
 
