@@ -9,6 +9,7 @@ from views.MainView import MainView
 from views.CustomButtons import QuitButton
 from map.map import Map
 from map.tileSprite import TileSprite
+from map.Minimap import Minimap
 
 ## @tidalwaave : 18/11, 22H30
 from entity.Zone import *
@@ -36,7 +37,7 @@ class AoCE(arcade.Window):
 	def __init__(self):
 		""" Initializer """
 		# Call the initializer of arcade.Window
-		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=False)
+		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True)
 		# arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# Show the mouse cursor
@@ -153,7 +154,7 @@ class Model():
 
 # --- Constants ---
 CAMERA_MOVE_STEP = 15
-CAMERA_MOVE_EDGE = 50
+CAMERA_MOVE_EDGE = 20
 
 class View():
 
@@ -173,7 +174,7 @@ class View():
 		self.sync_zones()
 
 	def static_menu(self) :
-		pass
+		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT)
 
 
 	def sync_entities(self):
@@ -221,6 +222,8 @@ class View():
 				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
 
+		# Update the minimap
+		self.minimap.draw()
 
 		#
 		# --- Manager and Camera ---
@@ -235,7 +238,6 @@ class View():
 		#
 		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
 		self.coord_label.fit_content()
-
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -273,7 +275,7 @@ class View():
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
-				anchor_x = "left",
+				anchor_x = "right",
 				anchor_y = "bottom",
 				child = self.v_box
 			)
@@ -296,22 +298,25 @@ class View():
 			)
 		)
 
-	def camera_move(self):
+	def camera_move(self) :
 		# Update the camera coords if the mouse is on the edges
 		# The movement of the camera is handled in the on_draw() function with move_to()
-		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE:
+		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE :
 			self.camera_x += CAMERA_MOVE_STEP
-		elif self.mouse_x <= CAMERA_MOVE_EDGE:
+		elif self.mouse_x <= CAMERA_MOVE_EDGE :
 			self.camera_x -= CAMERA_MOVE_STEP
-		if self.mouse_y <= CAMERA_MOVE_EDGE:
+		if self.mouse_y <= CAMERA_MOVE_EDGE :
 			self.camera_y -= CAMERA_MOVE_STEP
-		elif self.mouse_y >= self.game.window.height - CAMERA_MOVE_EDGE:
+		elif self.mouse_y >= self.game.window.height - CAMERA_MOVE_EDGE :
 			self.camera_y += CAMERA_MOVE_STEP
 
-	def on_mouse_press(self, x, y, button, key_modifiers):
+	def on_mouse_press(self, x, y, button, key_modifiers) :
 		mouse_position = Vector(x + self.camera.position.x, y + self.camera.position.y)
-
-		if button == arcade.MOUSE_BUTTON_LEFT:
+		if self.minimap.is_on_minimap_sprite(x, y) :
+			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
+			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
+			self.camera.move_to([self.camera_x, self.camera_y], 1)
+		elif button == arcade.MOUSE_BUTTON_LEFT :
 			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.entity_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			self.game.game_controller.move_selection(mouse_position)
@@ -368,7 +373,7 @@ class Controller():
 			i.selected = False
 		self.selection.clear()
 		for i in sprites_at_point:
-			if i.entity and isinstance(i.entity, Unit):
+			if i.entity and isinstance(i.entity, Unit) :
 				sprite = i
 				break
 		if sprite:
