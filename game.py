@@ -325,6 +325,7 @@ class Controller():
 	def __init__(self, aoce_game):
 		""" Initializer """
 		self.game = aoce_game
+		self.pathfinding_matrix = self.game.game_model.map.pathfinding_matrix
 
 		# Selection (will be an EntitySprite)
 		self.selection = []
@@ -333,6 +334,17 @@ class Controller():
 		pass
 
 	def on_update(self, delta_time):
+
+		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
+		
+		
+		grid = Grid(matrix=self.pathfinding_matrix)
+		finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+		start = grid.node(0, 0)
+		end = grid.node(2, 2)
+		path, runs = finder.find_path(start, end, grid)
+
+
 		""" Movement and game logic """
 		for sprite in self.selection:
 			entity = sprite.entity
@@ -341,6 +353,9 @@ class Controller():
 			if (not entity.position.isalmost(entity.aim, entity.speed)) and next_is_on_map:  # If it is not close to where it aims, move.
 				entity.position += entity.change
 				sprite.center_x, sprite.center_y = tuple(entity.position)
+
+
+
 
 			# iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			# int_position = Vector(int(entity.position.x), int(entity.position.y))
