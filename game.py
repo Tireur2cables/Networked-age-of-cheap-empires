@@ -157,7 +157,7 @@ class Model():
 # --- Constants ---
 CAMERA_MOVE_STEP = 15
 CAMERA_MOVE_EDGE = 50
-COLOR_STATIC_RESSOURCES = arcade.color.GREEN_YELLOW
+COLOR_STATIC_RESSOURCES = arcade.color.DARK_BROWN
 COLOR_STATIC_RESSOURCES_ICONE = arcade.color.DARK_GRAY
 
 
@@ -435,6 +435,8 @@ class View():
 		self.mouse_y = y
 
 
+
+
 #########################################################################
 #							CONTROLLER CLASS							#
 #########################################################################
@@ -473,10 +475,14 @@ class Controller():
 		for i in sprites_at_point:
 			if i.entity and isinstance(i.entity, Unit) :
 				sprite = i
+				#self.game.game_view.coin_GUI()
 				break
 		if sprite:
 			sprite.selected = True
 			self.selection.append(sprite)
+		if self.selection :
+			pass
+
 
 	def move_selection(self, mouse_position):
 		for i in self.selection:
