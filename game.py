@@ -192,7 +192,7 @@ class View():
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT)
 
 		Width_label = self.game.window.width/5
-		HEIGHT_LABEL = self.game.window.height*(0.05667) #(0.0567) #51.1 #old one : self.game.window.height/16.5
+		HEIGHT_LABEL = self.game.window.height*(0.05) #(0.0567) #51.1 #old one : self.game.window.height/16.5
 		
 		#TEST GUI STATIC
 		#arcade.draw_rectangle_filled(300,300,50,80,arcade.color.BROWN_NOSE)
@@ -231,7 +231,7 @@ class View():
 		self.manager.add(
             arcade.gui.UIAnchorWidget(
                 anchor_x="left",
-				align_x=self.game.window.width/5 + HEIGHT_LABEL,
+				align_x= HEIGHT_LABEL + int(self.game.window.width*(3/10)),
                 anchor_y="bottom",
                 child=self.v_box)
         )
@@ -263,7 +263,7 @@ class View():
 		self.manager.add(
             arcade.gui.UIAnchorWidget(
                 anchor_x="left",
-				align_x=self.game.window.width/5,
+				align_x= int(self.game.window.width*(3/10)),
                 anchor_y="bottom",
                 child=self.v_box2)
         )
