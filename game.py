@@ -419,6 +419,37 @@ class View():
 		self.mouse_x = x
 		self.mouse_y = y
 
+	#En construction, marche paaaaaaaaas des masses
+	def coin_GUI(self):
+		# Create and enable the UIManager
+		self.manager = arcade.gui.UIManager()
+		self.manager.enable()
+		
+        # Create a box group to align the 'open' button in the center
+		self.v_box = arcade.gui.UIBoxLayout()
+
+		coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width = 40)
+		self.v_box.add(coin_box.with_space_around(0,0,0,0,arcade.color.BRONZE))
+
+		# for i in self.entity_sprite_list:
+		# 	if i.selected:
+		# 		self.manager.add(
+		# 			arcade.gui.UIAnchorWidget(
+		# 				anchor_x="right",
+		# 				align_x=-int(self.game.window.width*3/10),
+		# 				anchor_y="bottom",
+		# 				child=self.v_box)
+		# 		)
+		
+		self.manager.add(
+					arcade.gui.UIAnchorWidget(
+						anchor_x="right",
+						align_x=-int(self.game.window.width*2/10),
+						anchor_y="bottom",
+						child=self.v_box)
+				)
+
+
 
 
 
@@ -460,7 +491,7 @@ class Controller():
 		for i in sprites_at_point:
 			if i.entity and isinstance(i.entity, Unit) :
 				sprite = i
-				#self.game.game_view.coin_GUI()
+				self.game.game_view.coin_GUI()
 				break
 		if sprite:
 			sprite.selected = True
