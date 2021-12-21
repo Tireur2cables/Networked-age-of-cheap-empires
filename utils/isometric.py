@@ -5,6 +5,11 @@ def cart_to_iso(x, y):
 	iso_y = (x + y) / 2
 	return iso_x, iso_y
 
+def iso_to_cart(iso_x, iso_y):
+	x = iso_x / 2 + iso_y
+	y = iso_y - iso_x / 2
+	return x, y
+
 def map_xy_to_iso(x, y, tile_width_half, tile_height_half):
 	iso_x = (x - y) * tile_width_half
 	iso_y = (x + y) * tile_height_half
