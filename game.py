@@ -179,7 +179,7 @@ class View():
 		for index, item in enumerate(self.game.game_model.zone_list):
 			if item.sprite is None:
 				zone_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
-				zone = ZoneSprite(index, item, "map/Tower.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
+				zone = ZoneSprite(index, item, "./Ressources/img/zones/buildables/towncenter.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
 				# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
 				self.zone_sprite_list.append(zone)
 
@@ -325,37 +325,42 @@ class Controller():
 	def __init__(self, aoce_game):
 		""" Initializer """
 		self.game = aoce_game
-		self.pathfinding_matrix = self.game.game_model.map.pathfinding_matrix
+		self.pathfinding_matrix = []
 
 		# Selection (will be an EntitySprite)
 		self.selection = []
 
 	def setup(self):
+		self.pathfinding_matrix = self.game.game_model.map.pathfinding_matrix
 		pass
 
 	def on_update(self, delta_time):
 
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
-		
-		
-		grid = Grid(matrix=self.pathfinding_matrix)
-		finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-		start = grid.node(0, 0)
-		end = grid.node(2, 2)
-		path, runs = finder.find_path(start, end, grid)
-
-
 		""" Movement and game logic """
+		
 		for sprite in self.selection:
+			# WORKING CODE BELOW
 			entity = sprite.entity
+
+			
+			grid = Grid(matrix=self.pathfinding_matrix)
+			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+			startvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			endvec = iso_to_map_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			start = grid.node(startvec.int().x, startvec.int().y)
+			end = grid.node(endvec.int().x, endvec.int().y)
+			path, runs = finder.find_path(start, end, grid)
+
+
+
+
 			next_map_position = iso_to_map_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
 			next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
 			if (not entity.position.isalmost(entity.aim, entity.speed)) and next_is_on_map:  # If it is not close to where it aims, move.
 				entity.position += entity.change
 				sprite.center_x, sprite.center_y = tuple(entity.position)
-
-
-
+		# END OF WORKING CODE
 
 			# iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			# int_position = Vector(int(entity.position.x), int(entity.position.y))
