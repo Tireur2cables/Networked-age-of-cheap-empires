@@ -7,7 +7,7 @@ from utils.isometric import *
 from entity.Unit import Unit
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
-from views.CustomButtons import QuitButton
+from views.CustomButtons import NextViewButton
 from map.map import Map
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
@@ -50,14 +50,14 @@ class AoCE(arcade.Window):
 		self.media_player = self.my_music.play(loop=True)
 
 		self.game_view = GameView()
-
 		# # Variables for communications between model, view and controller.
 		# self.toDraw = []
 
 	def on_show(self):
 		# Affiche le main menu
 		start_view = MainView(self.game_view)
-		start_view.setup()
+		self.game_view.setMenuView(start_view)
+		start_view.setup() # useless : mainview.setup is empty
 		self.show_view(start_view)
 
 	# Stop all process and exit arcade
@@ -88,14 +88,18 @@ class GameView(arcade.View):
 
 	def __init__(self):
 		super().__init__()
-
+		self.menu_view = None
 		# Créer l'architecture MVC
 		self.game_model = Model(self)
 		self.game_view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
 		self.game_controller = Controller(self)
 
+	def setMenuView(self, menu_view) :
+		self.menu_view = menu_view
+
 	def setup(self):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
+		print("tolo")
 		self.game_model.setup()
 		self.game_view.setup()
 		self.game_controller.setup()
@@ -118,8 +122,8 @@ class GameView(arcade.View):
 	def on_show(self):
 		self.game_view.on_show()
 
-	def on_hide_view(self):
-		self.manager.disable()
+	# def on_hide_view(self):
+	# 	self.manager.disable()
 
 #########################################################################
 #							MODEL CLASS									#
@@ -136,6 +140,10 @@ class Model():
 		self.zone_list = []
 
 	def setup(self):
+		# clear old lists
+		self.entity_list.clear()
+		self.tile_list.clear()
+		self.zone_list.clear()
 
 		# Set up the villager and add it to the entity_list.
 		self.map = Map(self.tile_list, DEFAULT_MAP_SIZE)
@@ -183,6 +191,11 @@ class View():
 		self.zone_sprite_list = arcade.SpriteList()
 
 	def setup(self) :
+		#clear old lists
+		self.entity_sprite_list = arcade.SpriteList()
+		self.tile_sprite_list = arcade.SpriteList()
+		self.zone_sprite_list = arcade.SpriteList()
+
 		self.static_menu()
 		self.sync_entities()
 		self.sync_ground()
@@ -331,8 +344,8 @@ class View():
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the exit button
-		quit_button = QuitButton(self.game.window, text="Quit", width=buttonsize)
-		self.v_box.add(quit_button)
+		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
+		self.v_box.add(retour_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
