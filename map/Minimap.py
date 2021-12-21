@@ -6,13 +6,16 @@ from math import sqrt
 # CONSTANTS
 BORDER_MINI_RECTANGLE = 15
 WHITE = (255, 255, 255)
+#MINIMAP_BACKGROOUND_COLOR = arcade.color.GRAY
 
 class Minimap() :
-	def __init__(self, view, default_map_size, tile_width, tile_height):
+	def __init__(self, view, default_map_size, tile_width, tile_height,	bakcground_color):
 		self.view = view
 		self.map_width = default_map_size * tile_width
 		self.map_height = default_map_size * tile_height
+		self.background_color = bakcground_color
 
+		
 		MINIMAP_WIDTH = int(self.view.game.window.width * 3 / 10)
 		MINIMAP_HEIGHT = int(self.view.game.window.height * 1 / 4)
 
@@ -36,7 +39,7 @@ class Minimap() :
 		iso_width, iso_height = cart_to_iso(self.map_width, self.map_height)
 		proj = -iso_width, iso_width, 0, iso_height - self.view.camera.viewport_height * 3 / 4
 		with self.sprite_list.atlas.render_into(self.texture, projection=proj) as fbo:
-			fbo.clear()
+			fbo.clear(self.background_color)
 			self.view.tile_sprite_list.draw()
 			self.view.zone_sprite_list.draw()
 			self.view.entity_sprite_list.draw()

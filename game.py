@@ -157,7 +157,7 @@ class Model():
 # --- Constants ---
 CAMERA_MOVE_STEP = 15
 CAMERA_MOVE_EDGE = 50
-COLOR_STATIC_RESSOURCES = arcade.color.GRAY
+COLOR_STATIC_RESSOURCES = arcade.color.GREEN_YELLOW
 COLOR_STATIC_RESSOURCES_ICONE = arcade.color.DARK_GRAY
 
 
@@ -189,7 +189,7 @@ class View():
 		self.sync_zones()
 
 	def static_menu(self) :
-		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT)
+		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT,COLOR_STATIC_RESSOURCES)
 
 		Width_label = self.game.window.width/5
 		HEIGHT_LABEL = self.game.window.height*(0.05) #(0.0567) #51.1 #old one : self.game.window.height/16.5
