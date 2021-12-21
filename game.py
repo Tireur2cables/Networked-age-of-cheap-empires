@@ -191,85 +191,49 @@ class View():
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT,COLOR_STATIC_RESSOURCES)
 
-		Width_label = self.game.window.width/5
-		HEIGHT_LABEL = self.game.window.height*(0.05) #(0.0567) #51.1 #old one : self.game.window.height/16.5
-		
-		#TEST GUI STATIC
-		#arcade.draw_rectangle_filled(300,300,50,80,arcade.color.BROWN_NOSE)
-		#arcade.draw_text("Dans la zone", 300,300,arcade.color.CELESTIAL_BLUE)
-		#arcade.draw_xywh_rectangle_filled(0, self.game.window.height, self.game.window.width*(1/5), self.game.window.height*(1/5), arcade.color.BROWN_NOSE )
-
 		self.manager = arcade.gui.UIManager()
 		self.manager.enable()
-		
+
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
 
-        # Create a text label, contenant le nombre de ressources disponibles pour le joueur
-		# Label de la population
-		civil_label = arcade.gui.UITextArea(0,0,Width_label, HEIGHT_LABEL,"  = 1 " , text_color=(0,0,0,255), font_name=('Impact',))
-		self.v_box.add(civil_label.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES))
+		WIDTH_LABEL = self.game.window.width / 5
+		HEIGHT_LABEL = self.game.window.height * (0.05)
 
-		# Label de la nourriture
-		food_label = arcade.gui.UITextArea(0,0,Width_label, HEIGHT_LABEL,"  = 5 ", text_color=(0,0,0,255), font_name=('Impact', ))
-		self.v_box.add(food_label.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES))
-
-		# Label du bois
-		wood_label = arcade.gui.UITextArea(0,0,Width_label, HEIGHT_LABEL,"  = 50 ", text_color=(0,0,0,255), font_name=('Impact', ))
-		self.v_box.add(wood_label.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES))
-
-		# Label de la pierre
-		stone_label = arcade.gui.UITextArea(0,0,Width_label, HEIGHT_LABEL,"  = 500 " ,  text_color=(0,0,0,255), font_name=('Impact',))
-		self.v_box.add(stone_label.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES))
-
-		# Label de l'or
-		gold_label = arcade.gui.UITextArea(0,0,Width_label, HEIGHT_LABEL,"  = 5000 ", text_color=(0,0,0,255), font_name=('Impact',) )
-		self.v_box.add(gold_label.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES))
-		
+		ressources_tab = ["  = 1 ", "  = 5 ", "  = 50 ", "  = 500 ", "  = 5000 "]
+		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
+		for val in ressources_tab :
+			label = arcade.gui.UITextArea(0, 0, WIDTH_LABEL, HEIGHT_LABEL, val, text_color=(0,0,0,255), font_name=('Impact',))
+			self.v_box.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
-            arcade.gui.UIAnchorWidget(
-                anchor_x="left",
-				align_x= HEIGHT_LABEL + int(self.game.window.width*(3/10)),
-                anchor_y="bottom",
-                child=self.v_box)
-        )
+			arcade.gui.UIAnchorWidget(
+				anchor_x="left",
+				align_x=HEIGHT_LABEL + int(self.game.window.width * 3 / 10),
+				anchor_y="bottom",
+				child=self.v_box
+			)
+		)
 
 		#Icones des ressources
 		self.v_box2 = arcade.gui.UIBoxLayout()
 
-		#Icone de la population
-		icone_civil = arcade.gui.UITextureButton(x=0,y=0,width= HEIGHT_LABEL, height = HEIGHT_LABEL,texture=arcade.load_texture(PIC_CIVIL))
-		self.v_box2.add(icone_civil.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES_ICONE))
-
-		#Icone de la nourriture
-		icone_food = arcade.gui.UITextureButton(x=0,y=0,width= HEIGHT_LABEL, height = HEIGHT_LABEL,texture=arcade.load_texture(PIC_FOOD))
-		self.v_box2.add(icone_food.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES_ICONE))
-
-		#Icone du bois
-		icone_wood = arcade.gui.UITextureButton(x=0,y=0,width= HEIGHT_LABEL, height = HEIGHT_LABEL,texture=arcade.load_texture(PIC_WOOD))
-		self.v_box2.add(icone_wood.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES_ICONE))
-
-		#Icone de la pierre
-		icone_stone = arcade.gui.UITextureButton(x=0,y=0,width= HEIGHT_LABEL, height = HEIGHT_LABEL,texture=arcade.load_texture(PIC_STONE))
-		self.v_box2.add(icone_stone.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES_ICONE))
-
-		#Icone de l or
-		icone_gold = arcade.gui.UITextureButton(x=0,y=0,width= HEIGHT_LABEL, height = HEIGHT_LABEL,texture=arcade.load_texture(PIC_GOLD))
-		self.v_box2.add(icone_gold.with_space_around(0,0,0,0,COLOR_STATIC_RESSOURCES_ICONE))
+		pics_tab = [PIC_CIVIL, PIC_FOOD, PIC_WOOD, PIC_STONE, PIC_GOLD]
+		for val in pics_tab :
+			icone = arcade.gui.UITextureButton(x=0, y=0, width=HEIGHT_LABEL, height=HEIGHT_LABEL, texture=arcade.load_texture(val))
+			self.v_box2.add(icone.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES_ICONE))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
-            arcade.gui.UIAnchorWidget(
-                anchor_x="left",
-				align_x= int(self.game.window.width*(3/10)),
-                anchor_y="bottom",
-                child=self.v_box2)
-        )
+			arcade.gui.UIAnchorWidget(
+				anchor_x="left",
+				align_x=int(self.game.window.width*3/10),
+				anchor_y="bottom",
+				child=self.v_box2
+			)
+		)
 
-		
-		
 	def sync_entities(self):
 		# Sync self.game_model.entity_list with sprite_list
 		for index, item in enumerate(self.game.game_model.entity_list):
@@ -331,8 +295,8 @@ class View():
 		#
 		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
 		self.coord_label.fit_content()
-		
-		
+
+
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -356,8 +320,8 @@ class View():
 		self.static_menu()
 		self.addButton()
 		self.addCoordLabel()
-		
-		
+
+
 
 	def addButton(self):
 		# def button size
