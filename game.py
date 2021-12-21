@@ -344,8 +344,16 @@ class View():
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the exit button
+		save_button = NextViewButton(self.game.window, self.game.menu_view, text="Option", width=buttonsize)
+		self.v_box.add(save_button)
+
+		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
 		self.v_box.add(retour_button)
+
+		# Create the exit button
+		save_button = NextViewButton(self.game.window, self.game.menu_view, text="Sauvegarder", width=buttonsize)
+		self.v_box.add(save_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
