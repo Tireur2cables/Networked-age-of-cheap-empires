@@ -8,14 +8,14 @@ class Tile():
 		self.y=y
 		self.pointerToEntity = pointerToEntity
 
-		self.isLocked = False
+		self.isLocked = 1
 		if blockID == "water":
-			self.isLocked = True
+			self.isLocked = 0
 
 		# Sprite
 		self.sprite = TileSprite(self)
 
 
 	def setEntity(self,pointerToEntity):
-		self.isLocked=True
+		self.isLocked=0
 		self.pointerToEntity=pointerToEntity

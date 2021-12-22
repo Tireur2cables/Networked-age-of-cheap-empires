@@ -15,6 +15,10 @@ class Map():
 		# self.tileArray = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
 		self.tileArray = [[Tile(default_map_2d[x][y], x, y, None) for y in range(map_size)] for x in range(map_size)]
 
+# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
+		self.pathfinding_matrix = [[self.tileArray[x][y].isLocked for y in range(map_size)] for x in range(map_size)]
+		
+
 		# for x in range(map_size):
 		# 	for y in range(map_size):
 		# 		if default_map_2d[x][y] == "tree":
@@ -28,8 +32,10 @@ class Map():
 			for y in range(self.map_size-1,-1, -1):
 				self.tiles.append(self.tileArray[x][y])
 
+
 	def get_tile_at(self, map_position):
 		return self.tileArray[map_position.x][map_position.y]
+	
 
 ####################################################################
 #

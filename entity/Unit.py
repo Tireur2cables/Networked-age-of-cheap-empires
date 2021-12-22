@@ -1,6 +1,11 @@
 from entity.Entity import Entity
 from CONSTANTS import Resource
 from utils.vector import Vector
+# Pathfinding / movement imports
+# TODO : pip3 install pathfinding
+from pathfinding.core.diagonal_movement import DiagonalMovement
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
 
 
 #   _    _           _   _
@@ -28,6 +33,9 @@ class Unit(Entity):
 	def aim_towards(self, aim, change):
 		self.aim = aim
 		self.change = change
+
+	# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
+	
 
 
 #  __      ___ _ _
