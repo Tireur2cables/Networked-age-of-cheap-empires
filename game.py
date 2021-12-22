@@ -338,16 +338,16 @@ class Controller():
 
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		""" Movement and game logic """
-		
+
 		for sprite in self.selection:
 			# WORKING CODE BELOW
 			entity = sprite.entity
 
-			
+
 			grid = Grid(matrix=self.pathfinding_matrix)
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
 			startvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			endvec = iso_to_map_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			endvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			start = grid.node(startvec.int().x, startvec.int().y)
 			end = grid.node(endvec.int().x, endvec.int().y)
 			path, runs = finder.find_path(start, end, grid)
@@ -383,10 +383,7 @@ class Controller():
 
 	def move_selection(self, mouse_position):
 		for i in self.selection:
-			entity = i.entity
-			# The following calculation is necessary to have uniform speeds :
-			entity.aim_towards(mouse_position, entity.speed * ((mouse_position - entity.position).normalized()))
-			# We want the same speed no matter what the distance between the villager and where he needs to go is.
+			i.entity.aim_towards(mouse_position)
 
 
 # Main function to launch the game
