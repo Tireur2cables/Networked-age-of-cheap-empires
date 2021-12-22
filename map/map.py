@@ -18,7 +18,9 @@ class Map():
 # @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		#Swapping x and y here, because of the library implementation
 		self.pathfinding_matrix = [[self.tileArray[x][y].isLocked for x in range(map_size)] for y in range(map_size)]
-		
+
+		self.ressources_array = [[]]
+
 
 		# for x in range(map_size):
 		# 	for y in range(map_size):
@@ -36,7 +38,7 @@ class Map():
 
 	def get_tile_at(self, map_position):
 		return self.tileArray[map_position.x][map_position.y]
-	
+
 
 ####################################################################
 #

@@ -101,7 +101,7 @@ class GameView(arcade.View):
 	def on_key_press(self, *args):
 		self.game_view.on_key_press(*args)
 
-	def on_mouse_press(self, *args):  # Redirecting inputs to the controller
+	def on_mouse_press(self, *args):  # Redirecting inputs to the View
 		self.game_view.on_mouse_press(*args)
 
 	def on_mouse_motion(self, *args):
@@ -178,8 +178,8 @@ class View():
 		## @tidalwaave : 18/11, 22H30
 		for index, item in enumerate(self.game.game_model.zone_list):
 			if item.sprite is None:
-				zone_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
-				zone = ZoneSprite(index, item, "./Ressources/img/zones/buildables/towncenter.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
+				zone_position = map_pos_to_iso(item.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+				zone = ZoneSprite(index, item, "Ressources/img/zones/buildables/towncenter.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
 				# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
 				self.zone_sprite_list.append(zone)
 
@@ -306,8 +306,8 @@ class View():
 			mouse_position_on_map = Vector(self.mouse_x, self.mouse_y) + Vector(self.camera.position.x, self.camera.position.y)
 			pos = iso_to_map_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
 			tCent = TownCenter(pos.x, pos.y)
-			print(pos)
 			self.game.game_model.zone_list.append(tCent)
+			print(self.game.game_model.zone_list)
 			self.sync_zones()
 
 	def on_mouse_motion(self, x, y, dx, dy):
