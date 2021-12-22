@@ -17,7 +17,6 @@ class EntitySprite(Sprite):
 	def __init__(self, entity, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.entity = entity
-		entity.sprite = self
 		self.selected = False
 
 

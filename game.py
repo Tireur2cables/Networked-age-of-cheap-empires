@@ -173,15 +173,16 @@ class View():
 		for z in self.game.game_model.zone_list:
 			self.zone_sprite_list.append(z.sprite)
 
-	def sync_zones(self):
-		# Sync self.game_model.zone_list with zone_sprite_list
-		## @tidalwaave : 18/11, 22H30
-		for index, item in enumerate(self.game.game_model.zone_list):
-			if item.sprite is None:
-				zone_position = map_pos_to_iso(item.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-				zone = ZoneSprite(index, item, "Ressources/img/zones/buildables/towncenter.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
-				# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
-				self.zone_sprite_list.append(zone)
+	# CE QU'A FAIT @tidalwaave : A DEPLACE DANS ZONE !!
+	# def sync_zones(self):
+	# 	# Sync self.game_model.zone_list with zone_sprite_list
+	# 	## @tidalwaave : 18/11, 22H30
+	# 	for index, item in enumerate(self.game.game_model.zone_list):
+	# 		if item.sprite is None:
+	# 			zone_position = map_pos_to_iso(item.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+	# 			zone = ZoneSprite(index, item, "Ressources/img/zones/buildables/towncenter.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
+	# 			# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
+	# 			self.zone_sprite_list.append(zone)
 
 	def on_draw(self):
 		""" Draw everything """
@@ -305,10 +306,9 @@ class View():
 		if symbol == arcade.key.T:
 			mouse_position_on_map = Vector(self.mouse_x, self.mouse_y) + Vector(self.camera.position.x, self.camera.position.y)
 			pos = iso_to_map_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
-			tCent = TownCenter(pos.x, pos.y)
+			tCent = TownCenter(pos)
 			self.game.game_model.zone_list.append(tCent)
-			print(self.game.game_model.zone_list)
-			self.sync_zones()
+			self.tile_sprite_list.append(tCent.sprite)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""

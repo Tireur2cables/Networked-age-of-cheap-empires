@@ -19,5 +19,4 @@ class ZoneSprite(Sprite):
 	def __init__(self, zone, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.zone = zone
-		self.id = id
 		self.selected = False

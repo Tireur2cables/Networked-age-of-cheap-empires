@@ -1,12 +1,14 @@
 from entity.Entity import Entity
 from entity.ZoneSprite import ZoneSprite
+from utils.isometric import map_pos_to_iso
 TILE_WIDTH = 64
 TILE_HEIGHT = TILE_WIDTH // 2
 
 class Zone(Entity):
-	def __init__(self, position, sprite_image, tile_size):#constructeur : initialise les attributs
+	def __init__(self, position, sprite_image, x_offset=0, y_offset=0, tile_size=1):#constructeur : initialise les attributs
 		self.tile_size=tile_size
-		self.sprite = ZoneSprite(self, "map/Tower.png", 1, center_x=position.x, center_y=position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
+		iso_coords = map_pos_to_iso(position, TILE_WIDTH//2, TILE_HEIGHT//2)
+		self.sprite = ZoneSprite(self, sprite_image, 1, center_x=iso_coords.x, center_y=iso_coords.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
 
 
 # Zone : Base brick of something that is present on the map, and not IN the map
@@ -65,7 +67,7 @@ class TownCenter(Buildable):
 	#Size: 3x3
 	#LineOfSight : 7
 	def __init__(self, position):
-		super().__init__(position, health = 600, tile_size=(3,3))
+		super().__init__(position, sprite_image="map/Tower.png", health = 600, tile_size=(3,3))
 		self.set_line_sight(7)
 
 	def get_health(self):
@@ -147,5 +149,5 @@ class Resources(Zone):
 		return self.amount
 
 class Wood(Resources):
-	def __init__(self, position, sprite_image):
-		super().__init__(position, sprite_image, health=25, amount=75)
+	def __init__(self, position):
+		super().__init__(position, sprite_image="Movements/coin_01.png", health=25, amount=75)

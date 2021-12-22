@@ -2,8 +2,9 @@
 
 import arcade
 from map.tile import Tile
-from entity.Zone import Zone
-from map.defaultmap import default_map_2d
+from entity.Zone import Wood
+from map.defaultmap import default_map_2d, default_map_objects_2d
+
 # --- Constants ---
 CHARACTER_SCALING = 1
 TILE_SCALING = 1
@@ -19,13 +20,13 @@ class Map():
 		#Swapping x and y here, because of the library implementation
 		self.pathfinding_matrix = [[self.tile_array[x][y].is_locked for x in range(map_size)] for y in range(map_size)]
 
-		self.ressources_array = [[]]
+		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
 
-
-		# for x in range(map_size):
-		# 	for y in range(map_size):
-		# 		if default_map_2d[x][y] == "tree":
-		# 			self.zoneArray = [[Zone(x, y)]]
+		for x in range(map_size):
+			for y in range(map_size):
+				object = default_map_2d[x][y]
+				if object == "tree":  # Can't use match for now, not compatible with arcade library...
+					self.objects_array[x][y] = Wood()
 
 		self.update_tile_list()
 
