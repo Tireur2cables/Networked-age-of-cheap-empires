@@ -1,21 +1,21 @@
 from map.tileSprite import TileSprite
 
 class Tile():
-	def __init__(self, blockID, x, y, pointerToEntity):
+	def __init__(self, blockID, x, y, pointer_to_entity):
 		self.blockID = blockID
 
 		self.x=x
 		self.y=y
-		self.pointerToEntity = pointerToEntity
+		self.pointer_to_entity = pointer_to_entity
 
-		self.isLocked = 1
+		self.is_locked = 1
 		if blockID == "water":
-			self.isLocked = 0
+			self.is_locked = 0
 
 		# Sprite
 		self.sprite = TileSprite(self)
 
 
-	def setEntity(self,pointerToEntity):
-		self.isLocked=0
-		self.pointerToEntity=pointerToEntity
+	def setEntity(self,pointer_to_entity):
+		self.is_locked=0
+		self.pointer_to_entity=pointer_to_entity
