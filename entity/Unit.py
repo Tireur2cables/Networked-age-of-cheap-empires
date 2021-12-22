@@ -1,6 +1,7 @@
 from entity.Entity import Entity
 from CONSTANTS import Resource
 from utils.vector import Vector
+from utils.isometric import *
 # Pathfinding / movement imports
 # TODO : pip3 install pathfinding
 from pathfinding.core.diagonal_movement import DiagonalMovement
@@ -15,7 +16,8 @@ from pathfinding.finder.a_star import AStarFinder
 #  | |__| | | | | | | | | |_
 #   \____/  |_| |_| |_|  \__|
 
-
+TILE_WIDTH = 64
+TILE_HEIGHT = TILE_WIDTH // 2
 
 
 class Unit(Entity):
@@ -26,15 +28,22 @@ class Unit(Entity):
 
 		# Movement
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
+		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
 		self.speed = speed  # Speed of the villager (should probably be a constant)
+		self.is_moving = False
+
+	def set_path(self, path):
+		self.path = path
+		self.is_moving = True
 
 	# Function for movement, may change in the future when pathfinding will be needed.
-	def aim_towards(self, aim):
-		self.aim = aim
+	def next_aim(self):
+		self.aim = map_pos_to_iso(Vector(*self.path.pop(0)), TILE_WIDTH//2, TILE_HEIGHT//2)
 		# The following calculation is necessary to have uniform speeds :
-		self.change = self.speed * ((aim - self.position).normalized())
+		self.change = self.speed * ((self.aim - self.position).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
+
 
 	# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 

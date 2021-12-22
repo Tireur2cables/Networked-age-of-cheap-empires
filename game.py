@@ -343,23 +343,23 @@ class Controller():
 			# WORKING CODE BELOW
 			entity = sprite.entity
 
-
-			grid = Grid(matrix=self.pathfinding_matrix)
-			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-			startvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			endvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			start = grid.node(startvec.int().x, startvec.int().y)
-			end = grid.node(endvec.int().x, endvec.int().y)
-			path, runs = finder.find_path(start, end, grid)
+			if entity.is_moving:
+				# CHeck if the next position is on the map
+				next_map_position = iso_to_map_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
+				next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
 
 
+				if not next_is_on_map:
+					entity.is_moving = False
+				elif entity.position.isalmost(entity.aim, entity.speed):
+					if entity.path:
+						entity.next_aim()
+					else:
+						entity.is_moving = False
+				else:  # If it is not close to where it aims and not out of bounds, move.
+					entity.position += entity.change
+					sprite.center_x, sprite.center_y = tuple(entity.position)
 
-
-			next_map_position = iso_to_map_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
-			next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
-			if (not entity.position.isalmost(entity.aim, entity.speed)) and next_is_on_map:  # If it is not close to where it aims, move.
-				entity.position += entity.change
-				sprite.center_x, sprite.center_y = tuple(entity.position)
 		# END OF WORKING CODE
 
 			# iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
@@ -383,7 +383,20 @@ class Controller():
 
 	def move_selection(self, mouse_position):
 		for i in self.selection:
-			i.entity.aim_towards(mouse_position)
+			entity = i.entity
+			grid = Grid(matrix=self.pathfinding_matrix)
+			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+			startvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			endvec = iso_to_map_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			start = grid.node(*startvec.int())
+			end = grid.node(*endvec.int())
+			path, runs = finder.find_path(start, end, grid)
+			# print(grid.grid_str(path=path, start=start, end=end))
+			if path:
+				path.pop(0)
+				if path:
+					entity.set_path(path)
+					entity.next_aim()
 
 
 # Main function to launch the game
