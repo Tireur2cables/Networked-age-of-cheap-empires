@@ -68,7 +68,7 @@ class TownCenter(Buildable):
 	#LineOfSight : 7
 	def __init__(self, position):
 		super().__init__(position,
-		sprite_data=SpriteData("map/Tower.png", scale=1, y_offset=253//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=1, y_offset=253//2 - TILE_HEIGHT),
 		health = 600,
 		tile_size=(3,3),
 		line_sight=7)

@@ -173,31 +173,13 @@ class View():
 		for z in self.game.game_model.zone_list:
 			self.zone_sprite_list.append(z.sprite)
 
-	# CE QU'A FAIT @tidalwaave : A DEPLACE DANS ZONE !!
-	# def sync_zones(self):
-	# 	# Sync self.game_model.zone_list with zone_sprite_list
-	# 	## @tidalwaave : 18/11, 22H30
-	# 	for index, item in enumerate(self.game.game_model.zone_list):
-	# 		if item.sprite is None:
-	# 			zone_position = map_pos_to_iso(item.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-	# 			zone = ZoneSprite(index, item, "Ressources/img/zones/buildables/towncenter.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
-	# 			# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
-	# 			self.zone_sprite_list.append(zone)
-
 	def on_draw(self):
 		""" Draw everything """
 		arcade.start_render()
 
-		#
 		# --- Object sprite lists : Tiles, Zones & Entities
-		#
-
 		self.tile_sprite_list.draw()
-
 		self.zone_sprite_list.draw()
-
-		# for e in self.game.game_model.unit_list:
-		# 	e.sprite.draw()
 
 		for i in self.unit_sprite_list:
 			if i.selected:
