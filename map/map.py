@@ -16,7 +16,7 @@ class Map():
 		self.tileArray = [[Tile(default_map_2d[x][y], x, y, None) for y in range(map_size)] for x in range(map_size)]
 
 # @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
-		self.pathfinding_matrix = [[self.tileArray[x][y].isLocked for y in range(map_size)] for x in range(map_size)]
+		self.pathfinding_matrix = [[self.tileArray[x][y].isLocked for x in range(map_size)] for y in range(map_size)]
 		
 
 		# for x in range(map_size):
