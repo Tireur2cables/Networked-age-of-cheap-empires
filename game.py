@@ -126,20 +126,20 @@ class Model():
 		""" Initializer """
 		self.game = aoce_game
 
-		self.entity_list = []
+		self.unit_list = []
 		self.tile_list = []
 		self.zone_list = []
 
 	def setup(self):
 
-		# Set up the villager and add it to the entity_list.
-		self.map = Map(self.tile_list, self.entity_list, DEFAULT_MAP_SIZE)
+		# Set up the villager and add it to the unit_list.
+		self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		unit0 = Villager(Vector(100, 100))
 		unit1 = Villager(Vector(50, 50))
 		unit2 = Villager(Vector(100, 100))
-		self.entity_list.append(unit0)
-		self.entity_list.append(unit1)
-		self.entity_list.append(unit2)
+		self.unit_list.append(unit0)
+		self.unit_list.append(unit1)
+		self.unit_list.append(unit2)
 
 		## @tidalwaave : 18/11, 22H30
 		# tCent = TownCenter(10, 10)
@@ -159,15 +159,15 @@ class View():
 		""" Initializer """
 		self.game = aoce_game
 
-		self.entity_sprite_list = arcade.SpriteList()
+		self.unit_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
 	def setup(self):
 
 		# Variables that will hold sprite lists
-		for e in self.game.game_model.entity_list:
-			self.entity_sprite_list.append(e.sprite)
+		for e in self.game.game_model.unit_list:
+			self.unit_sprite_list.append(e.sprite)
 		for t in self.game.game_model.tile_list:
 			self.tile_sprite_list.append(t.sprite)
 		for z in self.game.game_model.zone_list:
@@ -196,10 +196,10 @@ class View():
 
 		self.zone_sprite_list.draw()
 
-		# for e in self.game.game_model.entity_list:
+		# for e in self.game.game_model.unit_list:
 		# 	e.sprite.draw()
 
-		for i in self.entity_sprite_list:
+		for i in self.unit_sprite_list:
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
 				map_position = iso_to_map_pos(i.entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
@@ -215,12 +215,6 @@ class View():
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
-
-		#
-		# --- In-game GUI ---
-		#
-		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
-		self.coord_label.fit_content()
 
 
 	def on_show(self):
@@ -281,6 +275,7 @@ class View():
 				child = self.max_box
 			)
 		)
+		self.coord_label.fit_content()
 
 	def camera_move(self):
 		# Update the camera coords if the mouse is on the edges
@@ -298,7 +293,7 @@ class View():
 		mouse_position = Vector(x + self.camera.position.x, y + self.camera.position.y)
 
 		if button == arcade.MOUSE_BUTTON_LEFT:
-			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.entity_sprite_list))
+			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.unit_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			self.game.game_controller.move_selection(mouse_position)
 
@@ -308,13 +303,19 @@ class View():
 			pos = iso_to_map_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
 			tCent = TownCenter(pos)
 			self.game.game_model.zone_list.append(tCent)
-			self.tile_sprite_list.append(tCent.sprite)
+			self.zone_sprite_list.append(tCent.sprite)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
 		# Update the coords of the mouse
 		self.mouse_x = x
 		self.mouse_y = y
+
+		#
+		# --- In-game GUI ---
+		#
+		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
+		self.coord_label.fit_content()
 
 
 #########################################################################
