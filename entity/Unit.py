@@ -1,4 +1,5 @@
 from entity.Entity import Entity
+from entity.SpriteData import SpriteData
 from CONSTANTS import Resource
 from utils.vector import Vector
 from utils.isometric import *
@@ -61,7 +62,7 @@ class Unit(Entity):
 
 class Villager(Unit):#un Villageois est une Unit particuliere
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=25, damage=3, rate_fire=1.5)
+		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=25, damage=3, rate_fire=1.5)
 		self.resource = {Resource.FOOD : 0, Resource.WOOD : 0, Resource.STONE : 0, Resource.GOLD : 0}#utilisation de l'enumeration Resource
 		self.max_resource = 10
 
@@ -97,26 +98,26 @@ class Military(Unit):#un Militaire est une Unit particuliere
 #Infantry
 class Clubman(Military):
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=40, damage=3)
+		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=40, damage=3)
 
 class Swordsman(Military):
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=60, damage=7)
+		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=60, damage=7)
 
 #Archery
 class Bowman(Military):
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=35, damage=3)
+		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=35, damage=3)
 
 class ImprovedBowman(Military):
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=40, damage=4)
+		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=40, damage=4)
 
 #Cavalry
 class Scout(Military):
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=60, damage=3)
+		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=60, damage=3)
 
 class Cavalry(Military):
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=150, damage=8)
+		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=150, damage=8)

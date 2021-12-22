@@ -16,10 +16,10 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, position, sprite_image, health=1, damage=0, display=None, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+	def __init__(self, position, sprite_data, health=1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
 
 		# Sprite
-		self.sprite = EntitySprite(self, filename=sprite_image, scale=SPRITE_SCALING_COIN, center_x=position.x, center_y=position.y, hit_box_algorithm="None")
+		self.sprite = EntitySprite(self, filename=sprite_data.file, scale=sprite_data.scale, center_x=position.x + sprite_data.x_offset, center_y=position.y + sprite_data.y_offset, hit_box_algorithm="None")
 
 		# Position
 		self.position = position
@@ -30,11 +30,6 @@ class Entity:
 		self.health = health
 		self.max_health = health
 		self.damage = damage
-
-		#
-		## Display
-		#
-		self.display = display # Nouveau Concept --- Ce concept n'est pas utilisé pour l'instant, peut-être dans le futur cependant
 
 		# Battle
 		self.rate_fire = rate_fire

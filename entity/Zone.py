@@ -1,14 +1,18 @@
 from entity.Entity import Entity
+from entity.SpriteData import SpriteData
 from entity.ZoneSprite import ZoneSprite
 from utils.isometric import map_pos_to_iso
 TILE_WIDTH = 64
 TILE_HEIGHT = TILE_WIDTH // 2
 
 class Zone(Entity):
-	def __init__(self, position, sprite_image, x_offset=0, y_offset=0, tile_size=1):#constructeur : initialise les attributs
-		self.tile_size=tile_size
+	def __init__(self, position, tile_size=1, **kwargs):#constructeur : initialise les attributs
+		print(position)
 		iso_coords = map_pos_to_iso(position, TILE_WIDTH//2, TILE_HEIGHT//2)
-		self.sprite = ZoneSprite(self, sprite_image, 1, center_x=iso_coords.x, center_y=iso_coords.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
+		super().__init__(iso_coords, **kwargs)
+		self.tile_size=tile_size
+
+		# self.sprite = ZoneSprite(self, sprite_image, 1, center_x=iso_coords.x, center_y=iso_coords.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
 
 
 # Zone : Base brick of something that is present on the map, and not IN the map
@@ -67,7 +71,7 @@ class TownCenter(Buildable):
 	#Size: 3x3
 	#LineOfSight : 7
 	def __init__(self, position):
-		super().__init__(position, sprite_image="map/Tower.png", health = 600, tile_size=(3,3))
+		super().__init__(position, sprite_data=SpriteData("map/Tower.png", scale=1, y_offset=253//2 - TILE_HEIGHT), health = 600, tile_size=(3,3))
 		self.set_line_sight(7)
 
 	def get_health(self):
@@ -150,4 +154,21 @@ class Resources(Zone):
 
 class Wood(Resources):
 	def __init__(self, position):
-		super().__init__(position, sprite_image="Movements/coin_01.png", health=25, amount=75)
+		super().__init__(position,
+		sprite_data=SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT + 5),
+		health=25,
+		amount=75)
+
+class Stone(Resources):
+	def __init__(self, position):
+		super().__init__(position,
+		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT),
+		health=25,  # I don't know the values
+		amount=25)  # I don't know the values
+
+class Gold(Resources):
+	def __init__(self, position):
+		super().__init__(position,
+		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT),
+		health=25,  # I don't know the values
+		amount=10)  # I don't know the values

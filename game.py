@@ -133,7 +133,7 @@ class Model():
 	def setup(self):
 
 		# Set up the villager and add it to the entity_list.
-		self.map = Map(self.tile_list, DEFAULT_MAP_SIZE)
+		self.map = Map(self.tile_list, self.entity_list, DEFAULT_MAP_SIZE)
 		unit0 = Villager(Vector(100, 100))
 		unit1 = Villager(Vector(50, 50))
 		unit2 = Villager(Vector(100, 100))

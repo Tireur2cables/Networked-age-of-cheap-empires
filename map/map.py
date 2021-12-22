@@ -2,16 +2,19 @@
 
 import arcade
 from map.tile import Tile
-from entity.Zone import Wood
+from entity.Zone import Wood, Stone, Gold
 from map.defaultmap import default_map_2d, default_map_objects_2d
+from utils.vector import Vector
 
 # --- Constants ---
 CHARACTER_SCALING = 1
 TILE_SCALING = 1
 
 class Map():
-	def __init__(self, tiles, map_size):
+	def __init__(self, tiles, objects, map_size):
 		self.tiles = tiles
+		self.objects = objects
+
 		self.map_size = map_size
 		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
 		self.tile_array = [[Tile(default_map_2d[x][y], x, y, None) for y in range(map_size)] for x in range(map_size)]
@@ -21,12 +24,15 @@ class Map():
 		self.pathfinding_matrix = [[self.tile_array[x][y].is_locked for x in range(map_size)] for y in range(map_size)]
 
 		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
-
 		for x in range(map_size):
 			for y in range(map_size):
-				object = default_map_2d[x][y]
+				object = default_map_objects_2d[x][y]
 				if object == "tree":  # Can't use match for now, not compatible with arcade library...
-					self.objects_array[x][y] = Wood()
+					self.objects_array[x][y] = Wood(Vector(x, y))
+				elif object == "stone":
+					self.objects_array[x][y] = Stone(Vector(x, y))
+				elif object == "gold":
+					self.objects_array[x][y] = Gold(Vector(x, y))
 
 		self.update_tile_list()
 
@@ -35,6 +41,8 @@ class Map():
 		for x in range(self.map_size-1,-1, -1):
 			for y in range(self.map_size-1,-1, -1):
 				self.tiles.append(self.tile_array[x][y])
+				if self.objects_array[x][y]:
+					self.objects.append(self.objects_array[x][y])
 
 
 	def get_tile_at(self, map_position):
