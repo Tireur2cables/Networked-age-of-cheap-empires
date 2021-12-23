@@ -36,6 +36,13 @@ class Player:
 		self.max_unit = nb_max_unit
 
 	# resource
+	#all (par Maxence, le 23/12 à 22h36)
+	def add_all(self, qtyRes : int):
+		self.resource[Res.FOOD] += qtyRes
+		self.resource[Res.WOOD] += qtyRes
+		self.resource[Res.GOLD] += qtyRes
+		self.resource[Res.STONE] += qtyRes
+		
 	#food
 	def get_food(self) -> int:
 		return self.resource[Res.FOOD]
