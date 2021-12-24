@@ -52,6 +52,14 @@ class AoCE(arcade.Window):
 		self.game_view = GameView()
 		# # Variables for communications between model, view and controller.
 		# self.toDraw = []
+		
+	#added by Maxence | 24/12
+	def on_key_press(self, key, modifiers):
+		if key == arcade.key.F1:
+            # User hits f. Flip between full and not full screen.
+			self.set_fullscreen(not self.fullscreen)
+			width, height = self.get_size()
+			self.set_viewport(0, width, 0, height)
 
 	def on_show(self):
 		# Affiche le main menu

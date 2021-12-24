@@ -24,7 +24,7 @@ The idea is that you should have commands that enable you to debug and show off
 your AI. What commands those are will depend on your AI.
 """
 """
-idées : bouton pour toggle une ligne pour rentrer les cheats code : ²
+idées : key pour toggle une ligne pour rentrer les cheats code : F10
 if un cheat code est rentré : execute cheatcode pour un player en particulier
 else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les 
 cheat codes available ; 
