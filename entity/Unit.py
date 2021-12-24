@@ -37,8 +37,7 @@ class Unit(Entity):
 
 	# Function for movement, may change in the future when pathfinding will be needed.
 	def next_aim(self):
-		self.grid_aim = Vector(*self.path.pop(0))
-		self.aim = grid_pos_to_iso(self.grid_aim)
+		self.aim = grid_pos_to_iso(Vector(*self.path.pop(0)))
 		# The following calculation is necessary to have uniform speeds :
 		self.change = self.speed * ((self.aim - self.iso_position).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
