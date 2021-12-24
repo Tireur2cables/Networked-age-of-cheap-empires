@@ -4,15 +4,12 @@ import arcade.gui
 from utils.vector import Vector
 from utils.isometric import *
 from entity.Unit import *
-from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
 from map.map import Map
-from map.tileSprite import TileSprite
 
 ## @tidalwaave : 18/11, 22H30
 from entity.Zone import *
-from entity.ZoneSprite import ZoneSprite
 
 # --- Constants ---
 SCREEN_WIDTH = 800
@@ -185,7 +182,7 @@ class View():
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
 				map_position = iso_to_grid_pos(i.entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
-				tile_below = self.game.game_model.map.get_tile_at(map_position.int())
+				tile_below = self.game.game_model.map.get_tile_at(map_position)
 				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
 
@@ -272,18 +269,19 @@ class View():
 			self.camera_y += CAMERA_MOVE_STEP
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
-		mouse_position = Vector(x + self.camera.position.x, y + self.camera.position.y)
+		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
+		grid_pos =  iso_to_grid_pos(mouse_position_in_game, TILE_WIDTH//2, TILE_HEIGHT//2)
 
 		if button == arcade.MOUSE_BUTTON_LEFT:
-			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.unit_sprite_list))
+			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			self.game.game_controller.move_selection(mouse_position)
+			self.game.game_controller.move_selection(mouse_position_in_game)
 
 	def on_key_press(self, symbol, modifier):
 		if symbol == arcade.key.T:
-			mouse_position_on_map = Vector(self.mouse_x, self.mouse_y) + Vector(self.camera.position.x, self.camera.position.y)
-			pos = iso_to_grid_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
-			tCent = TownCenter(pos)
+			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+			grid_pos = iso_to_grid_pos(mouse_position_in_game, TILE_WIDTH//2, TILE_HEIGHT//2)
+			tCent = TownCenter(grid_pos)
 			self.game.game_model.zone_list.append(tCent)
 			self.zone_sprite_list.append(tCent.sprite)
 
@@ -310,7 +308,7 @@ class Controller():
 		self.game = aoce_game
 		self.pathfinding_matrix = []
 
-		# Selection (will be an EntitySprite)
+		# Selection (will contain elements of type EntitySprite)
 		self.selection = set()
 		self.moving_sprites = set()
 
@@ -329,7 +327,7 @@ class Controller():
 
 			if entity.is_moving:
 				# CHeck if the next position is on the map
-				next_map_position = iso_to_grid_pos(entity.iso_position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
+				next_map_position = iso_to_grid_pos(entity.iso_position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2)
 				next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
 
 
@@ -379,8 +377,8 @@ class Controller():
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
 			startvec = iso_to_grid_pos(entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			endvec = iso_to_grid_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			start = grid.node(*startvec.int())
-			end = grid.node(*endvec.int())
+			start = grid.node(*startvec)
+			end = grid.node(*endvec)
 			path, runs = finder.find_path(start, end, grid)
 
 			# print(grid.grid_str(path=path, start=start, end=end))
