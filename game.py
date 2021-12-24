@@ -368,7 +368,6 @@ class Controller():
 					else:
 						entity.is_moving = False
 				else:  # If it is not close to where it aims and not out of bounds, move.
-					print(f"change = {entity.change}")
 					entity.iso_position += entity.change
 					sprite.update()
 
