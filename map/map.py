@@ -17,7 +17,7 @@ class Map():
 
 		self.map_size = map_size
 		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
-		self.tile_array = [[Tile(default_map_2d[x][y], x, y, None) for y in range(map_size)] for x in range(map_size)]
+		self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], grid_x, grid_y, None) for grid_y in range(map_size)] for grid_x in range(map_size)]
 
 # @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		# Swapping x and y here, because of the library implementation

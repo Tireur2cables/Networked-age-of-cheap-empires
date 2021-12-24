@@ -24,8 +24,8 @@ TILE_HEIGHT = TILE_WIDTH // 2
 class Unit(Entity):
 	#une Unit est une Entity qui est mobile
 	#Liste des Unit: https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
-	def __init__(self, position, speed=5, **kwargs):
-		super().__init__(position, **kwargs)
+	def __init__(self, iso_position, speed=5, **kwargs):
+		super().__init__(iso_position, **kwargs)
 
 		# Movement
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
@@ -40,9 +40,9 @@ class Unit(Entity):
 
 	# Function for movement, may change in the future when pathfinding will be needed.
 	def next_aim(self):
-		self.aim = map_pos_to_iso(Vector(*self.path.pop(0)), TILE_WIDTH//2, TILE_HEIGHT//2)
+		self.aim = grid_pos_to_iso(Vector(*self.path.pop(0)), TILE_WIDTH//2, TILE_HEIGHT//2)
 		# The following calculation is necessary to have uniform speeds :
-		self.change = self.speed * ((self.aim - self.position).normalized())
+		self.change = self.speed * ((self.aim - self.iso_position).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
 
 
@@ -61,8 +61,8 @@ class Unit(Entity):
 
 
 class Villager(Unit):#un Villageois est une Unit particuliere
-	def __init__(self, position):
-		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=25, damage=3, rate_fire=1.5)
+	def __init__(self, iso_position):
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/villager_stand.png"), health=25, damage=3, rate_fire=1.5)
 		self.resource = {Resource.FOOD : 0, Resource.WOOD : 0, Resource.STONE : 0, Resource.GOLD : 0}#utilisation de l'enumeration Resource
 		self.max_resource = 10
 
@@ -90,34 +90,34 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 
 
 class Military(Unit):#un Militaire est une Unit particuliere
-	def __init__(self, position, **kwargs):
-		super().__init__(position, **kwargs)
+	def __init__(self, iso_position, **kwargs):
+		super().__init__(iso_position, **kwargs)
 
 # Rq : Il n'est peut-être pas utile de creer les implementation de chaque type de militaire car cela n'apporte pas vraiment d'interet
 
 #Infantry
 class Clubman(Military):
-	def __init__(self, position):
-		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=40, damage=3)
+	def __init__(self, iso_position):
+		super().__init__(iso_position, sprite_data=SpriteData("Movements/coin_01.png"), health=40, damage=3)
 
 class Swordsman(Military):
-	def __init__(self, position):
-		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=60, damage=7)
+	def __init__(self, iso_position):
+		super().__init__(iso_position, sprite_data=SpriteData("Movements/coin_01.png"), health=60, damage=7)
 
 #Archery
 class Bowman(Military):
-	def __init__(self, position):
-		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=35, damage=3)
+	def __init__(self, iso_position):
+		super().__init__(iso_position, sprite_data=SpriteData("Movements/coin_01.png"), health=35, damage=3)
 
 class ImprovedBowman(Military):
-	def __init__(self, position):
-		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=40, damage=4)
+	def __init__(self, iso_position):
+		super().__init__(iso_position, sprite_data=SpriteData("Movements/coin_01.png"), health=40, damage=4)
 
 #Cavalry
 class Scout(Military):
-	def __init__(self, position):
-		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=60, damage=3)
+	def __init__(self, iso_position):
+		super().__init__(iso_position, sprite_data=SpriteData("Movements/coin_01.png"), health=60, damage=3)
 
 class Cavalry(Military):
-	def __init__(self, position):
-		super().__init__(position, sprite_data=SpriteData("Movements/coin_01.png"), health=150, damage=8)
+	def __init__(self, iso_position):
+		super().__init__(iso_position, sprite_data=SpriteData("Movements/coin_01.png"), health=150, damage=8)

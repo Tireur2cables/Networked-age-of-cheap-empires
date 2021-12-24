@@ -14,7 +14,7 @@ N = 50
 p = 0.1
 mask = np.empty((N, N))
 for i in range (N):
-     mask[i] = np.random.choice(a=[0, 1], size=N, p=[p, 1-p])            
+     mask[i] = np.random.choice(a=[0, 1], size=N, p=[p, 1-p])
      if (i % 100 == 0):
           print(i)
 print(mask)
@@ -35,8 +35,8 @@ print(grid.grid_str(path=path, start=start, end=end))
 		# 	entity = i.entity
 		# 	grid = Grid(matrix=self.pathfinding_matrix)
 		# 	finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-		# 	startvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-		# 	endvec = iso_to_map_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
+		# 	startvec = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+		# 	endvec = iso_to_grid_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 		# 	start = grid.node(startvec.int().x, startvec.int().y)
 		# 	end = grid.node(endvec.int().x, endvec.int().y)
 		# 	path, runs = finder.find_path(start, end, grid)

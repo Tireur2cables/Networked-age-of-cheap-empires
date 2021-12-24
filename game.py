@@ -184,7 +184,7 @@ class View():
 		for i in self.unit_sprite_list:
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_map_pos(i.entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+				map_position = iso_to_grid_pos(i.entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
 				tile_below = self.game.game_model.map.get_tile_at(map_position.int())
 				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
@@ -282,7 +282,7 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		if symbol == arcade.key.T:
 			mouse_position_on_map = Vector(self.mouse_x, self.mouse_y) + Vector(self.camera.position.x, self.camera.position.y)
-			pos = iso_to_map_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
+			pos = iso_to_grid_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
 			tCent = TownCenter(pos)
 			self.game.game_model.zone_list.append(tCent)
 			self.zone_sprite_list.append(tCent.sprite)
@@ -328,7 +328,7 @@ class Controller():
 
 			if entity.is_moving:
 				# CHeck if the next position is on the map
-				next_map_position = iso_to_map_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
+				next_map_position = iso_to_grid_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
 				next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
 
 
@@ -345,7 +345,7 @@ class Controller():
 
 		# END OF WORKING CODE
 
-			# iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			# iso_position = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			# int_position = Vector(int(entity.position.x), int(entity.position.y))
 			# int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
 			# print(f"{int_position} -> {int_iso_position}")
@@ -369,8 +369,8 @@ class Controller():
 			entity = i.entity
 			grid = Grid(matrix=self.pathfinding_matrix)
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-			startvec = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			endvec = iso_to_map_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			startvec = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			endvec = iso_to_grid_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			start = grid.node(*startvec.int())
 			end = grid.node(*endvec.int())
 			path, runs = finder.find_path(start, end, grid)

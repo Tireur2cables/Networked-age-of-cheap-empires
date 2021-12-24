@@ -1,5 +1,5 @@
 from arcade import Sprite
-from utils.isometric import map_xy_to_iso
+from utils.isometric import grid_xy_to_iso
 
 # --- Constants ---
 TILE_SCALING = 1
@@ -11,6 +11,6 @@ class TileSprite(Sprite):
 		self.tile = tile
 		super().__init__("./map/Tiles/" + self.tile.blockID + ".png", TILE_SCALING)
 
-		isox, isoy = map_xy_to_iso(tile.x, tile.y, TILE_WIDTH//2, TILE_HEIGHT//2)  # Cette ligne ne recréer pas une map (testé et vérifié).
+		isox, isoy = grid_xy_to_iso(tile.x, tile.y, TILE_WIDTH//2, TILE_HEIGHT//2)  # Cette ligne ne recréer pas une map (testé et vérifié).
 		self.center_x = isox
 		self.center_y = isoy

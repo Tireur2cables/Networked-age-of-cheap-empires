@@ -16,13 +16,13 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, position, sprite_data, health=1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+	def __init__(self, iso_position, sprite_data, health=1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
 
 		# Sprite
-		self.sprite = EntitySprite(self, filename=sprite_data.file, scale=sprite_data.scale, center_x=position.x + sprite_data.x_offset, center_y=position.y + sprite_data.y_offset, hit_box_algorithm="None")
+		self.sprite = EntitySprite(self, filename=sprite_data.file, scale=sprite_data.scale, center_x=iso_position.x + sprite_data.x_offset, center_y=iso_position.y + sprite_data.y_offset, hit_box_algorithm="None")
 
 		# Position
-		self.position = position
+		self.iso_position = iso_position
 
 		#
 		## Life
@@ -41,17 +41,17 @@ class Entity:
 
 	# coordonnees
 	def get_x(self):
-		return self.position.x
+		return self.iso_position.x
 	def get_y(self):
-		return self.position.y
+		return self.iso_position.y
 	def set_xy(self, x, y):
-		self.position.x = x
-		self.position.y = y
+		self.iso_position.x = x
+		self.iso_position.y = y
 
 	def get_position(self):
-		return self.position
-	def set_position(self, position):
-		self.position = position
+		return self.iso_position
+	def set_position(self, iso_position):
+		self.iso_position = iso_position
 
 	# health
 	def get_health(self):
