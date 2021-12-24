@@ -18,9 +18,6 @@ SCREEN_TITLE = "Age Of Cheap Empire"
 MUSIC = "./Ressources/music/Marked.mp3"
 
 DEFAULT_MAP_SIZE = 50
-TILE_WIDTH = 64
-TILE_HEIGHT = TILE_WIDTH // 2
-
 
 #########################################################################
 #							MAIN CLASS									#
@@ -170,6 +167,13 @@ class View():
 		for z in self.game.game_model.zone_list:
 			self.zone_sprite_list.append(z.sprite)
 
+	def get_tile_outline(self, map_position):
+		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
+		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
+		bottom_vertex = tuple(map_position - Vector(0, TILE_HEIGHT//2))
+		top_vertex = tuple(map_position + Vector(0, TILE_HEIGHT//2))
+		return left_vertex, bottom_vertex, right_vertex, top_vertex
+
 	def on_draw(self):
 		""" Draw everything """
 		arcade.start_render()
@@ -181,9 +185,11 @@ class View():
 		for i in self.unit_sprite_list:
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_grid_pos(i.entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
-				tile_below = self.game.game_model.map.get_tile_at(map_position)
-				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
+				map_position = iso_to_grid_pos(i.entity.iso_position)
+				# tile_below = self.game.game_model.map.get_tile_at(map_position)
+				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
+				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
 
 
@@ -270,17 +276,19 @@ class View():
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
 		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
-		grid_pos =  iso_to_grid_pos(mouse_position_in_game, TILE_WIDTH//2, TILE_HEIGHT//2)
+		grid_pos = iso_to_grid_pos(mouse_position_in_game)
 
 		if button == arcade.MOUSE_BUTTON_LEFT:
 			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			self.game.game_controller.move_selection(mouse_position_in_game)
+		elif button == arcade.MOUSE_BUTTON_MIDDLE:
+			print(grid_pos)
 
 	def on_key_press(self, symbol, modifier):
 		if symbol == arcade.key.T:
 			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-			grid_pos = iso_to_grid_pos(mouse_position_in_game, TILE_WIDTH//2, TILE_HEIGHT//2)
+			grid_pos = iso_to_grid_pos(mouse_position_in_game)
 			tCent = TownCenter(grid_pos)
 			self.game.game_model.zone_list.append(tCent)
 			self.zone_sprite_list.append(tCent.sprite)
@@ -327,7 +335,7 @@ class Controller():
 
 			if entity.is_moving:
 				# CHeck if the next position is on the map
-				next_map_position = iso_to_grid_pos(entity.iso_position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2)
+				next_map_position = iso_to_grid_pos(entity.iso_position+entity.change)
 				next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
 
 
@@ -348,7 +356,7 @@ class Controller():
 
 		# END OF WORKING CODE
 
-			# iso_position = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			# iso_position = iso_to_grid_pos(entity.position)
 			# int_position = Vector(int(entity.iso_position.x), int(entity.iso_position.y))
 			# int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
 			# print(f"{int_position} -> {int_iso_position}")
@@ -375,8 +383,8 @@ class Controller():
 			# Pathfinding algorithm
 			grid = Grid(matrix=self.pathfinding_matrix)
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-			startvec = iso_to_grid_pos(entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			endvec = iso_to_grid_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			startvec = iso_to_grid_pos(entity.iso_position)
+			endvec = iso_to_grid_pos(mouse_position)
 			start = grid.node(*startvec)
 			end = grid.node(*endvec)
 			path, runs = finder.find_path(start, end, grid)

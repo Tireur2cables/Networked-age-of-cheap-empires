@@ -1,5 +1,5 @@
 from entity.Entity import Entity
-from entity.SpriteData import SpriteData
+from utils.SpriteData import SpriteData
 from CONSTANTS import Resource
 from utils.vector import Vector
 from utils.isometric import *
@@ -16,9 +16,6 @@ from pathfinding.finder.a_star import AStarFinder
 #  | |  | | | '_ \  | | | __|
 #  | |__| | | | | | | | | |_
 #   \____/  |_| |_| |_|  \__|
-
-TILE_WIDTH = 64
-TILE_HEIGHT = TILE_WIDTH // 2
 
 
 class Unit(Entity):
@@ -40,7 +37,7 @@ class Unit(Entity):
 
 	# Function for movement, may change in the future when pathfinding will be needed.
 	def next_aim(self):
-		self.aim = grid_pos_to_iso(Vector(*self.path.pop(0)), TILE_WIDTH//2, TILE_HEIGHT//2)
+		self.aim = grid_pos_to_iso(Vector(*self.path.pop(0)))
 		# The following calculation is necessary to have uniform speeds :
 		self.change = self.speed * ((self.aim - self.iso_position).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.

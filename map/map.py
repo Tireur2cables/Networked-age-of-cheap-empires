@@ -1,6 +1,7 @@
 # Imports
 
 import arcade
+from arcade.arcade_types import PointList
 from map.tile import Tile
 from entity.Zone import Wood, Stone, Gold
 from map.defaultmap import default_map_2d, default_map_objects_2d
@@ -8,7 +9,6 @@ from utils.vector import Vector
 
 # --- Constants ---
 CHARACTER_SCALING = 1
-TILE_SCALING = 1
 
 class Map():
 	def __init__(self, tiles, objects, map_size):

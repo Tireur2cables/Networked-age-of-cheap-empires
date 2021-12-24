@@ -1,4 +1,5 @@
 from map.tileSprite import TileSprite
+from utils.SpriteData import SpriteData
 
 class Tile():
 	def __init__(self, blockID, grid_x, grid_y, pointer_to_entity):
@@ -13,7 +14,8 @@ class Tile():
 			self.is_locked = 0
 
 		# Sprite
-		self.sprite = TileSprite(self)
+		sprite_data = SpriteData(file="./map/Tiles/" + self.blockID + ".png", y_offset=16)
+		self.sprite = TileSprite(self, sprite_data)
 
 
 	def setEntity(self,pointer_to_entity):

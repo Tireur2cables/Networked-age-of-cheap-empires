@@ -1,16 +1,12 @@
 from entity.Entity import Entity
-from entity.SpriteData import SpriteData
-from entity.ZoneSprite import ZoneSprite
-from utils.isometric import grid_pos_to_iso
-TILE_WIDTH = 64
-TILE_HEIGHT = TILE_WIDTH // 2
-
+from utils.SpriteData import SpriteData
+from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 
 # ----- GENERAL CLASS -----
 
 class Zone(Entity):
 	def __init__(self, grid_position, tile_size=1, **kwargs):#constructeur : initialise les attributs
-		iso_position = grid_pos_to_iso(grid_position, TILE_WIDTH//2, TILE_HEIGHT//2)
+		iso_position = grid_pos_to_iso(grid_position)
 		super().__init__(iso_position, **kwargs)
 		self.tile_size=tile_size
 
