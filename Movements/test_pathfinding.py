@@ -35,11 +35,11 @@ print(grid.grid_str(path=path, start=start, end=end))
 		# 	entity = i.entity
 		# 	grid = Grid(matrix=self.pathfinding_matrix)
 		# 	finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-		# 	startvec = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+		# 	startvec = iso_to_grid_pos(entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 		# 	endvec = iso_to_grid_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 		# 	start = grid.node(startvec.int().x, startvec.int().y)
 		# 	end = grid.node(endvec.int().x, endvec.int().y)
 		# 	path, runs = finder.find_path(start, end, grid)
 		# 	# The following calculation is necessary to have uniform speeds :
 		# 	for y in path:
-		# 		entity.aim_towards(Vector(y[0],y[1]), entity.speed * ((mouse_position - entity.position).normalized()))
+		# 		entity.aim_towards(Vector(y[0],y[1]), entity.speed * ((mouse_position - entity.iso_position).normalized()))

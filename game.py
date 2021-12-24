@@ -184,7 +184,7 @@ class View():
 		for i in self.unit_sprite_list:
 			if i.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_grid_pos(i.entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+				map_position = iso_to_grid_pos(i.entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 				tile_below = self.game.game_model.map.get_tile_at(map_position.int())
 				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
@@ -328,25 +328,25 @@ class Controller():
 
 			if entity.is_moving:
 				# CHeck if the next position is on the map
-				next_map_position = iso_to_grid_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
+				next_map_position = iso_to_grid_pos(entity.iso_position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
 				next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
 
 
 				if not next_is_on_map:
 					entity.is_moving = False
-				elif entity.position.isalmost(entity.aim, entity.speed):
+				elif entity.iso_position.isalmost(entity.aim, entity.speed):
 					if entity.path:
 						entity.next_aim()
 					else:
 						entity.is_moving = False
 				else:  # If it is not close to where it aims and not out of bounds, move.
-					entity.position += entity.change
-					sprite.center_x, sprite.center_y = tuple(entity.position)
+					entity.iso_position += entity.change
+					sprite.center_x, sprite.center_y = tuple(entity.iso_position)
 
 		# END OF WORKING CODE
 
 			# iso_position = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			# int_position = Vector(int(entity.position.x), int(entity.position.y))
+			# int_position = Vector(int(entity.iso_position.x), int(entity.iso_position.y))
 			# int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
 			# print(f"{int_position} -> {int_iso_position}")
 
@@ -369,7 +369,7 @@ class Controller():
 			entity = i.entity
 			grid = Grid(matrix=self.pathfinding_matrix)
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-			startvec = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
+			startvec = iso_to_grid_pos(entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			endvec = iso_to_grid_pos(mouse_position, TILE_WIDTH//2, TILE_HEIGHT//2)
 			start = grid.node(*startvec.int())
 			end = grid.node(*endvec.int())
