@@ -414,7 +414,7 @@ class Controller():
 				end = grid.node(*endvec)
 				path, runs = finder.find_path(start, end, grid)
 
-				print(grid.grid_str(path=path, start=start, end=end))
+				# print(grid.grid_str(path=path, start=start, end=end))
 				if path:
 					path.pop(0)
 					if path:
