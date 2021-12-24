@@ -7,6 +7,7 @@ from entity.Unit import *
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
 from map.map import Map
+from time import sleep
 
 ## @tidalwaave : 18/11, 22H30
 from entity.Zone import *
@@ -130,7 +131,7 @@ class Model():
 		self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		unit0 = Villager(Vector(100, 100))
 		unit1 = Villager(Vector(50, 50))
-		unit2 = Villager(Vector(100, 100))
+		unit2 = Villager(grid_pos_to_iso(Vector(3, 2)) + Vector(0, TILE_HEIGHT_HALF))
 		self.unit_list.append(unit0)
 		self.unit_list.append(unit1)
 		self.unit_list.append(unit2)
@@ -174,13 +175,23 @@ class View():
 		top_vertex = tuple(map_position + Vector(0, TILE_HEIGHT//2))
 		return left_vertex, bottom_vertex, right_vertex, top_vertex
 
+	def draw_grid_position(self, grid_position):
+		iso_position = grid_pos_to_iso(grid_position)
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+
+	def draw_iso_position(self, iso_position):
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+
 	def on_draw(self):
 		""" Draw everything """
 		arcade.start_render()
 
 		# --- Object sprite lists : Tiles, Zones & Entities
 		self.tile_sprite_list.draw()
-		self.zone_sprite_list.draw()
+
+		for i in self.zone_sprite_list:
+			i.draw()
+			self.draw_iso_position(i.entity.iso_position)
 
 		for i in self.unit_sprite_list:
 			if i.selected:
@@ -191,6 +202,13 @@ class View():
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
+			self.draw_iso_position(i.entity.iso_position)
+
+		for x in range(3):
+			for y in range(3):
+				tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+				self.draw_grid_position(Vector(x, y))
 
 
 		#
@@ -276,14 +294,18 @@ class View():
 
 	def on_mouse_press(self, x, y, button, key_modifiers):
 		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
-		grid_pos = iso_to_grid_pos(mouse_position_in_game)
 
 		if button == arcade.MOUSE_BUTTON_LEFT:
 			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			self.game.game_controller.move_selection(mouse_position_in_game)
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
-			print(grid_pos)
+			print(f"position de la souris : {mouse_position_in_game}")
+			print(f"position sur la grille : {iso_to_grid_pos(mouse_position_in_game)}")
+			pos = mouse_position_in_game
+			grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
+			grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
+			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
 		if symbol == arcade.key.T:
@@ -324,6 +346,9 @@ class Controller():
 		self.pathfinding_matrix = self.game.game_model.map.pathfinding_matrix
 		pass
 
+	def is_on_map(self, grid_position):
+		return grid_position.x >= 0 and grid_position.x < DEFAULT_MAP_SIZE and grid_position.y >= 0 and grid_position.y < DEFAULT_MAP_SIZE
+
 	def on_update(self, delta_time):
 
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
@@ -334,12 +359,8 @@ class Controller():
 			entity = sprite.entity
 
 			if entity.is_moving:
-				# CHeck if the next position is on the map
-				next_map_position = iso_to_grid_pos(entity.iso_position+entity.change)
-				next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
-
-
-				if not next_is_on_map:
+				# Check if the next position is on the map
+				if not self.is_on_map(iso_to_grid_pos(entity.iso_position+entity.change)):
 					entity.is_moving = False
 				elif entity.iso_position.isalmost(entity.aim, entity.speed):
 					if entity.path:
@@ -347,8 +368,9 @@ class Controller():
 					else:
 						entity.is_moving = False
 				else:  # If it is not close to where it aims and not out of bounds, move.
+					print(f"change = {entity.change}")
 					entity.iso_position += entity.change
-					sprite.center_x, sprite.center_y = tuple(entity.iso_position)
+					sprite.update()
 
 		if self.moving_sprites:
 			self.moving_sprites = {s for s in self.moving_sprites if s.entity.is_moving}
@@ -370,31 +392,38 @@ class Controller():
 		for i in sprites_at_point:
 			if i.entity and isinstance(i.entity, Unit):
 				sprite = i
+				print(iso_to_grid_pos(i.entity.iso_position))
 				break
 		if sprite:
 			sprite.selected = True
 			self.selection.add(sprite)
 
 	def move_selection(self, mouse_position):
-		for i in self.selection:
-			self.moving_sprites.add(i)
-			entity = i.entity
 
-			# Pathfinding algorithm
-			grid = Grid(matrix=self.pathfinding_matrix)
-			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-			startvec = iso_to_grid_pos(entity.iso_position)
-			endvec = iso_to_grid_pos(mouse_position)
-			start = grid.node(*startvec)
-			end = grid.node(*endvec)
-			path, runs = finder.find_path(start, end, grid)
+		mouse_position_grid = iso_to_grid_pos(mouse_position)
 
-			# print(grid.grid_str(path=path, start=start, end=end))
-			if path:
-				path.pop(0)
+		if self.is_on_map(mouse_position_grid):
+			for i in self.selection:
+				self.moving_sprites.add(i)
+				entity = i.entity
+
+				# Pathfinding algorithm
+				grid = Grid(matrix=self.pathfinding_matrix)
+				finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+				startvec = iso_to_grid_pos(entity.iso_position)
+				endvec = mouse_position_grid
+				start = grid.node(*startvec)
+				end = grid.node(*endvec)
+				path, runs = finder.find_path(start, end, grid)
+
+				# print(grid.grid_str(path=path, start=start, end=end))
 				if path:
-					entity.set_path(path)
-					entity.next_aim()
+					path.pop(0)
+					if path:
+						entity.set_path(path)
+						entity.next_aim()
+		else:
+			print("out of bound!")
 
 
 # Main function to launch the game

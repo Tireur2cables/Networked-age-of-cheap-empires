@@ -71,3 +71,6 @@ class Vector():
 
 	def int(self):
 		return Vector(int(self.x), int(self.y))
+
+	def round(self):
+		return Vector(round(self.x), round(self.y))

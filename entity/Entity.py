@@ -18,11 +18,11 @@ class Entity:
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
 	def __init__(self, iso_position, sprite_data, health=1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
 
-		# Sprite
-		self.sprite = EntitySprite(self, filename=sprite_data.file, scale=sprite_data.scale, center_x=iso_position.x + sprite_data.x_offset, center_y=iso_position.y + sprite_data.y_offset, hit_box_algorithm="None")
-
 		# Position
 		self.iso_position = iso_position
+
+		# Sprite
+		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="None")
 
 		#
 		## Life

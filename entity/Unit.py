@@ -37,13 +37,13 @@ class Unit(Entity):
 
 	# Function for movement, may change in the future when pathfinding will be needed.
 	def next_aim(self):
-		self.aim = grid_pos_to_iso(Vector(*self.path.pop(0)))
+		self.grid_aim = Vector(*self.path.pop(0))
+		self.aim = grid_pos_to_iso(self.grid_aim)
 		# The following calculation is necessary to have uniform speeds :
 		self.change = self.speed * ((self.aim - self.iso_position).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
 
 
-	# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 
 
 
@@ -59,7 +59,7 @@ class Unit(Entity):
 
 class Villager(Unit):#un Villageois est une Unit particuliere
 	def __init__(self, iso_position):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/villager_stand.png"), health=25, damage=3, rate_fire=1.5)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/villager_stand.png", y_offset=46//2), health=25, damage=3, rate_fire=1.5)
 		self.resource = {Resource.FOOD : 0, Resource.WOOD : 0, Resource.STONE : 0, Resource.GOLD : 0}#utilisation de l'enumeration Resource
 		self.max_resource = 10
 

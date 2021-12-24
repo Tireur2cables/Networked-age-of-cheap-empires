@@ -131,20 +131,20 @@ class Resources(Zone):
 class Wood(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT + 5),
+		sprite_data=SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT//2 + 5),
 		health=25,
 		amount=75)
 
 class Stone(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
 		health=25,  # I don't know the values
 		amount=25)  # I don't know the values
 
 class Gold(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
 		health=25,  # I don't know the values
 		amount=10)  # I don't know the values

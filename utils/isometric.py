@@ -18,7 +18,7 @@ def grid_xy_to_iso(x, y):
 def iso_to_grid_xy(x, y):
 	grid_x = (x / TILE_WIDTH_HALF + y / TILE_HEIGHT_HALF) / 2
 	grid_y = (y / TILE_HEIGHT_HALF - (x / TILE_WIDTH_HALF)) / 2
-	return int(grid_x), int(grid_y)
+	return round(grid_x), round(grid_y)
 
 def grid_pos_to_iso(pos):
 	iso_x = (pos.x - pos.y) * TILE_WIDTH_HALF
@@ -28,4 +28,4 @@ def grid_pos_to_iso(pos):
 def iso_to_grid_pos(pos):
 	grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
 	grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
-	return Vector(grid_x, grid_y).int()
+	return Vector(grid_x, grid_y).round()
