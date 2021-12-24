@@ -5,10 +5,11 @@ from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 # ----- GENERAL CLASS -----
 
 class Zone(Entity):
-	def __init__(self, grid_position, tile_size=1, **kwargs):#constructeur : initialise les attributs
+	def __init__(self, grid_position, tile_size=1, is_locking=False, **kwargs):#constructeur : initialise les attributs
 		iso_position = grid_pos_to_iso(grid_position)
 		super().__init__(iso_position, **kwargs)
 		self.tile_size=tile_size
+		self.is_locking = is_locking
 
 		# self.sprite = ZoneSprite(self, sprite_image, 1, center_x=iso_coords.x, center_y=iso_coords.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
 
@@ -138,6 +139,7 @@ class Wood(Resources):
 class Stone(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
+		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
 		health=25,  # I don't know the values
 		amount=25)  # I don't know the values
@@ -145,6 +147,7 @@ class Stone(Resources):
 class Gold(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
+		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
 		health=25,  # I don't know the values
 		amount=10)  # I don't know the values

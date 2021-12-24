@@ -17,11 +17,7 @@ class Map():
 
 		self.map_size = map_size
 		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
-		self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], grid_x, grid_y, None) for grid_y in range(map_size)] for grid_x in range(map_size)]
-
-# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
-		# Swapping x and y here, because of the library implementation
-		self.pathfinding_matrix = [[self.tile_array[x][y].is_locked for x in range(map_size)] for y in range(map_size)]
+		self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], grid_x, grid_y) for grid_y in range(map_size)] for grid_x in range(map_size)]
 
 		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
 		for x in range(map_size):
@@ -33,6 +29,8 @@ class Map():
 					self.objects_array[x][y] = Stone(Vector(x, y))
 				elif object == "gold":
 					self.objects_array[x][y] = Gold(Vector(x, y))
+				if self.objects_array[x][y] and self.objects_array[x][y].is_locking:
+					self.tile_array[x][y].is_locked = 0
 
 		self.update_tile_list()
 
@@ -43,6 +41,11 @@ class Map():
 				self.tiles.append(self.tile_array[x][y])
 				if self.objects_array[x][y]:
 					self.objects.append(self.objects_array[x][y])
+
+	def get_pathfinding_matrix(self):  # @kenzo6c: The pathfinding_matrix has to be created on the fly, otherwise it won't change if the map changes
+		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
+		# Swapping x and y here, because of the library implementation
+		return [[self.tile_array[x][y].is_locked for x in range(self.map_size)] for y in range(self.map_size)]
 
 
 	def get_tile_at(self, map_position):

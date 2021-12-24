@@ -336,14 +336,12 @@ class Controller():
 	def __init__(self, aoce_game):
 		""" Initializer """
 		self.game = aoce_game
-		self.pathfinding_matrix = []
 
 		# Selection (will contain elements of type EntitySprite)
 		self.selection = set()
 		self.moving_sprites = set()
 
 	def setup(self):
-		self.pathfinding_matrix = self.game.game_model.map.pathfinding_matrix
 		pass
 
 	def is_on_map(self, grid_position):
@@ -407,7 +405,8 @@ class Controller():
 				entity = i.entity
 
 				# Pathfinding algorithm
-				grid = Grid(matrix=self.pathfinding_matrix)
+				pathfinding_matrix = self.game.game_model.map.get_pathfinding_matrix()
+				grid = Grid(matrix=pathfinding_matrix)
 				finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
 				startvec = iso_to_grid_pos(entity.iso_position)
 				endvec = mouse_position_grid
@@ -415,7 +414,7 @@ class Controller():
 				end = grid.node(*endvec)
 				path, runs = finder.find_path(start, end, grid)
 
-				# print(grid.grid_str(path=path, start=start, end=end))
+				print(grid.grid_str(path=path, start=start, end=end))
 				if path:
 					path.pop(0)
 					if path:
