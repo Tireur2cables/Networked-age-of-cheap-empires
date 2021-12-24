@@ -311,7 +311,8 @@ class Controller():
 		self.pathfinding_matrix = []
 
 		# Selection (will be an EntitySprite)
-		self.selection = []
+		self.selection = set()
+		self.moving_sprites = set()
 
 	def setup(self):
 		self.pathfinding_matrix = self.game.game_model.map.pathfinding_matrix
@@ -322,7 +323,7 @@ class Controller():
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		""" Movement and game logic """
 
-		for sprite in self.selection:
+		for sprite in self.moving_sprites:
 			# WORKING CODE BELOW
 			entity = sprite.entity
 
@@ -343,6 +344,10 @@ class Controller():
 					entity.iso_position += entity.change
 					sprite.center_x, sprite.center_y = tuple(entity.iso_position)
 
+		if self.moving_sprites:
+			self.moving_sprites = {s for s in self.moving_sprites if s.entity.is_moving}
+
+
 		# END OF WORKING CODE
 
 			# iso_position = iso_to_grid_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
@@ -362,11 +367,14 @@ class Controller():
 				break
 		if sprite:
 			sprite.selected = True
-			self.selection.append(sprite)
+			self.selection.add(sprite)
 
 	def move_selection(self, mouse_position):
 		for i in self.selection:
+			self.moving_sprites.add(i)
 			entity = i.entity
+
+			# Pathfinding algorithm
 			grid = Grid(matrix=self.pathfinding_matrix)
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
 			startvec = iso_to_grid_pos(entity.iso_position, TILE_WIDTH//2, TILE_HEIGHT//2)
@@ -374,6 +382,7 @@ class Controller():
 			start = grid.node(*startvec.int())
 			end = grid.node(*endvec.int())
 			path, runs = finder.find_path(start, end, grid)
+
 			# print(grid.grid_str(path=path, start=start, end=end))
 			if path:
 				path.pop(0)
