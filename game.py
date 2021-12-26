@@ -140,6 +140,12 @@ class Model():
 		# tCent = TownCenter(10, 10)
 		# self.zoneLayerList.append(tCent)
 
+	def discard_dead_entity(self, dead_entity):
+		if isinstance(dead_entity, Unit) and dead_entity in self.unit_list:
+			self.unit_list.remove(dead_entity)
+		elif isinstance(dead_entity, Zone) and dead_entity in self.zone_list:
+			self.zone_list.remove(dead_entity)
+
 #########################################################################
 #							VIEW CLASS									#
 #########################################################################
@@ -324,9 +330,6 @@ class View():
 			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 			self.game.game_controller.action_on_zone(mouse_position_in_game)
 
-
-
-
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
 		# Update the coords of the mouse
@@ -338,6 +341,12 @@ class View():
 		#
 		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
 		self.coord_label.fit_content()
+
+	def discard_dead_sprite(self, dead_sprite):
+		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
+			self.unit_sprite_list.remove(dead_sprite)
+		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.zone_sprite_list:
+			self.zone_sprite_list.remove(dead_sprite)
 
 
 #########################################################################
@@ -353,6 +362,7 @@ class Controller():
 		self.selection = set()
 		self.moving_entities = set()
 		self.interacting_entities = set()
+		self.dead_entities = set()
 
 	def setup(self):
 		pass
@@ -393,6 +403,14 @@ class Controller():
 
 		if self.interacting_entities:
 			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
+
+		for dead_entity in self.dead_entities:
+			self.selection.discard(dead_entity)
+			self.moving_entities.discard(dead_entity)
+			self.interacting_entities.discard(dead_entity)
+			self.game.game_view.discard_dead_sprite(dead_entity.sprite)
+			self.game.game_model.discard_dead_entity(dead_entity)
+		self.dead_entities.clear()
 
 		# END OF WORKING CODE
 
@@ -465,6 +483,7 @@ class Controller():
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 				entity.resources[type(aimed_entity).__name__.lower()] = harvested  # Not very elegant, must be changed in the future.
 				entity.aimed_entity = None
+				self.dead_entities.add(aimed_entity)
 
 
 
