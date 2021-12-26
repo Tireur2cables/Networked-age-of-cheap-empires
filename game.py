@@ -139,11 +139,17 @@ class Model():
 		# tCent = TownCenter(10, 10)
 		# self.zoneLayerList.append(tCent)
 
-	def discard_dead_entity(self, dead_entity):
+	def discard_entity(self, dead_entity):
 		if isinstance(dead_entity, Unit) and dead_entity in self.unit_list:
 			self.unit_list.remove(dead_entity)
 		elif isinstance(dead_entity, Zone) and dead_entity in self.zone_list:
 			self.zone_list.remove(dead_entity)
+
+	def add_entity(self, new_entity):
+		if isinstance(new_entity, Unit) and new_entity not in self.unit_list:
+			self.unit_list.append(new_entity)
+		elif isinstance(new_entity, Zone) and new_entity not in self.zone_list:
+			self.zone_list.append(new_entity)
 
 #########################################################################
 #							VIEW CLASS									#
@@ -322,8 +328,7 @@ class View():
 			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 			grid_pos = iso_to_grid_pos(mouse_position_in_game)
 			tCent = TownCenter(grid_pos)
-			self.game.game_model.zone_list.append(tCent)
-			self.zone_sprite_list.append(tCent.sprite)
+			self.game.game_controller.add_entity_to_game(tCent)
 
 		if symbol == arcade.key.C:  # Couper arbre
 			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
@@ -341,11 +346,17 @@ class View():
 		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
 		self.coord_label.fit_content()
 
-	def discard_dead_sprite(self, dead_sprite):
+	def discard_sprite(self, dead_sprite):
 		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
 			self.unit_sprite_list.remove(dead_sprite)
 		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.zone_sprite_list:
 			self.zone_sprite_list.remove(dead_sprite)
+
+	def add_sprite(self, new_sprite):
+		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.unit_sprite_list:
+			self.unit_sprite_list.append(new_sprite)
+		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
+			self.zone_sprite_list.append(new_sprite)
 
 
 #########################################################################
@@ -398,7 +409,6 @@ class Controller():
 				self.harvest_zone(entity, delta_time)
 
 
-
 		# --- Updating Lists ---
 		if self.moving_entities:
 			self.moving_entities = {e for e in self.moving_entities if e.is_moving}
@@ -407,16 +417,22 @@ class Controller():
 			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
 
 
-
 		# --- Deleting dead entities ---
 		for dead_entity in self.dead_entities:
-			self.selection.discard(dead_entity)
-			self.moving_entities.discard(dead_entity)
-			self.interacting_entities.discard(dead_entity)
-			self.game.game_view.discard_dead_sprite(dead_entity.sprite)
-			self.game.game_model.discard_dead_entity(dead_entity)
+			self.discard_entity_from_game(dead_entity)
 		self.dead_entities.clear()
 
+
+	def discard_entity_from_game(self, dead_entity):
+		self.selection.discard(dead_entity)
+		self.moving_entities.discard(dead_entity)
+		self.interacting_entities.discard(dead_entity)
+		self.game.game_view.discard_sprite(dead_entity.sprite)
+		self.game.game_model.discard_entity(dead_entity)
+
+	def add_entity_to_game(self, new_entity):
+		self.game.game_model.add_entity(new_entity)
+		self.game.game_view.add_sprite(new_entity.sprite)
 
 	def select(self, sprites_at_point):
 		print(sprites_at_point)
