@@ -26,6 +26,7 @@ class Entity:
 
 		# Backend
 		self.action_timer = 0
+		self.selected = False
 
 		#
 		## Life

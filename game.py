@@ -194,7 +194,7 @@ class View():
 			self.draw_iso_position(i.entity.iso_position)
 
 		for i in self.unit_sprite_list:
-			if i.selected:
+			if i.entity.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
 				map_position = iso_to_grid_pos(i.entity.iso_position)
 				# tile_below = self.game.game_model.map.get_tile_at(map_position)
@@ -349,10 +349,10 @@ class Controller():
 		""" Initializer """
 		self.game = aoce_game
 
-		# Selection (will contain elements of type EntitySprite)
+		# Selection (will contain elements of type Entity)
 		self.selection = set()
-		self.moving_sprites = set()
-		self.interacting_sprites = set()
+		self.moving_entities = set()
+		self.interacting_entities = set()
 
 	def setup(self):
 		pass
@@ -365,9 +365,8 @@ class Controller():
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		""" Movement and game logic """
 
-		for sprite in self.moving_sprites:
+		for entity in self.moving_entities:
 			# WORKING CODE BELOW
-			entity = sprite.entity
 
 			if entity.is_moving:
 				# Check if the next position is on the map
@@ -379,22 +378,21 @@ class Controller():
 					else:
 						entity.is_moving = False
 						if entity.aimed_entity:
-							self.interacting_sprites.add(sprite)
+							self.interacting_entities.add(entity)
 
 				else:  # If it is not close to where it aims and not out of bounds, move.
 					entity.iso_position += entity.change
-					sprite.update()
+					entity.sprite.update()
 
-		for sprite in self.interacting_sprites:
-			entity = sprite.entity
+		for entity in self.interacting_entities:
 			if isinstance(entity.aimed_entity, Zone):
 				self.harvest_zone(entity, delta_time)
 
-		if self.moving_sprites:
-			self.moving_sprites = {s for s in self.moving_sprites if s.entity.is_moving}
+		if self.moving_entities:
+			self.moving_entities = {e for e in self.moving_entities if e.is_moving}
 
-		if self.interacting_sprites:
-			self.interacting_sprites = {s for s in self.interacting_sprites if s.entity.aimed_entity}
+		if self.interacting_entities:
+			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
 
 		# END OF WORKING CODE
 
@@ -405,27 +403,27 @@ class Controller():
 
 	def select(self, sprites_at_point):
 		print(sprites_at_point)
-		sprite = None
-		for i in self.selection:
-			i.selected = False
+		entity_found = None
+		for entity in self.selection:
+			entity.selected = False
 		self.selection.clear()
-		for i in sprites_at_point:
-			if i.entity and isinstance(i.entity, Unit):
-				sprite = i
-				print(iso_to_grid_pos(i.entity.iso_position))
+		for s in sprites_at_point:
+			entity = s.entity
+			if entity and isinstance(entity, Unit):
+				entity_found = entity
+				print(iso_to_grid_pos(entity.iso_position))
 				break
-		if sprite:
-			sprite.selected = True
-			self.selection.add(sprite)
+		if entity_found:
+			entity_found.selected = True
+			self.selection.add(entity_found)
 
 	def move_selection(self, position, need_conversion=True):
 		position_grid = position
 		if need_conversion:
 			position_grid = iso_to_grid_pos(position)
 		if self.is_on_map(position_grid):
-			for i in self.selection:
-				self.moving_sprites.add(i)
-				entity = i.entity
+			for entity in self.selection:
+				self.moving_entities.add(entity)
 
 				# Pathfinding algorithm
 				pathfinding_matrix = self.game.game_model.map.get_pathfinding_matrix()
@@ -447,12 +445,12 @@ class Controller():
 			print("out of bound!")
 
 	def action_on_zone(self, mouse_position_in_game):
-		for i in self.selection:
+		for entity in self.selection:
 			mouse_grid_pos = iso_to_grid_pos(mouse_position_in_game)
 			for z in self.game.game_model.zone_list:
 				z_grid_pos = iso_to_grid_pos(z.iso_position)
 				if z_grid_pos == mouse_grid_pos:
-					i.entity.aimed_entity = z
+					entity.aimed_entity = z
 					self.move_selection(z_grid_pos, need_conversion=False)
 					break
 

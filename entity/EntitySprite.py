@@ -18,7 +18,6 @@ class EntitySprite(Sprite):
 		super().__init__(filename=sprite_data.file, scale=sprite_data.scale, center_x=entity.iso_position.x + sprite_data.x_offset, center_y=entity.iso_position.y + sprite_data.y_offset, *args, **kwargs)
 		self.sprite_data = sprite_data
 		self.entity = entity
-		self.selected = False
 
 	def update(self):
 		self.center_x = self.entity.iso_position.x + self.sprite_data.x_offset
