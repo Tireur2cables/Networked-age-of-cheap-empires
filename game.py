@@ -7,7 +7,7 @@ from utils.isometric import *
 from entity.Unit import Unit
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
-from views.CustomButtons import NextViewButton
+from views.CustomButtons import NextViewButton, ListButton
 from map.map import Map
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
@@ -99,7 +99,6 @@ class GameView(arcade.View):
 
 	def setup(self):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		print("tolo")
 		self.game_model.setup()
 		self.game_view.setup()
 		self.game_controller.setup()
@@ -122,8 +121,8 @@ class GameView(arcade.View):
 	def on_show(self):
 		self.game_view.on_show()
 
-	# def on_hide_view(self):
-	# 	self.manager.disable()
+	def on_hide_view(self):
+		self.game_view.on_hide_view()
 
 #########################################################################
 #							MODEL CLASS									#
@@ -185,6 +184,9 @@ class View():
 		""" Initializer """
 		self.game = aoce_game
 
+		# a UIManager to handle the UI.
+		self.manager = arcade.gui.UIManager()
+
 		# Variables that will hold sprite lists
 		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
@@ -196,7 +198,6 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
-		self.static_menu()
 		self.sync_entities()
 		self.sync_ground()
 		self.sync_zones()
@@ -204,11 +205,8 @@ class View():
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT,COLOR_STATIC_RESSOURCES)
 
-		self.manager = arcade.gui.UIManager()
-		self.manager.enable()
-
 		# Create a vertical BoxGroup to align buttons
-		self.v_box = arcade.gui.UIBoxLayout()
+		self.v_box1 = arcade.gui.UIBoxLayout()
 
 		WIDTH_LABEL = self.game.window.width / 5
 		HEIGHT_LABEL = self.game.window.height * (0.05)
@@ -217,7 +215,7 @@ class View():
 		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 		for val in ressources_tab :
 			label = arcade.gui.UITextArea(0, 0, WIDTH_LABEL, HEIGHT_LABEL, val, text_color=(0,0,0,255), font_name=('Impact',))
-			self.v_box.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
+			self.v_box1.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
@@ -225,7 +223,7 @@ class View():
 				anchor_x="left",
 				align_x=HEIGHT_LABEL + int(self.game.window.width * 3 / 10),
 				anchor_y="bottom",
-				child=self.v_box
+				child=self.v_box1
 			)
 		)
 
@@ -296,18 +294,18 @@ class View():
 		self.minimap.draw()
 
 		#
+		# --- In-game GUI ---
+		#
+		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
+		self.coord_label.fit_content()
+
+		#
 		# --- Manager and Camera ---
 		#
 		self.manager.draw()
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
-
-		#
-		# --- In-game GUI ---
-		#
-		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
-		self.coord_label.fit_content()
 
 
 
@@ -326,41 +324,34 @@ class View():
 
 		arcade.set_background_color(arcade.csscolor.YELLOW_GREEN)
 
-		# a UIManager to handle the UI.
-		self.manager = arcade.gui.UIManager()
 		self.manager.enable()
 
 		self.static_menu()
 		self.addButton()
 		self.addCoordLabel()
 
-
-
 	def addButton(self):
 		# def button size
 		buttonsize = self.game.window.width / 6
 
 		# Create a vertical BoxGroup to align buttons
-		self.v_box = arcade.gui.UIBoxLayout()
-
-		# Create the exit button
-		option_button = NextViewButton(self.game.window, self.game.menu_view, text="Option", width=buttonsize)
-		self.v_box.add(option_button)
+		self.v_box3 = arcade.gui.UIBoxLayout()
 
 		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
-		self.v_box.add(retour_button)
-
-		# Create the exit button
+		# Create the save button
 		save_button = NextViewButton(self.game.window, self.game.menu_view, text="Sauvegarder", width=buttonsize)
-		self.v_box.add(save_button)
+
+		# Create the option button
+		option_button = ListButton(self.manager, self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
+		self.v_box3.add(option_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x = "right",
-				anchor_y = "bottom",
-				child = self.v_box
+				anchor_y = "top",
+				child = self.v_box3
 			)
 		)
 
@@ -420,16 +411,13 @@ class View():
 		self.mouse_y = y
 
 	#En construction, marche paaaaaaaaas des masses
-	def coin_GUI(self):
-		# Create and enable the UIManager
-		self.manager = arcade.gui.UIManager()
-		self.manager.enable()
-		
-        # Create a box group to align the 'open' button in the center
-		self.v_box = arcade.gui.UIBoxLayout()
+	def coin_GUI(self) :
+
+		# Create a box group to align the 'open' button in the center
+		self.v_box4 = arcade.gui.UIBoxLayout()
 
 		coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width = 40)
-		self.v_box.add(coin_box.with_space_around(0,0,0,0,arcade.color.BRONZE))
+		self.v_box4.add(coin_box.with_space_around(0,0,0,0,arcade.color.BRONZE))
 
 		# for i in self.entity_sprite_list:
 		# 	if i.selected:
@@ -440,16 +428,18 @@ class View():
 		# 				anchor_y="bottom",
 		# 				child=self.v_box)
 		# 		)
-		
+
 		self.manager.add(
-					arcade.gui.UIAnchorWidget(
-						anchor_x="right",
-						align_x=-int(self.game.window.width*2/10),
-						anchor_y="bottom",
-						child=self.v_box)
-				)
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-int(self.game.window.width*2/10),
+				anchor_y="bottom",
+				child=self.v_box4
+			)
+		)
 
-
+	def on_hide_view(self) :
+		self.manager.disable()
 
 
 

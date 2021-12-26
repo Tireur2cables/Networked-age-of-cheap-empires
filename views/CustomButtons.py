@@ -26,9 +26,26 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 		self.nextView = nextView
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		print("NextView :", event)
 		self.nextView.setup()
 		self.window.show_view(self.nextView)
+
+# Button to display things or not
+class ListButton(arcade.gui.UIFlatButton) :
+	def __init__(self, manager, vbox, children, text, width) :
+		super().__init__(text=text, width=width)
+		self.manager = manager
+		self.vbox = vbox
+		self.list = children
+		self.isDisplayed = False
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		self.isDisplayed = not self.isDisplayed
+		self.vbox.clear()
+		self.vbox.add(self)
+
+		if self.isDisplayed :
+			for child in self.list :
+				self.vbox.add(child)
 
 
 # CheckboxButton
@@ -41,8 +58,6 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 		self.fullscreen = fullscreen
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		print("Checkbox : ", event)
-
 		self.texture = arcade.load_texture(textureEmpty if self.ticked else textureTicked)
 
 		self.ticked = not self.ticked
