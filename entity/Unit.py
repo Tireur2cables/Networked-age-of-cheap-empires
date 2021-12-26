@@ -26,6 +26,7 @@ class Unit(Entity):
 
 		# Movement
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
+		self.aimed_entity = None
 		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
 		self.speed = speed  # Speed of the villager (should probably be a constant)
@@ -59,7 +60,7 @@ class Unit(Entity):
 class Villager(Unit):#un Villageois est une Unit particuliere
 	def __init__(self, iso_position):
 		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/villager_stand.png", y_offset=46//2), health=25, damage=3, rate_fire=1.5)
-		self.resource = {Resource.FOOD : 0, Resource.WOOD : 0, Resource.STONE : 0, Resource.GOLD : 0}#utilisation de l'enumeration Resource
+		self.resources = {"food" : 0, "wood" : 0, "stone" : 0, "gold" : 0} # utilisation de l'enumeration Resource --- Annulé pour l'instant
 		self.max_resource = 10
 
 	def nb_resources(self):
@@ -73,6 +74,7 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 
 	def is_full(self):#ne peut plus prendre de nouvelles resources
 		return self.nb_resources() == self.max_resource
+
 
 
 #   __  __ _ _ _ _

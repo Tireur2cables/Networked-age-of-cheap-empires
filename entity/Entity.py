@@ -24,6 +24,9 @@ class Entity:
 		# Sprite
 		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="None")
 
+		# Backend
+		self.action_timer = 0
+
 		#
 		## Life
 		#

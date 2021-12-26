@@ -298,7 +298,12 @@ class View():
 		if button == arcade.MOUSE_BUTTON_LEFT:
 			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			self.game.game_controller.move_selection(mouse_position_in_game)
+			units_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list)
+			if units_at_point:
+				print("unit!")
+			else:
+				self.game.game_controller.move_selection(mouse_position_in_game)
+
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
 			print(f"position sur la grille : {iso_to_grid_pos(mouse_position_in_game)}")
@@ -308,12 +313,19 @@ class View():
 			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
-		if symbol == arcade.key.T:
+		if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
 			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 			grid_pos = iso_to_grid_pos(mouse_position_in_game)
 			tCent = TownCenter(grid_pos)
 			self.game.game_model.zone_list.append(tCent)
 			self.zone_sprite_list.append(tCent.sprite)
+
+		if symbol == arcade.key.C:  # Couper arbre
+			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+			self.game.game_controller.action_on_zone(mouse_position_in_game)
+
+
+
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
@@ -340,6 +352,7 @@ class Controller():
 		# Selection (will contain elements of type EntitySprite)
 		self.selection = set()
 		self.moving_sprites = set()
+		self.interacting_sprites = set()
 
 	def setup(self):
 		pass
@@ -365,13 +378,23 @@ class Controller():
 						entity.next_aim()
 					else:
 						entity.is_moving = False
+						if entity.aimed_entity:
+							self.interacting_sprites.add(sprite)
+
 				else:  # If it is not close to where it aims and not out of bounds, move.
 					entity.iso_position += entity.change
 					sprite.update()
 
+		for sprite in self.interacting_sprites:
+			entity = sprite.entity
+			if isinstance(entity.aimed_entity, Zone):
+				self.harvest_zone(entity, delta_time)
+
 		if self.moving_sprites:
 			self.moving_sprites = {s for s in self.moving_sprites if s.entity.is_moving}
 
+		if self.interacting_sprites:
+			self.interacting_sprites = {s for s in self.interacting_sprites if s.entity.aimed_entity}
 
 		# END OF WORKING CODE
 
@@ -395,11 +418,11 @@ class Controller():
 			sprite.selected = True
 			self.selection.add(sprite)
 
-	def move_selection(self, mouse_position):
-
-		mouse_position_grid = iso_to_grid_pos(mouse_position)
-
-		if self.is_on_map(mouse_position_grid):
+	def move_selection(self, position, need_conversion=True):
+		position_grid = position
+		if need_conversion:
+			position_grid = iso_to_grid_pos(position)
+		if self.is_on_map(position_grid):
 			for i in self.selection:
 				self.moving_sprites.add(i)
 				entity = i.entity
@@ -409,7 +432,7 @@ class Controller():
 				grid = Grid(matrix=pathfinding_matrix)
 				finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
 				startvec = iso_to_grid_pos(entity.iso_position)
-				endvec = mouse_position_grid
+				endvec = position_grid
 				start = grid.node(*startvec)
 				end = grid.node(*endvec)
 				path, runs = finder.find_path(start, end, grid)
@@ -422,6 +445,29 @@ class Controller():
 						entity.next_aim()
 		else:
 			print("out of bound!")
+
+	def action_on_zone(self, mouse_position_in_game):
+		for i in self.selection:
+			mouse_grid_pos = iso_to_grid_pos(mouse_position_in_game)
+			for z in self.game.game_model.zone_list:
+				z_grid_pos = iso_to_grid_pos(z.iso_position)
+				if z_grid_pos == mouse_grid_pos:
+					i.entity.aimed_entity = z
+					self.move_selection(z_grid_pos, need_conversion=False)
+					break
+
+	def harvest_zone(self, entity, delta_time):
+		entity.action_timer += delta_time
+		if entity.action_timer > 1:
+			entity.action_timer = 0
+			aimed_entity = entity.aimed_entity
+			harvested = aimed_entity.harvest(entity.damage)
+			print(f"[harvesting] entity health = {entity.health} - zone health = {aimed_entity.health}")
+			if harvested:
+				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+				entity.resources[type(aimed_entity).__name__.lower()] = harvested  # Not very elegant, must be changed in the future.
+				entity.aimed_entity = None
+
 
 
 # Main function to launch the game

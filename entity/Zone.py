@@ -126,6 +126,14 @@ class Resources(Zone):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
 		self.amount = amount
 
+	def harvest(self, dmg):
+		self.health -= dmg
+		if self.health > 0:
+			return 0
+		else:
+			return self.amount
+
+
 # -------------------------
 
 
