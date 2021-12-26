@@ -7,7 +7,6 @@ from entity.Unit import *
 from views.MainView import MainView
 from views.CustomButtons import QuitButton
 from map.map import Map
-from time import sleep
 
 ## @tidalwaave : 18/11, 22H30
 from entity.Zone import *
@@ -375,9 +374,8 @@ class Controller():
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		""" Movement and game logic """
 
+		# --- Action - Moving entities ---
 		for entity in self.moving_entities:
-			# WORKING CODE BELOW
-
 			if entity.is_moving:
 				# Check if the next position is on the map
 				if not self.is_on_map(iso_to_grid_pos(entity.iso_position+entity.change)):
@@ -394,16 +392,23 @@ class Controller():
 					entity.iso_position += entity.change
 					entity.sprite.update()
 
+		# --- Action - Interacting entities ---
 		for entity in self.interacting_entities:
 			if isinstance(entity.aimed_entity, Zone):
 				self.harvest_zone(entity, delta_time)
 
+
+
+		# --- Updating Lists ---
 		if self.moving_entities:
 			self.moving_entities = {e for e in self.moving_entities if e.is_moving}
 
 		if self.interacting_entities:
 			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
 
+
+
+		# --- Deleting dead entities ---
 		for dead_entity in self.dead_entities:
 			self.selection.discard(dead_entity)
 			self.moving_entities.discard(dead_entity)
@@ -412,12 +417,6 @@ class Controller():
 			self.game.game_model.discard_dead_entity(dead_entity)
 		self.dead_entities.clear()
 
-		# END OF WORKING CODE
-
-			# iso_position = iso_to_grid_pos(entity.position)
-			# int_position = Vector(int(entity.iso_position.x), int(entity.iso_position.y))
-			# int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
-			# print(f"{int_position} -> {int_iso_position}")
 
 	def select(self, sprites_at_point):
 		print(sprites_at_point)
@@ -462,6 +461,7 @@ class Controller():
 		else:
 			print("out of bound!")
 
+	# Called once when you order an action on a zone
 	def action_on_zone(self, mouse_position_in_game):
 		for entity in self.selection:
 			mouse_grid_pos = iso_to_grid_pos(mouse_position_in_game)
@@ -472,6 +472,7 @@ class Controller():
 					self.move_selection(z_grid_pos, need_conversion=False)
 					break
 
+	# Called every frame when an action is done on a zone (harvesting).
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
 		if entity.action_timer > 1:
