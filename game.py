@@ -184,9 +184,6 @@ class View():
 		""" Initializer """
 		self.game = aoce_game
 
-		# a UIManager to handle the UI.
-		self.manager = arcade.gui.UIManager()
-
 		# Variables that will hold sprite lists
 		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
@@ -197,7 +194,9 @@ class View():
 		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
-
+		# a UIManager to handle the UI.
+		self.manager = arcade.gui.UIManager()
+		
 		self.sync_entities()
 		self.sync_ground()
 		self.sync_zones()
