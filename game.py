@@ -204,13 +204,18 @@ class View():
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
-		self.cheat_box = arcade.gui.UIBoxLayout()
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="center",
-				anchor_y="center",
-				child=self.cheat_box
-			)
+
+		width = self.game.window.width / 5
+		height = self.game.window.height / 20
+		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
+		self.cheat_pane = arcade.gui.UITexturePane(
+			arcade.gui.UIInputText(
+				x=0,
+				y=(self.game.window.height - height) / 2,
+				text="enter cheat code here", width=width, height=height,
+				text_color=(255, 255, 255, 255)
+			),
+			tex=bg_text
 		)
 
 	def static_menu(self) :
@@ -425,10 +430,9 @@ class View():
 
 	def triggerCheatInput(self) :
 		if self.display_cheat_input :
-			self.cheat_box.clear()
+			self.manager.remove(self.cheat_pane)
 		else :
-			cheat_input = arcade.gui.UIInputText(text="enter cheats here", width=self.game.window.width / 6)
-			self.cheat_box.add(cheat_input)
+			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
 
 	#En construction, marche paaaaaaaaas des masses
