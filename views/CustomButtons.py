@@ -31,9 +31,8 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 
 # Button to display things or not
 class ListButton(arcade.gui.UIFlatButton) :
-	def __init__(self, manager, vbox, children, text, width) :
+	def __init__(self, vbox, children, text, width) :
 		super().__init__(text=text, width=width)
-		self.manager = manager
 		self.vbox = vbox
 		self.list = children
 		self.isDisplayed = False

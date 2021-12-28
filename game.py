@@ -196,10 +196,22 @@ class View():
 		self.zone_sprite_list = arcade.SpriteList()
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
-		
+
+		self.init_cheats()
 		self.sync_entities()
 		self.sync_ground()
 		self.sync_zones()
+
+	def init_cheats(self) :
+		self.display_cheat_input = False
+		self.cheat_box = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				anchor_y="center",
+				child=self.cheat_box
+			)
+		)
 
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT,COLOR_STATIC_RESSOURCES)
@@ -342,7 +354,7 @@ class View():
 		save_button = NextViewButton(self.game.window, self.game.menu_view, text="Sauvegarder", width=buttonsize)
 
 		# Create the option button
-		option_button = ListButton(self.manager, self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
+		option_button = ListButton(self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
 		self.v_box3.add(option_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -402,12 +414,22 @@ class View():
 			print(pos)
 			self.game.game_model.zone_list.append(tCent)
 			self.sync_zones()
+		elif symbol == arcade.key.F10 :
+			self.triggerCheatInput()
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
 		# Update the coords of the mouse
 		self.mouse_x = x
 		self.mouse_y = y
+
+	def triggerCheatInput(self) :
+		if self.display_cheat_input :
+			self.cheat_box.clear()
+		else :
+			cheat_input = arcade.gui.UIInputText(text="enter cheats here", width=self.game.window.width / 6)
+			self.cheat_box.add(cheat_input)
+		self.display_cheat_input = not self.display_cheat_input
 
 	#En construction, marche paaaaaaaaas des masses
 	def coin_GUI(self) :
@@ -439,8 +461,6 @@ class View():
 
 	def on_hide_view(self) :
 		self.manager.disable()
-
-
 
 #########################################################################
 #							CONTROLLER CLASS							#
