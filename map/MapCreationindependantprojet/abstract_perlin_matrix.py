@@ -8,9 +8,9 @@ import numpy as np
 
 
 def perlin_array(size = (50, 50),
-			scale=10, octaves = 50, 
-			persistence = 0.5, 
-			lacunarity = 4.0, 
+			scale=75, octaves = 50, 
+			persistence = 0.3, 
+			lacunarity = 2.0, 
 			seed = None):
 
 	if not seed:
@@ -44,14 +44,14 @@ def process_array(array, size = (50,50)):
 	out = [[0 for y in range(size[1])] for x in range(size[0])]
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] < 0.3:
-				out[x][y] = Tile("water", x,y)
-			elif array[x][y] < 0.75:
+			if array[x][y] < 0.45:
+				out[x][y] = Tile("grass", x,y)
+			elif array[x][y] < 0.58:
 				out[x][y] = Tile("grass", x,y, "tree")
 			elif array[x][y] < 0.75:
-				out[x][y] = Tile("stone", x,y, "gold")
+				out[x][y] = Tile("sand", x,y, "gold")
 			else:
-				out[x][y] = Tile("grass", x,y)
+				out[x][y] = Tile("water", x,y)
 	return out
 
 a = process_array(perlin_array())
