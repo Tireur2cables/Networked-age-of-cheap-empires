@@ -11,13 +11,15 @@ from utils.vector import Vector
 CHARACTER_SCALING = 1
 
 class Map():
-	def __init__(self, tiles, objects, map_size):
-		self.tiles = tiles
-		self.objects = objects
+	def __init__(self, tile_array, tiles, objects, map_size):
+		# self.tiles = tiles
+		# self.objects = objects
+		self.tile_array = tile_array
 
 		self.map_size = map_size
 		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
-		self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], grid_x, grid_y) for grid_y in range(map_size)] for grid_x in range(map_size)]
+		if not(self.tile_array):
+			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], grid_x, grid_y) for grid_y in range(map_size)] for grid_x in range(map_size)]
 
 		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
 		for x in range(map_size):
