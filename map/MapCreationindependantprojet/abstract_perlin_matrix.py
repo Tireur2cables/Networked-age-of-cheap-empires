@@ -34,7 +34,7 @@ def perlin_array(size = (50, 50),
 	norm_me = lambda x: (x-min_arr)/(max_arr - min_arr)
 	norm_me = np.vectorize(norm_me)
 	arr = norm_me(arr)
-	print(arr)
+	#print(arr)
 	return arr
 
 perlin_array(seed=61)
@@ -54,8 +54,8 @@ def process_array(array, size = (50,50)):
 				out[x][y] = Tile("water", x,y)
 	return out
 
-a = process_array(perlin_array())
-print(a)
+#a = process_array(perlin_array())
+#print(a)
 
 
 # tileArray = [[Tile("grass",x,y,None) for y in range(50)] for x in range(50)]
