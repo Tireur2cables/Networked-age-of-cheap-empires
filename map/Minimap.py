@@ -15,9 +15,9 @@ class Minimap() :
 		self.map_height = default_map_size * tile_height
 		self.background_color = bakcground_color
 
-		
-		MINIMAP_WIDTH = int(self.view.game.window.width * 3 / 10)
-		MINIMAP_HEIGHT = int(self.view.game.window.height * 1 / 4)
+
+		MINIMAP_WIDTH = int(self.view.game.window.width * 3 / 10) # arbitrary
+		MINIMAP_HEIGHT = int(self.view.game.window.height * 1 / 4) # arbitrary
 
 		self.size = (MINIMAP_WIDTH, MINIMAP_HEIGHT)
 
@@ -37,7 +37,7 @@ class Minimap() :
 
 	def update_minimap(self) :
 		iso_width, iso_height = cart_to_iso(self.map_width, self.map_height)
-		proj = -iso_width, iso_width, 0, iso_height - self.view.camera.viewport_height * 3 / 4
+		proj = -iso_width, iso_width, 0, iso_height - self.view.camera.viewport_height * 3 / 4 # it works
 		with self.sprite_list.atlas.render_into(self.texture, projection=proj) as fbo:
 			fbo.clear(self.background_color)
 			self.view.tile_sprite_list.draw()

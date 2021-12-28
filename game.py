@@ -197,21 +197,33 @@ class View():
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
+		self.init_dynamic_gui()
 		self.init_cheats()
 		self.sync_entities()
 		self.sync_ground()
 		self.sync_zones()
 
+	def init_dynamic_gui(self) :
+		# Create a box group to align the 'open' button in the center
+		self.v_box4 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				anchor_y="bottom",
+				child=self.v_box4
+			)
+		)
+
 	def init_cheats(self) :
 		self.display_cheat_input = False
 
-		width = self.game.window.width / 5
-		height = self.game.window.height / 20
+		width = self.game.window.width / 5 # arbitrary
+		height = self.game.window.height / 20 # arbitrary
 		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
 		self.cheat_pane = arcade.gui.UITexturePane(
 			arcade.gui.UIInputText(
 				x=0,
-				y=(self.game.window.height - height) / 2,
+				y=(self.game.window.height - height) / 2, # middle
 				text="enter cheat code here", width=width, height=height,
 				text_color=(255, 255, 255, 255)
 			),
@@ -224,20 +236,21 @@ class View():
 		# Create a vertical BoxGroup to align buttons
 		self.v_box1 = arcade.gui.UIBoxLayout()
 
-		WIDTH_LABEL = self.game.window.width / 5
-		HEIGHT_LABEL = self.game.window.height * (0.05)
-
 		ressources_tab = ["  = 1 ", "  = 5 ", "  = 50 ", "  = 500 ", "  = 5000 "]
+
+		self.HEIGHT_LABEL = self.minimap.size[1] / len(ressources_tab) # in order to have same height as minimap at the end
+		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
+
 		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 		for val in ressources_tab :
-			label = arcade.gui.UITextArea(0, 0, WIDTH_LABEL, HEIGHT_LABEL, val, text_color=(0,0,0,255), font_name=('Impact',))
+			label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
 			self.v_box1.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="left",
-				align_x=HEIGHT_LABEL + int(self.game.window.width * 3 / 10),
+				align_x=self.HEIGHT_LABEL + int(self.minimap.size[0]), # just after minimap and icone
 				anchor_y="bottom",
 				child=self.v_box1
 			)
@@ -248,14 +261,14 @@ class View():
 
 		pics_tab = [PIC_CIVIL, PIC_FOOD, PIC_WOOD, PIC_STONE, PIC_GOLD]
 		for val in pics_tab :
-			icone = arcade.gui.UITextureButton(x=0, y=0, width=HEIGHT_LABEL, height=HEIGHT_LABEL, texture=arcade.load_texture(val))
+			icone = arcade.gui.UITextureButton(x=0, y=0, width=self.HEIGHT_LABEL, height=self.HEIGHT_LABEL, texture=arcade.load_texture(val))
 			self.v_box2.add(icone.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES_ICONE))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="left",
-				align_x=int(self.game.window.width*3/10),
+				align_x=int(self.minimap.size[0]), # just after minimap
 				anchor_y="bottom",
 				child=self.v_box2
 			)
@@ -348,7 +361,7 @@ class View():
 
 	def addButton(self):
 		# def button size
-		buttonsize = self.game.window.width / 6
+		buttonsize = self.game.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box3 = arcade.gui.UIBoxLayout()
@@ -371,8 +384,8 @@ class View():
 			)
 		)
 
-	def addCoordLabel(self):
-		coordsize = self.game.window.width / 5
+	def addCoordLabel(self): # just for debug (should disappear for the final render)
+		coordsize = self.game.window.width / 5 # arbitrary?
 
 		coordsmouse = f"x = {self.mouse_x}  y = {self.mouse_y}"
 		self.coord_label = arcade.gui.UILabel(text = coordsmouse, width= 100, height = 100, anchor_y="bottom")
@@ -436,32 +449,14 @@ class View():
 		self.display_cheat_input = not self.display_cheat_input
 
 	#En construction, marche paaaaaaaaas des masses
-	def coin_GUI(self) :
+	def trigger_coin_GUI(self, selected_list) :
+		self.v_box4.clear()
 
-		# Create a box group to align the 'open' button in the center
-		self.v_box4 = arcade.gui.UIBoxLayout()
-
-		coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width = 40)
-		self.v_box4.add(coin_box.with_space_around(0,0,0,0,arcade.color.BRONZE))
-
-		# for i in self.entity_sprite_list:
-		# 	if i.selected:
-		# 		self.manager.add(
-		# 			arcade.gui.UIAnchorWidget(
-		# 				anchor_x="right",
-		# 				align_x=-int(self.game.window.width*3/10),
-		# 				anchor_y="bottom",
-		# 				child=self.v_box)
-		# 		)
-
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="right",
-				align_x=-int(self.game.window.width*2/10),
-				anchor_y="bottom",
-				child=self.v_box4
-			)
-		)
+		if selected_list :
+			width = self.game.window.width / 2 # other half of the screen
+			height = self.minimap.size[1] # same as minimap
+			coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width=width, height=height)
+			self.v_box4.add(coin_box.with_space_around(0, 0, 0, 0, arcade.color.BRONZE))
 
 	def on_hide_view(self) :
 		self.manager.disable()
@@ -504,13 +499,12 @@ class Controller():
 		for i in sprites_at_point:
 			if i.entity and isinstance(i.entity, Unit) :
 				sprite = i
-				self.game.game_view.coin_GUI()
 				break
 		if sprite:
 			sprite.selected = True
 			self.selection.append(sprite)
-		if self.selection :
-			pass
+
+		self.game.game_view.trigger_coin_GUI(self.selection)
 
 
 	def move_selection(self, mouse_position):
