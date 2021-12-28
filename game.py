@@ -213,6 +213,19 @@ class View():
 				child=self.v_box4
 			)
 		)
+		
+		# Create a box for the button in the precedent box, maybe redondant
+		self.v_box5 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x= -100,
+				anchor_y="bottom",
+				align_y=50,
+				child=self.v_box5
+			)
+		)
+
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -451,12 +464,19 @@ class View():
 	#En construction, marche paaaaaaaaas des masses
 	def trigger_coin_GUI(self, selected_list) :
 		self.v_box4.clear()
+		self.v_box5.clear()
+
+
 
 		if selected_list :
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
 			coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width=width, height=height)
 			self.v_box4.add(coin_box.with_space_around(0, 0, 0, 0, arcade.color.BRONZE))
+
+			# Button for coin, you wan click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
+			coin_button = arcade.gui.UIFlatButton(text = "Machala")
+			self.v_box5.add(coin_button.with_space_around(0,0,0,0,arcade.color.ANTIQUE_BRONZE))
 
 	def on_hide_view(self) :
 		self.manager.disable()
