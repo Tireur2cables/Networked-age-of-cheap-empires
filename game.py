@@ -140,6 +140,14 @@ class Model():
 		self.unit_list.append(unit1)
 		self.unit_list.append(unit2)
 
+		#military
+		militia = Militia(grid_pos_to_iso(Vector(10, 2)) + Vector(0, TILE_HEIGHT_HALF))
+		self.unit_list.append(militia)
+		archer = Archer(grid_pos_to_iso(Vector(13, 2)) + Vector(0, TILE_HEIGHT_HALF))
+		self.unit_list.append(archer)
+		knight = Knight(grid_pos_to_iso(Vector(16, 2)) + Vector(0, TILE_HEIGHT_HALF))
+		self.unit_list.append(knight)
+
 		## @tidalwaave : 18/11, 22H30
 		# tCent = TownCenter(10, 10)
 		# self.zoneLayerList.append(tCent)

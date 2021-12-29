@@ -17,7 +17,7 @@ from pathfinding.finder.a_star import AStarFinder
 #  | |__| | | | | | | | | |_
 #   \____/  |_| |_| |_|  \__|
 
-
+SPEED_UNITS = 5#correction of the speed because it was too slow
 class Unit(Entity):
 	#une Unit est une Entity qui est mobile
 	#Liste des Unit: https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires_II)
@@ -29,7 +29,7 @@ class Unit(Entity):
 		self.aimed_entity = None
 		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
-		self.speed = speed  # Speed of the unit
+		self.speed = SPEED_UNITS * speed  # Speed of the unit
 		self.is_moving = False
 
 	def set_path(self, path):
@@ -100,13 +100,13 @@ class Militia(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 20, Res.STONE : 0}
 	creation_time = 21
 	def __init__(self, iso_position):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/militia_stand.png"), speed = 0.9, health=40, damage=4, rate_fire=2, pierce_armor=1, line_sight=4)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2), speed = 0.9, health=40, damage=4, rate_fire=2, pierce_armor=1, line_sight=4)
 
 class Spearman(Military):
 	creation_cost = {Res.FOOD : 35, Res.WOOD : 25, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 22
 	def __init__(self, iso_position):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/spearman_stand.png"), speed=1, health=45, damage=3, rate_fire=3, line_sight=4)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/spearman_stand.png", y_offset=67//2), speed=1, health=45, damage=3, rate_fire=3, line_sight=4)
 
 #Archery (Trained at Archery Range)
 #For the moment, all archery units deal instant damage (there is no projectile) and they aim parfectly well.
@@ -114,23 +114,23 @@ class Archer(Military):
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 25, Res.GOLD : 45, Res.STONE : 0}
 	creation_time = 35
 	def __init__(self, iso_position):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/archer_stand.png"), speed=0.96, health=30, damage=4, rate_fire=2, range=4, line_sight=6)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/archer_stand.png", y_offset=51//2), speed=0.96, health=30, damage=4, rate_fire=2, range=4, line_sight=6)
 
 class Skirmisher(Military):
 	creation_cost = {Res.FOOD : 25, Res.WOOD : 35, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 22
 	def __init__(self, iso_position):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/skirmisher_stand.png"), speed=0.96, health=30, damage=2, rate_fire=3, range=4, pierce_armor=3, line_sight=6)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/skirmisher_stand.png", y_offset=71//2), speed=0.96, health=30, damage=2, rate_fire=3, range=4, pierce_armor=3, line_sight=6)
 
 #Cavalry (Trained at Stable)
 class ScoutCavalry(Military):
 	creation_cost = {Res.FOOD : 80, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 30
 	def __init__(self, iso_position):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/scoutcavalry_stand.png"), speed=1.2, health=45, damage=3, rate_fire=2, pierce_armor=2, line_sight=4)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/scoutcavalry_stand.png", y_offset=90//2), speed=1.2, health=45, damage=3, rate_fire=2, pierce_armor=2, line_sight=4)
 
 class Knight(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 75, Res.STONE : 0}
 	creation_time = 30
 	def __init__(self, iso_position):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/knight_stand.png"), speed=1.35, health=100, damage=10, rate_fire=1.8, melee_armor=2, pierce_armor=2, line_sight=4)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/knight_stand.png", y_offset=90//2), speed=1.35, health=100, damage=10, rate_fire=1.8, melee_armor=2, pierce_armor=2, line_sight=4)
