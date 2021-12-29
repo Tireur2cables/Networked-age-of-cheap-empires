@@ -15,6 +15,7 @@ from map.MapCreationindependantprojet.abstract_perlin_matrix import perlin_array
 from entity.Zone import *
 
 # --- Constants ---
+from CONSTANTS import Resource as Res
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
@@ -502,7 +503,8 @@ class Controller():
 			print(f"[harvesting] entity health = {entity.health} - zone health = {aimed_entity.health}")
 			if harvested:
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-				entity.resources[type(aimed_entity).__name__.lower()] = harvested  # Not very elegant, must be changed in the future.
+				entity.resource[Res[type(aimed_entity).__name__.upper()]] = harvested
+				print(entity.resource)
 				entity.aimed_entity = None
 				self.dead_entities.add(aimed_entity)
 
