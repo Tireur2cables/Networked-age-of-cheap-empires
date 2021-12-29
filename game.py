@@ -5,11 +5,12 @@ from utils.vector import Vector
 from utils.isometric import *
 from entity.Unit import *
 from views.MainView import MainView
-from views.CustomButtons import QuitButton
+from views.CustomButtons import QuitButton,SaveButton
 from map.map import Map
 
 ####
 from map.MapCreationindependantprojet.abstract_perlin_matrix import perlin_array,process_array
+from save.serializationTest import *
 
 ## @tidalwaave : 18/11, 22H30
 from entity.Zone import *
@@ -256,6 +257,7 @@ class View():
 
 		self.addButton()
 		self.addCoordLabel()
+		self.addSaveButton()
 
 	def addButton(self):
 		# def button size
@@ -294,6 +296,20 @@ class View():
 			)
 		)
 		self.coord_label.fit_content()
+
+
+	def addSaveButton(self):
+		buttonsize = self.game.window.width / 6
+		self.v_box = arcade.gui.UIBoxLayout()
+		save_button = SaveButton(self.game.game_model.unit_list, self.game.game_model.tile_list ,self.game.game_model.zone_list, text="Save Game", width=buttonsize)
+		self.v_box.add(save_button)
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x = "right",
+				anchor_y = "bottom",
+				child = self.v_box
+			)
+		)
 
 	def camera_move(self):
 		# Update the camera coords if the mouse is on the edges
