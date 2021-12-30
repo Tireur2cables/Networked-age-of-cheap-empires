@@ -57,6 +57,9 @@ class Entity:
 	def set_position(self, iso_position):
 		self.iso_position = iso_position
 
+	def get_sprite(self):
+		return self.sprite
+
 	# health
 	def get_health(self):
 		return self.health

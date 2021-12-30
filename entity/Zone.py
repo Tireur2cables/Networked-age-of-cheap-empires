@@ -8,8 +8,12 @@ class Zone(Entity):
 	def __init__(self, grid_position, tile_size=1, is_locking=False, **kwargs):#constructeur : initialise les attributs
 		iso_position = grid_pos_to_iso(grid_position)
 		super().__init__(iso_position, **kwargs)
+		self.grid_position=grid_position
 		self.tile_size=tile_size
 		self.is_locking = is_locking
+
+	def get_grid_position(self):
+		return self.grid_position
 
 		# self.sprite = ZoneSprite(self, sprite_image, 1, center_x=iso_coords.x, center_y=iso_coords.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None")
 
@@ -125,6 +129,15 @@ class Resources(Zone):
 	def __init__(self, grid_position, amount, **kwargs):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
 		self.amount = amount
+	
+	def __getstate__(self):
+		return [self.get_grid_position(), self.is_locking,self.sprite_data, self.health, self.amount]
+	def __setstate__(self, data):
+		super().__init__(data[0])
+		self.is_locking=data[1]
+		self.sprite_data=data[2]
+		self.health = data[3]
+		self.amount=data[4]
 
 	def harvest(self, dmg):
 		self.health -= dmg

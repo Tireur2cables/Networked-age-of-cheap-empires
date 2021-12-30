@@ -66,5 +66,3 @@ def process_array(array, size = (50,50)):
 #         noise.pnoise2(x/scale, y/scale, octaves=octaves, persistence=persistence, lacunarity=lacunarity, repeatx=1024, repeaty=1024, base=seed)
 
 #         tileArray[x][y]=Tile()
-
-pass

@@ -16,6 +16,17 @@ class Tile():
 		# Sprite
 		sprite_data = SpriteData(file="./map/Tiles/" + self.blockID + ".png", y_offset=16)
 		self.sprite = TileSprite(self, sprite_data)
+	def __getstate__(self):
+		return [self.blockID, self.grid_x, self.grid_y, self.is_locked]
+	def __setstate__(self, data):
+		self.blockID = data[0]
+		self.grid_x=data[1]
+		self.grid_y=data[2]
+		self.is_locked = data[3]
+		sprite_data = SpriteData(file="./map/Tiles/" + self.blockID + ".png", y_offset=16)
+		self.sprite = TileSprite(self, sprite_data)
+		#self.pointer_to_entity = data[4]
+		
 
 
 	def setEntity(self,pointer_to_entity):
