@@ -14,17 +14,18 @@ class Map():
 	def __init__(self, tiles, objects, map_size, tile_array = None):
 		self.tiles = tiles
 		self.objects = objects
-		self.tile_array = tile_array
 
 		self.map_size = map_size
 		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
-		if self.tile_array is None:
+		if tile_array is None:
 			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], grid_x, grid_y) for grid_y in range(map_size)] for grid_x in range(map_size)]
+		else:
+			self.tile_array = tile_array
 
 		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
 		for x in range(map_size):
 			for y in range(map_size):
-				object = tile_array[x][y].pointer_to_entity
+				object = default_map_objects_2d[x][y] if tile_array is None else self.tile_array[x][y].pointer_to_entity
 				if object == "tree":  # Can't use match for now, not compatible with arcade library...
 					self.objects_array[x][y] = Wood(Vector(x, y))
 				elif object == "stone":
