@@ -1,5 +1,5 @@
 from player import Player
-import arcade 
+import arcade
 import arcade.gui
 """
 NINJALUI: get 10000 of each resource.
@@ -27,16 +27,16 @@ your AI. What commands those are will depend on your AI.
 """
 idées : key pour toggle une ligne pour rentrer les cheats code : F10
 if un cheat code est rentré : execute cheatcode pour un player en particulier
-else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les 
-cheat codes available ; 
+else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
+cheat codes available ;
 """
 class CheatsInput(arcade.gui.UIInputText):
     def __init__(self, x, y, text, width, height, text_color) :
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
 
-    def Ninjalui(self, player : Player):
-        player.add_all(player, 10000)
+    def Ninjalui(self):
+        print("ninjalui")#player.add_all(player, 10000)
     def Bigdaddy(self):
         print("debug big daddz")
     def Steroids(self):
@@ -47,7 +47,8 @@ class CheatsInput(arcade.gui.UIInputText):
         print("debug NoFog")
 
     def on_event(self, event) :
-        if self._active and isinstance(event, arcade.gui.events.UITextEvent) and (self.text in self.cheats_list):
+        super().on_event(event)
+        if self._active and isinstance(event, arcade.gui.events.UITextEvent) :
             if self.text == "NINJALUI":
                 self.Ninjalui()
             if self.text == "BIGDADDY":
