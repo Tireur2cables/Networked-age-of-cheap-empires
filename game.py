@@ -135,7 +135,7 @@ class Model():
 
 	def setup(self):
 		# clear old lists
-		self.entity_list.clear()
+		self.unit_list.clear()
 		self.tile_list.clear()
 		self.zone_list.clear()
 
@@ -349,7 +349,7 @@ class View():
 
 	def sync_entities(self):
 		# Sync self.game_model.entity_list with sprite_list
-		for index, item in enumerate(self.game.game_model.entity_list):
+		for index, item in enumerate(self.game.game_model.unit_list):
 			if item.sprite is None:
 				es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
 				self.entity_sprite_list.append(es)
@@ -439,7 +439,6 @@ class View():
 		self.static_menu()
 		self.addButton()
 		self.addCoordLabel()
-		self.addSaveButton()
 
 	def addButton(self):
 		# def button size
@@ -451,7 +450,7 @@ class View():
 		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
 		# Create the save button
-		save_button = NextViewButton(self.game.window, self.game.menu_view, text="Sauvegarder", width=buttonsize)
+		save_button = SaveButton(self.game.game_model.unit_list, self.game.game_model.tile_list ,self.game.game_model.zone_list, text="Save Game", width=buttonsize)
 
 		# Create the option button
 		option_button = ListButton(self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
@@ -484,19 +483,6 @@ class View():
 		)
 		self.coord_label.fit_content()
 
-
-	def addSaveButton(self):
-		buttonsize = self.game.window.width / 6
-		self.v_box = arcade.gui.UIBoxLayout()
-		save_button = SaveButton(self.game.game_model.unit_list, self.game.game_model.tile_list ,self.game.game_model.zone_list, text="Save Game", width=buttonsize)
-		self.v_box.add(save_button)
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x = "right",
-				anchor_y = "bottom",
-				child = self.v_box
-			)
-		)
 
 	def camera_move(self) :
 		# Update the camera coords if the mouse is on the edges
