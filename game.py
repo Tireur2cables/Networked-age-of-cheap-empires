@@ -197,6 +197,9 @@ class View():
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
+		#Boolean qui indique si le gui dynamic est active ou non
+		self.boolean_dynamic_gui = False
+
 		self.init_dynamic_gui()
 		self.init_cheats()
 		self.sync_entities()
@@ -432,6 +435,9 @@ class View():
 			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
 			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
 			self.camera.move_to([self.camera_x, self.camera_y], 1)
+		#Empeche la deselection des entites quand on clique sur le gui static correspondant
+		elif self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL):
+			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT :
 			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.entity_sprite_list))
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
@@ -466,9 +472,10 @@ class View():
 		self.v_box4.clear()
 		self.v_box5.clear()
 
-
+		self.boolean_dynamic_gui = False
 
 		if selected_list :
+			self.boolean_dynamic_gui = True
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
 			coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width=width, height=height)
@@ -480,6 +487,9 @@ class View():
 
 	def on_hide_view(self) :
 		self.manager.disable()
+	
+	
+
 
 #########################################################################
 #							CONTROLLER CLASS							#
