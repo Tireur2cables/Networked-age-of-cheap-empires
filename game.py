@@ -459,6 +459,7 @@ class View():
 	def triggerCheatInput(self) :
 		if self.display_cheat_input :
 			self.manager.remove(self.cheat_pane)
+			self.cheat_pane.child.reset_text()
 		else :
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input

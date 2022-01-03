@@ -46,16 +46,20 @@ class CheatsInput(arcade.gui.UIInputText):
     def NoFog(self):
         print("debug NoFog")
 
+    def reset_text(self):
+        self.text = "Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG"
+        
     def on_event(self, event) :
         super().on_event(event)
-        if self._active and isinstance(event, arcade.gui.events.UITextEvent) :
+        if self._active and isinstance(event, arcade.gui.events.UITextEvent):
             if self.text == "NINJALUI":
                 self.Ninjalui()
-            if self.text == "BIGDADDY":
+            elif self.text == "BIGDADDY":
                 self.Bigdaddy()
-            if self.text == "STEROIDS":
+            elif self.text == "STEROIDS":
                 self.Steroids()
-            if self.text == "REVEAL MAP":
+            elif self.text == "REVEAL MAP":
                 self.RevealMap()
-            if self.text == "NO FOG":
+            elif self.text == "NO FOG":
                 self.NoFog()
+    
