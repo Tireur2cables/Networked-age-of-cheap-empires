@@ -24,7 +24,7 @@ class Map():
 		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
 		for x in range(map_size):
 			for y in range(map_size):
-				object = default_map_objects_2d[x][y]
+				object = tile_array[x][y].pointer_to_entity
 				if object == "tree":  # Can't use match for now, not compatible with arcade library...
 					self.objects_array[x][y] = Wood(Vector(x, y))
 				elif object == "stone":
