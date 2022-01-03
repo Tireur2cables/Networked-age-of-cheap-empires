@@ -16,12 +16,13 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, iso_position, sprite_data, health=1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+	def __init__(self, iso_position, sprite_data, health=-1, max_health=1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
 
 		# Position
 		self.iso_position = iso_position
 
 		# Sprite
+		self.sprite_data = sprite_data
 		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="None")
 
 		# Backend
@@ -31,8 +32,10 @@ class Entity:
 		#
 		## Life
 		#
-		self.health = health
-		self.max_health = health
+		#by default, initialize the life with max_health
+		#health is when we load a game from a save file
+		self.health = max_health if health == -1 else health
+		self.max_health = max_health
 		self.damage = damage
 
 		# Battle
@@ -42,6 +45,33 @@ class Entity:
 		self.pierce_armor = pierce_armor
 		self.line_sight = line_sight
 
+	def __getstate__(self):
+		return [self.iso_position, self.sprite_data, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
+	def __setstate__(self, data):
+		# Position
+		self.iso_position = data[0]
+
+		# Sprite
+		self.sprite_data = data[1]
+		self.sprite = EntitySprite(self, self.sprite_data, hit_box_algorithm="None")
+
+		# Backend
+		self.action_timer = 0
+		self.selected = False
+
+		#
+		## Life
+		#
+		self.health = data[2]
+		self.max_health = data[3]
+		self.damage = data[4]
+
+		# Battle
+		self.rate_fire = data[5]
+		self.range = data[6]
+		self.melee_armor = data[7]
+		self.pierce_armor = data[8]
+		self.line_sight = data[9]
 
 	# coordonnees
 	def get_x(self):
