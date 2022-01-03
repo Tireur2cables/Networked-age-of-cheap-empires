@@ -3,10 +3,10 @@ from CONSTANTS import Resource as Res
 class Player:
 	def __init__(self,
 				IA: bool = True,
-				qtyFood: int = 200,
-				qtyWood: int = 200,
-				qtyGold: int = 100,
-				qtyStone: int = 200) -> None:
+				qty_food: int = 200,
+				qty_wood: int = 200,
+				qty_gold: int = 100,
+				qty_stone: int = 200) -> None:
 		"""
 		Create a player.
 
@@ -16,25 +16,25 @@ class Player:
 		self.IA = IA
 
 		# resource (dictionnary initialized with qty[Resource])
-		self.resource = {Res.FOOD : qtyFood, Res.WOOD : qtyWood, Res.GOLD : qtyGold, Res.STONE : qtyStone}
-		
+		self.resource = {Res.FOOD : qty_food, Res.WOOD : qty_wood, Res.GOLD : qty_gold, Res.STONE : qty_stone}
+
 		# unit
 		self.nb_unit = 0
 		self.max_unit = 5
-	
+
 	# unit
 	def get_nb_unit(self) -> int:
 		return self.nb_unit
-	
+
 	def set_nb_unit(self, nb_unit):
 		self.nb_unit = nb_unit
 
 	def get_max_unit(self) -> int:
 		return self.max_unit
-	
+
 	def set_max_unit(self, nb_max_unit: int):
 		self.max_unit = nb_max_unit
-
+    
 	# resource
 	#all (par Maxence, le 23/12 à 22h36)
 	def add_all(self, qtyRes : int):
@@ -86,22 +86,16 @@ class Player:
 
 	def set_gold(self, totalGold: int):
 		self.resource[Res.GOLD] = totalGold
+    
+	# Resource
+	def get_resource(self, resource):
+		return self.resource[resource]
 
-	def add_gold(self, qtyGold: int):
-		self.resource[Res.GOLD] += qtyGold
-	
-	def sub_gold(self, qtyGold: int):
-		self.resource[Res.GOLD] -= qtyGold
-	
-	#stone
-	def get_stone(self) -> int:
-		return self.resource[Res.STONE]
+	def set_resource(self, resource, total_resource):
+		self.resource[resource] = total_resource
 
-	def set_stone(self, totalStone: int):
-		self.resource[Res.STONE] = totalStone
+	def add_resource(self, resource, qty_resource):
+		self.resource[resource] += qty_resource
 
-	def add_stone(self, qtyStone: int):
-		self.resource[Res.STONE] += qtyStone
-	
-	def sub_stone(self, qtyStone: int):
-		self.resource[Res.STONE] -= qtyStone
+	def sub_resource(self, resource, qty_resource):
+		self.resource[resource] -= qty_resource

@@ -11,7 +11,6 @@ octaves = 6  # Taux de détail (différence entre chaque case, sinon ça fait un
 persistence = 0.1  # A quel point les cases sont influencées par les voisines.
 lacunarity = 2.0  # Taux de détail (de + en + chaotique) : plus ça va plus la forme géométrique du bruit est complexe (forme de "fractale").
 seed = random.randint(0, 100)  # Pour être modifié en fonction du menu.
-
 def show_map(array):
 	print("\nShowing the map :")
 	for i in range(shape[0]):

@@ -4,20 +4,19 @@ from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
 from utils.vector import Vector
 from utils.isometric import *
-from entity.Unit import Unit
-from entity.EntitySprite import EntitySprite
+from entity.Unit import *
 from views.MainView import MainView
-from views.CustomButtons import ConstructButton, NextViewButton, ListButton
+from views.CustomButtons import ConstructButton, NextViewButton, ListButton, QuitButton, SaveButton
 from map.map import Map
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
 from cheats.fonctions import CheatsInput
-## @tidalwaave : 18/11, 22H30
+from map.MapCreationindependantprojet.abstract_perlin_matrix import perlin_array,process_array
+from save.serializationTest import *
 from entity.Zone import *
-from entity.ZoneSprite import ZoneSprite
 
 # --- Constants ---
-SPRITE_SCALING_COIN = 0.2
+from CONSTANTS import Resource as Res
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
@@ -25,10 +24,6 @@ MUSIC = "./Ressources/music/Marked.mp3"
 
 
 DEFAULT_MAP_SIZE = 50
-
-TILE_WIDTH = 64
-TILE_HEIGHT = TILE_WIDTH // 2
-
 
 #########################################################################
 #							MAIN CLASS									#
@@ -109,7 +104,7 @@ class GameView(arcade.View):
 	def on_key_press(self, *args):
 		self.game_view.on_key_press(*args)
 
-	def on_mouse_press(self, *args):  # Redirecting inputs to the controller
+	def on_mouse_press(self, *args):  # Redirecting inputs to the View
 		self.game_view.on_mouse_press(*args)
 
 	def on_mouse_motion(self, *args):
@@ -134,7 +129,7 @@ class Model():
 		""" Initializer """
 		self.game = aoce_game
 
-		self.entity_list = []
+		self.unit_list = []
 		self.tile_list = []
 		self.zone_list = []
 
@@ -144,18 +139,43 @@ class Model():
 		self.tile_list.clear()
 		self.zone_list.clear()
 
-		# Set up the villager and add it to the entity_list.
-		self.map = Map(self.tile_list, DEFAULT_MAP_SIZE)
-		unit0 = Unit(Vector(100, 100), 10, 10)
-		unit1 = Unit(Vector(50, 50), 10, 10)
-		unit2 = Unit(Vector(100, 100), 10, 10)
-		self.entity_list.append(unit0)
-		self.entity_list.append(unit1)
-		self.entity_list.append(unit2)
+		# Set up the villager and add it to the unit_list.
+		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
+		use_default = False
+		if use_default:
+			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
+		else:
+			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array(perlin_array(seed=69)))
+		unit0 = Villager(Vector(100, 100))
+		unit1 = Villager(Vector(50, 50))
+		unit2 = Villager(grid_pos_to_iso(Vector(3, 2)) + Vector(0, TILE_HEIGHT_HALF))
+		self.unit_list.append(unit0)
+		self.unit_list.append(unit1)
+		self.unit_list.append(unit2)
+
+		#military
+		militia = Militia(grid_pos_to_iso(Vector(10, 2)) + Vector(0, TILE_HEIGHT_HALF))
+		self.unit_list.append(militia)
+		archer = Archer(grid_pos_to_iso(Vector(13, 2)) + Vector(0, TILE_HEIGHT_HALF))
+		self.unit_list.append(archer)
+		knight = Knight(grid_pos_to_iso(Vector(16, 2)) + Vector(0, TILE_HEIGHT_HALF))
+		self.unit_list.append(knight)
 
 		## @tidalwaave : 18/11, 22H30
 		# tCent = TownCenter(10, 10)
 		# self.zoneLayerList.append(tCent)
+
+	def discard_entity(self, dead_entity):
+		if isinstance(dead_entity, Unit) and dead_entity in self.unit_list:
+			self.unit_list.remove(dead_entity)
+		elif isinstance(dead_entity, Zone) and dead_entity in self.zone_list:
+			self.zone_list.remove(dead_entity)
+
+	def add_entity(self, new_entity):
+		if isinstance(new_entity, Unit) and new_entity not in self.unit_list:
+			self.unit_list.append(new_entity)
+		elif isinstance(new_entity, Zone) and new_entity not in self.zone_list:
+			self.zone_list.append(new_entity)
 
 #########################################################################
 #							VIEW CLASS									#
@@ -184,11 +204,34 @@ class View():
 		""" Initializer """
 		self.game = aoce_game
 
-		# Variables that will hold sprite lists
-		self.entity_sprite_list = arcade.SpriteList()
+		self.unit_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
+  def setup(self):
+
+		# Variables that will hold sprite lists
+		#for e in self.game.game_model.unit_list:
+		#	self.unit_sprite_list.append(e.sprite)
+		#for t in self.game.game_model.tile_list:
+		#	self.tile_sprite_list.append(t.sprite)
+		#for z in self.game.game_model.zone_list:
+		#	self.zone_sprite_list.append(z.sprite)
+
+	def get_tile_outline(self, map_position):
+		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
+		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
+		bottom_vertex = tuple(map_position - Vector(0, TILE_HEIGHT//2))
+		top_vertex = tuple(map_position + Vector(0, TILE_HEIGHT//2))
+		return left_vertex, bottom_vertex, right_vertex, top_vertex
+
+	def draw_grid_position(self, grid_position):
+		iso_position = grid_pos_to_iso(grid_position)
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+
+	def draw_iso_position(self, iso_position):
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+    
 	def setup(self) :
 		#clear old lists
 		self.entity_sprite_list = arcade.SpriteList()
@@ -334,20 +377,29 @@ class View():
 		""" Draw everything """
 		arcade.start_render()
 
-		#
 		# --- Object sprite lists : Tiles, Zones & Entities
-		#
 		self.tile_sprite_list.draw()
 
-		self.zone_sprite_list.draw()
-
-		for i in self.entity_sprite_list:
-			if i.selected:
-				i.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_map_pos(i.entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-				tile_below = self.game.game_model.map.get_tile_at(map_position.int())
-				tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
+		for i in self.zone_sprite_list:
 			i.draw()
+			self.draw_iso_position(i.entity.iso_position)
+
+		for i in self.unit_sprite_list:
+			if i.entity.selected:
+				i.draw_hit_box((255, 0, 0), line_thickness=3)
+				map_position = iso_to_grid_pos(i.entity.iso_position)
+				# tile_below = self.game.game_model.map.get_tile_at(map_position)
+				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
+				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
+			i.draw()
+			self.draw_iso_position(i.entity.iso_position)
+
+		for x in range(3):
+			for y in range(3):
+				tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+				self.draw_grid_position(Vector(x, y))
 
 		# Update the minimap
 		self.minimap.draw()
@@ -365,7 +417,6 @@ class View():
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
-
 
 
 	def on_show(self):
@@ -388,6 +439,7 @@ class View():
 		self.static_menu()
 		self.addButton()
 		self.addCoordLabel()
+		self.addSaveButton()
 
 	def addButton(self):
 		# def button size
@@ -430,6 +482,21 @@ class View():
 				child = self.max_box
 			)
 		)
+		self.coord_label.fit_content()
+
+
+	def addSaveButton(self):
+		buttonsize = self.game.window.width / 6
+		self.v_box = arcade.gui.UIBoxLayout()
+		save_button = SaveButton(self.game.game_model.unit_list, self.game.game_model.tile_list ,self.game.game_model.zone_list, text="Save Game", width=buttonsize)
+		self.v_box.add(save_button)
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x = "right",
+				anchor_y = "bottom",
+				child = self.v_box
+			)
+		)
 
 	def camera_move(self) :
 		# Update the camera coords if the mouse is on the edges
@@ -444,7 +511,7 @@ class View():
 			self.camera_y += CAMERA_MOVE_STEP
 
 	def on_mouse_press(self, x, y, button, key_modifiers) :
-		mouse_position = Vector(x + self.camera.position.x, y + self.camera.position.y)
+		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
 		if self.minimap.is_on_minimap_sprite(x, y) :
 			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
 			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
@@ -452,21 +519,34 @@ class View():
 		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
 			pass
-		elif button == arcade.MOUSE_BUTTON_LEFT :
-			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.entity_sprite_list))
+		elif button == arcade.MOUSE_BUTTON_LEFT:
+			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list))
+
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			self.game.game_controller.move_selection(mouse_position)
+			units_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list)
+			if units_at_point:
+				print("unit!")
+			else:
+				self.game.game_controller.move_selection(mouse_position_in_game)
+
+		elif button == arcade.MOUSE_BUTTON_MIDDLE:
+			print(f"position de la souris : {mouse_position_in_game}")
+			print(f"position sur la grille : {iso_to_grid_pos(mouse_position_in_game)}")
+			pos = mouse_position_in_game
+			grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
+			grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
+			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
-		if symbol == arcade.key.T:
-			mouse_position_on_map = Vector(self.mouse_x, self.mouse_y) + Vector(self.camera.position.x, self.camera.position.y)
-			pos = iso_to_map_pos(mouse_position_on_map, TILE_WIDTH//2, TILE_HEIGHT//2).int()
-			tCent = TownCenter(pos.x, pos.y)
-			print(pos)
-			self.game.game_model.zone_list.append(tCent)
-			self.sync_zones()
-		elif symbol == arcade.key.F :
+    mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+		if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
+			grid_pos = iso_to_grid_pos(mouse_position_in_game)
+			tCent = TownCenter(grid_pos)
+			self.game.game_controller.add_entity_to_game(tCent)
+		elif symbol == arcade.key.F : # cheat window
 			self.triggerCheatInput()
+		eliif symbol == arcade.key.C:  # Couper arbre
+			self.game.game_controller.action_on_zone(mouse_position_in_game)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
@@ -482,7 +562,7 @@ class View():
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
 
-	#En construction, marche paaaaaaaaas des masses
+	# test pour les coins mais dois bouger TODO
 	def trigger_coin_GUI(self, selected_list) :
 		self.v_box4.clear()
 		self.v_box5.clear()
@@ -510,6 +590,17 @@ class View():
 	def on_hide_view(self) :
 		self.manager.disable()
 	
+	def discard_sprite(self, dead_sprite):
+		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
+			self.unit_sprite_list.remove(dead_sprite)
+		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.zone_sprite_list:
+			self.zone_sprite_list.remove(dead_sprite)
+
+	def add_sprite(self, new_sprite):
+		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.unit_sprite_list:
+			self.unit_sprite_list.append(new_sprite)
+		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
+			self.zone_sprite_list.append(new_sprite)
 	
 
 
@@ -522,49 +613,141 @@ class Controller():
 		""" Initializer """
 		self.game = aoce_game
 
-		# Selection (will be an EntitySprite)
-		self.selection = []
+		# Selection (will contain elements of type Entity)
+		self.selection = set()
+		self.moving_entities = set()
+		self.interacting_entities = set()
+		self.dead_entities = set()
 
 	def setup(self):
 		pass
 
-	def on_update(self, delta_time):
-		""" Movement and game logic """
-		for sprite in self.selection:
-			entity = sprite.entity
-			next_map_position = iso_to_map_pos(entity.position+entity.change, TILE_WIDTH//2, TILE_HEIGHT//2).int()
-			next_is_on_map = next_map_position.x >= 0 and next_map_position.x < DEFAULT_MAP_SIZE and next_map_position.y >= 0 and next_map_position.y < DEFAULT_MAP_SIZE
-			if (not entity.position.isalmost(entity.aim, entity.speed)) and next_is_on_map:  # If it is not close to where it aims, move.
-				entity.position += entity.change
-				sprite.center_x, sprite.center_y = tuple(entity.position)
+	def is_on_map(self, grid_position):
+		return grid_position.x >= 0 and grid_position.x < DEFAULT_MAP_SIZE and grid_position.y >= 0 and grid_position.y < DEFAULT_MAP_SIZE
 
-			# iso_position = iso_to_map_pos(entity.position, TILE_WIDTH//2, TILE_HEIGHT//2)
-			# int_position = Vector(int(entity.position.x), int(entity.position.y))
-			# int_iso_position = Vector(int(iso_position.x), int(iso_position.y))
-			# print(f"{int_position} -> {int_iso_position}")
+	def on_update(self, delta_time):
+
+		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
+		""" Movement and game logic """
+
+		# --- Action - Moving entities ---
+		for entity in self.moving_entities:
+			if entity.is_moving:
+				# Check if the next position is on the map
+				if not self.is_on_map(iso_to_grid_pos(entity.iso_position+entity.change)):
+					entity.is_moving = False
+				elif entity.iso_position.isalmost(entity.aim, entity.speed):
+					if entity.path:
+						entity.next_aim()
+					else:
+						entity.is_moving = False
+						if entity.aimed_entity:
+							self.interacting_entities.add(entity)
+
+				else:  # If it is not close to where it aims and not out of bounds, move.
+					entity.iso_position += entity.change
+					entity.sprite.update()
+
+		# --- Action - Interacting entities ---
+		for entity in self.interacting_entities:
+			if isinstance(entity.aimed_entity, Zone):
+				self.harvest_zone(entity, delta_time)
+
+
+		# --- Updating Lists ---
+		if self.moving_entities:
+			self.moving_entities = {e for e in self.moving_entities if e.is_moving}
+
+		if self.interacting_entities:
+			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
+
+
+		# --- Deleting dead entities ---
+		for dead_entity in self.dead_entities:
+			self.discard_entity_from_game(dead_entity)
+		self.dead_entities.clear()
+
+
+	def discard_entity_from_game(self, dead_entity):
+		self.selection.discard(dead_entity)
+		self.moving_entities.discard(dead_entity)
+		self.interacting_entities.discard(dead_entity)
+		self.game.game_view.discard_sprite(dead_entity.sprite)
+		self.game.game_model.discard_entity(dead_entity)
+
+	def add_entity_to_game(self, new_entity):
+		self.game.game_model.add_entity(new_entity)
+		self.game.game_view.add_sprite(new_entity.sprite)
 
 	def select(self, sprites_at_point):
-		sprite = None
-		for i in self.selection:
-			i.selected = False
+		#print(sprites_at_point)
+		entity_found = None
+		for entity in self.selection:
+			entity.selected = False
 		self.selection.clear()
-		for i in sprites_at_point:
-			if i.entity and isinstance(i.entity, Unit) :
-				sprite = i
+		for s in sprites_at_point:
+			entity = s.entity
+			if entity and isinstance(entity, Unit):
+				entity_found = entity
+				#print(iso_to_grid_pos(entity.iso_position))
 				break
-		if sprite:
-			sprite.selected = True
-			self.selection.append(sprite)
+		if entity_found:
+			entity_found.selected = True
+			self.selection.add(entity_found)
+    self.game.game_view.trigger_coin_GUI(self.selection)
 
-		self.game.game_view.trigger_coin_GUI(self.selection)
+	def move_selection(self, position, need_conversion=True):
+		position_grid = position
+		if need_conversion:
+			position_grid = iso_to_grid_pos(position)
+		if self.is_on_map(position_grid):
+			for entity in self.selection:
+				self.moving_entities.add(entity)
 
+				# Pathfinding algorithm
+				pathfinding_matrix = self.game.game_model.map.get_pathfinding_matrix()
+				grid = Grid(matrix=pathfinding_matrix)
+				finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+				startvec = iso_to_grid_pos(entity.iso_position)
+				endvec = position_grid
+				start = grid.node(*startvec)
+				end = grid.node(*endvec)
+				path, runs = finder.find_path(start, end, grid)
 
-	def move_selection(self, mouse_position):
-		for i in self.selection:
-			entity = i.entity
-			# The following calculation is necessary to have uniform speeds :
-			entity.aim_towards(mouse_position, entity.speed * ((mouse_position - entity.position).normalized()))
-			# We want the same speed no matter what the distance between the villager and where he needs to go is.
+				# print(grid.grid_str(path=path, start=start, end=end))
+				if path:
+					path.pop(0)
+					if path:
+						entity.set_path(path)
+						entity.next_aim()
+		else:
+			print("out of bound!")
+
+	# Called once when you order an action on a zone
+	def action_on_zone(self, mouse_position_in_game):
+		for entity in self.selection:
+			mouse_grid_pos = iso_to_grid_pos(mouse_position_in_game)
+			for z in self.game.game_model.zone_list:
+				z_grid_pos = iso_to_grid_pos(z.iso_position)
+				if z_grid_pos == mouse_grid_pos:
+					entity.aimed_entity = z
+					self.move_selection(z_grid_pos, need_conversion=False)
+					break
+
+	# Called every frame when an action is done on a zone (harvesting).
+	def harvest_zone(self, entity, delta_time):
+		entity.action_timer += delta_time
+		if entity.action_timer > 1:
+			entity.action_timer = 0
+			aimed_entity = entity.aimed_entity
+			harvested = aimed_entity.harvest(entity.damage)
+			print(f"[harvesting] entity health = {entity.health} - zone health = {aimed_entity.health}")
+			if harvested:
+				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+				entity.resource[Res[type(aimed_entity).__name__.upper()]] = harvested
+				print(entity.resource)
+				entity.aimed_entity = None
+				self.dead_entities.add(aimed_entity)
 
 
 # Main function to launch the game
@@ -572,3 +755,6 @@ def main():
 	""" Main method """
 	game = AoCE()
 	arcade.run()
+
+if __name__ == "__main__":  # Python syntax that means "if you are launching from this file, run main()", useful if this file is going to be imported.
+	main()

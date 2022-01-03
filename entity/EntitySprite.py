@@ -1,26 +1,27 @@
 from arcade import Sprite
 
 
-#   ______           _     _   _              _____                  _   _          
-#  |  ____|         | |   (_) | |            / ____|                (_) | |         
-#  | |__     _ __   | |_   _  | |_   _   _  | (___    _ __    _ __   _  | |_    ___ 
+#   ______           _     _   _              _____                  _   _
+#  |  ____|         | |   (_) | |            / ____|                (_) | |
+#  | |__     _ __   | |_   _  | |_   _   _  | (___    _ __    _ __   _  | |_    ___
 #  |  __|   | '_ \  | __| | | | __| | | | |  \___ \  | '_ \  | '__| | | | __|  / _ \
 #  | |____  | | | | | |_  | | | |_  | |_| |  ____) | | |_) | | |    | | | |_  |  __/
 #  |______| |_| |_|  \__| |_|  \__|  \__, | |_____/  | .__/  |_|    |_|  \__|  \___|
-#                                     __/ |          | |                            
-#                                    |___/           |_|                            
+#                                     __/ |          | |
+#                                    |___/           |_|
 
 
 # Wrapper for arcade.Sprite that enables us to access the entity from the sprite.
 class EntitySprite(Sprite):
 
-	def __init__(self, id, entity, *args, **kwargs):
-		super().__init__(*args, **kwargs)
+	def __init__(self, entity, sprite_data, *args, **kwargs):
+		super().__init__(filename=sprite_data.file, scale=sprite_data.scale, center_x=entity.iso_position.x + sprite_data.x_offset, center_y=entity.iso_position.y + sprite_data.y_offset, *args, **kwargs)
+		self.sprite_data = sprite_data
 		self.entity = entity
-		entity.sprite = self
-		self.id = id
-		self.selected = False
 
+	def update(self):
+		self.center_x = self.entity.iso_position.x + self.sprite_data.x_offset
+		self.center_y = self.entity.iso_position.y + self.sprite_data.y_offset
 
 # class Villager(Unit): # Un Villageois est une Unit particuliere
 # 	def __init__(self, position, health=25, damage=3, rate_fire=1.5, range=0, melee_armor=0, pierce_armor=0, line_sight=4, speed=1):

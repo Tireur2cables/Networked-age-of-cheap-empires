@@ -8,6 +8,11 @@ class Vector():
 		self.x = x
 		self.y = y
 
+	def __getstate__(self):
+		return [self.x, self.y]
+	def __setstate__(self, data):
+		self.__init__(data[0], data[1])
+
 	def __str__(self):
 		"""Improving the view when printing a vector"""
 		return f"Vector({self.x}, {self.y})"
@@ -71,3 +76,6 @@ class Vector():
 
 	def int(self):
 		return Vector(int(self.x), int(self.y))
+
+	def round(self):
+		return Vector(round(self.x), round(self.y))

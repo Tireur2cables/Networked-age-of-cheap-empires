@@ -1,5 +1,6 @@
 # Imports
 import arcade.gui
+from save.serializationTest import *
 
 # Constants
 textureTicked = "Ressources/img/tick.png"
@@ -17,6 +18,17 @@ class QuitButton(arcade.gui.UIFlatButton) :
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		self.window.exit()
+
+
+class SaveButton(arcade.gui.UIFlatButton) :
+	def __init__(self, unit_list, tile_list, zone_list, text, width) :
+		super().__init__(text=text, width=width)
+		self.unit_list = unit_list
+		self.tile_list = tile_list
+		self.zone_list = zone_list
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		pickleSaving("savetest",self.unit_list,self.tile_list,self.zone_list)
 
 # Button to return to the main menu
 class NextViewButton(arcade.gui.UIFlatButton) :
