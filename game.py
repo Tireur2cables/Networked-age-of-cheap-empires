@@ -435,8 +435,8 @@ class View():
 			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
 			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
 			self.camera.move_to([self.camera_x, self.camera_y], 1)
-		#Empeche la deselection des entites quand on clique sur le gui static correspondant
-		elif self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL):
+		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
+		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
 			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT :
 			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position), self.entity_sprite_list))
