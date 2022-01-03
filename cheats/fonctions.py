@@ -1,5 +1,6 @@
 from player import Player
-
+import arcade 
+import arcade.gui
 """
 NINJALUI: get 10000 of each resource.
 \
@@ -29,14 +30,31 @@ if un cheat code est rentré : execute cheatcode pour un player en particulier
 else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les 
 cheat codes available ; 
 """
-def Ninjalui(player : Player, ):
-    player.add_all(player, 10000)
+class CheatsInput(arcade.gui.UIInputText):
+    def __init__(self, x, y, text, width, height, text_color) :
+        super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
+        self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
 
-def Bigdaddy():
-    pass
-def Steroids():
-    pass
-def RevealMap():
-    pass
-def NoFog():
-    pass
+    def Ninjalui(self, player : Player):
+        player.add_all(player, 10000)
+    def Bigdaddy(self):
+        print("debug big daddz")
+    def Steroids(self):
+        print("debug steroidz")
+    def RevealMap(self):
+        print("debug reveal map")
+    def NoFog(self):
+        print("debug NoFog")
+
+    def on_event(self, event) :
+        if self._active and isinstance(event, arcade.gui.events.UITextEvent) and (self.text in self.cheats_list):
+            if self.text == "NINJALUI":
+                self.Ninjalui()
+            if self.text == "BIGDADDY":
+                self.Bigdaddy()
+            if self.text == "STEROIDS":
+                self.Steroids()
+            if self.text == "REVEAL MAP":
+                self.RevealMap()
+            if self.text == "NO FOG":
+                self.NoFog()

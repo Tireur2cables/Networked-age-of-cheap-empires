@@ -11,7 +11,7 @@ from views.CustomButtons import NextViewButton, ListButton
 from map.map import Map
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
-
+from cheats.fonctions import CheatsInput
 ## @tidalwaave : 18/11, 22H30
 from entity.Zone import *
 from entity.ZoneSprite import ZoneSprite
@@ -39,7 +39,7 @@ class AoCE(arcade.Window):
 	def __init__(self):
 		""" Initializer """
 		# Call the initializer of arcade.Window
-		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True)
+		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=False)
 		# arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# Show the mouse cursor
@@ -230,14 +230,16 @@ class View():
 	def init_cheats(self) :
 		self.display_cheat_input = False
 
-		width = self.game.window.width / 5 # arbitrary
-		height = self.game.window.height / 20 # arbitrary
+		cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
+
+		width = self.game.window.width  # arbitrary
+		height = self.game.window.height / 22 # arbitrary
 		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
 		self.cheat_pane = arcade.gui.UITexturePane(
-			arcade.gui.UIInputText(
+			CheatsInput(
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
-				text="enter cheat code here", width=width, height=height,
+				text=f"Enter a cheatcode among {cheat_list_display}", width=width, height=height,
 				text_color=(255, 255, 255, 255)
 			),
 			tex=bg_text
@@ -445,7 +447,7 @@ class View():
 			print(pos)
 			self.game.game_model.zone_list.append(tCent)
 			self.sync_zones()
-		elif symbol == arcade.key.F10 :
+		elif symbol == arcade.key.F :
 			self.triggerCheatInput()
 
 	def on_mouse_motion(self, x, y, dx, dy):
