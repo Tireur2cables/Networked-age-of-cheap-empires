@@ -208,7 +208,7 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
-  def setup(self):
+	#def setup(self):
 
 		# Variables that will hold sprite lists
 		#for e in self.game.game_model.unit_list:
@@ -231,7 +231,7 @@ class View():
 
 	def draw_iso_position(self, iso_position):
 		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
-    
+
 	def setup(self) :
 		#clear old lists
 		self.entity_sprite_list = arcade.SpriteList()
@@ -538,14 +538,14 @@ class View():
 			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
-    mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
 			grid_pos = iso_to_grid_pos(mouse_position_in_game)
 			tCent = TownCenter(grid_pos)
 			self.game.game_controller.add_entity_to_game(tCent)
 		elif symbol == arcade.key.F : # cheat window
 			self.triggerCheatInput()
-		eliif symbol == arcade.key.C:  # Couper arbre
+		elif symbol == arcade.key.C:  # Couper arbre
 			self.game.game_controller.action_on_zone(mouse_position_in_game)
 
 	def on_mouse_motion(self, x, y, dx, dy):
@@ -589,7 +589,7 @@ class View():
 
 	def on_hide_view(self) :
 		self.manager.disable()
-	
+
 	def discard_sprite(self, dead_sprite):
 		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
 			self.unit_sprite_list.remove(dead_sprite)
@@ -601,7 +601,7 @@ class View():
 			self.unit_sprite_list.append(new_sprite)
 		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
 			self.zone_sprite_list.append(new_sprite)
-	
+
 
 
 #########################################################################
@@ -694,7 +694,7 @@ class Controller():
 		if entity_found:
 			entity_found.selected = True
 			self.selection.add(entity_found)
-    self.game.game_view.trigger_coin_GUI(self.selection)
+		self.game.game_view.trigger_coin_GUI(self.selection)
 
 	def move_selection(self, position, need_conversion=True):
 		position_grid = position
