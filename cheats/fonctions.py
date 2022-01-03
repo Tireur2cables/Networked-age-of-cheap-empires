@@ -1,5 +1,6 @@
 from player import Player
-
+import arcade
+import arcade.gui
 """
 NINJALUI: get 10000 of each resource.
 \
@@ -26,17 +27,39 @@ your AI. What commands those are will depend on your AI.
 """
 idées : key pour toggle une ligne pour rentrer les cheats code : F10
 if un cheat code est rentré : execute cheatcode pour un player en particulier
-else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les 
-cheat codes available ; 
+else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
+cheat codes available ;
 """
-def Ninjalui(player : Player, ):
-    player.add_all(player, 10000)
+class CheatsInput(arcade.gui.UIInputText):
+    def __init__(self, x, y, text, width, height, text_color) :
+        super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
+        self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
 
-def Bigdaddy():
-    pass
-def Steroids():
-    pass
-def RevealMap():
-    pass
-def NoFog():
-    pass
+    def Ninjalui(self):
+        print("ninjalui")#player.add_all(player, 10000)
+    def Bigdaddy(self):
+        print("debug big daddz")
+    def Steroids(self):
+        print("debug steroidz")
+    def RevealMap(self):
+        print("debug reveal map")
+    def NoFog(self):
+        print("debug NoFog")
+
+    def reset_text(self):
+        self.text = "Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG"
+        
+    def on_event(self, event) :
+        super().on_event(event)
+        if self._active and isinstance(event, arcade.gui.events.UITextEvent):
+            if self.text == "NINJALUI":
+                self.Ninjalui()
+            elif self.text == "BIGDADDY":
+                self.Bigdaddy()
+            elif self.text == "STEROIDS":
+                self.Steroids()
+            elif self.text == "REVEAL MAP":
+                self.RevealMap()
+            elif self.text == "NO FOG":
+                self.NoFog()
+    
