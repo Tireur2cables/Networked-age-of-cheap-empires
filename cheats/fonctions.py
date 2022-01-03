@@ -30,7 +30,7 @@ else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
 cheat codes available ; 
 """
 def Ninjalui(player : Player, ):
-    Player.add_all(player, 10000)
+    player.add_all(player, 10000)
 
 def Bigdaddy():
     pass

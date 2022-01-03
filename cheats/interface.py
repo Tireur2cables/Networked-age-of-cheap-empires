@@ -15,7 +15,7 @@ SCREEN_TITLE = "Age Of Cheap Empire"
 #         arcade.start_render()
 n = 'NINJALUI'; b = 'BIGDADDY'; s = 'STEROIDS'; r_m = 'REVEAL MAP'; n_f = 'NO FOG'
 cheats_list = [n, b, s, r_m, n_f, n.lower(), b.lower(), s.lower(), r_m.lower(), n_f.lower()]
-cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG', 'ninjalui', 'bigdaddy', 'steroids', 'reveal map', 'no fog']
+cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
 print(cheats_list)
 
 def on_key_press(self, key: int, modifiers: int): 
