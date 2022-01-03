@@ -34,7 +34,7 @@ class AoCE(arcade.Window):
 	def __init__(self):
 		""" Initializer """
 		# Call the initializer of arcade.Window
-		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=False)
+		super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True)
 		# arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# Show the mouse cursor
@@ -161,10 +161,6 @@ class Model():
 		knight = Knight(grid_pos_to_iso(Vector(16, 2)) + Vector(0, TILE_HEIGHT_HALF))
 		self.unit_list.append(knight)
 
-		## @tidalwaave : 18/11, 22H30
-		# tCent = TownCenter(10, 10)
-		# self.zoneLayerList.append(tCent)
-
 	def discard_entity(self, dead_entity):
 		if isinstance(dead_entity, Unit) and dead_entity in self.unit_list:
 			self.unit_list.remove(dead_entity)
@@ -208,16 +204,6 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
-	#def setup(self):
-
-		# Variables that will hold sprite lists
-		#for e in self.game.game_model.unit_list:
-		#	self.unit_sprite_list.append(e.sprite)
-		#for t in self.game.game_model.tile_list:
-		#	self.tile_sprite_list.append(t.sprite)
-		#for z in self.game.game_model.zone_list:
-		#	self.zone_sprite_list.append(z.sprite)
-
 	def get_tile_outline(self, map_position):
 		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
 		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
@@ -237,6 +223,7 @@ class View():
 		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
+
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
@@ -348,30 +335,19 @@ class View():
 		)
 
 	def sync_entities(self):
-		# Sync self.game_model.entity_list with sprite_list
-		for index, item in enumerate(self.game.game_model.unit_list):
-			if item.sprite is None:
-				es = EntitySprite(index, item, "Movements/coin_01.png", SPRITE_SCALING_COIN, center_x=item.position.x, center_y=item.position.y, hit_box_algorithm="None")
-				self.entity_sprite_list.append(es)
-				# La ligne d'au dessus créer un sprite associé au personnage et le met dans une liste. Le hit_box_algorithm à non c'est pour éviter d'utiliser une hitbox complexe, inutile pour notre projet.
-				# "Movements/coin_01.png" may cause an error depending on how the IDE is configurated (what is the root directory). I now how to fix this but haven't implemented it for now.
+		# Sync self.game_model.tile_list with unit_sprite_list
+		for e in self.game.game_model.unit_list:
+			self.unit_sprite_list.append(e.sprite)
 
 	def sync_ground(self):
 		# Sync self.game_model.tile_list with tile_sprite_list
-		for index, item in enumerate(self.game.game_model.tile_list):
-			if item.sprite is None:
-				ts = TileSprite(index, item, TILE_WIDTH, TILE_HEIGHT)
-				self.tile_sprite_list.append(ts)
+		for t in self.game.game_model.tile_list:
+			self.tile_sprite_list.append(t.sprite)
 
 	def sync_zones(self):
 		# Sync self.game_model.zone_list with zone_sprite_list
-		## @tidalwaave : 18/11, 22H30
-		for index, item in enumerate(self.game.game_model.zone_list):
-			if item.sprite is None:
-				zone_position = map_pos_to_iso(Vector(item.x, item.y), TILE_WIDTH//2, TILE_HEIGHT//2)
-				zone = ZoneSprite(index, item, "map/Tower.png", 1, center_x=zone_position.x, center_y=zone_position.y + 253//2 - TILE_HEIGHT, hit_box_algorithm="None", )
-				# ATTENTION : la valeur numérique 253 est une valeur issue du sprite
-				self.zone_sprite_list.append(zone)
+		for z in self.game.game_model.zone_list:
+			self.zone_sprite_list.append(z.sprite)
 
 	def on_draw(self):
 		""" Draw everything """
