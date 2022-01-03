@@ -4,6 +4,9 @@
 
 - Python 3 (version 3.8 minimum - notamment utilisation de ```math.dist()``` apparu avec la version 3.8 )  
 - ```pip3 install arcade```
+- ```pip3 install pathfinding```
+- ```pip3 install noise``` requiert Microsoft Tools
+- ```pip3 install numpy```
 
 ## Comment lancer le jeu
 
