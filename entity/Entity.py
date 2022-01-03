@@ -22,6 +22,7 @@ class Entity:
 		self.iso_position = iso_position
 
 		# Sprite
+		self.sprite_data = sprite_data
 		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="None")
 
 		# Backend
@@ -42,6 +43,10 @@ class Entity:
 		self.pierce_armor = pierce_armor
 		self.line_sight = line_sight
 
+	def __getstate__(self):
+		return [self.iso_position, self.sprite_data, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
+	def __setstate__(self, data):
+		self.__init__(*data)
 
 	# coordonnees
 	def get_x(self):
