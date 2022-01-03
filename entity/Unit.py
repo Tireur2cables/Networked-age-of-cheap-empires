@@ -120,17 +120,17 @@ class Skirmisher(Military):
 	creation_cost = {Res.FOOD : 25, Res.WOOD : 35, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 22
 	def __init__(self, iso_position, health=-1):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/skirmisher_stand.png", y_offset=71//2), speed=0.96, health=health, health=30, damage=2, rate_fire=3, range=4, pierce_armor=3, line_sight=6)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/skirmisher_stand.png", y_offset=71//2), speed=0.96, health=health, max_health=30, damage=2, rate_fire=3, range=4, pierce_armor=3, line_sight=6)
 
 #Cavalry (Trained at Stable)
 class ScoutCavalry(Military):
 	creation_cost = {Res.FOOD : 80, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 30
 	def __init__(self, iso_position, health=-1):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/scoutcavalry_stand.png", y_offset=90//2), speed=1.2, health=health, health=45, damage=3, rate_fire=2, pierce_armor=2, line_sight=4)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/scoutcavalry_stand.png", y_offset=90//2), speed=1.2, health=health, max_health=45, damage=3, rate_fire=2, pierce_armor=2, line_sight=4)
 
 class Knight(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 75, Res.STONE : 0}
 	creation_time = 30
 	def __init__(self, iso_position, health=-1):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/knight_stand.png", y_offset=90//2), speed=1.35, health=health, health=100, damage=10, rate_fire=1.8, melee_armor=2, pierce_armor=2, line_sight=4)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/knight_stand.png", y_offset=90//2), speed=1.35, health=health, max_health=100, damage=10, rate_fire=1.8, melee_armor=2, pierce_armor=2, line_sight=4)
