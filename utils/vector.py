@@ -1,6 +1,5 @@
 from math import dist
 
-
 class Vector():
 	"""2D Custom Vector Class"""
 
@@ -8,6 +7,11 @@ class Vector():
 		"""Initializer of a vector"""
 		self.x = x
 		self.y = y
+
+	def __getstate__(self):
+		return [self.x, self.y]
+	def __setstate__(self, data):
+		self.__init__(data[0], data[1])
 
 	def __str__(self):
 		"""Improving the view when printing a vector"""
@@ -37,6 +41,10 @@ class Vector():
 		"""Dividing a vector by a real"""
 		return Vector(self.x / other, self.y / other) if isinstance(other, (int, float)) else NotImplemented
 
+	def __floordiv__(self, other):
+		"""Dividing a vector by a real"""
+		return Vector(self.x // other, self.y // other) if isinstance(other, (int, float)) else NotImplemented
+
 	def __eq__(self, other):
 		"""Equality between vectors"""
 		return self.x == other.x and self.y == other.y if isinstance(other, Vector) else NotImplemented
@@ -65,3 +73,9 @@ class Vector():
 	def isalmost(self, other, d=5):
 		"""Tests if vectors n and m are close with a maximum distance of d"""
 		return (self - other).norm() < d
+
+	def int(self):
+		return Vector(int(self.x), int(self.y))
+
+	def round(self):
+		return Vector(round(self.x), round(self.y))

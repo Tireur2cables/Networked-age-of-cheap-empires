@@ -2,6 +2,7 @@
 from ctypes import string_at
 from arcade.arcade_types import Color
 import arcade.gui
+from save.serializationTest import *
 
 # Constants
 textureTicked = "Ressources/img/tick.png"
@@ -20,6 +21,17 @@ class QuitButton(arcade.gui.UIFlatButton) :
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		self.window.exit()
 
+
+class SaveButton(arcade.gui.UIFlatButton) :
+	def __init__(self, unit_list, tile_list, zone_list, text, width) :
+		super().__init__(text=text, width=width)
+		self.unit_list = unit_list
+		self.tile_list = tile_list
+		self.zone_list = zone_list
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		pickleSaving("savetest",self.unit_list,self.tile_list,self.zone_list)
+
 # Button to return to the main menu
 class NextViewButton(arcade.gui.UIFlatButton) :
 	def __init__(self, window, nextView, text, width) :
@@ -28,9 +40,26 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 		self.nextView = nextView
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		print("NextView :", event)
 		self.nextView.setup()
 		self.window.show_view(self.nextView)
+
+# Button to display things or not
+class ListButton(arcade.gui.UIFlatButton) :
+	def __init__(self, vbox, children, text, width) :
+		super().__init__(text=text, width=width)
+		self.vbox = vbox
+		self.list = children
+		self.isDisplayed = False
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		self.isDisplayed = not self.isDisplayed
+		self.vbox.clear()
+		self.vbox.add(self)
+
+		if self.isDisplayed :
+			for child in self.list :
+				self.vbox.add(child)
+
 
 # CheckboxButton
 class CheckboxButton(arcade.gui.UITextureButton) :
@@ -43,8 +72,6 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 		self.vsync = vsync
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		print("Checkbox : ", event)
-
 		self.texture = arcade.load_texture(textureEmpty if self.ticked else textureTicked)
 
 		self.ticked = not self.ticked
@@ -94,3 +121,13 @@ class NumInput(arcade.gui.UIInputText) :
 
 		if self.text == "" :
 			self.caret.on_text("0")
+
+class ConstructButton(arcade.gui.UITextureButton) :
+	def __init__(self,image, construct, width=60, height=90, text=""):
+		super().__init__(texture = arcade.load_texture(image),width=width, height=height, text=text)
+		self.image = image
+		self.construct = construct
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent):
+		self.construct
+		print("Lezgo mon soleil")
