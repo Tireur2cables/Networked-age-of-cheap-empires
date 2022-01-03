@@ -65,3 +65,13 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 			self.window.triggerMusic()
 		elif self.fullscreen :
 			self.window.triggerFullscreen()
+
+class ConstructButton(arcade.gui.UITextureButton) :
+	def __init__(self,image, construct, width=60, height=90, text=""):
+		super().__init__(texture = arcade.load_texture(image),width=width, height=height, text=text)
+		self.image = image
+		self.construct = construct
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent):
+		self.construct
+		print("Lezgo mon soleil")

@@ -7,7 +7,7 @@ from utils.isometric import *
 from entity.Unit import Unit
 from entity.EntitySprite import EntitySprite
 from views.MainView import MainView
-from views.CustomButtons import NextViewButton, ListButton
+from views.CustomButtons import ConstructButton, NextViewButton, ListButton
 from map.map import Map
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
@@ -221,11 +221,23 @@ class View():
 		self.v_box5 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
-				anchor_x="right",
-				align_x= -100,
+				anchor_x="center",
+				align_x= 200,
 				anchor_y="bottom",
-				align_y=50,
+				align_y=15,
 				child=self.v_box5
+			)
+		)
+
+		# Create a box for the button in the precedent box, maybe redondant
+		self.v_box6 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				align_x= 400,
+				anchor_y="bottom",
+				align_y=15,
+				child=self.v_box6
 			)
 		)
 
@@ -471,6 +483,7 @@ class View():
 	def trigger_coin_GUI(self, selected_list) :
 		self.v_box4.clear()
 		self.v_box5.clear()
+		self.v_box6.clear()
 
 		self.boolean_dynamic_gui = False
 
@@ -482,8 +495,14 @@ class View():
 			self.v_box4.add(coin_box.with_space_around(0, 0, 0, 0, arcade.color.BRONZE))
 
 			# Button for coin, you wan click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
-			coin_button = arcade.gui.UIFlatButton(text = "Machala")
-			self.v_box5.add(coin_button.with_space_around(0,0,0,0,arcade.color.ANTIQUE_BRONZE))
+			coin_button = arcade.gui.UIFlatButton(text = "Machala",height = 70, width=110)
+			self.v_box5.add(coin_button.with_space_around(15,15,15,15,arcade.color.BRONZE))
+
+			coin_button2 = arcade.gui.UIFlatButton(text = "Attaquer", height = 70, width = 110)
+			self.v_box5.add(coin_button2.with_space_around(15,15,15,15,arcade.color.BRONZE))
+
+			coin_button3 = ConstructButton(image="map/Tower.png",construct=None)
+			self.v_box6.add(coin_button3.with_space_around(15,15,15,15,arcade.color.BRONZE))
 
 	def on_hide_view(self) :
 		self.manager.disable()
