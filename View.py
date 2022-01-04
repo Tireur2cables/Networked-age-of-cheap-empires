@@ -314,14 +314,14 @@ class View():
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
 			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT:
-			self.game.game_controller.select(arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list))
+			self.game.game_controller.select(self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list))
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			units_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), self.unit_sprite_list)
-			if units_at_point:
-				print("unit!")
-			else:
-				self.game.game_controller.move_selection(mouse_position_in_game)
+			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+			# if units_at_point:
+			# 	print("unit!")
+			# else:
+			self.game.game_controller.move_selection(mouse_position_in_game)
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -330,6 +330,11 @@ class View():
 			grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
 			grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
 			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
+
+	def get_closest_sprites(self, mouse_position_in_game, sprite_list):
+		sprites_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list)
+		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
+		return sprites_at_point_sorted
 
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
@@ -340,7 +345,8 @@ class View():
 		elif symbol == arcade.key.F : # cheat window
 			self.triggerCheatInput()
 		elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-			self.game.game_controller.action_on_zone(mouse_position_in_game)
+			self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""

@@ -1,11 +1,13 @@
 # Imports
 
-import arcade
-from arcade.arcade_types import PointList
 from map.tile import Tile
 from entity.Zone import Wood, Stone, Gold
 from map.defaultmap import default_map_2d, default_map_objects_2d
+from utils.isometric import iso_to_grid_pos
 from utils.vector import Vector
+from pathfinding.core.diagonal_movement import DiagonalMovement
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
 
 # --- Constants ---
 CHARACTER_SCALING = 1
@@ -50,10 +52,27 @@ class Map():
 		# Swapping x and y here, because of the library implementation
 		return [[self.tile_array[x][y].is_locked for x in range(self.map_size)] for y in range(self.map_size)]
 
+	def get_path(self, start, end):
+		# Pathfinding algorithm
+		pathfinding_matrix = self.get_pathfinding_matrix()
+		grid = Grid(matrix=pathfinding_matrix)
+		finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+		start = grid.node(*start)
+		end = grid.node(*end)
+		path, runs = finder.find_path(start, end, grid)
+		return path
 
 	def get_tile_at(self, map_position):
 		return self.tile_array[map_position.x][map_position.y]
 
+	def get_tiles_nearby(self, map_position):
+		return tuple(self.tile_array[map_position.x + i][map_position.y + j] for i in range(-1, 2) for j in range(-1, 2))
+
+	def free_tile_at(self, map_position):
+		x, y = map_position
+		if self.objects_array[x][y] is not None:
+			self.objects_array[x][y] = None
+			self.tile_array[x][y].is_locked = 1
 
 ####################################################################
 #

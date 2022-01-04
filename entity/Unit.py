@@ -5,9 +5,6 @@ from utils.vector import Vector
 from utils.isometric import *
 # Pathfinding / movement imports
 # TODO : pip3 install pathfinding
-from pathfinding.core.diagonal_movement import DiagonalMovement
-from pathfinding.core.grid import Grid
-from pathfinding.finder.a_star import AStarFinder
 
 
 #   _    _           _   _

@@ -105,17 +105,7 @@ class Controller():
 		if self.is_on_map(position_grid):
 			for entity in self.selection:
 				self.moving_entities.add(entity)
-
-				# Pathfinding algorithm
-				pathfinding_matrix = self.game.game_model.map.get_pathfinding_matrix()
-				grid = Grid(matrix=pathfinding_matrix)
-				finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-				startvec = iso_to_grid_pos(entity.iso_position)
-				endvec = position_grid
-				start = grid.node(*startvec)
-				end = grid.node(*endvec)
-				path, runs = finder.find_path(start, end, grid)
-
+				path = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=position_grid)
 				# print(grid.grid_str(path=path, start=start, end=end))
 				if path:
 					path.pop(0)
@@ -126,17 +116,43 @@ class Controller():
 			print("out of bound!")
 
 	# Called once when you order an action on a zone
-	def action_on_zone(self, mouse_position_in_game):
-		for entity in self.selection:
-			mouse_grid_pos = iso_to_grid_pos(mouse_position_in_game)
-			for z in self.game.game_model.zone_list:
-				z_grid_pos = iso_to_grid_pos(z.iso_position)
-				if z_grid_pos == mouse_grid_pos:
-					print(z)
-					entity.aimed_entity = z
-					print(z.is_locking)  # This is why villagers can't harvest gold and stone but can harvest trees.
-					self.move_selection(z_grid_pos, need_conversion=False)
-					break
+	def action_on_zone(self, sprites_at_point):
+		# Step 1: Search for a zone in the sprites_at_point
+		zone_found = None
+		for s in sprites_at_point:
+			e = s.entity
+			if e and isinstance(e, Zone):
+				zone_found = e
+				break
+
+		if zone_found is not None:
+			for entity in self.selection:
+				# Step 2: Search the closest tile near the zone_found to harvest it.
+				z_grid_pos = iso_to_grid_pos(zone_found.iso_position)
+
+				aimed_tile = None
+				min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
+				entity_grid_position = iso_to_grid_pos(entity.iso_position)
+				for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
+
+					path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
+					if path:
+						path.pop()
+						if path:
+							path_len = len(path)
+							if min_path_len > path_len:
+								aimed_tile = tile
+								min_path_len = path_len
+						elif entity_grid_position == tile.grid_position:
+							self.interacting_entities.add(entity)
+							break
+						else:
+							break
+
+				# Step 3: Start moving toward the aimed entity
+				if aimed_tile is not None:
+					entity.aimed_entity = zone_found
+					self.move_selection(aimed_tile.grid_position, need_conversion=False)
 
 	# Called every frame when an action is done on a zone (harvesting).
 	def harvest_zone(self, entity, delta_time):

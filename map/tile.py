@@ -1,5 +1,6 @@
 from map.tileSprite import TileSprite
 from utils.SpriteData import SpriteData
+from utils.vector import Vector
 
 class Tile():
 	def __init__(self, blockID, grid_x, grid_y, pointer_to_entity=None):
@@ -7,6 +8,7 @@ class Tile():
 
 		self.grid_x=grid_x
 		self.grid_y=grid_y
+		self.grid_position = Vector(grid_x, grid_y)
 		self.pointer_to_entity = pointer_to_entity  # For now, pointer_to_entity is never used.
 
 		self.is_locked = 1
