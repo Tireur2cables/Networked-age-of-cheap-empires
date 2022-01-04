@@ -18,6 +18,7 @@ class Tile():
 
 	def __getstate__(self):
 		return [self.blockID, self.grid_x, self.grid_y, self.is_locked]
+		
 	def __setstate__(self, data):
 		self.blockID = data[0]
 		self.grid_x=data[1]

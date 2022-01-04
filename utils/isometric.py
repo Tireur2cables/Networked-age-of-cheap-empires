@@ -1,9 +1,8 @@
+# --- Imports ---
 from utils.vector import Vector
 
-TILE_WIDTH = 64
-TILE_HEIGHT = TILE_WIDTH // 2
-TILE_WIDTH_HALF = TILE_WIDTH//2
-TILE_HEIGHT_HALF = TILE_HEIGHT//2
+# --- Constants ---
+from CONSTANTS import TILE_WIDTH, TILE_HEIGHT, TILE_WIDTH_HALF, TILE_HEIGHT_HALF
 
 def cart_to_iso(x, y):
 	iso_x = (x - y)
@@ -18,7 +17,7 @@ def iso_to_cart(iso_x, iso_y):
 def map_xy_to_iso(x, y, tile_width_half, tile_height_half):
 	iso_x = (x - y) * tile_width_half
 	iso_y = (x + y) * tile_height_half
-  
+
 def grid_xy_to_iso(x, y):
 	iso_x = (x - y) * TILE_WIDTH_HALF
 	iso_y = (x + y) * TILE_HEIGHT_HALF

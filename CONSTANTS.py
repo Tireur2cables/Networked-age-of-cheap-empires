@@ -1,5 +1,4 @@
 # Definition des constantes utiles dans tout le projet
-# Par exemple, certaines dimensions ou pour realiser des enumerations
 
 # Doc pour les enumerations: https://docs.python.org/fr/3/library/enum.html
 from enum import Enum, auto
@@ -11,3 +10,12 @@ class Resource(Enum):
 	WOOD = auto()
 	GOLD = auto()
 	STONE = auto()
+
+# Default number of tiles on each side of the map
+DEFAULT_MAP_SIZE = 50
+
+# Some basics sizes about tiles
+TILE_WIDTH = 64 # arbitrary ?
+TILE_HEIGHT = TILE_WIDTH // 2
+TILE_WIDTH_HALF = TILE_WIDTH // 2
+TILE_HEIGHT_HALF = TILE_HEIGHT // 2
