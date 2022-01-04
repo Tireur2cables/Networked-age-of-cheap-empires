@@ -378,7 +378,7 @@ class View():
 			coin_button2 = arcade.gui.UIFlatButton(text = "Attaquer", height = 70, width = 110)
 			self.v_box5.add(coin_button2.with_space_around(15,15,15,15,arcade.color.BRONZE))
 
-			coin_button3 = ConstructButton(image="map/Tower.png",construct=None)
+			coin_button3 = ConstructButton(image="Ressources/img/zones/buildables/Tower.png",construct=None)
 			self.v_box6.add(coin_button3.with_space_around(15,15,15,15,arcade.color.BRONZE))
 
 	def on_hide_view(self) :
