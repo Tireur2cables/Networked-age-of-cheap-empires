@@ -72,9 +72,16 @@ class View():
 
 		self.init_dynamic_gui()
 		self.init_cheats()
-		self.sync_entities()
-		self.sync_ground()
-		self.sync_zones()
+
+		# Sync self.game_model.tile_list with unit_sprite_list
+		for e in self.game.game_model.unit_list:
+			self.unit_sprite_list.append(e.sprite)
+		# Sync self.game_model.tile_list with tile_sprite_list
+		for t in self.game.game_model.tile_list:
+			self.tile_sprite_list.append(t.sprite)
+		# Sync self.game_model.zone_list with zone_sprite_list
+		for z in self.game.game_model.zone_list:
+			self.zone_sprite_list.append(z.sprite)
 
 	def init_dynamic_gui(self) :
 		# Create a box group to align the 'open' button in the center
@@ -173,21 +180,6 @@ class View():
 				child=self.v_box2
 			)
 		)
-
-	def sync_entities(self):
-		# Sync self.game_model.tile_list with unit_sprite_list
-		for e in self.game.game_model.unit_list:
-			self.unit_sprite_list.append(e.sprite)
-
-	def sync_ground(self):
-		# Sync self.game_model.tile_list with tile_sprite_list
-		for t in self.game.game_model.tile_list:
-			self.tile_sprite_list.append(t.sprite)
-
-	def sync_zones(self):
-		# Sync self.game_model.zone_list with zone_sprite_list
-		for z in self.game.game_model.zone_list:
-			self.zone_sprite_list.append(z.sprite)
 
 	def on_draw(self):
 		""" Draw everything """
