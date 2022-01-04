@@ -54,9 +54,9 @@ class LaunchGameButton(arcade.gui.UIFlatButton) :
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		ia = {}
-		for padding in self.pregameview.ia_box.children :
-			name, diff = padding.child.text.split(padding.child.sep)
-			ia[name] = diff
+		# for padding in self.pregameview.ia_box.children :
+		# 	name, diff = padding.child.text.split(padding.child.sep)
+		# 	ia[name] = diff
 
 		ressources = {}
 		tab = [Res.GOLD, Res.WOOD, Res.FOOD, Res.STONE]

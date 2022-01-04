@@ -122,3 +122,7 @@ def main():
 	""" Main method """
 	game = AoCE()
 	arcade.run()
+
+
+if __name__ == "__main__":  # Python syntax that means "if you are launching from this file, run main()", useful if this file is going to be imported.
+	main()
