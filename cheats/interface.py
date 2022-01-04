@@ -13,8 +13,7 @@ SCREEN_TITLE = "Age Of Cheap Empire"
 #         super().__init__
 # def on_draw(self):
 #         arcade.start_render()
-n = 'NINJALUI'; b = 'BIGDADDY'; s = 'STEROIDS'; r_m = 'REVEAL MAP'; n_f = 'NO FOG'
+n, b, s, r_m, n_f = 'NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG'
 cheats_list = [n, b, s, r_m, n_f, n.lower(), b.lower(), s.lower(), r_m.lower(), n_f.lower()]
 cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
 arcade.draw_text(f"Enter a cheatcode among {cheat_list_display}", 1, SCREEN_HEIGHT-1)  #marche pas, relou
-    
