@@ -100,6 +100,7 @@ class GameView(arcade.View):
 		self.game_model.setup(ressources, ia, isPlayer)
 		self.game_view.setup()
 		self.game_controller.setup()
+		self.player.setup(ressources)
 
 	def on_update(self, *args):  # Redirecting on_update to the Controller
 		self.game_controller.on_update(*args)

@@ -62,7 +62,7 @@ class LaunchGameButton(arcade.gui.UIFlatButton) :
 		tab = [Res.GOLD, Res.WOOD, Res.FOOD, Res.STONE]
 		indice = 0
 		for texture_pane in self.pregameview.name_input_ressources :
-			ressources[tab[indice]] = texture_pane.child.text
+			ressources[tab[indice]] = int(texture_pane.child.text)
 			indice += 1
 		self.nextView.setup(ressources, ia, self.pregameview.isPlayer)
 		self.window.show_view(self.nextView)

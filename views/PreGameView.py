@@ -102,43 +102,48 @@ class PreGameView(arcade.View) :
 			text_color=(0, 0, 0, 255)
 		)
 
-		name_ressources = ["Or : ", "Bois : ", "Nourriture : ", "Pierre : "]
+		name_ressources = ["Or", "Bois", "Nourriture", "Pierre"]
+		ressources_default_value = {"Or": 100, "Bois": 200, "Nourriture": 200, "Pierre": 200}
 
 		#COMPLETEMENT DINGUE : le nom de ressource sous format "" est écrasé mais après qu'on est
 		#deja implemente la valeur "" a notre fonction, diront nous.
-		for i in range(len(name_ressources)) :
-			name_ressources[i]= UITextArea(
+		for i, name_ressource in enumerate(name_ressources) :
+			text_area = UITextArea(
 				x=self.window.width - buttonsize * (3 / 2),
 				y=self.window.height - buttonsize * (1.25 + i * 0.25),
 				width=buttonsize / 3,
 				height=buttonsize / 11,
-				text=name_ressources[i],
+				text=f"{name_ressource} : ",
 				text_color=(0, 0, 0, 255)
 			)
 
 			self.manager.add(
 				UITexturePane(
-					name_ressources[i].with_space_around(right=20),
+					text_area.with_space_around(right=20),
 					tex=bg_text,
 					padding=(10, 10, 10, 10)
 				)
 			)
 
 		#Creation des espaces ressources modifiables
-		self.name_input_ressources = ["Or_input", "Bois_input", "Nourriture_input", "Pierre_input"]
+		self.name_input_ressources = []
 
-		for i in range(len(self.name_input_ressources)) :
-			self.name_input_ressources[i] = arcade.gui.UITexturePane(
+		for i, name_ressource in enumerate(name_ressources):
+			texture_pane = arcade.gui.UITexturePane(
 				NumInput(
 					x=self.window.width - buttonsize/(1.4),
 					y=self.window.height - buttonsize*(1.25+i*0.25),
-					text="200", width=buttonsize/(2.5), height=buttonsize/10,
+					text=str(ressources_default_value[name_ressource]), width=buttonsize/(2.5), height=buttonsize/10,
 					text_color=(1, 1, 1, 255)
 				),
 				tex=bg_text
 			)
+
 			#Affichage des espaces ressources modifiables
-			self.manager.add(self.name_input_ressources[i])
+			self.manager.add(texture_pane)
+
+			#Ajout du texture_pain créé à self.name_input_ressources
+			self.name_input_ressources.append(texture_pane)
 
 		#Affichage de "Ressource :"
 		self.manager.add(
