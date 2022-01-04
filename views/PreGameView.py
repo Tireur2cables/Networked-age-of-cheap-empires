@@ -2,7 +2,6 @@
 import arcade
 from arcade.gui.widgets import UITextArea, UITexturePane
 from views.CustomButtons import SelctCivilButton, NextViewButton, NumInput
-from views.FakeGameView import FakeGameView
 
 #Constants
 BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
@@ -16,6 +15,9 @@ class PreGameView(arcade.View) :
 		self.isPlayer = True
 
 	def setup(self) :
+		# add an UIManager to handle the UI.
+		self.manager = arcade.gui.UIManager()
+
 		if self.nbAdv == 8 :
 			self.nbAdv = 0
 
@@ -25,8 +27,6 @@ class PreGameView(arcade.View) :
 		# ajoute l'image de background
 		self.texture = arcade.load_texture(BACKGROUND_PREGAME)
 
-		# add an UIManager to handle the UI.
-		self.manager = arcade.gui.UIManager()
 		self.manager.enable()
 
 		self.setupButtons()
@@ -34,46 +34,37 @@ class PreGameView(arcade.View) :
 		self.launch_game()
 		self.retourButton()
 
-	#Boutton retour
+	# Boutton retour
 	def retourButton(self):
-		buttonsize = self.window.width/6
+		buttonsize = self.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
-		self.v_box = arcade.gui.UIBoxLayout()
+		self.retour_box = arcade.gui.UIBoxLayout()
 
-		quit_button = NextViewButton(
-			self.window, self.main_view,
-			text="Retour",
-			width=buttonsize
-		)
-		self.v_box.add(quit_button)
+		retour_button = NextViewButton(self.window, self.main_view, text="Retour", width=buttonsize)
+		self.retour_box.add(retour_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x = "left",
-				align_x = buttonsize*(0.1),
+				align_x = buttonsize*(0.1), # arbitrary
 				anchor_y = "top",
-				align_y= -buttonsize*(0.1),
-				child = self.v_box
+				align_y= -buttonsize*(0.1), # arbitrary
+				child = self.retour_box
 			)
 		)
 
 
 	def setupButtons(self):
 		# def button size
-		buttonsize = self.window.width / 6
+		buttonsize = self.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
 
 		# Create the buttons of incrementation
-		you_civil_button = SelctCivilButton(
-			self.window,
-			text="Vous : Civilisation",
-			size=buttonsize,
-			name="Vous"
-		)
+		you_civil_button = SelctCivilButton(self.window, text="Vous : Civilisation", size=buttonsize, name="Vous")
 		self.v_box.add(you_civil_button.with_space_around(bottom=20))
 
 		name = ["Hugot", "Nico", "GuiLeDav", "Maxence", "Thomas", "Kenzo", "Nicolas"]
@@ -89,9 +80,9 @@ class PreGameView(arcade.View) :
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x = "left",
-				align_x = buttonsize/2,
+				align_x = buttonsize / 2, # arbitrary
 				anchor_y = "top",
-				align_y= -buttonsize*(3/5),
+				align_y= -buttonsize * (3 / 5), # arbitrary
 				child = self.v_box
 			)
 		)
@@ -99,17 +90,17 @@ class PreGameView(arcade.View) :
 	#New class ad by GuiLeDav 22/11/2021, affiche la gestion du nombre de ressources
 	def ressourcesInput(self) :
 		# def button size
-		buttonsize = self.window.width / 6
+		buttonsize = self.window.width / 6 # arbitrarys
 
 		#Couleur de fond pour les espaces ressources modifiables
 		bg_text = arcade.load_texture("Ressources/img/grey_fond.jpg")
 
 		#Creation du text "Ressource :"
 		ressource_text = UITextArea(
-			x=self.window.width - buttonsize*(3/2),
-			y=self.window.height - buttonsize*(0.75),
-			width=buttonsize/2,
-			height=buttonsize/10,
+			x=self.window.width - buttonsize * (3 / 2), # arbitrary
+			y=self.window.height - buttonsize * (0.75), # arbitrary
+			width=buttonsize / 2,
+			height=buttonsize / 10,
 			text="Ressources :",
 			text_color=(0, 0, 0, 255)
 		)
@@ -120,10 +111,10 @@ class PreGameView(arcade.View) :
 		#deja implemente la valeur "" a notre fonction, diront nous.
 		for i in range(len(name_ressources)) :
 			name_ressources[i]= UITextArea(
-				x=self.window.width - buttonsize*(3/2),
-				y=self.window.height - buttonsize*(1.25+i*0.25),
-				width=buttonsize/3,
-				height=buttonsize/11,
+				x=self.window.width - buttonsize * (3 / 2),
+				y=self.window.height - buttonsize * (1.25 + i * 0.25),
+				width=buttonsize / 3,
+				height=buttonsize / 11,
 				text=name_ressources[i],
 				text_color=(0, 0, 0, 255)
 			)
@@ -164,34 +155,32 @@ class PreGameView(arcade.View) :
 	#Button to start the game
 	def launch_game(self):
 		# def button size
-		buttonsize = self.window.width / 6
+		buttonsize = self.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
-		self.v_box = arcade.gui.UIBoxLayout()
+		self.launch_box = arcade.gui.UIBoxLayout()
 
 		# Create the button
 		num_enem_button = NextViewButton(
 			self.window,
-			PreGameView(
-				self.main_view,
-				self.nbAdv+1
-			),
+			PreGameView(self.main_view, self.nbAdv + 1),
 			text="Nombre d'IA : " + str(self.nbAdv),
-			width=buttonsize*(3/2)
+			width=buttonsize * (3 / 2)
 		)
-		self.v_box.add(num_enem_button.with_space_around(bottom=20))
+		self.launch_box.add(num_enem_button.with_space_around(bottom=20))
 
 		launch_button = NextViewButton(
 			self.window,
-			FakeGameView(
-				self.name_input_ressources,
-				self.nbAdv,
-				self.isPlayer
-			),
+			self.main_view.game_view,
+			# FakeGameView(
+			# 	self.name_input_ressources,
+			# 	self.nbAdv,
+			# 	self.isPlayer
+			# ),
 			text="Lancer la partie",
-			width=buttonsize*(3/2)
+			width=buttonsize * (3 / 2)
 		)
-		self.v_box.add(launch_button.with_space_around(bottom=20))
+		self.launch_box.add(launch_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttonsS
 		self.manager.add(
@@ -200,7 +189,7 @@ class PreGameView(arcade.View) :
 				align_x = -buttonsize*(0.2),
 				anchor_y = "center_y",
 				align_y = -buttonsize,
-				child = self.v_box
+				child = self.launch_box
 			)
 		)
 

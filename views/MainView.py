@@ -1,4 +1,4 @@
-# Imports
+# --- Imports ---
 import arcade
 from arcade.arcade_types import Color
 from views.CustomButtons import QuitButton, NextViewButton
@@ -6,7 +6,7 @@ from views.SettingsView import SettingsView
 from views.PreGameView import PreGameView
 from views.IAvsIAView import IAPreGameView
 
-# Constants
+# --- Constants ---
 BACKGROUND = "./Ressources/img/background.png"
 
 # View d'accueil : première à etre affichée à l'écran
@@ -33,7 +33,7 @@ class MainView(arcade.View) :
 
 	def setupButtons(self):
 		# def button size
-		buttonsize = self.window.width / 6
+		buttonsize = self.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
@@ -46,8 +46,9 @@ class MainView(arcade.View) :
 		ia_match_button = NextViewButton(self.window,IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
-		map_button = NextViewButton(self.window, self.game_view, text="Show Map", width=buttonsize)
-		self.v_box.add(map_button.with_space_around(bottom=20))
+		# TODO : charger une sauvegarde				# should not be self here
+		charger_button = NextViewButton(self.window, self, text="Charger une sauvegarde", width=buttonsize)
+		self.v_box.add(charger_button.with_space_around(bottom=20))
 
 		settings_button = NextViewButton(self.window, SettingsView(self), text="Settings", width=buttonsize)
 		self.v_box.add(settings_button.with_space_around(bottom=20))
@@ -61,7 +62,7 @@ class MainView(arcade.View) :
 				anchor_x = "left",
 				align_x = buttonsize,
 				anchor_y = "center_y",
-				align_y= -buttonsize/6,
+				align_y= -buttonsize / 6,
 				child = self.v_box
 			)
 		)
