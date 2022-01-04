@@ -339,7 +339,7 @@ class View():
 			self.game.game_controller.add_entity_to_game(tCent)
 		elif symbol == arcade.key.F : # cheat window
 			self.triggerCheatInput()
-		elif symbol == arcade.key.C:  # Couper arbre
+		elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
 			self.game.game_controller.action_on_zone(mouse_position_in_game)
 
 	def on_mouse_motion(self, x, y, dx, dy):
