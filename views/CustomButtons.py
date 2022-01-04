@@ -5,6 +5,7 @@ import arcade.gui
 from save.serializationTest import *
 
 # Constants
+from CONSTANTS import Resource as Res
 textureTicked = "Ressources/img/tick.png"
 textureEmpty = "Ressources/img/empty.png"
 
@@ -41,6 +42,29 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		self.nextView.setup()
+		self.window.show_view(self.nextView)
+
+# Button to return to the main menu
+class LaunchGameButton(arcade.gui.UIFlatButton) :
+	def __init__(self, window, nextView, pregameview, text, width) :
+		super().__init__(text=text, width=width)
+		self.window = window
+		self.nextView = nextView
+		self.pregameview = pregameview
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		ia = {}
+		for padding in self.pregameview.ia_box.children :
+			name, diff = padding.child.text.split(padding.child.sep)
+			ia[name] = diff
+
+		ressources = {}
+		tab = [Res.GOLD, Res.WOOD, Res.FOOD, Res.STONE]
+		indice = 0
+		for texture_pane in self.pregameview.name_input_ressources :
+			ressources[tab[indice]] = texture_pane.child.text
+			indice += 1
+		self.nextView.setup(ressources, ia, self.pregameview.isPlayer)
 		self.window.show_view(self.nextView)
 
 # Button to display things or not
@@ -83,30 +107,21 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 		elif self.vsync :
 			self.window.triggerVsync()
 
-# Selection de sa civilisation (meme si on aura pas forcement autant de civilisation) //Inutile, on a besoin que d'une seule civilisation
-class SelctCivilButton(arcade.gui.UIFlatButton):
-	def __init__(self, window, text, size,name):
-		super().__init__(text= text, width=size*2, height=size/4)
-		self.window =window
-		self.count=0
-		self.name=name
+# Selection de sa difficulté
+class SelctDifButton(arcade.gui.UIFlatButton):
+	def __init__(self, text, size, name):
+		super().__init__(text=text + " : Facile ", width=size * 2, height=size / 4)
+		self.count = 0
+		self.name = name
+		self.list = ["Facile", "Moyen", "Difficile"]
+		self.sep = " : "
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
-		if (self.count==4):
+		if self.count == len(self.list) - 1 :
 			self.count = 0
 		else :
-			self.count = self.count +1
-
-		if (self.count==0):
-			self.text= self.name + " : Romains "
-		elif (self.count==1):
-			self.text= self.name + " : Egyptiens "
-		elif (self.count==2):
-			self.text= self.name + " : Gaulois "
-		elif (self.count==3):
-			self.text= self.name + " : Vikings "
-		else :
-			self.text= self.name + " : GuiLeDavien "
+			self.count = self.count + 1
+		self.text = self.name + self.sep + self.list[self.count]
 
 class NumInput(arcade.gui.UIInputText) :
 	def __init__(self, x, y, text, width, height, text_color) :

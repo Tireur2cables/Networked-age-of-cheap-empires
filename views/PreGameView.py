@@ -1,7 +1,7 @@
 # Imports
 import arcade
 from arcade.gui.widgets import UITextArea, UITexturePane
-from views.CustomButtons import SelctCivilButton, NextViewButton, NumInput
+from views.CustomButtons import SelctDifButton, NextViewButton, NumInput, LaunchGameButton
 
 #Constants
 BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
@@ -61,20 +61,17 @@ class PreGameView(arcade.View) :
 		buttonsize = self.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
-		self.v_box = arcade.gui.UIBoxLayout()
+		self.ia_box = arcade.gui.UIBoxLayout()
 
 		# Create the buttons of incrementation
-		you_civil_button = SelctCivilButton(self.window, text="Vous : Civilisation", size=buttonsize, name="Vous")
-		self.v_box.add(you_civil_button.with_space_around(bottom=20))
+		you_civil_button = arcade.gui.UIFlatButton(text="Vous", width=buttonsize * 2, height=buttonsize / 4)
+		self.ia_box.add(you_civil_button.with_space_around(bottom=20))
 
 		name = ["Hugot", "Nico", "GuiLeDav", "Maxence", "Thomas", "Kenzo", "Nicolas"]
 
 		for i in range(self.nbAdv) :
-			adv1_civil_button = SelctCivilButton(
-				self.window, text=name[i] + " : Civilisation",
-				size=buttonsize,name=name[i]
-			)
-			self.v_box.add(adv1_civil_button.with_space_around(bottom=20))
+			adv_civil_button = SelctDifButton(text=name[i],size=buttonsize, name=name[i])
+			self.ia_box.add(adv_civil_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
@@ -83,7 +80,7 @@ class PreGameView(arcade.View) :
 				align_x = buttonsize / 2, # arbitrary
 				anchor_y = "top",
 				align_y= -buttonsize * (3 / 5), # arbitrary
-				child = self.v_box
+				child = self.ia_box
 			)
 		)
 
@@ -169,14 +166,10 @@ class PreGameView(arcade.View) :
 		)
 		self.launch_box.add(num_enem_button.with_space_around(bottom=20))
 
-		launch_button = NextViewButton(
+		launch_button = LaunchGameButton(
 			self.window,
 			self.main_view.game_view,
-			# FakeGameView(
-			# 	self.name_input_ressources,
-			# 	self.nbAdv,
-			# 	self.isPlayer
-			# ),
+ 			self,
 			text="Lancer la partie",
 			width=buttonsize * (3 / 2)
 		)

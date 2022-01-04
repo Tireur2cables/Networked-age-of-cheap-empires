@@ -1,6 +1,6 @@
 # Imports
 import arcade
-from views.CustomButtons import NumInput, SelctCivilButton, NextViewButton
+from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton
 from views.PreGameView import PreGameView
 
 class IAPreGameView(PreGameView) :
@@ -12,7 +12,7 @@ class IAPreGameView(PreGameView) :
 	def setup(self) :
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
-		
+
 		if self.nbAdv == 9 :
 			self.nbAdv = 2
 
@@ -21,18 +21,13 @@ class IAPreGameView(PreGameView) :
 		buttonsize = self.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
-		self.v_box = arcade.gui.UIBoxLayout()
+		self.ia_box = arcade.gui.UIBoxLayout()
 
 		name = ["IA1", "IA2", "IA3 ", "IA4", "IA5", "IA6", "IA7", "IA8"]
 
 		for i in range(self.nbAdv) :
-			adv_civil_button = SelctCivilButton(
-				self.window,
-				text=name[i] + " : Civilisation",
-				size=buttonsize,
-				name=name[i]
-			)
-			self.v_box.add(adv_civil_button.with_space_around(bottom=20))
+			ia_button = SelctDifButton(text=name[i], size=buttonsize, name=name[i])
+			self.ia_box.add(ia_button.with_space_around(bottom=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
@@ -41,7 +36,7 @@ class IAPreGameView(PreGameView) :
 				align_x = buttonsize / 2,
 				anchor_y = "top",
 				align_y= -buttonsize * (3 / 5),
-				child = self.v_box
+				child = self.ia_box
 			)
 		)
 
@@ -62,14 +57,10 @@ class IAPreGameView(PreGameView) :
 		)
 		self.launch_box.add(num_enem_button.with_space_around(bottom=20))
 
-		launch_button = NextViewButton(
+		launch_button = LaunchGameButton(
 			self.window,
 			self.main_view.game_view,
-			# FakeGameView(
-			# 	self.name_input_ressources,
-			# 	self.nbAdv,
-			# 	self.isPlayer
-			# ),
+			self,
 			text="Lancer la partie",
 			width=buttonsize * (3 / 2)
 		)

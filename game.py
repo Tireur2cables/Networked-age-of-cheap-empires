@@ -74,7 +74,7 @@ class AoCE(arcade.Window):
 #########################################################################
 #							GAME VIEW									#
 #########################################################################
-
+# In game view
 class GameView(arcade.View):
 
 	def __init__(self):
@@ -88,9 +88,9 @@ class GameView(arcade.View):
 	def setMenuView(self, menu_view) :
 		self.menu_view = menu_view
 
-	def setup(self):
+	def setup(self, ressources, ia, isPlayer):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		self.game_model.setup()
+		self.game_model.setup(ressources, ia, isPlayer)
 		self.game_view.setup()
 		self.game_controller.setup()
 
