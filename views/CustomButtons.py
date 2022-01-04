@@ -54,9 +54,9 @@ class LaunchGameButton(arcade.gui.UIFlatButton) :
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		ia = {}
-		# for padding in self.pregameview.ia_box.children :
-		# 	name, diff = padding.child.text.split(padding.child.sep)
-		# 	ia[name] = diff
+		for padding in self.pregameview.ia_box.children :
+			name, diff = padding.child.text.split(padding.child.sep)
+			ia[name] = diff
 
 		ressources = {}
 		tab = [Res.GOLD, Res.WOOD, Res.FOOD, Res.STONE]
@@ -122,6 +122,11 @@ class SelctDifButton(arcade.gui.UIFlatButton):
 		else :
 			self.count = self.count + 1
 		self.text = self.name + self.sep + self.list[self.count]
+
+class PlayerButton(arcade.gui.UIFlatButton):
+	def __init__(self, text, width, height):
+		super().__init__(text=text + " : Joueur Humain", width=width, height=height)
+		self.sep = " : "
 
 class NumInput(arcade.gui.UIInputText) :
 	def __init__(self, x, y, text, width, height, text_color) :

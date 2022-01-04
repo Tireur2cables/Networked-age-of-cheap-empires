@@ -1,7 +1,7 @@
 # Imports
 import arcade
 from arcade.gui.widgets import UITextArea, UITexturePane
-from views.CustomButtons import SelctDifButton, NextViewButton, NumInput, LaunchGameButton
+from views.CustomButtons import SelctDifButton, NextViewButton, NumInput, LaunchGameButton, PlayerButton
 
 #Constants
 BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
@@ -64,7 +64,7 @@ class PreGameView(arcade.View) :
 		self.ia_box = arcade.gui.UIBoxLayout()
 
 		# Create the buttons of incrementation
-		you_civil_button = arcade.gui.UIFlatButton(text="Vous", width=buttonsize * 2, height=buttonsize / 4)
+		you_civil_button = PlayerButton(text="Vous", width=buttonsize * 2, height=buttonsize / 4)
 		self.ia_box.add(you_civil_button.with_space_around(bottom=20))
 
 		name = ["Hugot", "Nico", "GuiLeDav", "Maxence", "Thomas", "Kenzo", "Nicolas"]
