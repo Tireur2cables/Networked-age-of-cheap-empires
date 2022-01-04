@@ -15,6 +15,9 @@ SCREEN_TITLE = "Age Of Cheap Empire"
 
 MUSIC = "./Ressources/music/Marked.mp3"
 
+# --- Launch setup ---
+from LAUNCH_SETUP import LAUNCH_FULLSCREEN, LAUNCH_MUSIC
+
 #########################################################################
 #							MAIN CLASS									#
 #########################################################################
@@ -24,7 +27,7 @@ class AoCE(arcade.Window):
 	def __init__(self):
 		""" Initializer """
 		# Call the initializer of arcade.Window
-		super().__init__(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=True, vsync=True)
+		super().__init__(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=LAUNCH_FULLSCREEN, vsync=True)
 		#arcade.set_background_color(arcade.csscolor.WHITE)
 
 		# Show the mouse cursor
@@ -33,6 +36,8 @@ class AoCE(arcade.Window):
 		# Lance la musique
 		self.my_music = arcade.load_sound(MUSIC, streaming=True)
 		self.media_player = self.my_music.play(loop=True)
+		if not LAUNCH_MUSIC:
+			self.media_player.pause()
 
 		self.game_view = GameView()
 		# # Variables for communications between model, view and controller.

@@ -2,9 +2,10 @@
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
+from player import Player
 
 # --- Constants ---
-from CONSTANTS import DEFAULT_MAP_SIZE
+from CONSTANTS import DEFAULT_MAP_SIZE, Resource
 
 #########################################################################
 #							CONTROLLER CLASS							#
@@ -20,6 +21,7 @@ class Controller():
 		self.moving_entities = set()
 		self.interacting_entities = set()
 		self.dead_entities = set()
+		self.player = Player(IA=False)
 
 	def setup(self):
 		pass
@@ -144,7 +146,9 @@ class Controller():
 			print(f"[harvesting] entity health = {entity.health} - zone health = {aimed_entity.health}")
 			if harvested:
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-				entity.resource[Res[type(aimed_entity).__name__.upper()]] = harvested
-				print(entity.resource)
+				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
+				# print(entity.resource)
+				self.player.add_resource(aimed_entity.get_resource_nbr(), harvested)
+				print(self.player.resource)
 				entity.aimed_entity = None
 				self.dead_entities.add(aimed_entity)

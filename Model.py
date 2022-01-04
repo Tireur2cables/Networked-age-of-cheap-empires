@@ -9,6 +9,9 @@ from utils.isometric import *
 # -- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, TILE_HEIGHT_HALF
 
+# --- Launch setup ---
+from LAUNCH_SETUP import LAUNCH_DEFAULT_MAP
+
 #########################################################################
 #							MODEL CLASS									#
 #########################################################################
@@ -37,7 +40,7 @@ class Model():
 
 		# Set up the villager and add it to the unit_list.
 		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
-		use_default = False
+		use_default = LAUNCH_DEFAULT_MAP
 		if use_default:
 			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		else:

@@ -1,6 +1,7 @@
 from entity.Entity import Entity
 from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
+from CONSTANTS import Resource as Res
 
 # ----- GENERAL CLASS -----
 
@@ -129,7 +130,7 @@ class Resources(Zone):
 	def __init__(self, grid_position, amount, **kwargs):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
 		self.amount = amount
-	
+
 	def __getstate__(self):
 		return [self.get_grid_position(), self.is_locking,self.sprite_data, self.health, self.amount]
 	def __setstate__(self, data):
@@ -138,6 +139,9 @@ class Resources(Zone):
 		self.sprite_data=data[2]
 		self.health = data[3]
 		self.amount=data[4]
+
+	def get_resource_nbr(self):
+		return Res[type(self).__name__.upper()]
 
 	def harvest(self, dmg):
 		self.health -= dmg
