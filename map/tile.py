@@ -18,7 +18,7 @@ class Tile():
 
 	def __getstate__(self):
 		return [self.blockID, self.grid_x, self.grid_y, self.is_locked]
-		
+
 	def __setstate__(self, data):
 		self.blockID = data[0]
 		self.grid_x=data[1]
@@ -28,7 +28,7 @@ class Tile():
 		self.init_sprite()
 
 	def init_sprite(self):
-		sprite_data = SpriteData(file="./map/Tiles/" + self.blockID + ".png", y_offset=16)
+		sprite_data = SpriteData(file="./Ressources/img/tiles/" + self.blockID + ".png", y_offset=16)
 		self.sprite = TileSprite(self, sprite_data)
 
 	def setEntity(self,pointer_to_entity):

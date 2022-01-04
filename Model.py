@@ -1,6 +1,6 @@
 # --- Imports ---
 from map.map import Map
-from map.MapCreationindependantprojet.abstract_perlin_matrix import perlin_array,process_array
+from map.map_tests.abstract_perlin_matrix import perlin_array,process_array
 from utils.vector import Vector
 from entity.Unit import *
 from entity.Zone import *
