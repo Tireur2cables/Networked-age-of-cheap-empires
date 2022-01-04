@@ -134,8 +134,8 @@ class Controller():
 				min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
 				entity_grid_position = iso_to_grid_pos(entity.iso_position)
 				for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
-
 					path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
+					print(path)
 					if path:
 						path.pop()
 						if path:
@@ -143,10 +143,10 @@ class Controller():
 							if min_path_len > path_len:
 								aimed_tile = tile
 								min_path_len = path_len
-						elif entity_grid_position == tile.grid_position:
-							self.interacting_entities.add(entity)
-							break
 						else:
+							self.interacting_entities.add(entity)
+							entity.aimed_entity = zone_found
+							aimed_tile = None
 							break
 
 				# Step 3: Start moving toward the aimed entity

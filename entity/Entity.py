@@ -23,7 +23,7 @@ class Entity:
 
 		# Sprite
 		self.sprite_data = sprite_data
-		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="None")
+		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="Simple")
 
 		# Backend
 		self.action_timer = 0
@@ -53,7 +53,7 @@ class Entity:
 
 		# Sprite
 		self.sprite_data = data[1]
-		self.sprite = EntitySprite(self, self.sprite_data, hit_box_algorithm="None")
+		self.sprite = EntitySprite(self, self.sprite_data, hit_box_algorithm="Simple")
 
 		# Backend
 		self.action_timer = 0
