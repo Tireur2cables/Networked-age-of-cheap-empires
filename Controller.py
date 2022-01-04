@@ -52,7 +52,7 @@ class Controller():
 
 		# --- Action - Interacting entities ---
 		for entity in self.interacting_entities:
-			if isinstance(entity.aimed_entity, Zone):
+			if isinstance(entity.aimed_entity, Resources):
 				self.harvest_zone(entity, delta_time)
 
 
@@ -132,7 +132,9 @@ class Controller():
 			for z in self.game.game_model.zone_list:
 				z_grid_pos = iso_to_grid_pos(z.iso_position)
 				if z_grid_pos == mouse_grid_pos:
+					print(z)
 					entity.aimed_entity = z
+					print(z.is_locking)  # This is why villagers can't harvest gold and stone but can harvest trees.
 					self.move_selection(z_grid_pos, need_conversion=False)
 					break
 
