@@ -143,14 +143,17 @@ class View():
 		# Create a vertical BoxGroup to align buttons
 		self.v_box1 = arcade.gui.UIBoxLayout()
 
-		ressources_tab = ["  = 1 ", "  = 5 ", "  = 50 ", "  = 500 ", "  = 5000 "]
+		player_resources = self.game.player.resource
+		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 
-		self.HEIGHT_LABEL = self.minimap.size[1] / len(ressources_tab) # in order to have same height as minimap at the end
+		self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
 		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
-		for val in ressources_tab :
+		self.resource_label_list = []
+		for val in resources_tab :
 			label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
+			self.resource_label_list.append(label)
 			self.v_box1.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -180,6 +183,12 @@ class View():
 				child=self.v_box2
 			)
 		)
+
+	def update_vbox1(self):
+		player_resources = self.game.player.resource
+		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		for label, resource_text in zip(self.resource_label_list, resources_tab):
+			label.text = resource_text
 
 	def on_draw(self):
 		""" Draw everything """

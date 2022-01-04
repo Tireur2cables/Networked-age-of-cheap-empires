@@ -1,6 +1,7 @@
 # --- Imports ---
 # -- arcade --
 import arcade
+from player import Player
 # -- others --
 from views.MainView import MainView
 # -- mvc --
@@ -89,6 +90,7 @@ class GameView(arcade.View):
 		self.game_model = Model(self)
 		self.game_view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
 		self.game_controller = Controller(self)
+		self.player = Player(IA=False)
 
 	def setMenuView(self, menu_view) :
 		self.menu_view = menu_view

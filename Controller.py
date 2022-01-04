@@ -2,7 +2,6 @@
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
-from player import Player
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -21,7 +20,6 @@ class Controller():
 		self.moving_entities = set()
 		self.interacting_entities = set()
 		self.dead_entities = set()
-		self.player = Player(IA=False)
 
 	def setup(self):
 		pass
@@ -135,7 +133,6 @@ class Controller():
 				entity_grid_position = iso_to_grid_pos(entity.iso_position)
 				for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
 					path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
-					print(path)
 					if path:
 						path.pop()
 						if path:
@@ -166,7 +163,7 @@ class Controller():
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
 				# print(entity.resource)
-				self.player.add_resource(aimed_entity.get_resource_nbr(), harvested)
-				print(self.player.resource)
+				self.game.player.add_resource(aimed_entity.get_resource_nbr(), harvested)
+				self.game.game_view.update_vbox1()
 				entity.aimed_entity = None
 				self.dead_entities.add(aimed_entity)
