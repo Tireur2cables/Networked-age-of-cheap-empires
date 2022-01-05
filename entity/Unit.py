@@ -14,7 +14,7 @@ from utils.isometric import *
 #  | |__| | | | | | | | | |_
 #   \____/  |_| |_| |_|  \__|
 
-SPEED_UNITS = 5#correction of the speed because it was too slow
+SPEED_UNITS = 3 # Correction of the speed because it was too slow --- Be careful: The FPS affects units speed!
 class Unit(Entity):
 	#une Unit est une Entity qui est mobile
 	#Liste des Unit: https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires_II)
