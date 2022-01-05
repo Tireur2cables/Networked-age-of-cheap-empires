@@ -178,28 +178,41 @@ class Controller():
 
 		assert isinstance(building, Buildable)
 
-		# Step 2: Start searching if it is possible to move toward the aimed map_position
-		for entity in self.selection:
-			entity.action_timer = 0
-			entity.aimed_entity = building
-			for i in range(entity.aimed_entity.tile_size[0]):
-				for j in range(entity.aimed_entity.tile_size[1]):
-					tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
-					if tile.pointer_to_entity is not None or tile.is_free == 0:
-						entity.aimed_entity = None
-						return
-			# Step 3: if possible (no return), move one tile below the first tile of the building.
-			self.move_selection(map_position - Vector(1, 1), need_conversion=False)
+		if self.game.player.get_resource(building.cost[0]) > building.cost[1]:
+
+			# Step 2: Search for an entity that can build: a Villager.
+			for entity in self.selection:
+				if isinstance(entity, Villager):
+					entity.action_timer = 0
+					entity.aimed_entity = building
+					# Step 3: Start searching if it is possible to move toward the aimed map_position
+					for i in range(entity.aimed_entity.tile_size[0]):
+						for j in range(entity.aimed_entity.tile_size[1]):
+							tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
+							if tile.pointer_to_entity is not None or tile.is_free == 0:
+								entity.aimed_entity = None
+								return
+					# Step 4: if possible (no return), move one tile below the first tile of the building.
+					self.move_selection(map_position - Vector(1, 1), need_conversion=False)
+				else:
+					print("Not a Villager!")
+		else:
+			print("not enough resources to build!")
 
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
 		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
-			self.game.player.sub_resource(*entity.aimed_entity.cost)
-			self.game.game_view.update_vbox1()
-			entity.action_timer = 0
-			self.add_entity_to_game(entity.aimed_entity)
-			entity.aimed_entity = None
+			if self.game.player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:
+				self.game.player.sub_resource(*entity.aimed_entity.cost)
+				self.game.game_view.update_vbox1()
+				entity.action_timer = 0
+				self.add_entity_to_game(entity.aimed_entity)
+				entity.aimed_entity = None
+			else:
+				print("not enough resources to build!")
+				entity.action_timer = 0
+				entity.aimed_entity = None
 
 
 	# Called every frame when an action is done on a zone (harvesting).
