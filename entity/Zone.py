@@ -138,7 +138,7 @@ class House(Buildable):
 		#Equiv AOE2: House
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=1, y_offset=256//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.8, y_offset=126//2 - TILE_HEIGHT),
 		health=75,
 		cost=(Res.WOOD, 30),
 		build_time=25,

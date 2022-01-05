@@ -1,5 +1,5 @@
 from arcade import Sprite
-from utils.isometric import grid_xy_to_iso
+from utils.isometric import grid_pos_to_iso
 
 class TileSprite(Sprite):
 	def __init__(self, tile, sprite_data):
@@ -7,6 +7,6 @@ class TileSprite(Sprite):
 
 		self.tile = tile
 
-		isox, isoy = grid_xy_to_iso(tile.grid_x, tile.grid_y)  # Cette ligne ne recréer pas une map (testé et vérifié).
-		self.center_x = isox + sprite_data.x_offset
-		self.center_y = isoy + sprite_data.y_offset
+		iso_position = grid_pos_to_iso(tile.grid_position)  # Cette ligne ne recréer pas une map (testé et vérifié).
+		self.center_x = iso_position.x + sprite_data.x_offset
+		self.center_y = iso_position.y + sprite_data.y_offset

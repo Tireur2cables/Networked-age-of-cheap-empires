@@ -20,7 +20,7 @@ class Map():
 		self.map_size = map_size
 		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
 		if tile_array is None:
-			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], grid_x, grid_y) for grid_y in range(map_size)] for grid_x in range(map_size)]
+			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], Vector(grid_x, grid_y)) for grid_y in range(map_size)] for grid_x in range(map_size)]
 		else:
 			self.tile_array = tile_array
 
