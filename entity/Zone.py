@@ -6,7 +6,7 @@ from CONSTANTS import Resource as Res
 # ----- GENERAL CLASS -----
 
 class Zone(Entity):
-	def __init__(self, grid_position, tile_size=1, is_locking=False, **kwargs):#constructeur : initialise les attributs
+	def __init__(self, grid_position, tile_size=(1, 1), is_locking=False, **kwargs):#constructeur : initialise les attributs
 		iso_position = grid_pos_to_iso(grid_position)
 		super().__init__(iso_position, **kwargs)
 		self.grid_position=grid_position
@@ -50,14 +50,22 @@ class Zone(Entity):
 # ----- GENERAL CLASS -----
 
 class Buildable(Zone):
-	def __init__(self, grid_position, cost=0, **kwargs):
+	def __init__(self, grid_position, cost=0, build_time=0, **kwargs):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
 		self.cost = cost
+		self.build_time = build_time
 
 # -------------------------
 
 # intégrer préconditions de construction de bat dans bat qui permet de construire bat
 # avancées tech : fonction boucle faisant appel aux fonctions des objets respectifs pour modif leur propriétés
+
+class WorkSite(Zone):
+	# == In progess building, Not Implemented Yet.
+	def __init__(self, grid_position, zone_to_build, **kwargs):
+		super().__init__(grid_position, **kwargs)
+		self.zone_to_build = zone_to_build
+
 
 #
 ##
@@ -68,50 +76,71 @@ class TownCenter(Buildable):
 	#WhoAmI : Cost : 200Wood 60sec build time
 	#Size: 3x3
 	#LineOfSight : 7
+	#Equiv AOE2: TownCenter
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=1, y_offset=253//2 - TILE_HEIGHT),
-		health = 600,
+		health=600,
+		cost=(Res.WOOD, 200),
+		build_time=1,
 		tile_size=(3,3),
 		line_sight=7)
 
 class Barracks(Buildable):
 		#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
+		#Equiv AOE2: Barracks
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		sprite_data=None,
-		health=350)
+		health=350,
+		cost=(Res.WOOD, 125),
+		build_time=0.5,
+		tile_size=(3,3))
 
 class StoragePit(Buildable):
 		#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)
 		#Size : 3x3
 		#LineOfSight:4
+		#Equiv AOE2: Lumber Camp & Miner Camp
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		sprite_data=None,
-		health=350)
+		health=350,
+		cost=(Res.WOOD, 120),
+		build_time=0.5,
+		tile_size=(3, 3)) # (2, 2) sur AOE2
 
 class Granary(Buildable):
 		#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
+		#Equiv AOE2: Mill
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		sprite_data=None,
-		health=350)
+		health=350,
+		cost=(Res.WOOD, 120),
+		build_time=0.5,
+		tile_size=(2, 2))
 
 
 class Dock(Buildable):
 		#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
+		#Equiv AOE2: Dock
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		sprite_data=None,
-		health=600)
+		health=600,
+		cost=(Res.WOOD, 100),
+		tile_size=(3, 3))
 
 class House(Buildable):
 		#WhoAmI : Cost : 30 Wood; Use : +4 population per house
+		#Equiv AOE2: House
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
-		health=75)
+		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=1, y_offset=256//2 - TILE_HEIGHT),
+		health=75,
+		cost=(Res.WOOD, 30),
+		tile_size=(2, 2))
 
 
 

@@ -52,6 +52,8 @@ class Controller():
 		for entity in self.interacting_entities:
 			if isinstance(entity.aimed_entity, Resources):
 				self.harvest_zone(entity, delta_time)
+			elif isinstance(entity.aimed_entity, Buildable):
+				self.build_zone(entity, delta_time)
 
 
 		# --- Updating Lists ---
@@ -96,6 +98,7 @@ class Controller():
 			self.selection.add(entity_found)
 		self.game.game_view.trigger_coin_GUI(self.selection)
 
+	# Called once when you order to move
 	def move_selection(self, position, need_conversion=True):
 		position_grid = position
 		if need_conversion:
@@ -110,8 +113,14 @@ class Controller():
 					if path:
 						entity.set_path(path)
 						entity.next_aim()
+						return True
+					else:
+						return False
+				else:
+					return False
 		else:
 			print("out of bound!")
+			return False
 
 	# Called once when you order an action on a zone
 	def action_on_zone(self, sprites_at_point):
@@ -148,8 +157,28 @@ class Controller():
 
 				# Step 3: Start moving toward the aimed entity
 				if aimed_tile is not None:
+					entity.action_timer = 0
 					entity.aimed_entity = zone_found
 					self.move_selection(aimed_tile.grid_position, need_conversion=False)
+
+	# Called once
+	def build_on_tiles(self, map_position):
+		# Step 1: Start moving toward the aimed map_position
+		for entity in self.selection:
+			entity.action_timer = 0
+			can_move = self.move_selection(map_position, need_conversion=False)
+			if can_move:
+				entity.aimed_entity = House(map_position)
+
+
+	# Called every frame
+	def build_zone(self, entity, delta_time):
+		entity.action_timer += delta_time
+		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
+			entity.action_timer = 0
+			self.add_entity_to_game(entity.aimed_entity)
+			entity.aimed_entity = None
+
 
 	# Called every frame when an action is done on a zone (harvesting).
 	def harvest_zone(self, entity, delta_time):

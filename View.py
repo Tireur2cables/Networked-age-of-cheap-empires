@@ -347,15 +347,16 @@ class View():
 
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+		grid_pos = iso_to_grid_pos(mouse_position_in_game)
 		if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
-			grid_pos = iso_to_grid_pos(mouse_position_in_game)
 			tCent = TownCenter(grid_pos)
 			self.game.game_controller.add_entity_to_game(tCent)
 		elif symbol == arcade.key.F : # cheat window
 			self.triggerCheatInput()
 		elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
 			self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-
+		elif symbol == arcade.key.B: # Build something
+			self.game.game_controller.build_on_tiles(grid_pos)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
