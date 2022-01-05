@@ -30,6 +30,9 @@ PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
 PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
 PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
 
+# --- Launch setup ---
+from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
+
 #########################################################################
 #							VIEW CLASS									#
 #########################################################################
@@ -199,7 +202,9 @@ class View():
 
 		for i in self.zone_sprite_list:
 			i.draw()
-			self.draw_iso_position(i.entity.iso_position)
+
+			if LAUNCH_DEBUG_DISPLAY:
+				self.draw_iso_position(i.entity.iso_position)
 
 		for i in self.unit_sprite_list:
 			if i.entity.selected:
@@ -210,13 +215,16 @@ class View():
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 			i.draw()
-			self.draw_iso_position(i.entity.iso_position)
 
-		for x in range(3):
-			for y in range(3):
-				tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
-				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-				self.draw_grid_position(Vector(x, y))
+			if LAUNCH_DEBUG_DISPLAY:
+				self.draw_iso_position(i.entity.iso_position)
+
+		if LAUNCH_DEBUG_DISPLAY:
+			for x in range(3):
+				for y in range(3):
+					tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+					arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+					self.draw_grid_position(Vector(x, y))
 
 		# Update the minimap
 		self.minimap.draw()
