@@ -33,6 +33,7 @@ class AoCE(arcade.Window):
 
 		# Show the mouse cursor
 		self.set_mouse_visible(True)
+		arcade.enable_timings(20)
 
 		# Lance la musique
 		self.my_music = arcade.load_sound(MUSIC, streaming=True)

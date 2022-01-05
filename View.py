@@ -224,7 +224,7 @@ class View():
 		#
 		# --- In-game GUI ---
 		#
-		self.coord_label.text = f"x = {self.mouse_x}  y = {self.mouse_y}"
+		self.coord_label.text = f"FPS: {int(arcade.get_fps())} | x = {self.mouse_x}  y = {self.mouse_y}"
 		self.coord_label.fit_content()
 
 		#

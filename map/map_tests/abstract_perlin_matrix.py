@@ -9,9 +9,9 @@ from utils.vector import Vector
 
 
 def perlin_array(size = (50, 50),
-			scale=75, octaves = 50, 
-			persistence = 0.3, 
-			lacunarity = 0.8, 
+			scale=75, octaves = 50,
+			persistence = 0.3,
+			lacunarity = 0.8,
 			seed = None):
 
 	if not seed:
@@ -47,17 +47,17 @@ def process_array(array, size = (50,50)):
 		for y in range(size[1]):
 			if array[x][y] < 0.30:
 				#layer2=Stone(Vector(x,y))
-				out[x][y] = Tile("grass", x, y, "stone")
+				out[x][y] = Tile("grass", Vector(x, y), "stone")
 			if array[x][y] < 0.45:
-				out[x][y] = Tile("grass", x, y)
+				out[x][y] = Tile("grass", Vector(x, y))
 			elif array[x][y] < 0.58:
 				#layer2=Wood(Vector(x,y))
-				out[x][y] = Tile("grass", x, y, "tree")
+				out[x][y] = Tile("grass", Vector(x, y), "tree")
 			elif array[x][y] < 0.75:
 				#layer2=Gold(Vector(x,y))
-				out[x][y] = Tile("sand", x, y, "gold")
+				out[x][y] = Tile("sand", Vector(x, y), "gold")
 			else:
-				out[x][y] = Tile("water", x, y)
+				out[x][y] = Tile("water", Vector(x, y))
 	return out
 
 #a = process_array(perlin_array())
