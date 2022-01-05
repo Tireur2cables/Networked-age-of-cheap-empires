@@ -169,11 +169,14 @@ class Controller():
 			can_move = self.move_selection(map_position, need_conversion=False)
 			if can_move:
 				entity.aimed_entity = House(map_position)
+				self.game.player.sub_resource(*entity.aimed_entity.cost)
+				self.game.game_view.update_vbox1()
 
 
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
+		print(entity.action_timer)
 		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
 			entity.action_timer = 0
 			self.add_entity_to_game(entity.aimed_entity)

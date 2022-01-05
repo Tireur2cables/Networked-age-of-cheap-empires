@@ -82,7 +82,7 @@ class TownCenter(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=1, y_offset=253//2 - TILE_HEIGHT),
 		health=600,
 		cost=(Res.WOOD, 200),
-		build_time=1,
+		build_time=60,
 		tile_size=(3,3),
 		line_sight=7)
 
@@ -94,7 +94,7 @@ class Barracks(Buildable):
 		sprite_data=None,
 		health=350,
 		cost=(Res.WOOD, 125),
-		build_time=0.5,
+		build_time=30,
 		tile_size=(3,3))
 
 class StoragePit(Buildable):
@@ -107,7 +107,7 @@ class StoragePit(Buildable):
 		sprite_data=None,
 		health=350,
 		cost=(Res.WOOD, 120),
-		build_time=0.5,
+		build_time=30,
 		tile_size=(3, 3)) # (2, 2) sur AOE2
 
 class Granary(Buildable):
@@ -118,7 +118,7 @@ class Granary(Buildable):
 		sprite_data=None,
 		health=350,
 		cost=(Res.WOOD, 120),
-		build_time=0.5,
+		build_time=30,
 		tile_size=(2, 2))
 
 
@@ -130,6 +130,7 @@ class Dock(Buildable):
 		sprite_data=None,
 		health=600,
 		cost=(Res.WOOD, 100),
+		build_time=35,
 		tile_size=(3, 3))
 
 class House(Buildable):
@@ -140,6 +141,7 @@ class House(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=1, y_offset=256//2 - TILE_HEIGHT),
 		health=75,
 		cost=(Res.WOOD, 30),
+		build_time=25,
 		tile_size=(2, 2))
 
 
