@@ -166,18 +166,21 @@ class Controller():
 		# Step 1: Start moving toward the aimed map_position
 		for entity in self.selection:
 			entity.action_timer = 0
-			can_move = self.move_selection(map_position, need_conversion=False)
-			if can_move:
-				entity.aimed_entity = House(map_position)
-				self.game.player.sub_resource(*entity.aimed_entity.cost)
-				self.game.game_view.update_vbox1()
-
+			entity.aimed_entity = House(map_position)
+			for i in range(entity.aimed_entity.tile_size[0]):
+				for j in range(entity.aimed_entity.tile_size[1]):
+					tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
+					if tile.pointer_to_entity is not None or tile.is_locked == 0:
+						entity.aimed_entity = None
+						return
+			self.move_selection(map_position - Vector(1, 1), need_conversion=False)
 
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
-		print(entity.action_timer)
 		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
+			self.game.player.sub_resource(*entity.aimed_entity.cost)
+			self.game.game_view.update_vbox1()
 			entity.action_timer = 0
 			self.add_entity_to_game(entity.aimed_entity)
 			entity.aimed_entity = None

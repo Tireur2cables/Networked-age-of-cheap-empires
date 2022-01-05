@@ -28,6 +28,9 @@ class Map():
 		for x in range(map_size):
 			for y in range(map_size):
 				object = default_map_objects_2d[x][y] if tile_array is None else self.tile_array[x][y].pointer_to_entity
+				if tile_array is None:
+					self.tile_array[x][y].pointer_to_entity = object
+
 				if object == "tree":  # Can't use match for now, not compatible with arcade library...
 					self.objects_array[x][y] = Wood(Vector(x, y))
 				elif object == "stone":
@@ -68,11 +71,18 @@ class Map():
 	def get_tiles_nearby(self, map_position):
 		return tuple(self.tile_array[map_position.x + i][map_position.y + j] for i in range(-1, 2) for j in range(-1, 2))
 
-	def free_tile_at(self, map_position):
-		x, y = map_position
-		if self.objects_array[x][y] is not None:
-			self.objects_array[x][y] = None
-			self.tile_array[x][y].is_locked = 1
+	def free_tile_at(self, map_position, tile_size):
+		for x in range(map_position.x, map_position.x + tile_size[0]):
+			for y in range(map_position.y, map_position.y + tile_size[1]):
+				if self.objects_array[x][y] is not None or self.tile_array[x][y].pointer_to_entity is not None:
+					self.objects_array[x][y] = None
+					self.tile_array[x][y].pointer_to_entity = None
+				self.tile_array[x][y].is_locked = 1
+
+	def reserve_tile_at(self, map_position, tile_size):
+		for x in range(map_position.x, map_position.x + tile_size[0]):
+			for y in range(map_position.y, map_position.y + tile_size[1]):
+				self.tile_array[x][y].is_locked = 0
 
 ####################################################################
 #
