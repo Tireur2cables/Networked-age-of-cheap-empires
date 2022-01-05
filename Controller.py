@@ -162,17 +162,33 @@ class Controller():
 					self.move_selection(aimed_tile.grid_position, need_conversion=False)
 
 	# Called once
-	def build_on_tiles(self, map_position):
-		# Step 1: Start moving toward the aimed map_position
+	def build_on_tiles(self, map_position, building_name):
+		# Step 1: Find which building building_name is
+		building = None
+		if building_name == "House":
+			building = House(map_position)
+		elif building_name == "StoragePit":
+			building = StoragePit(map_position)
+		elif building_name == "Granary":
+			building = Granary(map_position)
+		elif building_name == "Barracks":
+			building = Barracks(map_position)
+		elif building_name == "Dock":
+			building = Dock(map_position)
+
+		assert isinstance(building, Buildable)
+
+		# Step 2: Start searching if it is possible to move toward the aimed map_position
 		for entity in self.selection:
 			entity.action_timer = 0
-			entity.aimed_entity = House(map_position)
+			entity.aimed_entity = building
 			for i in range(entity.aimed_entity.tile_size[0]):
 				for j in range(entity.aimed_entity.tile_size[1]):
 					tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
 					if tile.pointer_to_entity is not None or tile.is_free == 0:
 						entity.aimed_entity = None
 						return
+			# Step 3: if possible (no return), move one tile below the first tile of the building.
 			self.move_selection(map_position - Vector(1, 1), need_conversion=False)
 
 	# Called every frame

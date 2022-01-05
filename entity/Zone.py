@@ -3,8 +3,9 @@ from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
 
-# ----- GENERAL CLASS -----
+from LAUNCH_SETUP import LAUNCH_FAST_BUILD
 
+# ----- GENERAL CLASS -----
 class Zone(Entity):
 	def __init__(self, grid_position, tile_size=(1, 1), is_locking=False, **kwargs):#constructeur : initialise les attributs
 		iso_position = grid_pos_to_iso(grid_position)
@@ -82,7 +83,7 @@ class TownCenter(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=1, y_offset=253//2 - TILE_HEIGHT),
 		health=600,
 		cost=(Res.WOOD, 200),
-		build_time=60,
+		build_time=2 if LAUNCH_FAST_BUILD else 60,
 		tile_size=(3,3),
 		line_sight=7)
 
@@ -91,34 +92,34 @@ class Barracks(Buildable):
 		#Equiv AOE2: Barracks
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
 		health=350,
 		cost=(Res.WOOD, 125),
-		build_time=30,
-		tile_size=(3,3))
+		build_time=2 if LAUNCH_FAST_BUILD else 30,
+		tile_size=(3, 3))
 
 class StoragePit(Buildable):
 		#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)
 		#Size : 3x3
 		#LineOfSight:4
-		#Equiv AOE2: Lumber Camp & Miner Camp
+		#Equiv AOE2: Lumber Camp & Mining Camp
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
 		health=350,
 		cost=(Res.WOOD, 120),
-		build_time=30,
-		tile_size=(3, 3)) # (2, 2) sur AOE2
+		build_time=2 if LAUNCH_FAST_BUILD else 30,
+		tile_size=(2, 2)) # (3, 3) sur AOE, (2, 2) sur AOE2
 
 class Granary(Buildable):
 		#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
 		#Equiv AOE2: Mill
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15),
 		health=350,
 		cost=(Res.WOOD, 120),
-		build_time=30,
+		build_time=2 if LAUNCH_FAST_BUILD else 30,
 		tile_size=(2, 2))
 
 
@@ -127,10 +128,10 @@ class Dock(Buildable):
 		#Equiv AOE2: Dock
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10),
 		health=600,
 		cost=(Res.WOOD, 100),
-		build_time=35,
+		build_time=2 if LAUNCH_FAST_BUILD else 35,
 		tile_size=(3, 3))
 
 class House(Buildable):
@@ -138,10 +139,10 @@ class House(Buildable):
 		#Equiv AOE2: House
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.8, y_offset=126//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10),
 		health=75,
 		cost=(Res.WOOD, 30),
-		build_time=25,
+		build_time=2 if LAUNCH_FAST_BUILD else 25,
 		tile_size=(2, 2))
 
 

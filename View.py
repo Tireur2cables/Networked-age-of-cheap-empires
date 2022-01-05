@@ -47,6 +47,8 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
+		self.mode = "move"
+
 	def get_tile_outline(self, map_position):
 		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
 		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
@@ -243,7 +245,6 @@ class View():
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
 
-
 	def on_show(self):
 		""" This is run once when we switch to this view """
 
@@ -356,15 +357,28 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		grid_pos = iso_to_grid_pos(mouse_position_in_game)
-		if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
-			tCent = TownCenter(grid_pos)
-			self.game.game_controller.add_entity_to_game(tCent)
-		elif symbol == arcade.key.F : # cheat window
-			self.triggerCheatInput()
-		elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-			self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-		elif symbol == arcade.key.B: # Build something
-			self.game.game_controller.build_on_tiles(grid_pos)
+		if self.mode == "move":
+			if symbol == arcade.key.F : # cheat window
+				self.triggerCheatInput()
+			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+				self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+			elif symbol == arcade.key.B:
+				self.mode = "build"
+				print("build mode!")
+		elif self.mode == "build":
+			if symbol == arcade.key.H: # Build something
+				self.game.game_controller.build_on_tiles(grid_pos, "House")
+			elif symbol == arcade.key.S:
+				self.game.game_controller.build_on_tiles(grid_pos, "StoragePit")
+			elif symbol == arcade.key.G:
+				self.game.game_controller.build_on_tiles(grid_pos, "Granary")
+			elif symbol == arcade.key.B:
+				self.game.game_controller.build_on_tiles(grid_pos, "Barracks")
+			# elif symbol == arcade.key.D:
+			# 	self.game.game_controller.build_on_tiles(grid_pos, "Dock")
+			self.mode = "move"
+			print("move mode!")
+
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
