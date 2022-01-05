@@ -38,7 +38,7 @@ class Map():
 				elif object == "gold":
 					self.objects_array[x][y] = Gold(Vector(x, y))
 				if self.objects_array[x][y] and self.objects_array[x][y].is_locking:
-					self.tile_array[x][y].is_locked = 0
+					self.tile_array[x][y].is_free = 0
 
 		self.update_tile_list()
 
@@ -53,7 +53,7 @@ class Map():
 	def get_pathfinding_matrix(self):  # @kenzo6c: The pathfinding_matrix has to be created on the fly, otherwise it won't change if the map changes
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		# Swapping x and y here, because of the library implementation
-		return [[self.tile_array[x][y].is_locked for x in range(self.map_size)] for y in range(self.map_size)]
+		return [[self.tile_array[x][y].is_free for x in range(self.map_size)] for y in range(self.map_size)]
 
 	def get_path(self, start, end):
 		# Pathfinding algorithm
@@ -77,12 +77,12 @@ class Map():
 				if self.objects_array[x][y] is not None or self.tile_array[x][y].pointer_to_entity is not None:
 					self.objects_array[x][y] = None
 					self.tile_array[x][y].pointer_to_entity = None
-				self.tile_array[x][y].is_locked = 1
+				self.tile_array[x][y].is_free = 1
 
 	def reserve_tile_at(self, map_position, tile_size):
 		for x in range(map_position.x, map_position.x + tile_size[0]):
 			for y in range(map_position.y, map_position.y + tile_size[1]):
-				self.tile_array[x][y].is_locked = 0
+				self.tile_array[x][y].is_free = 0
 
 ####################################################################
 #
