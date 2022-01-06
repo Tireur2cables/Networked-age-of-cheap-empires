@@ -173,14 +173,20 @@ class Resources(Zone):
 		self.amount=data[4]
 
 	def get_resource_nbr(self):
-		return Res[type(self).__name__.upper()]
+		name = type(self).__name__.upper()
+		enum_name = name if name != "BERRYBUSH" else "FOOD"
+		return Res[enum_name]
 
 	def harvest(self, dmg):
-		self.health -= dmg
 		if self.health > 0:
+			self.health -= dmg
 			return 0
 		else:
-			return self.amount
+			if self.amount > 0:
+				self.amount -= 1
+				return 1
+			else:
+				return -1
 
 
 # -------------------------
@@ -198,13 +204,21 @@ class Stone(Resources):
 		super().__init__(grid_position,
 		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
-		health=25,  # I don't know the values
-		amount=25)  # I don't know the values
+		health=0,
+		amount=250)
 
 class Gold(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
-		health=25,  # I don't know the values
-		amount=10)  # I don't know the values
+		health=0,
+		amount=450)
+
+class BerryBush(Resources):
+	def __init__(self, grid_position):
+		super().__init__(grid_position,
+		is_locking=True,
+		sprite_data=SpriteData("Ressources/img/zones/resources/berrybush.png", scale=1, y_offset=63//2 - TILE_HEIGHT//2),
+		health=0,
+		amount=150)

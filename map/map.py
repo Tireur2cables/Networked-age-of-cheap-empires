@@ -1,7 +1,7 @@
 # Imports
 
 from map.tile import Tile
-from entity.Zone import Wood, Stone, Gold
+from entity.Zone import Wood, Stone, Gold, BerryBush
 from map.defaultmap import default_map_2d, default_map_objects_2d
 from utils.isometric import iso_to_grid_pos
 from utils.vector import Vector
@@ -37,6 +37,8 @@ class Map():
 					self.objects_array[x][y] = Stone(Vector(x, y))
 				elif object == "gold":
 					self.objects_array[x][y] = Gold(Vector(x, y))
+				elif object == "berry":
+					self.objects_array[x][y] = BerryBush(Vector(x, y))
 				if self.objects_array[x][y] and self.objects_array[x][y].is_locking:
 					self.tile_array[x][y].is_free = 0
 

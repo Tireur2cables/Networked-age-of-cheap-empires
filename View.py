@@ -200,10 +200,10 @@ class View():
 		arcade.start_render()
 
 		# --- Object sprite lists : Tiles, Zones & Entities
-		self.tile_sprite_list.draw()
+		self.tile_sprite_list.draw(pixelated=True)
 
 		for i in self.zone_sprite_list:
-			i.draw()
+			i.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
 				self.draw_iso_position(i.entity.iso_position)
@@ -216,7 +216,7 @@ class View():
 				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
-			i.draw()
+			i.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
 				self.draw_iso_position(i.entity.iso_position)
@@ -361,21 +361,21 @@ class View():
 			if symbol == arcade.key.F : # cheat window
 				self.triggerCheatInput()
 			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-				self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+				self.game.game_controller.order_harvest(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
 			elif symbol == arcade.key.B:
 				self.mode = "build"
 				print("build mode!")
 		elif self.mode == "build":
 			if symbol == arcade.key.H: # Build something
-				self.game.game_controller.build_on_tiles(grid_pos, "House")
+				self.game.game_controller.order_build(grid_pos, "House")
 			elif symbol == arcade.key.S:
-				self.game.game_controller.build_on_tiles(grid_pos, "StoragePit")
+				self.game.game_controller.order_build(grid_pos, "StoragePit")
 			elif symbol == arcade.key.G:
-				self.game.game_controller.build_on_tiles(grid_pos, "Granary")
+				self.game.game_controller.order_build(grid_pos, "Granary")
 			elif symbol == arcade.key.B:
-				self.game.game_controller.build_on_tiles(grid_pos, "Barracks")
+				self.game.game_controller.order_build(grid_pos, "Barracks")
 			# elif symbol == arcade.key.D:
-			# 	self.game.game_controller.build_on_tiles(grid_pos, "Dock")
+			# 	self.game.game_controller.order_build(grid_pos, "Dock")
 			self.mode = "move"
 			print("move mode!")
 

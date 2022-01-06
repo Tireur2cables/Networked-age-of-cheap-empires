@@ -123,7 +123,7 @@ class Controller():
 			return False
 
 	# Called once when you order an action on a zone
-	def action_on_zone(self, sprites_at_point):
+	def order_harvest(self, sprites_at_point):
 		# Step 1: Search for a zone in the sprites_at_point
 		zone_found = None
 		for s in sprites_at_point:
@@ -134,35 +134,38 @@ class Controller():
 
 		if zone_found is not None:
 			for entity in self.selection:
-				# Step 2: Search the closest tile near the zone_found to harvest it.
-				z_grid_pos = iso_to_grid_pos(zone_found.iso_position)
+				if isinstance(entity, Villager):
+					# Step 2: Search the closest tile near the zone_found to harvest it.
+					z_grid_pos = iso_to_grid_pos(zone_found.iso_position)
 
-				aimed_tile = None
-				min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
-				entity_grid_position = iso_to_grid_pos(entity.iso_position)
-				for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
-					path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
-					if path:
-						path.pop()
+					aimed_tile = None
+					min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
+					entity_grid_position = iso_to_grid_pos(entity.iso_position)
+					for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
+						path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
 						if path:
-							path_len = len(path)
-							if min_path_len > path_len:
-								aimed_tile = tile
-								min_path_len = path_len
-						else:
-							self.interacting_entities.add(entity)
-							entity.aimed_entity = zone_found
-							aimed_tile = None
-							break
+							path.pop()
+							if path:
+								path_len = len(path)
+								if min_path_len > path_len:
+									aimed_tile = tile
+									min_path_len = path_len
+							else:
+								self.interacting_entities.add(entity)
+								entity.aimed_entity = zone_found
+								aimed_tile = None
+								break
 
-				# Step 3: Start moving toward the aimed entity
-				if aimed_tile is not None:
-					entity.action_timer = 0
-					entity.aimed_entity = zone_found
-					self.move_selection(aimed_tile.grid_position, need_conversion=False)
+					# Step 3: Start moving toward the aimed entity
+					if aimed_tile is not None:
+						entity.action_timer = 0
+						entity.aimed_entity = zone_found
+						self.move_selection(aimed_tile.grid_position, need_conversion=False)
+				else:
+					print("Not a villager!")
 
 	# Called once
-	def build_on_tiles(self, map_position, building_name):
+	def order_build(self, map_position, building_name):
 		# Step 1: Find which building building_name is
 		building = None
 		if building_name == "House":
@@ -214,7 +217,6 @@ class Controller():
 				entity.action_timer = 0
 				entity.aimed_entity = None
 
-
 	# Called every frame when an action is done on a zone (harvesting).
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
@@ -222,12 +224,13 @@ class Controller():
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
 			harvested = aimed_entity.harvest(entity.damage)
-			print(f"[harvesting] entity health = {entity.health} - zone health = {aimed_entity.health}")
-			if harvested:
+			print(f"[harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
+			if harvested > 0:
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
 				# print(entity.resource)
 				self.game.player.add_resource(aimed_entity.get_resource_nbr(), harvested)
 				self.game.game_view.update_vbox1()
+			elif harvested == -1:
 				entity.aimed_entity = None
 				self.dead_entities.add(aimed_entity)
