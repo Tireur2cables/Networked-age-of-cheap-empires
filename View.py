@@ -209,17 +209,21 @@ class View():
 				self.draw_iso_position(i.entity.iso_position)
 
 		for i in self.unit_sprite_list:
-			if i.entity.selected:
+			entity = i.entity
+			if entity.selected:
 				i.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_grid_pos(i.entity.iso_position)
+				map_position = iso_to_grid_pos(entity.iso_position)
 				# tile_below = self.game.game_model.map.get_tile_at(map_position)
 				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
+				self.draw_health_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
+				if (aimed_entity := i.entity.aimed_entity) and aimed_entity.amount:
+					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE)
 			i.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
-				self.draw_iso_position(i.entity.iso_position)
+				self.draw_iso_position(entity.iso_position)
 
 		if LAUNCH_DEBUG_DISPLAY:
 			for x in range(3):
@@ -339,7 +343,7 @@ class View():
 			# if units_at_point:
 			# 	print("unit!")
 			# else:
-			self.game.game_controller.move_selection(mouse_position_in_game)
+			self.game.game_controller.order_move(mouse_position_in_game)
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -433,3 +437,8 @@ class View():
 			self.unit_sprite_list.append(new_sprite)
 		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
 			self.zone_sprite_list.append(new_sprite)
+
+	def draw_health_bar(self, pos, health, max_health, color):
+		y_offset = 10
+		arcade.draw_rectangle_filled(pos.x, pos.y - y_offset, 36, 12, arcade.color.GRAY)
+		arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - y_offset, (health*32)/max_health, 8, color)

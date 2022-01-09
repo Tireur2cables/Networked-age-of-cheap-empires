@@ -98,15 +98,12 @@ class Controller():
 			self.selection.add(entity_found)
 		self.game.game_view.trigger_coin_GUI(self.selection)
 
-	# Called once when you order to move
-	def move_selection(self, position, need_conversion=True):
-		position_grid = position
-		if need_conversion:
-			position_grid = iso_to_grid_pos(position)
-		if self.is_on_map(position_grid):
+	# Called once when you setup the movement
+	def move_selection(self, grid_position):
+		if self.is_on_map(grid_position):
 			for entity in self.selection:
 				self.moving_entities.add(entity)
-				path = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=position_grid)
+				path = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 				# print(grid.grid_str(path=path, start=start, end=end))
 				if path:
 					path.pop(0)
@@ -121,6 +118,13 @@ class Controller():
 		else:
 			print("out of bound!")
 			return False
+
+	# Called once when you order to move
+	def order_move(self, iso_position):
+		grid_position = iso_to_grid_pos(iso_position)
+		for entity in self.selection:
+			entity.aimed_entity = None
+		self.move_selection(grid_position)
 
 	# Called once when you order an action on a zone
 	def order_harvest(self, sprites_at_point):
@@ -160,7 +164,7 @@ class Controller():
 					if aimed_tile is not None:
 						entity.action_timer = 0
 						entity.aimed_entity = zone_found
-						self.move_selection(aimed_tile.grid_position, need_conversion=False)
+						self.move_selection(aimed_tile.grid_position)
 				else:
 					print("Not a villager!")
 
@@ -196,7 +200,7 @@ class Controller():
 								entity.aimed_entity = None
 								return
 					# Step 4: if possible (no return), move one tile below the first tile of the building.
-					self.move_selection(map_position - Vector(1, 1), need_conversion=False)
+					self.move_selection(map_position - Vector(1, 1))
 				else:
 					print("Not a Villager!")
 		else:
@@ -223,8 +227,8 @@ class Controller():
 		if entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
-			harvested = aimed_entity.harvest(entity.damage)
 			print(f"[harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
+			harvested = aimed_entity.harvest(entity.damage)
 			if harvested > 0:
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested

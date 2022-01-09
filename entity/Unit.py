@@ -58,7 +58,7 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 	creation_cost = {Res.FOOD : 50, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 25
 	def __init__(self, iso_position, health=-1):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/villager_stand.png", y_offset=46//2), speed=0.8, health=health, max_health=25, damage=3, rate_fire=2, line_sight=4)
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/villager_stand.png", y_offset=46//2, x_offset=-3), speed=0.8, health=health, max_health=25, damage=3, rate_fire=2, line_sight=4)
 		self.resource = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
 		self.max_resource = 10
 
