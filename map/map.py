@@ -24,6 +24,8 @@ class Map():
 		else:
 			self.tile_array = tile_array
 
+		self.spawn_array = []
+
 		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
 		for x in range(map_size):
 			for y in range(map_size):
@@ -39,6 +41,8 @@ class Map():
 					self.objects_array[x][y] = Gold(Vector(x, y))
 				elif object == "berry":
 					self.objects_array[x][y] = BerryBush(Vector(x, y))
+				elif object is not None and "spawn" in object:
+					self.spawn_array.append((Vector(x, y), int(object.split("_")[1])))
 				if self.objects_array[x][y] and self.objects_array[x][y].is_locking:
 					self.tile_array[x][y].is_free = 0
 

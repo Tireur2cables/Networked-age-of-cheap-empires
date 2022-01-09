@@ -218,7 +218,7 @@ class View():
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 				self.draw_health_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
-				if (aimed_entity := i.entity.aimed_entity) and aimed_entity.amount:
+				if (aimed_entity := i.entity.aimed_entity) and isinstance(aimed_entity, Resources):
 					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE)
 			i.draw(pixelated=True)
 

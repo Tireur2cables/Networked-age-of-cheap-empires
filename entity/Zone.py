@@ -80,11 +80,11 @@ class TownCenter(Buildable):
 	#Equiv AOE2: TownCenter
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=1, y_offset=253//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2),
 		health=600,
 		cost=(Res.WOOD, 200),
 		build_time=2 if LAUNCH_FAST_BUILD else 60,
-		tile_size=(3,3),
+		tile_size=(4, 4), # (3, 3) sur AOE
 		line_sight=7)
 
 class Barracks(Buildable):

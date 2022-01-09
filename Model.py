@@ -45,6 +45,9 @@ class Model():
 			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		else:
 			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array(perlin_array(seed=69)))
+
+		for pos_spawn in self.map.spawn_array:
+			self.add_entity(TownCenter(pos_spawn[0]))
 		unit0 = Villager(Vector(100, 100))
 		unit1 = Villager(Vector(50, 50))
 		unit2 = Villager(grid_pos_to_iso(Vector(3, 2)) + Vector(0, TILE_HEIGHT_HALF))
