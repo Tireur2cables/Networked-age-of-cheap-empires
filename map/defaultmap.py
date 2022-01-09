@@ -1,6 +1,6 @@
 import json
 
-with open("map/map_tests/maptest.json") as json_file:
+with open("map/defaultmap/defaultmap.json") as json_file:
     data = json.load(json_file)
     default_map_int = data["layers"][0]["data"]
     default_map_objects_int = data["layers"][1]["data"]
