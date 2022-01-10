@@ -63,16 +63,16 @@ class Model():
 		knight = Knight(grid_pos_to_iso(Vector(16, 2)) + Vector(0, TILE_HEIGHT_HALF))
 		self.unit_list.append(knight)
 
-	def discard_entity(self, dead_entity):
-		if isinstance(dead_entity, Unit) and dead_entity in self.unit_list:
-			self.unit_list.remove(dead_entity)
-		elif isinstance(dead_entity, Zone) and dead_entity in self.zone_list:
-			self.zone_list.remove(dead_entity)
-			self.map.free_tile_at(dead_entity.grid_position, dead_entity.tile_size)
-
 	def add_entity(self, new_entity):
 		if isinstance(new_entity, Unit) and new_entity not in self.unit_list:
 			self.unit_list.append(new_entity)
 		elif isinstance(new_entity, Zone) and new_entity not in self.zone_list:
 			self.zone_list.append(new_entity)
 			self.map.reserve_tile_at(new_entity.grid_position, new_entity.tile_size)
+
+	def discard_entity(self, dead_entity):
+		if isinstance(dead_entity, Unit) and dead_entity in self.unit_list:
+			self.unit_list.remove(dead_entity)
+		elif isinstance(dead_entity, Zone) and dead_entity in self.zone_list:
+			self.zone_list.remove(dead_entity)
+			self.map.free_tile_at(dead_entity.grid_position, dead_entity.tile_size)

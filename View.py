@@ -39,6 +39,8 @@ from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
 
 class View():
 
+# --- Setup ---
+
 	def __init__(self, aoce_game):
 		""" Initializer """
 		self.game = aoce_game
@@ -48,20 +50,6 @@ class View():
 		self.zone_sprite_list = arcade.SpriteList()
 
 		self.mode = "move"
-
-	def get_tile_outline(self, map_position):
-		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
-		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
-		bottom_vertex = tuple(map_position - Vector(0, TILE_HEIGHT//2))
-		top_vertex = tuple(map_position + Vector(0, TILE_HEIGHT//2))
-		return left_vertex, bottom_vertex, right_vertex, top_vertex
-
-	def draw_grid_position(self, grid_position):
-		iso_position = grid_pos_to_iso(grid_position)
-		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
-
-	def draw_iso_position(self, iso_position):
-		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
 
 	def setup(self) :
 		#clear old lists
@@ -87,42 +75,6 @@ class View():
 		# Sync self.game_model.zone_list with zone_sprite_list
 		for z in self.game.game_model.zone_list:
 			self.zone_sprite_list.append(z.sprite)
-
-	def init_dynamic_gui(self) :
-		# Create a box group to align the 'open' button in the center
-		self.v_box4 = arcade.gui.UIBoxLayout()
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="right",
-				anchor_y="bottom",
-				child=self.v_box4
-			)
-		)
-
-		# Create a box for the button in the precedent box, maybe redondant
-		self.v_box5 = arcade.gui.UIBoxLayout()
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="center",
-				align_x= 200,
-				anchor_y="bottom",
-				align_y=15,
-				child=self.v_box5
-			)
-		)
-
-		# Create a box for the button in the precedent box, maybe redondant
-		self.v_box6 = arcade.gui.UIBoxLayout()
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="center",
-				align_x= 400,
-				anchor_y="bottom",
-				align_y=15,
-				child=self.v_box6
-			)
-		)
-
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -189,11 +141,25 @@ class View():
 			)
 		)
 
-	def update_vbox1(self):
-		player_resources = self.game.player.resource
-		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
-		for label, resource_text in zip(self.resource_label_list, resources_tab):
-			label.text = resource_text
+
+
+# --- Adding/Discarding Sprites ---
+
+	def add_sprite(self, new_sprite):
+		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.unit_sprite_list:
+			self.unit_sprite_list.append(new_sprite)
+		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
+			self.zone_sprite_list.append(new_sprite)
+
+	def discard_sprite(self, dead_sprite):
+		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
+			self.unit_sprite_list.remove(dead_sprite)
+		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.zone_sprite_list:
+			self.zone_sprite_list.remove(dead_sprite)
+
+
+
+# --- Drawing ---
 
 	def on_draw(self):
 		""" Draw everything """
@@ -256,6 +222,24 @@ class View():
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
 
+	def get_tile_outline(self, map_position):
+		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
+		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
+		bottom_vertex = tuple(map_position - Vector(0, TILE_HEIGHT//2))
+		top_vertex = tuple(map_position + Vector(0, TILE_HEIGHT//2))
+		return left_vertex, bottom_vertex, right_vertex, top_vertex
+
+	def draw_grid_position(self, grid_position):
+		iso_position = grid_pos_to_iso(grid_position)
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+
+	def draw_iso_position(self, iso_position):
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+
+
+
+# --- View & Camera ---
+
 	def on_show(self):
 		""" This is run once when we switch to this view """
 
@@ -276,6 +260,153 @@ class View():
 		self.static_menu()
 		self.addButton()
 		self.addCoordLabel()
+
+	def on_hide_view(self) :
+		self.manager.disable()
+
+	def camera_move(self) :
+		# Update the camera coords if the mouse is on the edges
+		# The movement of the camera is handled in the on_draw() function with move_to()
+		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE :
+			self.camera_x += CAMERA_MOVE_STEP
+		elif self.mouse_x <= CAMERA_MOVE_EDGE :
+			self.camera_x -= CAMERA_MOVE_STEP
+		if self.mouse_y <= CAMERA_MOVE_EDGE :
+			self.camera_y -= CAMERA_MOVE_STEP
+		elif self.mouse_y >= self.game.window.height - CAMERA_MOVE_EDGE :
+			self.camera_y += CAMERA_MOVE_STEP
+
+
+
+# --- Inputs ---
+
+	def on_mouse_motion(self, x, y, dx, dy):
+		"""Called whenever the mouse moves."""
+		# Update the coords of the mouse
+		self.mouse_x = x
+		self.mouse_y = y
+
+	def on_mouse_press(self, x, y, button, key_modifiers) :
+		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
+		if self.minimap.is_on_minimap_sprite(x, y) :
+			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
+			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
+			self.camera.move_to([self.camera_x, self.camera_y], 1)
+		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
+		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
+			pass
+		elif button == arcade.MOUSE_BUTTON_LEFT:
+			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+			if closest_unit_sprites :
+				self.game.game_controller.select(closest_unit_sprites)
+			else:
+				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
+				if closest_zone_sprites :
+					self.game.game_controller.select_zone(closest_zone_sprites)
+
+		elif button == arcade.MOUSE_BUTTON_RIGHT:
+			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+			# if units_at_point:
+			# 	print("unit!")
+			# else
+			if self.is_a_unit(mouse_position_in_game):
+				self.game.game_controller.order_move(mouse_position_in_game)
+
+		elif button == arcade.MOUSE_BUTTON_MIDDLE:
+			print(f"position de la souris : {mouse_position_in_game}")
+			print(f"position sur la grille : {iso_to_grid_pos(mouse_position_in_game)}")
+			pos = mouse_position_in_game
+			grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
+			grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
+			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
+
+	def on_key_press(self, symbol, modifier):
+		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+		grid_pos = iso_to_grid_pos(mouse_position_in_game)
+		if self.mode == "move":
+			if symbol == arcade.key.F : # cheat window
+				self.triggerCheatInput()
+			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+				self.game.game_controller.order_harvest(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+			elif symbol == arcade.key.B:
+				self.mode = "build"
+				print("build mode!")
+		elif self.mode == "build":
+			if symbol == arcade.key.H: # Build something
+				self.game.game_controller.order_build(grid_pos, "House")
+			elif symbol == arcade.key.S:
+				self.game.game_controller.order_build(grid_pos, "StoragePit")
+			elif symbol == arcade.key.G:
+				self.game.game_controller.order_build(grid_pos, "Granary")
+			elif symbol == arcade.key.B:
+				self.game.game_controller.order_build(grid_pos, "Barracks")
+			# elif symbol == arcade.key.D:
+			# 	self.game.game_controller.order_build(grid_pos, "Dock")
+			self.mode = "move"
+			print("move mode!")
+
+	def get_closest_sprites(self, mouse_position_in_game, sprite_list):
+		sprites_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list)
+		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
+		return sprites_at_point_sorted
+
+	def is_a_unit(self, mouse_position_in_game):
+		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.unit_sprite_list)
+	def is_a_zone(self, mouse_position_in_game):
+		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.zone_sprite_list)
+
+
+
+# --- GUI ---
+
+	def triggerCheatInput(self) :
+		if self.display_cheat_input :
+			self.manager.remove(self.cheat_pane)
+			self.cheat_pane.child.reset_text()
+		else :
+			self.manager.add(self.cheat_pane)
+		self.display_cheat_input = not self.display_cheat_input
+
+	def draw_health_bar(self, pos, health, max_health, color):
+		if max_health:
+			y_offset = 10
+			arcade.draw_rectangle_filled(pos.x, pos.y - y_offset, 36, 12, arcade.color.GRAY)
+			arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - y_offset, (health*32)/max_health, 8, color)
+
+	def init_dynamic_gui(self) :
+		# Create a box group to align the 'open' button in the center
+		self.v_box4 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				anchor_y="bottom",
+				child=self.v_box4
+			)
+		)
+
+		# Create a box for the button in the precedent box, maybe redondant
+		self.v_box5 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				align_x= 200,
+				anchor_y="bottom",
+				align_y=15,
+				child=self.v_box5
+			)
+		)
+
+		# Create a box for the button in the precedent box, maybe redondant
+		self.v_box6 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				align_x= 400,
+				anchor_y="bottom",
+				align_y=15,
+				child=self.v_box6
+			)
+		)
 
 	def addButton(self):
 		# def button size
@@ -320,102 +451,11 @@ class View():
 		)
 		self.coord_label.fit_content()
 
-
-	def camera_move(self) :
-		# Update the camera coords if the mouse is on the edges
-		# The movement of the camera is handled in the on_draw() function with move_to()
-		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE :
-			self.camera_x += CAMERA_MOVE_STEP
-		elif self.mouse_x <= CAMERA_MOVE_EDGE :
-			self.camera_x -= CAMERA_MOVE_STEP
-		if self.mouse_y <= CAMERA_MOVE_EDGE :
-			self.camera_y -= CAMERA_MOVE_STEP
-		elif self.mouse_y >= self.game.window.height - CAMERA_MOVE_EDGE :
-			self.camera_y += CAMERA_MOVE_STEP
-
-	def on_mouse_press(self, x, y, button, key_modifiers) :
-		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
-		if self.minimap.is_on_minimap_sprite(x, y) :
-			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
-			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
-			self.camera.move_to([self.camera_x, self.camera_y], 1)
-		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
-		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
-			pass
-		elif button == arcade.MOUSE_BUTTON_LEFT:
-			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			if closest_unit_sprites :
-				self.game.game_controller.select(closest_unit_sprites)
-			else:
-				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
-				if closest_zone_sprites :
-					self.game.game_controller.select_zone(closest_zone_sprites)
-
-		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			# if units_at_point:
-			# 	print("unit!")
-			# else
-			if self.is_a_unit(mouse_position_in_game):
-				self.game.game_controller.order_move(mouse_position_in_game)
-
-		elif button == arcade.MOUSE_BUTTON_MIDDLE:
-			print(f"position de la souris : {mouse_position_in_game}")
-			print(f"position sur la grille : {iso_to_grid_pos(mouse_position_in_game)}")
-			pos = mouse_position_in_game
-			grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
-			grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
-			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
-
-	def get_closest_sprites(self, mouse_position_in_game, sprite_list):
-		sprites_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list)
-		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
-		return sprites_at_point_sorted
-
-	def is_a_unit(self, mouse_position_in_game):
-		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.unit_sprite_list)
-	def is_a_zone(self, mouse_position_in_game):
-		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.zone_sprite_list)
-
-	def on_key_press(self, symbol, modifier):
-		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-		grid_pos = iso_to_grid_pos(mouse_position_in_game)
-		if self.mode == "move":
-			if symbol == arcade.key.F : # cheat window
-				self.triggerCheatInput()
-			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-				self.game.game_controller.order_harvest(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-			elif symbol == arcade.key.B:
-				self.mode = "build"
-				print("build mode!")
-		elif self.mode == "build":
-			if symbol == arcade.key.H: # Build something
-				self.game.game_controller.order_build(grid_pos, "House")
-			elif symbol == arcade.key.S:
-				self.game.game_controller.order_build(grid_pos, "StoragePit")
-			elif symbol == arcade.key.G:
-				self.game.game_controller.order_build(grid_pos, "Granary")
-			elif symbol == arcade.key.B:
-				self.game.game_controller.order_build(grid_pos, "Barracks")
-			# elif symbol == arcade.key.D:
-			# 	self.game.game_controller.order_build(grid_pos, "Dock")
-			self.mode = "move"
-			print("move mode!")
-
-
-	def on_mouse_motion(self, x, y, dx, dy):
-		"""Called whenever the mouse moves."""
-		# Update the coords of the mouse
-		self.mouse_x = x
-		self.mouse_y = y
-
-	def triggerCheatInput(self) :
-		if self.display_cheat_input :
-			self.manager.remove(self.cheat_pane)
-			self.cheat_pane.child.reset_text()
-		else :
-			self.manager.add(self.cheat_pane)
-		self.display_cheat_input = not self.display_cheat_input
+	def update_vbox1(self):
+		player_resources = self.game.player.resource
+		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		for label, resource_text in zip(self.resource_label_list, resources_tab):
+			label.text = resource_text
 
 	# test pour les coins mais dois bouger TODO
 	def trigger_coin_GUI(self, selected_list) :
@@ -441,24 +481,3 @@ class View():
 
 			coin_button3 = ConstructButton(image="Ressources/img/zones/buildables/Tower.png",construct=None)
 			self.v_box6.add(coin_button3.with_space_around(15,15,15,15,arcade.color.BRONZE))
-
-	def on_hide_view(self) :
-		self.manager.disable()
-
-	def discard_sprite(self, dead_sprite):
-		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
-			self.unit_sprite_list.remove(dead_sprite)
-		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.zone_sprite_list:
-			self.zone_sprite_list.remove(dead_sprite)
-
-	def add_sprite(self, new_sprite):
-		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.unit_sprite_list:
-			self.unit_sprite_list.append(new_sprite)
-		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
-			self.zone_sprite_list.append(new_sprite)
-
-	def draw_health_bar(self, pos, health, max_health, color):
-		if max_health:
-			y_offset = 10
-			arcade.draw_rectangle_filled(pos.x, pos.y - y_offset, 36, 12, arcade.color.GRAY)
-			arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - y_offset, (health*32)/max_health, 8, color)
