@@ -11,6 +11,9 @@ from CONSTANTS import DEFAULT_MAP_SIZE, Resource
 #########################################################################
 
 class Controller():
+
+# --- Setup ---
+
 	def __init__(self, aoce_game):
 		""" Initializer """
 		self.game = aoce_game
@@ -24,51 +27,13 @@ class Controller():
 	def setup(self):
 		pass
 
-	def is_on_map(self, grid_position):
-		return grid_position.x >= 0 and grid_position.x < DEFAULT_MAP_SIZE and grid_position.y >= 0 and grid_position.y < DEFAULT_MAP_SIZE
-
-	def on_update(self, delta_time):
-		""" Movement and game logic """
-
-		# --- Action - Moving entities ---
-		for entity in self.moving_entities:
-			if entity.is_moving:
-				# Check if the next position is on the map
-				if not self.is_on_map(iso_to_grid_pos(entity.iso_position+entity.change)):
-					entity.is_moving = False
-				elif entity.iso_position.isalmost(entity.aim, entity.speed):
-					if entity.path:
-						entity.next_aim()
-					else:
-						entity.is_moving = False
-						if entity.aimed_entity:
-							self.interacting_entities.add(entity)
-
-				else:  # If it is not close to where it aims and not out of bounds, move.
-					entity.iso_position += entity.change
-					entity.sprite.update()
-
-		# --- Action - Interacting entities ---
-		for entity in self.interacting_entities:
-			if isinstance(entity.aimed_entity, Resources):
-				self.harvest_zone(entity, delta_time)
-			elif isinstance(entity.aimed_entity, Buildable):
-				self.build_zone(entity, delta_time)
 
 
-		# --- Updating Lists ---
-		if self.moving_entities:
-			self.moving_entities = {e for e in self.moving_entities if e.is_moving}
+# --- Adding/Discarding entities ---
 
-		if self.interacting_entities:
-			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
-
-
-		# --- Deleting dead entities ---
-		for dead_entity in self.dead_entities:
-			self.discard_entity_from_game(dead_entity)
-		self.dead_entities.clear()
-
+	def add_entity_to_game(self, new_entity):
+		self.game.game_model.add_entity(new_entity)
+		self.game.game_view.add_sprite(new_entity.sprite)
 
 	def discard_entity_from_game(self, dead_entity):
 		self.selection.discard(dead_entity)
@@ -77,9 +42,9 @@ class Controller():
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
 
-	def add_entity_to_game(self, new_entity):
-		self.game.game_model.add_entity(new_entity)
-		self.game.game_view.add_sprite(new_entity.sprite)
+
+
+# --- Selection (Called once) ---
 
 	def select(self, sprites_at_point):
 		#print(sprites_at_point)
@@ -107,7 +72,11 @@ class Controller():
 		zone.selected = True
 		self.selection.add(zone)
 
-	# Called once when you setup the movement
+
+
+# --- Order (Called once) ----
+
+	# Called once when you setup the movement of the selection
 	def move_selection(self, grid_position):
 		if self.is_on_map(grid_position):
 			for entity in self.selection:
@@ -214,6 +183,59 @@ class Controller():
 					print("Not a Villager!")
 		else:
 			print("not enough resources to build!")
+
+
+
+# --- On_update (Called every frame) ---
+
+	def on_update(self, delta_time):
+		""" Movement and game logic """
+
+		# --- Action - Moving entities ---
+		for entity in self.moving_entities:
+			if entity.is_moving:
+				# Check if the next position is on the map
+				if not self.is_on_map(iso_to_grid_pos(entity.iso_position+entity.change)):
+					entity.is_moving = False
+				elif entity.iso_position.isalmost(entity.aim, entity.speed):
+					if entity.path:
+						entity.next_aim()
+					else:
+						entity.is_moving = False
+						if entity.aimed_entity:
+							self.interacting_entities.add(entity)
+
+				else:  # If it is not close to where it aims and not out of bounds, move.
+					entity.iso_position += entity.change
+					entity.sprite.update()
+
+		# --- Action - Interacting entities ---
+		for entity in self.interacting_entities:
+			if isinstance(entity.aimed_entity, Resources):
+				self.harvest_zone(entity, delta_time)
+			elif isinstance(entity.aimed_entity, Buildable):
+				self.build_zone(entity, delta_time)
+
+
+		# --- Updating Lists ---
+		if self.moving_entities:
+			self.moving_entities = {e for e in self.moving_entities if e.is_moving}
+
+		if self.interacting_entities:
+			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
+
+
+		# --- Deleting dead entities ---
+		for dead_entity in self.dead_entities:
+			self.discard_entity_from_game(dead_entity)
+		self.dead_entities.clear()
+
+	def is_on_map(self, grid_position):
+		return grid_position.x >= 0 and grid_position.x < DEFAULT_MAP_SIZE and grid_position.y >= 0 and grid_position.y < DEFAULT_MAP_SIZE
+
+
+
+# --- Updating interaction (Called every frame) ---
 
 	# Called every frame
 	def build_zone(self, entity, delta_time):
