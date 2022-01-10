@@ -83,20 +83,29 @@ class Controller():
 
 	def select(self, sprites_at_point):
 		#print(sprites_at_point)
-		entity_found = None
+		unit_found = None
 		for entity in self.selection:
 			entity.selected = False
 		self.selection.clear()
 		for s in sprites_at_point:
 			entity = s.entity
 			if entity and isinstance(entity, Unit):
-				entity_found = entity
+				unit_found = entity
 				#print(iso_to_grid_pos(entity.iso_position))
 				break
-		if entity_found:
-			entity_found.selected = True
-			self.selection.add(entity_found)
+		if unit_found:
+			unit_found.selected = True
+			self.selection.add(unit_found)
 		self.game.game_view.trigger_coin_GUI(self.selection)
+
+	def select_zone(self, sprites_at_point):
+		for entity in self.selection:
+			entity.selected = False
+		self.selection.clear()
+		s = sprites_at_point[0]
+		zone = s.entity
+		zone.selected = True
+		self.selection.add(zone)
 
 	# Called once when you setup the movement
 	def move_selection(self, grid_position):
