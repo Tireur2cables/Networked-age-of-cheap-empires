@@ -5,8 +5,9 @@
 # 2) Never commit changes on this file (except to add lines), so that everyone still has his own version.
 # Note: If you add lines, remember to put the default values back before commiting.
 
-# Defaults, in this order: True, True, False
+# Defaults, in this order: True, True, False, False, False
 LAUNCH_FULLSCREEN = True
 LAUNCH_MUSIC = True
 LAUNCH_DEFAULT_MAP = False
 LAUNCH_DEBUG_DISPLAY = False
+LAUNCH_FAST_BUILD = False

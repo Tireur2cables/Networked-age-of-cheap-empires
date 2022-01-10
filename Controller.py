@@ -83,30 +83,36 @@ class Controller():
 
 	def select(self, sprites_at_point):
 		#print(sprites_at_point)
-		entity_found = None
+		unit_found = None
 		for entity in self.selection:
 			entity.selected = False
 		self.selection.clear()
 		for s in sprites_at_point:
 			entity = s.entity
 			if entity and isinstance(entity, Unit):
-				entity_found = entity
+				unit_found = entity
 				#print(iso_to_grid_pos(entity.iso_position))
 				break
-		if entity_found:
-			entity_found.selected = True
-			self.selection.add(entity_found)
+		if unit_found:
+			unit_found.selected = True
+			self.selection.add(unit_found)
 		self.game.game_view.trigger_coin_GUI(self.selection)
 
-	# Called once when you order to move
-	def move_selection(self, position, need_conversion=True):
-		position_grid = position
-		if need_conversion:
-			position_grid = iso_to_grid_pos(position)
-		if self.is_on_map(position_grid):
+	def select_zone(self, sprites_at_point):
+		for entity in self.selection:
+			entity.selected = False
+		self.selection.clear()
+		s = sprites_at_point[0]
+		zone = s.entity
+		zone.selected = True
+		self.selection.add(zone)
+
+	# Called once when you setup the movement
+	def move_selection(self, grid_position):
+		if self.is_on_map(grid_position):
 			for entity in self.selection:
 				self.moving_entities.add(entity)
-				path = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=position_grid)
+				path = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 				# print(grid.grid_str(path=path, start=start, end=end))
 				if path:
 					path.pop(0)
@@ -122,8 +128,15 @@ class Controller():
 			print("out of bound!")
 			return False
 
+	# Called once when you order to move
+	def order_move(self, iso_position):
+		grid_position = iso_to_grid_pos(iso_position)
+		for entity in self.selection:
+			entity.aimed_entity = None
+		self.move_selection(grid_position)
+
 	# Called once when you order an action on a zone
-	def action_on_zone(self, sprites_at_point):
+	def order_harvest(self, sprites_at_point):
 		# Step 1: Search for a zone in the sprites_at_point
 		zone_found = None
 		for s in sprites_at_point:
@@ -134,57 +147,88 @@ class Controller():
 
 		if zone_found is not None:
 			for entity in self.selection:
-				# Step 2: Search the closest tile near the zone_found to harvest it.
-				z_grid_pos = iso_to_grid_pos(zone_found.iso_position)
+				if isinstance(entity, Villager):
+					# Step 2: Search the closest tile near the zone_found to harvest it.
+					z_grid_pos = iso_to_grid_pos(zone_found.iso_position)
 
-				aimed_tile = None
-				min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
-				entity_grid_position = iso_to_grid_pos(entity.iso_position)
-				for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
-					path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
-					if path:
-						path.pop()
+					aimed_tile = None
+					min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
+					entity_grid_position = iso_to_grid_pos(entity.iso_position)
+					for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
+						path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
 						if path:
-							path_len = len(path)
-							if min_path_len > path_len:
-								aimed_tile = tile
-								min_path_len = path_len
-						else:
-							self.interacting_entities.add(entity)
-							entity.aimed_entity = zone_found
-							aimed_tile = None
-							break
+							path.pop()
+							if path:
+								path_len = len(path)
+								if min_path_len > path_len:
+									aimed_tile = tile
+									min_path_len = path_len
+							else:
+								self.interacting_entities.add(entity)
+								entity.aimed_entity = zone_found
+								aimed_tile = None
+								break
 
-				# Step 3: Start moving toward the aimed entity
-				if aimed_tile is not None:
-					entity.action_timer = 0
-					entity.aimed_entity = zone_found
-					self.move_selection(aimed_tile.grid_position, need_conversion=False)
+					# Step 3: Start moving toward the aimed entity
+					if aimed_tile is not None:
+						entity.action_timer = 0
+						entity.aimed_entity = zone_found
+						self.move_selection(aimed_tile.grid_position)
+				else:
+					print("Not a villager!")
 
 	# Called once
-	def build_on_tiles(self, map_position):
-		# Step 1: Start moving toward the aimed map_position
-		for entity in self.selection:
-			entity.action_timer = 0
-			entity.aimed_entity = House(map_position)
-			for i in range(entity.aimed_entity.tile_size[0]):
-				for j in range(entity.aimed_entity.tile_size[1]):
-					tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
-					if tile.pointer_to_entity is not None or tile.is_free == 0:
-						entity.aimed_entity = None
-						return
-			self.move_selection(map_position - Vector(1, 1), need_conversion=False)
+	def order_build(self, map_position, building_name):
+		# Step 1: Find which building building_name is
+		building = None
+		if building_name == "House":
+			building = House(map_position)
+		elif building_name == "StoragePit":
+			building = StoragePit(map_position)
+		elif building_name == "Granary":
+			building = Granary(map_position)
+		elif building_name == "Barracks":
+			building = Barracks(map_position)
+		elif building_name == "Dock":
+			building = Dock(map_position)
+
+		assert isinstance(building, Buildable)
+
+		if self.game.player.get_resource(building.cost[0]) > building.cost[1]:
+
+			# Step 2: Search for an entity that can build: a Villager.
+			for entity in self.selection:
+				if isinstance(entity, Villager):
+					entity.action_timer = 0
+					entity.aimed_entity = building
+					# Step 3: Start searching if it is possible to move toward the aimed map_position
+					for i in range(entity.aimed_entity.tile_size[0]):
+						for j in range(entity.aimed_entity.tile_size[1]):
+							tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
+							if tile.pointer_to_entity is not None or tile.is_free == 0:
+								entity.aimed_entity = None
+								return
+					# Step 4: if possible (no return), move one tile below the first tile of the building.
+					self.move_selection(map_position - Vector(1, 1))
+				else:
+					print("Not a Villager!")
+		else:
+			print("not enough resources to build!")
 
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
 		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
-			self.game.player.sub_resource(*entity.aimed_entity.cost)
-			self.game.game_view.update_vbox1()
-			entity.action_timer = 0
-			self.add_entity_to_game(entity.aimed_entity)
-			entity.aimed_entity = None
-
+			if self.game.player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:
+				self.game.player.sub_resource(*entity.aimed_entity.cost)
+				self.game.game_view.update_vbox1()
+				entity.action_timer = 0
+				self.add_entity_to_game(entity.aimed_entity)
+				entity.aimed_entity = None
+			else:
+				print("not enough resources to build!")
+				entity.action_timer = 0
+				entity.aimed_entity = None
 
 	# Called every frame when an action is done on a zone (harvesting).
 	def harvest_zone(self, entity, delta_time):
@@ -192,13 +236,14 @@ class Controller():
 		if entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
+			print(f"[harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
 			harvested = aimed_entity.harvest(entity.damage)
-			print(f"[harvesting] entity health = {entity.health} - zone health = {aimed_entity.health}")
-			if harvested:
+			if harvested > 0:
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
 				# print(entity.resource)
 				self.game.player.add_resource(aimed_entity.get_resource_nbr(), harvested)
 				self.game.game_view.update_vbox1()
+			elif harvested == -1:
 				entity.aimed_entity = None
 				self.dead_entities.add(aimed_entity)

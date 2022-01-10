@@ -47,6 +47,8 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.zone_sprite_list = arcade.SpriteList()
 
+		self.mode = "move"
+
 	def get_tile_outline(self, map_position):
 		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
 		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
@@ -198,26 +200,37 @@ class View():
 		arcade.start_render()
 
 		# --- Object sprite lists : Tiles, Zones & Entities
-		self.tile_sprite_list.draw()
+		self.tile_sprite_list.draw(pixelated=True)
 
-		for i in self.zone_sprite_list:
-			i.draw()
+		for s in self.zone_sprite_list:
+			zone = s.entity
+			if zone.selected:
+				for x in range(zone.tile_size[0]):
+					for y in range(zone.tile_size[1]):
+						tile_outline = self.get_tile_outline(grid_pos_to_iso(iso_to_grid_pos(zone.iso_position) + Vector(x, y)))
+						arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+						self.draw_health_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
-				self.draw_iso_position(i.entity.iso_position)
+				self.draw_iso_position(s.entity.iso_position)
 
-		for i in self.unit_sprite_list:
-			if i.entity.selected:
-				i.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_grid_pos(i.entity.iso_position)
+		for s in self.unit_sprite_list:
+			entity = s.entity
+			if entity.selected:
+				s.draw_hit_box((255, 0, 0), line_thickness=3)
+				map_position = iso_to_grid_pos(entity.iso_position)
 				# tile_below = self.game.game_model.map.get_tile_at(map_position)
 				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
-			i.draw()
+				self.draw_health_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
+				if (aimed_entity := s.entity.aimed_entity) and isinstance(aimed_entity, Resources):
+					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE)
+			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
-				self.draw_iso_position(i.entity.iso_position)
+				self.draw_iso_position(entity.iso_position)
 
 		if LAUNCH_DEBUG_DISPLAY:
 			for x in range(3):
@@ -242,7 +255,6 @@ class View():
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
-
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -331,14 +343,21 @@ class View():
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
 			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT:
-			self.game.game_controller.select(self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list))
+			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+			if closest_unit_sprites :
+				self.game.game_controller.select(closest_unit_sprites)
+			else:
+				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
+				if closest_zone_sprites :
+					self.game.game_controller.select_zone(closest_zone_sprites)
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
 			# if units_at_point:
 			# 	print("unit!")
-			# else:
-			self.game.game_controller.move_selection(mouse_position_in_game)
+			# else
+			if self.is_a_unit(mouse_position_in_game):
+				self.game.game_controller.order_move(mouse_position_in_game)
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -353,18 +372,36 @@ class View():
 		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
 		return sprites_at_point_sorted
 
+	def is_a_unit(self, mouse_position_in_game):
+		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.unit_sprite_list)
+	def is_a_zone(self, mouse_position_in_game):
+		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.zone_sprite_list)
+
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		grid_pos = iso_to_grid_pos(mouse_position_in_game)
-		if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
-			tCent = TownCenter(grid_pos)
-			self.game.game_controller.add_entity_to_game(tCent)
-		elif symbol == arcade.key.F : # cheat window
-			self.triggerCheatInput()
-		elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-			self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-		elif symbol == arcade.key.B: # Build something
-			self.game.game_controller.build_on_tiles(grid_pos)
+		if self.mode == "move":
+			if symbol == arcade.key.F : # cheat window
+				self.triggerCheatInput()
+			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+				self.game.game_controller.order_harvest(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+			elif symbol == arcade.key.B:
+				self.mode = "build"
+				print("build mode!")
+		elif self.mode == "build":
+			if symbol == arcade.key.H: # Build something
+				self.game.game_controller.order_build(grid_pos, "House")
+			elif symbol == arcade.key.S:
+				self.game.game_controller.order_build(grid_pos, "StoragePit")
+			elif symbol == arcade.key.G:
+				self.game.game_controller.order_build(grid_pos, "Granary")
+			elif symbol == arcade.key.B:
+				self.game.game_controller.order_build(grid_pos, "Barracks")
+			# elif symbol == arcade.key.D:
+			# 	self.game.game_controller.order_build(grid_pos, "Dock")
+			self.mode = "move"
+			print("move mode!")
+
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
@@ -419,3 +456,9 @@ class View():
 			self.unit_sprite_list.append(new_sprite)
 		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
 			self.zone_sprite_list.append(new_sprite)
+
+	def draw_health_bar(self, pos, health, max_health, color):
+		if max_health:
+			y_offset = 10
+			arcade.draw_rectangle_filled(pos.x, pos.y - y_offset, 36, 12, arcade.color.GRAY)
+			arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - y_offset, (health*32)/max_health, 8, color)

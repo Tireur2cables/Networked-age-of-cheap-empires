@@ -3,8 +3,9 @@ from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
 
-# ----- GENERAL CLASS -----
+from LAUNCH_SETUP import LAUNCH_FAST_BUILD
 
+# ----- GENERAL CLASS -----
 class Zone(Entity):
 	def __init__(self, grid_position, tile_size=(1, 1), is_locking=False, **kwargs):#constructeur : initialise les attributs
 		iso_position = grid_pos_to_iso(grid_position)
@@ -79,11 +80,11 @@ class TownCenter(Buildable):
 	#Equiv AOE2: TownCenter
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=1, y_offset=253//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		health=600,
 		cost=(Res.WOOD, 200),
-		build_time=60,
-		tile_size=(3,3),
+		build_time=2 if LAUNCH_FAST_BUILD else 60,
+		tile_size=(4, 4), # (3, 3) sur AOE
 		line_sight=7)
 
 class Barracks(Buildable):
@@ -91,34 +92,34 @@ class Barracks(Buildable):
 		#Equiv AOE2: Barracks
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
 		health=350,
 		cost=(Res.WOOD, 125),
-		build_time=30,
-		tile_size=(3,3))
+		build_time=2 if LAUNCH_FAST_BUILD else 30,
+		tile_size=(3, 3))
 
 class StoragePit(Buildable):
 		#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)
 		#Size : 3x3
 		#LineOfSight:4
-		#Equiv AOE2: Lumber Camp & Miner Camp
+		#Equiv AOE2: Lumber Camp & Mining Camp
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
 		health=350,
 		cost=(Res.WOOD, 120),
-		build_time=30,
-		tile_size=(3, 3)) # (2, 2) sur AOE2
+		build_time=2 if LAUNCH_FAST_BUILD else 30,
+		tile_size=(2, 2)) # (3, 3) sur AOE, (2, 2) sur AOE2
 
 class Granary(Buildable):
 		#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
 		#Equiv AOE2: Mill
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15),
 		health=350,
 		cost=(Res.WOOD, 120),
-		build_time=30,
+		build_time=2 if LAUNCH_FAST_BUILD else 30,
 		tile_size=(2, 2))
 
 
@@ -127,10 +128,10 @@ class Dock(Buildable):
 		#Equiv AOE2: Dock
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=None,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10),
 		health=600,
 		cost=(Res.WOOD, 100),
-		build_time=35,
+		build_time=2 if LAUNCH_FAST_BUILD else 35,
 		tile_size=(3, 3))
 
 class House(Buildable):
@@ -138,10 +139,10 @@ class House(Buildable):
 		#Equiv AOE2: House
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.8, y_offset=126//2 - TILE_HEIGHT),
+		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10),
 		health=75,
 		cost=(Res.WOOD, 30),
-		build_time=25,
+		build_time=2 if LAUNCH_FAST_BUILD else 25,
 		tile_size=(2, 2))
 
 
@@ -161,25 +162,33 @@ class Resources(Zone):
 	def __init__(self, grid_position, amount, **kwargs):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
 		self.amount = amount
+		self.max_amount = self.amount
 
 	def __getstate__(self):
-		return [self.get_grid_position(), self.is_locking,self.sprite_data, self.health, self.amount]
+		return [self.get_grid_position(), self.is_locking, self.sprite_data, self.health, self.amount, self.max_amount]
 	def __setstate__(self, data):
 		super().__init__(data[0])
 		self.is_locking=data[1]
 		self.sprite_data=data[2]
 		self.health = data[3]
 		self.amount=data[4]
+		self.max_amount=data[5]
 
 	def get_resource_nbr(self):
-		return Res[type(self).__name__.upper()]
+		name = type(self).__name__.upper()
+		enum_name = name if name != "BERRYBUSH" else "FOOD"
+		return Res[enum_name]
 
 	def harvest(self, dmg):
-		self.health -= dmg
 		if self.health > 0:
+			self.health -= dmg
 			return 0
 		else:
-			return self.amount
+			if self.amount > 0:
+				self.amount -= 1
+				return 1
+			else:
+				return -1
 
 
 # -------------------------
@@ -190,20 +199,28 @@ class Wood(Resources):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT//2 + 5),
 		health=25,
-		amount=75)
+		amount=10)
 
 class Stone(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
-		health=25,  # I don't know the values
-		amount=25)  # I don't know the values
+		health=0,
+		amount=250)
 
 class Gold(Resources):
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
-		health=25,  # I don't know the values
-		amount=10)  # I don't know the values
+		health=0,
+		amount=450)
+
+class BerryBush(Resources):
+	def __init__(self, grid_position):
+		super().__init__(grid_position,
+		is_locking=True,
+		sprite_data=SpriteData("Ressources/img/zones/resources/berrybush.png", scale=1, y_offset=63//2 - TILE_HEIGHT//2),
+		health=0,
+		amount=150)
