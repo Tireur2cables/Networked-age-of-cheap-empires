@@ -31,6 +31,34 @@ class Controller():
 
 
 
+# --- Utility methods ---
+	@staticmethod
+	def filter_type(type):
+		return lambda entity: isinstance(entity, type)
+	@staticmethod
+	def filter_faction(faction):
+		return lambda entity: entity.faction == faction
+	@staticmethod
+	def filter_both(type, faction):
+		return lambda entity: isinstance(entity, type) and entity.faction == faction
+
+	@staticmethod
+	def find_entity_in_sprites(sprites_collection, filter):
+		for s in sprites_collection:
+			entity = s.entity
+			if entity and filter(entity):
+				return entity
+		return None
+
+	@staticmethod
+	def find_entity(entity_collection, filter):
+		for e in entity_collection:
+			if e and filter(e):
+				return e
+		return None
+
+
+
 # --- Adding/Discarding entities ---
 
 	def add_entity_to_game(self, new_entity):
@@ -52,26 +80,15 @@ class Controller():
 
 	def select(self, faction, sprites_at_point):
 		self.clear_faction_selection(faction)
-		#print(sprites_at_point)
-		unit_found = None
-		for s in sprites_at_point:
-			entity = s.entity
-			if entity and isinstance(entity, Unit) and entity.faction == faction:
-				unit_found = entity
-				#print(iso_to_grid_pos(entity.iso_position))
-				break
-		if unit_found:
+		unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(Unit, faction))
+		if unit_found is not None:
 			unit_found.selected = True
 			self.selection[faction].add(unit_found)
-		self.game.game_view.trigger_coin_GUI(self.selection)
+			self.game.game_view.trigger_coin_GUI(self.selection)
 
 	def select_zone(self, faction, sprites_at_point):
 		self.clear_faction_selection(faction)
-		zone_found = None
-		for s in sprites_at_point:
-			zone = s.entity
-			if zone.faction == faction:
-				zone_found = zone
+		zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
 		if zone_found:
 			zone_found.selected = True
 			self.selection[faction].add(zone_found)
@@ -121,24 +138,16 @@ class Controller():
 	# Called once when you order to move
 	def order_move(self, faction, iso_position):
 		grid_position = iso_to_grid_pos(iso_position)
-		found_entity = False
-		for entity in self.selection[faction]:
-			if isinstance(entity, Unit):
-				entity.aimed_entity = None
-				found_entity = True
-				break
-		if found_entity:
+		found_entity = self.find_entity(self.selection[faction], self.filter_type(Unit))
+
+		if found_entity is not None:
+			found_entity.aimed_entity = None
 			self.move_selection(faction, grid_position)
 
 	# Called once when you order an action on a zone
 	def order_harvest(self, faction, sprites_at_point):
 		# Step 1: Search for a zone in the sprites_at_point
-		zone_found = None
-		for s in sprites_at_point:
-			e = s.entity
-			if e and isinstance(e, Zone):
-				zone_found = e
-				break
+		zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
 
 		if zone_found is not None:
 			for entity in self.selection[faction]:

@@ -297,12 +297,14 @@ class View():
 			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT:
 			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			if closest_unit_sprites :
+			if closest_unit_sprites:
 				self.game.game_controller.select("player", closest_unit_sprites)
 			else:
 				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
-				if closest_zone_sprites :
+				if closest_zone_sprites:
 					self.game.game_controller.select_zone("player", closest_zone_sprites)
+				else:
+					self.game.game_controller.clear_faction_selection("player")
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
