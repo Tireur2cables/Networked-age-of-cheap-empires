@@ -86,6 +86,9 @@ class TownCenter(Buildable):
 		build_time=2 if LAUNCH_FAST_BUILD else 60,
 		tile_size=(4, 4), # (3, 3) sur AOE
 		line_sight=7)
+		self.villager_cooldown = 20  # in seconds
+		self.villager_cost = (Res.FOOD, 50)
+		self.is_producing = False
 
 class Barracks(Buildable):
 		#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)

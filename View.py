@@ -309,8 +309,7 @@ class View():
 			# if units_at_point:
 			# 	print("unit!")
 			# else
-			if self.is_a_unit(mouse_position_in_game):
-				self.game.game_controller.order_move(mouse_position_in_game)
+			self.game.game_controller.order_move(mouse_position_in_game)
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -323,37 +322,36 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		grid_pos = iso_to_grid_pos(mouse_position_in_game)
-		if self.mode == "move":
-			if symbol == arcade.key.F : # cheat window
-				self.triggerCheatInput()
-			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-				self.game.game_controller.order_harvest(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-			elif symbol == arcade.key.B:
-				self.mode = "build"
-				print("build mode!")
-		elif self.mode == "build":
-			if symbol == arcade.key.H: # Build something
-				self.game.game_controller.order_build(grid_pos, "House")
-			elif symbol == arcade.key.S:
-				self.game.game_controller.order_build(grid_pos, "StoragePit")
-			elif symbol == arcade.key.G:
-				self.game.game_controller.order_build(grid_pos, "Granary")
-			elif symbol == arcade.key.B:
-				self.game.game_controller.order_build(grid_pos, "Barracks")
-			# elif symbol == arcade.key.D:
-			# 	self.game.game_controller.order_build(grid_pos, "Dock")
-			self.mode = "move"
-			print("move mode!")
+		if self.game.game_controller.unit_in_selection():
+			if self.mode == "move":
+				if symbol == arcade.key.F: # cheat window
+					self.triggerCheatInput()
+				elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+					self.game.game_controller.order_harvest(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+				elif symbol == arcade.key.B:
+					self.mode = "build"
+					print("build mode!")
+			elif self.mode == "build":
+				if symbol == arcade.key.H: # Build something
+					self.game.game_controller.order_build(grid_pos, "House")
+				elif symbol == arcade.key.S:
+					self.game.game_controller.order_build(grid_pos, "StoragePit")
+				elif symbol == arcade.key.G:
+					self.game.game_controller.order_build(grid_pos, "Granary")
+				elif symbol == arcade.key.B:
+					self.game.game_controller.order_build(grid_pos, "Barracks")
+				# elif symbol == arcade.key.D:
+				# 	self.game.game_controller.order_build(grid_pos, "Dock")
+				self.mode = "move"
+				print("move mode!")
+		else:
+			if symbol == arcade.key.V:
+				self.game.game_controller.order_zone_villagers()
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list):
 		sprites_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list)
 		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
 		return sprites_at_point_sorted
-
-	def is_a_unit(self, mouse_position_in_game):
-		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.unit_sprite_list)
-	def is_a_zone(self, mouse_position_in_game):
-		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.zone_sprite_list)
 
 
 
@@ -451,7 +449,7 @@ class View():
 		)
 		self.coord_label.fit_content()
 
-	def update_vbox1(self):
+	def update_resources_gui(self):
 		player_resources = self.game.player.resource
 		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 		for label, resource_text in zip(self.resource_label_list, resources_tab):

@@ -22,6 +22,7 @@ class Controller():
 		self.selection = set()
 		self.moving_entities = set()
 		self.interacting_entities = set()
+		self.producing_entities = set()
 		self.dead_entities = set()
 
 	def setup(self):
@@ -39,6 +40,7 @@ class Controller():
 		self.selection.discard(dead_entity)
 		self.moving_entities.discard(dead_entity)
 		self.interacting_entities.discard(dead_entity)
+		self.producing_entities.discard(dead_entity)
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
 
@@ -47,11 +49,9 @@ class Controller():
 # --- Selection (Called once) ---
 
 	def select(self, sprites_at_point):
+		self.clear_selection()
 		#print(sprites_at_point)
 		unit_found = None
-		for entity in self.selection:
-			entity.selected = False
-		self.selection.clear()
 		for s in sprites_at_point:
 			entity = s.entity
 			if entity and isinstance(entity, Unit):
@@ -64,13 +64,28 @@ class Controller():
 		self.game.game_view.trigger_coin_GUI(self.selection)
 
 	def select_zone(self, sprites_at_point):
-		for entity in self.selection:
-			entity.selected = False
-		self.selection.clear()
+		self.clear_selection()
 		s = sprites_at_point[0]
 		zone = s.entity
 		zone.selected = True
 		self.selection.add(zone)
+
+	def clear_selection(self):
+		for entity in self.selection:
+			entity.selected = False
+		self.selection.clear()
+
+	def unit_in_selection(self):
+		for entity in self.selection:
+			if isinstance(entity, Unit):
+				return True
+		return False
+
+	def zone_in_selection(self):
+		for entity in self.selection:
+			if isinstance(entity, Zone):
+				return True
+		return False
 
 
 
@@ -100,9 +115,14 @@ class Controller():
 	# Called once when you order to move
 	def order_move(self, iso_position):
 		grid_position = iso_to_grid_pos(iso_position)
+		found_entity = False
 		for entity in self.selection:
-			entity.aimed_entity = None
-		self.move_selection(grid_position)
+			if isinstance(entity, Unit):
+				entity.aimed_entity = None
+				found_entity = True
+				break
+		if found_entity:
+			self.move_selection(grid_position)
 
 	# Called once when you order an action on a zone
 	def order_harvest(self, sprites_at_point):
@@ -184,6 +204,15 @@ class Controller():
 		else:
 			print("not enough resources to build!")
 
+	def order_zone_villagers(self):
+		for entity in self.selection:
+			if isinstance(entity, TownCenter):
+				tc = entity
+				if not tc.is_producing and self.game.player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1]:
+					tc.is_producing = True
+					self.game.player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
+					self.game.game_view.update_resources_gui()
+					self.producing_entities.add(tc)
 
 
 # --- On_update (Called every frame) ---
@@ -216,6 +245,9 @@ class Controller():
 			elif isinstance(entity.aimed_entity, Buildable):
 				self.build_zone(entity, delta_time)
 
+		for entity in self.producing_entities:
+			if isinstance(entity, TownCenter):
+				self.produce_villagers(entity, delta_time)
 
 		# --- Updating Lists ---
 		if self.moving_entities:
@@ -223,6 +255,9 @@ class Controller():
 
 		if self.interacting_entities:
 			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
+
+		if self.producing_entities:
+			self.producing_entities = {e for e in self.producing_entities if e.is_producing}
 
 
 		# --- Deleting dead entities ---
@@ -243,14 +278,12 @@ class Controller():
 		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
 			if self.game.player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:
 				self.game.player.sub_resource(*entity.aimed_entity.cost)
-				self.game.game_view.update_vbox1()
-				entity.action_timer = 0
+				self.game.game_view.update_resources_gui()
 				self.add_entity_to_game(entity.aimed_entity)
-				entity.aimed_entity = None
 			else:
 				print("not enough resources to build!")
-				entity.action_timer = 0
-				entity.aimed_entity = None
+			entity.action_timer = 0
+			entity.aimed_entity = None
 
 	# Called every frame when an action is done on a zone (harvesting).
 	def harvest_zone(self, entity, delta_time):
@@ -265,7 +298,15 @@ class Controller():
 				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
 				# print(entity.resource)
 				self.game.player.add_resource(aimed_entity.get_resource_nbr(), harvested)
-				self.game.game_view.update_vbox1()
+				self.game.game_view.update_resources_gui()
 			elif harvested == -1:
 				entity.aimed_entity = None
 				self.dead_entities.add(aimed_entity)
+
+	def produce_villagers(self, tc, delta_time):
+		tc.action_timer += delta_time
+		if tc.action_timer > tc.villager_cooldown:
+			tc.action_timer = 0
+			tc.is_producing = False
+			grid_position = iso_to_grid_pos(tc.iso_position) - Vector(1, 1)
+			self.add_entity_to_game(Villager(grid_pos_to_iso(grid_position)))
