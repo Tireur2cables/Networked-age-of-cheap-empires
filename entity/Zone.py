@@ -63,8 +63,8 @@ class Buildable(Zone):
 
 class WorkSite(Zone):
 	# == In progess building, Not Implemented Yet.
-	def __init__(self, grid_position, zone_to_build, **kwargs):
-		super().__init__(grid_position, **kwargs)
+	def __init__(self, grid_position, faction, zone_to_build, **kwargs):
+		super().__init__(grid_position, faction, **kwargs)
 		self.zone_to_build = zone_to_build
 
 
@@ -78,9 +78,10 @@ class TownCenter(Buildable):
 	#Size: 3x3
 	#LineOfSight : 7
 	#Equiv AOE2: TownCenter
-	def __init__(self, grid_position):
+	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
+		faction=faction,
 		health=600,
 		cost=(Res.WOOD, 200),
 		build_time=2 if LAUNCH_FAST_BUILD else 60,
@@ -93,9 +94,10 @@ class TownCenter(Buildable):
 class Barracks(Buildable):
 		#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
 		#Equiv AOE2: Barracks
-	def __init__(self, grid_position):
+	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
+		faction=faction,
 		health=350,
 		cost=(Res.WOOD, 125),
 		build_time=2 if LAUNCH_FAST_BUILD else 30,
@@ -106,8 +108,9 @@ class StoragePit(Buildable):
 		#Size : 3x3
 		#LineOfSight:4
 		#Equiv AOE2: Lumber Camp & Mining Camp
-	def __init__(self, grid_position):
+	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
+		faction=faction,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
 		health=350,
 		cost=(Res.WOOD, 120),
@@ -117,9 +120,10 @@ class StoragePit(Buildable):
 class Granary(Buildable):
 		#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
 		#Equiv AOE2: Mill
-	def __init__(self, grid_position):
+	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15),
+		faction=faction,
 		health=350,
 		cost=(Res.WOOD, 120),
 		build_time=2 if LAUNCH_FAST_BUILD else 30,
@@ -129,9 +133,10 @@ class Granary(Buildable):
 class Dock(Buildable):
 		#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
 		#Equiv AOE2: Dock
-	def __init__(self, grid_position):
+	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10),
+		faction=faction,
 		health=600,
 		cost=(Res.WOOD, 100),
 		build_time=2 if LAUNCH_FAST_BUILD else 35,
@@ -140,9 +145,10 @@ class Dock(Buildable):
 class House(Buildable):
 		#WhoAmI : Cost : 30 Wood; Use : +4 population per house
 		#Equiv AOE2: House
-	def __init__(self, grid_position):
+	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10),
+		faction=faction,
 		health=75,
 		cost=(Res.WOOD, 30),
 		build_time=2 if LAUNCH_FAST_BUILD else 25,

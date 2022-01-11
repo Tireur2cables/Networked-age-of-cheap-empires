@@ -42,7 +42,7 @@ class Map():
 				elif object == "berry":
 					self.objects_array[x][y] = BerryBush(Vector(x, y))
 				elif object is not None and "spawn" in object:
-					self.spawn_array.append((Vector(x, y), int(object.split("_")[1])))
+					self.spawn_array.append((Vector(x, y), object.split("_")[1]))
 				if self.objects_array[x][y] and self.objects_array[x][y].is_locking:
 					self.tile_array[x][y].is_free = 0
 

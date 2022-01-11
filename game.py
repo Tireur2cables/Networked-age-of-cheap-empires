@@ -98,9 +98,10 @@ class GameView(arcade.View):
 
 	def setup(self, ressources, ia, isPlayer):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		self.game_model.setup(ressources, ia, isPlayer)
+		players = ("player", "ai")
+		self.game_model.setup(ressources, players)
 		self.game_view.setup()
-		self.game_controller.setup()
+		self.game_controller.setup(players)
 		self.player.setup(ressources)
 
 	def on_update(self, *args):  # Redirecting on_update to the Controller

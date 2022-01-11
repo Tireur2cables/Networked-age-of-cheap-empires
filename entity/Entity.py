@@ -16,7 +16,7 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, iso_position, sprite_data, health=-1, max_health=-1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+	def __init__(self, iso_position, sprite_data, faction="None", health=-1, max_health=-1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
 
 		# Position
 		self.iso_position = iso_position
@@ -24,6 +24,9 @@ class Entity:
 		# Sprite
 		self.sprite_data = sprite_data
 		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="Simple")
+
+		# Faction
+		self.faction = faction
 
 		# Backend
 		self.action_timer = 0
@@ -46,7 +49,7 @@ class Entity:
 		self.line_sight = line_sight
 
 	def __getstate__(self):
-		return [self.iso_position, self.sprite_data, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
+		return [self.iso_position, self.sprite_data, self.faction, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
 	def __setstate__(self, data):
 		# Position
 		self.iso_position = data[0]

@@ -20,7 +20,7 @@ class Player:
 
 		# unit
 		self.nb_unit = 0
-		self.max_unit = 5
+		self.max_unit = 4
 
 	def setup(self, resources):
 		self.resource = resources

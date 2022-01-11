@@ -19,14 +19,15 @@ class Controller():
 		self.game = aoce_game
 
 		# Selection (will contain elements of type Entity)
-		self.selection = set()
+		self.selection = dict()  # self.section ---> convert to a dict, the key is "player" or "ai_1" or "ai_2" or ...
 		self.moving_entities = set()
 		self.interacting_entities = set()
 		self.producing_entities = set()
 		self.dead_entities = set()
 
-	def setup(self):
-		pass
+	def setup(self, players):
+		for p in players:
+			self.selection[p] = set()
 
 
 
@@ -37,7 +38,8 @@ class Controller():
 		self.game.game_view.add_sprite(new_entity.sprite)
 
 	def discard_entity_from_game(self, dead_entity):
-		self.selection.discard(dead_entity)
+		if (selection_set := self.selection.get(dead_entity.faction)):
+			selection_set.discard(dead_entity)
 		self.moving_entities.discard(dead_entity)
 		self.interacting_entities.discard(dead_entity)
 		self.producing_entities.discard(dead_entity)
@@ -48,41 +50,45 @@ class Controller():
 
 # --- Selection (Called once) ---
 
-	def select(self, sprites_at_point):
-		self.clear_selection()
+	def select(self, faction, sprites_at_point):
+		self.clear_faction_selection(faction)
 		#print(sprites_at_point)
 		unit_found = None
 		for s in sprites_at_point:
 			entity = s.entity
-			if entity and isinstance(entity, Unit):
+			if entity and isinstance(entity, Unit) and entity.faction == faction:
 				unit_found = entity
 				#print(iso_to_grid_pos(entity.iso_position))
 				break
 		if unit_found:
 			unit_found.selected = True
-			self.selection.add(unit_found)
+			self.selection[faction].add(unit_found)
 		self.game.game_view.trigger_coin_GUI(self.selection)
 
-	def select_zone(self, sprites_at_point):
-		self.clear_selection()
-		s = sprites_at_point[0]
-		zone = s.entity
-		zone.selected = True
-		self.selection.add(zone)
+	def select_zone(self, faction, sprites_at_point):
+		self.clear_faction_selection(faction)
+		zone_found = None
+		for s in sprites_at_point:
+			zone = s.entity
+			if zone.faction == faction:
+				zone_found = zone
+		if zone_found:
+			zone_found.selected = True
+			self.selection[faction].add(zone_found)
 
-	def clear_selection(self):
-		for entity in self.selection:
+	def clear_faction_selection(self, faction):
+		for entity in self.selection[faction]:
 			entity.selected = False
-		self.selection.clear()
+		self.selection[faction].clear()
 
-	def unit_in_selection(self):
-		for entity in self.selection:
+	def unit_in_selection(self, faction):
+		for entity in self.selection[faction]:
 			if isinstance(entity, Unit):
 				return True
 		return False
 
-	def zone_in_selection(self):
-		for entity in self.selection:
+	def zone_in_selection(self, faction):
+		for entity in self.selection[faction]:
 			if isinstance(entity, Zone):
 				return True
 		return False
@@ -92,9 +98,9 @@ class Controller():
 # --- Order (Called once) ----
 
 	# Called once when you setup the movement of the selection
-	def move_selection(self, grid_position):
+	def move_selection(self, faction, grid_position):
 		if self.is_on_map(grid_position):
-			for entity in self.selection:
+			for entity in self.selection[faction]:
 				self.moving_entities.add(entity)
 				path = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 				# print(grid.grid_str(path=path, start=start, end=end))
@@ -113,19 +119,19 @@ class Controller():
 			return False
 
 	# Called once when you order to move
-	def order_move(self, iso_position):
+	def order_move(self, faction, iso_position):
 		grid_position = iso_to_grid_pos(iso_position)
 		found_entity = False
-		for entity in self.selection:
+		for entity in self.selection[faction]:
 			if isinstance(entity, Unit):
 				entity.aimed_entity = None
 				found_entity = True
 				break
 		if found_entity:
-			self.move_selection(grid_position)
+			self.move_selection(faction, grid_position)
 
 	# Called once when you order an action on a zone
-	def order_harvest(self, sprites_at_point):
+	def order_harvest(self, faction, sprites_at_point):
 		# Step 1: Search for a zone in the sprites_at_point
 		zone_found = None
 		for s in sprites_at_point:
@@ -135,7 +141,7 @@ class Controller():
 				break
 
 		if zone_found is not None:
-			for entity in self.selection:
+			for entity in self.selection[faction]:
 				if isinstance(entity, Villager):
 					# Step 2: Search the closest tile near the zone_found to harvest it.
 					z_grid_pos = iso_to_grid_pos(zone_found.iso_position)
@@ -162,31 +168,31 @@ class Controller():
 					if aimed_tile is not None:
 						entity.action_timer = 0
 						entity.aimed_entity = zone_found
-						self.move_selection(aimed_tile.grid_position)
+						self.move_selection(faction, aimed_tile.grid_position)
 				else:
 					print("Not a villager!")
 
 	# Called once
-	def order_build(self, map_position, building_name):
+	def order_build(self, faction, map_position, building_name):
 		# Step 1: Find which building building_name is
 		building = None
 		if building_name == "House":
-			building = House(map_position)
+			building = House(map_position, faction)
 		elif building_name == "StoragePit":
-			building = StoragePit(map_position)
+			building = StoragePit(map_position, faction)
 		elif building_name == "Granary":
-			building = Granary(map_position)
+			building = Granary(map_position, faction)
 		elif building_name == "Barracks":
-			building = Barracks(map_position)
+			building = Barracks(map_position, faction)
 		elif building_name == "Dock":
-			building = Dock(map_position)
+			building = Dock(map_position, faction)
 
 		assert isinstance(building, Buildable)
 
-		if self.game.player.get_resource(building.cost[0]) > building.cost[1]:
+		if self.game.player.get_resource(building.cost[0]) > building.cost[1]:  # TODO CONVERT FOR AI
 
 			# Step 2: Search for an entity that can build: a Villager.
-			for entity in self.selection:
+			for entity in self.selection[faction]:
 				if isinstance(entity, Villager):
 					entity.action_timer = 0
 					entity.aimed_entity = building
@@ -198,21 +204,22 @@ class Controller():
 								entity.aimed_entity = None
 								return
 					# Step 4: if possible (no return), move one tile below the first tile of the building.
-					self.move_selection(map_position - Vector(1, 1))
+					self.move_selection(faction, map_position - Vector(1, 1))
 				else:
 					print("Not a Villager!")
 		else:
 			print("not enough resources to build!")
 
-	def order_zone_villagers(self):
-		for entity in self.selection:
+	def order_zone_villagers(self, faction):
+		for entity in self.selection[faction]:
 			if isinstance(entity, TownCenter):
 				tc = entity
 				if not tc.is_producing and self.game.player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1]:
 					tc.is_producing = True
-					self.game.player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
+					self.game.player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])  # TODO CONVERT FOR AI
 					self.game.game_view.update_resources_gui()
 					self.producing_entities.add(tc)
+
 
 
 # --- On_update (Called every frame) ---
@@ -276,8 +283,8 @@ class Controller():
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
 		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
-			if self.game.player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:
-				self.game.player.sub_resource(*entity.aimed_entity.cost)
+			if self.game.player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:  # TODO CONVERT FOR AI
+				self.game.player.sub_resource(*entity.aimed_entity.cost)  # TODO CONVERT FOR AI
 				self.game.game_view.update_resources_gui()
 				self.add_entity_to_game(entity.aimed_entity)
 			else:
@@ -297,7 +304,7 @@ class Controller():
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
 				# print(entity.resource)
-				self.game.player.add_resource(aimed_entity.get_resource_nbr(), harvested)
+				self.game.player.add_resource(aimed_entity.get_resource_nbr(), harvested)  # TODO CONVERT FOR AI
 				self.game.game_view.update_resources_gui()
 			elif harvested == -1:
 				entity.aimed_entity = None
@@ -309,4 +316,4 @@ class Controller():
 			tc.action_timer = 0
 			tc.is_producing = False
 			grid_position = iso_to_grid_pos(tc.iso_position) - Vector(1, 1)
-			self.add_entity_to_game(Villager(grid_pos_to_iso(grid_position)))
+			self.add_entity_to_game(Villager(grid_pos_to_iso(grid_position), tc.faction))
