@@ -51,6 +51,8 @@ class View():
 
 		self.mode = "move"
 
+		self.resource_label_list = []
+
 	def setup(self) :
 		#clear old lists
 		self.entity_sprite_list = arcade.SpriteList()
@@ -66,9 +68,6 @@ class View():
 		self.init_dynamic_gui()
 		self.init_cheats()
 
-		# Sync self.game_model.tile_list with unit_sprite_list
-		for e in self.game.game_model.unit_list:
-			self.unit_sprite_list.append(e.sprite)
 		# Sync self.game_model.tile_list with tile_sprite_list
 		for t in self.game.game_model.tile_list:
 			self.tile_sprite_list.append(t.sprite)
@@ -100,14 +99,14 @@ class View():
 		# Create a vertical BoxGroup to align buttons
 		self.v_box1 = arcade.gui.UIBoxLayout()
 
-		player_resources = self.game.player.resource
-		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		player = self.game.players["player"]
+		player_resources = player.resource
+		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 
 		self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
 		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
-		self.resource_label_list = []
 		for val in resources_tab :
 			label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
 			self.resource_label_list.append(label)
@@ -175,7 +174,17 @@ class View():
 					for y in range(zone.tile_size[1]):
 						tile_outline = self.get_tile_outline(grid_pos_to_iso(iso_to_grid_pos(zone.iso_position) + Vector(x, y)))
 						arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-						self.draw_health_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+				nbr_health_bar = 1
+				if zone.health > 0:
+					self.draw_health_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+					nbr_health_bar += 1
+
+				if isinstance(zone, Resources):
+					self.draw_health_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
+					nbr_health_bar +=1
+				elif isinstance(zone, TownCenter) and zone.is_producing:
+					self.draw_health_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+					nbr_health_bar +=1
 			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
@@ -192,7 +201,8 @@ class View():
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 				self.draw_health_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
 				if (aimed_entity := s.entity.aimed_entity) and isinstance(aimed_entity, Resources):
-					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE)
+					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED)
+					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE,nbr_health_bar=2)
 			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
@@ -367,11 +377,12 @@ class View():
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
 
-	def draw_health_bar(self, pos, health, max_health, color):
+	def draw_health_bar(self, pos, health, max_health, color, nbr_health_bar=1):
 		if max_health:
 			y_offset = 10
-			arcade.draw_rectangle_filled(pos.x, pos.y - y_offset, 36, 12, arcade.color.GRAY)
-			arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - y_offset, (health*32)/max_health, 8, color)
+			arcade.draw_rectangle_filled(pos.x, pos.y - nbr_health_bar*y_offset, 36, 12, arcade.color.GRAY)
+			if health > 0:
+				arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - nbr_health_bar*y_offset, (health*32)/max_health, 8, color)
 
 	def init_dynamic_gui(self) :
 		# Create a box group to align the 'open' button in the center
@@ -452,8 +463,9 @@ class View():
 		self.coord_label.fit_content()
 
 	def update_resources_gui(self):
-		player_resources = self.game.player.resource
-		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		player = self.game.players["player"]
+		player_resources = player.resource
+		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 		for label, resource_text in zip(self.resource_label_list, resources_tab):
 			label.text = resource_text
 

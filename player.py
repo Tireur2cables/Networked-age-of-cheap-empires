@@ -1,8 +1,11 @@
 from CONSTANTS import Resource as Res
+from entity.Unit import Unit
+from entity.Zone import House
 
 class Player:
 	def __init__(self,
-				IA: bool = True,
+				game,
+				player_type: str,
 				qty_food: int = 200,
 				qty_wood: int = 200,
 				qty_gold: int = 100,
@@ -13,7 +16,8 @@ class Player:
 		:param bool IA: The player is an IA (True) or a human (False)
 		:param int qty[Resource]: The initial qty of the 4 types of Resource
 		"""
-		self.IA = IA
+		self.game = game
+		self.player_type = player_type
 
 		# resource (dictionnary initialized with qty[Resource])
 		self.resource = {Res.FOOD : qty_food, Res.WOOD : qty_wood, Res.GOLD : qty_gold, Res.STONE : qty_stone}
@@ -21,9 +25,30 @@ class Player:
 		# unit
 		self.nb_unit = 0
 		self.max_unit = 4
+		self.my_entities = dict()
+
 
 	def setup(self, resources):
 		self.resource = resources
+
+	# my_entities
+	def add_entity(self, new_entity):
+		my_entities = self.my_entities.get(new_entity.get_name())
+		if my_entities is None:
+			self.my_entities[new_entity.get_name()] = set()
+		self.my_entities[new_entity.get_name()].add(new_entity)
+		if isinstance(new_entity, Unit):
+			self.nb_unit += 1
+		elif isinstance(new_entity, House):
+			self.max_unit += 4
+
+	def discard_entity(self, dead_entity):
+		self.my_entities[dead_entity.get_name()].discard(dead_entity)
+
+		if isinstance(dead_entity, Unit):
+			self.nb_unit -= 1
+		elif isinstance(dead_entity, House):
+			self.max_unit -= 4
 
 	# unit
 	def get_nb_unit(self) -> int:

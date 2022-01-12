@@ -49,7 +49,6 @@ class Controller():
 			if entity and filter(entity):
 				return entity
 		return None
-
 	@staticmethod
 	def find_entity(entity_collection, filter):
 		for e in entity_collection:
@@ -62,8 +61,12 @@ class Controller():
 # --- Adding/Discarding entities ---
 
 	def add_entity_to_game(self, new_entity):
+		player = self.game.players.get(new_entity.faction)
+		if player is not None:
+			player.add_entity(new_entity)
 		self.game.game_model.add_entity(new_entity)
 		self.game.game_view.add_sprite(new_entity.sprite)
+		self.game.game_view.update_resources_gui()
 
 	def discard_entity_from_game(self, dead_entity):
 		if (selection_set := self.selection.get(dead_entity.faction)):
@@ -71,6 +74,11 @@ class Controller():
 		self.moving_entities.discard(dead_entity)
 		self.interacting_entities.discard(dead_entity)
 		self.producing_entities.discard(dead_entity)
+		self.game.game_view.update_resources_gui()
+
+		player = self.game.players.get(dead_entity.faction)
+		if player is not None:
+			player.discard_entity(dead_entity)
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
 
@@ -198,7 +206,7 @@ class Controller():
 
 		assert isinstance(building, Buildable)
 
-		if self.game.player.get_resource(building.cost[0]) > building.cost[1]:  # TODO CONVERT FOR AI
+		if self.game.players[faction].get_resource(building.cost[0]) > building.cost[1]:  # TODO CONVERT FOR AI
 
 			# Step 2: Search for an entity that can build: a Villager.
 			for entity in self.selection[faction]:
@@ -223,9 +231,10 @@ class Controller():
 		for entity in self.selection[faction]:
 			if isinstance(entity, TownCenter):
 				tc = entity
-				if not tc.is_producing and self.game.player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1]:
+				current_player = self.game.players[faction]
+				if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
 					tc.is_producing = True
-					self.game.player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])  # TODO CONVERT FOR AI
+					current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])  # TODO CONVERT FOR AI
 					self.game.game_view.update_resources_gui()
 					self.producing_entities.add(tc)
 
@@ -292,8 +301,9 @@ class Controller():
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
 		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
-			if self.game.player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:  # TODO CONVERT FOR AI
-				self.game.player.sub_resource(*entity.aimed_entity.cost)  # TODO CONVERT FOR AI
+			current_player = self.game.players[entity.faction]
+			if current_player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:  # TODO CONVERT FOR AI
+				current_player.sub_resource(*entity.aimed_entity.cost)  # TODO CONVERT FOR AI
 				self.game.game_view.update_resources_gui()
 				self.add_entity_to_game(entity.aimed_entity)
 			else:
@@ -313,7 +323,7 @@ class Controller():
 				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
 				# print(entity.resource)
-				self.game.player.add_resource(aimed_entity.get_resource_nbr(), harvested)  # TODO CONVERT FOR AI
+				self.game.players[entity.faction].add_resource(aimed_entity.get_resource_nbr(), harvested)  # TODO CONVERT FOR AI
 				self.game.game_view.update_resources_gui()
 			elif harvested == -1:
 				entity.aimed_entity = None

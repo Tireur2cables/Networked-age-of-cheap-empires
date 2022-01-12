@@ -47,21 +47,29 @@ class Model():
 
 		for pos_spawn in self.map.spawn_array:
 			faction = "player" if pos_spawn[1] == "0" else "ai_" + pos_spawn[1]
-			self.add_entity(TownCenter(pos_spawn[0], faction))
-		unit0 = Villager(Vector(100, 100), "player")
-		unit1 = Villager(Vector(50, 50), "player")
-		unit2 = Villager(grid_pos_to_iso(Vector(3, 2)) + Vector(0, TILE_HEIGHT_HALF), "player")
-		self.unit_list.append(unit0)
-		self.unit_list.append(unit1)
-		self.unit_list.append(unit2)
+			self.game.game_controller.add_entity_to_game(TownCenter(pos_spawn[0], faction))
 
-		#military
-		militia = Militia(grid_pos_to_iso(Vector(10, 2)) + Vector(0, TILE_HEIGHT_HALF), "player")
-		self.unit_list.append(militia)
-		archer = Archer(grid_pos_to_iso(Vector(13, 2)) + Vector(0, TILE_HEIGHT_HALF), "player")
-		self.unit_list.append(archer)
-		knight = Knight(grid_pos_to_iso(Vector(16, 2)) + Vector(0, TILE_HEIGHT_HALF), "player")
-		self.unit_list.append(knight)
+			start_villagers = (Villager(grid_pos_to_iso(pos_spawn[0] - Vector(1, 1)), faction),
+				Villager(grid_pos_to_iso(pos_spawn[0] - Vector(0, 1)), faction),
+				Villager(grid_pos_to_iso(pos_spawn[0] - Vector(1, 0)), faction))
+
+			for v in start_villagers:
+				self.game.game_controller.add_entity_to_game(v)
+
+		# units = (Villager(Vector(100, 100), "player"),
+		# Villager(Vector(50, 50), "player"),
+		# Villager(grid_pos_to_iso(Vector(3, 2)) + Vector(0, TILE_HEIGHT_HALF),"player"))
+		# for unit in units:
+		# 	self.game.game_controller.add_entity_to_game(unit)
+
+		# #military
+		# militaries = (Militia(grid_pos_to_iso(Vector(10, 2)) + Vector(0, TILE_HEIGHT_HALF), "player"),
+		# Archer(grid_pos_to_iso(Vector(13, 2)) + Vector(0, TILE_HEIGHT_HALF), "player"),
+		# Knight(grid_pos_to_iso(Vector(16, 2)) + Vector(0, TILE_HEIGHT_HALF), "player")
+		# )
+
+		# for military in militaries:
+		# 	self.game.game_controller.add_entity_to_game(military)
 
 	def add_entity(self, new_entity):
 		if isinstance(new_entity, Unit) and new_entity not in self.unit_list:
