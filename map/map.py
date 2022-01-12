@@ -63,13 +63,26 @@ class Map():
 
 	def get_path(self, start, end):
 		# Pathfinding algorithm
-		pathfinding_matrix = self.get_pathfinding_matrix()
-		grid = Grid(matrix=pathfinding_matrix)
-		finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-		start = grid.node(*start)
-		end = grid.node(*end)
-		path, runs = finder.find_path(start, end, grid)
-		return path
+		path = []
+		path_len = -1
+		if start != end:
+			pathfinding_matrix = self.get_pathfinding_matrix()
+			grid = Grid(matrix=pathfinding_matrix)
+			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+			start = grid.node(*start)
+			end = grid.node(*end)
+			path, runs = finder.find_path(start, end, grid)
+
+			if path:
+				path.pop(0)
+				path_len = len(path)
+		else:
+			path_len = 0
+
+		# path_len == -1 : means end is inacessible
+		# path_len == 0 : means start == end
+		# path_len > 0 : means there is a path between start and end.
+		return path, path_len
 
 	def get_tile_at(self, map_position):
 		return self.tile_array[map_position.x][map_position.y]

@@ -7,11 +7,10 @@ from LAUNCH_SETUP import LAUNCH_FAST_BUILD
 
 # ----- GENERAL CLASS -----
 class Zone(Entity):
-	def __init__(self, grid_position, tile_size=(1, 1), is_locking=False, **kwargs):#constructeur : initialise les attributs
+	def __init__(self, grid_position, is_locking=False, **kwargs):#constructeur : initialise les attributs
 		iso_position = grid_pos_to_iso(grid_position)
 		super().__init__(iso_position, **kwargs)
 		self.grid_position=grid_position
-		self.tile_size=tile_size
 		self.is_locking = is_locking
 
 	def get_grid_position(self):
@@ -51,10 +50,8 @@ class Zone(Entity):
 # ----- GENERAL CLASS -----
 
 class Buildable(Zone):
-	def __init__(self, grid_position, cost=0, build_time=0, **kwargs):
+	def __init__(self, grid_position, **kwargs):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
-		self.cost = cost
-		self.build_time = build_time
 
 # -------------------------
 
@@ -63,9 +60,29 @@ class Buildable(Zone):
 
 class WorkSite(Zone):
 	# == In progess building, Not Implemented Yet.
-	def __init__(self, grid_position, faction, zone_to_build, **kwargs):
-		super().__init__(grid_position, faction, **kwargs)
-		self.zone_to_build = zone_to_build
+	def __init__(self, grid_position, faction, name_zone_to_build, **kwargs):
+		super().__init__(grid_position,
+		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12), # not used for now
+		faction=faction,
+		**kwargs)
+		self.zone_to_build = self.get_zone_class(name_zone_to_build.lower())
+
+	@staticmethod
+	def get_zone_class(name_zone):
+		if name_zone == "house":
+			return House
+		elif name_zone == "storagepit":
+			return StoragePit
+		elif name_zone == "granary":
+			return Granary
+		elif name_zone == "barracks":
+			return Barracks
+		elif name_zone == "dock":
+			return Dock
+
+	def create_zone(self):
+		building = self.zone_to_build(self.grid_position, self.faction)
+		return building
 
 
 #
@@ -78,81 +95,87 @@ class TownCenter(Buildable):
 	#Size: 3x3
 	#LineOfSight : 7
 	#Equiv AOE2: TownCenter
+	cost=(Res.WOOD, 200)
+	build_time=2 if LAUNCH_FAST_BUILD else 60
+	tile_size=(4, 4) # (3, 3) sur AOE
+
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		faction=faction,
 		health=600,
-		cost=(Res.WOOD, 200),
-		build_time=2 if LAUNCH_FAST_BUILD else 60,
-		tile_size=(4, 4), # (3, 3) sur AOE
 		line_sight=7)
 		self.villager_cooldown = 20  # in seconds
 		self.villager_cost = (Res.FOOD, 50)
 		self.is_producing = False
 
 class Barracks(Buildable):
-		#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
-		#Equiv AOE2: Barracks
+	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
+	#Equiv AOE2: Barracks
+	cost=(Res.WOOD, 125)
+	build_time=2 if LAUNCH_FAST_BUILD else 30
+	tile_size=(3, 3)
+
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
 		faction=faction,
-		health=350,
-		cost=(Res.WOOD, 125),
-		build_time=2 if LAUNCH_FAST_BUILD else 30,
-		tile_size=(3, 3))
+		health=350)
 
 class StoragePit(Buildable):
-		#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)
-		#Size : 3x3
-		#LineOfSight:4
-		#Equiv AOE2: Lumber Camp & Mining Camp
+	#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)
+	#Size : 3x3
+	#LineOfSight:4
+	#Equiv AOE2: Lumber Camp & Mining Camp
+	cost=(Res.WOOD, 120)
+	build_time=2 if LAUNCH_FAST_BUILD else 30
+	tile_size=(2, 2) # (3, 3) sur AOE, (2, 2) sur AOE2
+
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		faction=faction,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
-		health=350,
-		cost=(Res.WOOD, 120),
-		build_time=2 if LAUNCH_FAST_BUILD else 30,
-		tile_size=(2, 2)) # (3, 3) sur AOE, (2, 2) sur AOE2
+		health=350)
 
 class Granary(Buildable):
-		#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
-		#Equiv AOE2: Mill
+	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
+	#Equiv AOE2: Mill
+	cost=(Res.WOOD, 120)
+	build_time=2 if LAUNCH_FAST_BUILD else 30
+	tile_size=(2, 2)
+
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15),
 		faction=faction,
-		health=350,
-		cost=(Res.WOOD, 120),
-		build_time=2 if LAUNCH_FAST_BUILD else 30,
-		tile_size=(2, 2))
+		health=350)
 
 
 class Dock(Buildable):
-		#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
-		#Equiv AOE2: Dock
+	#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
+	#Equiv AOE2: Dock
+	cost=(Res.WOOD, 100)
+	build_time=2 if LAUNCH_FAST_BUILD else 35
+	tile_size=(3, 3)
+
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10),
 		faction=faction,
-		health=600,
-		cost=(Res.WOOD, 100),
-		build_time=2 if LAUNCH_FAST_BUILD else 35,
-		tile_size=(3, 3))
+		health=600)
 
 class House(Buildable):
-		#WhoAmI : Cost : 30 Wood; Use : +4 population per house
-		#Equiv AOE2: House
+	#WhoAmI : Cost : 30 Wood; Use : +4 population per house
+	#Equiv AOE2: House
+	cost=(Res.WOOD, 30)
+	build_time=2 if LAUNCH_FAST_BUILD else 25
+	tile_size=(2, 2)
+
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10),
 		faction=faction,
-		health=75,
-		cost=(Res.WOOD, 30),
-		build_time=2 if LAUNCH_FAST_BUILD else 25,
-		tile_size=(2, 2))
+		health=75)
 
 
 
@@ -204,6 +227,8 @@ class Resources(Zone):
 
 
 class Wood(Resources):
+	tile_size = (1, 1)
+
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT//2 + 5),
@@ -211,6 +236,8 @@ class Wood(Resources):
 		amount=10)
 
 class Stone(Resources):
+	tile_size = (1, 1)
+
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
@@ -219,6 +246,8 @@ class Stone(Resources):
 		amount=250)
 
 class Gold(Resources):
+	tile_size = (1, 1)
+
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
@@ -227,6 +256,8 @@ class Gold(Resources):
 		amount=450)
 
 class BerryBush(Resources):
+	tile_size = (1, 1)
+
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,

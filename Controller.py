@@ -127,16 +127,13 @@ class Controller():
 		if self.is_on_map(grid_position):
 			for entity in self.selection[faction]:
 				self.moving_entities.add(entity)
-				path = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+				path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 				# print(grid.grid_str(path=path, start=start, end=end))
-				if path:
-					path.pop(0)
-					if path:
-						entity.set_path(path)
-						entity.next_aim()
-						return True
-					else:
-						return False
+				print(path, path_len)
+				if path_len > 0:
+					entity.set_path(path)
+					entity.next_aim()
+					return True
 				else:
 					return False
 		else:
@@ -149,7 +146,7 @@ class Controller():
 		found_entity = self.find_entity(self.selection[faction], self.filter_type(Unit))
 
 		if found_entity is not None:
-			found_entity.aimed_entity = None
+			found_entity.reset_flags()
 			self.move_selection(faction, grid_position)
 
 	# Called once when you order an action on a zone
@@ -160,6 +157,7 @@ class Controller():
 		if zone_found is not None:
 			for entity in self.selection[faction]:
 				if isinstance(entity, Villager):
+					entity.reset_flags()
 					# Step 2: Search the closest tile near the zone_found to harvest it.
 					z_grid_pos = iso_to_grid_pos(zone_found.iso_position)
 
@@ -167,55 +165,69 @@ class Controller():
 					min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
 					entity_grid_position = iso_to_grid_pos(entity.iso_position)
 					for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
-						path = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
-						if path:
-							path.pop()
-							if path:
-								path_len = len(path)
-								if min_path_len > path_len:
-									aimed_tile = tile
-									min_path_len = path_len
-							else:
-								self.interacting_entities.add(entity)
-								entity.aimed_entity = zone_found
-								aimed_tile = None
-								break
+						path, path_len = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
+
+						if path_len > 0 and min_path_len > path_len:
+							aimed_tile = tile
+							min_path_len = path_len
+						elif path_len == 0: # Dans ce cas c'est que nous sommes déjà arrivé
+							self.interacting_entities.add(entity)
+							entity.is_interacting = True
+							entity.aimed_entity = zone_found
+							aimed_tile = None
+							break
 
 					# Step 3: Start moving toward the aimed entity
 					if aimed_tile is not None:
-						entity.action_timer = 0
 						entity.aimed_entity = zone_found
 						self.move_selection(faction, aimed_tile.grid_position)
 				else:
 					print("Not a villager!")
 
+	def manual_order_stock_resources(self, faction, sprites_at_point):
+		zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(TownCenter))
+		if zone_found is not None:
+			for entity in self.selection[faction]:
+				if isinstance(entity, Villager):
+					self.order_stock_resources(self, faction, entity, zone_found)
+
+	def order_stock_resources(self, faction, entity, stock_zone):
+		# Step 2: Search the closest tile near the zone_found to harvest it.
+		z_grid_pos = iso_to_grid_pos(stock_zone.iso_position)
+
+		aimed_tile = None
+		min_path_len = DEFAULT_MAP_SIZE**2  # Value that shouldn't be reached when searching a path through the map.
+		entity_grid_position = iso_to_grid_pos(entity.iso_position)
+		for tile in self.game.game_model.map.get_tiles_nearby(z_grid_pos):
+			path, path_len = self.game.game_model.map.get_path(entity_grid_position, tile.grid_position)
+
+			if path_len > 0 and min_path_len > path_len:
+				aimed_tile = tile
+				min_path_len = path_len
+			elif path_len == 0:
+				entity.aimed_entity = stock_zone
+				aimed_tile = None
+				break
+
+		# Step 3: Start moving toward the aimed entity
+		if aimed_tile is not None:
+			entity.action_timer = 0
+			entity.aimed_entity = stock_zone
+			self.move_selection(faction, aimed_tile.grid_position)
+
 	# Called once
 	def order_build(self, faction, map_position, building_name):
 		# Step 1: Find which building building_name is
-		building = None
-		if building_name == "House":
-			building = House(map_position, faction)
-		elif building_name == "StoragePit":
-			building = StoragePit(map_position, faction)
-		elif building_name == "Granary":
-			building = Granary(map_position, faction)
-		elif building_name == "Barracks":
-			building = Barracks(map_position, faction)
-		elif building_name == "Dock":
-			building = Dock(map_position, faction)
-
-		assert isinstance(building, Buildable)
-
-		if self.game.players[faction].get_resource(building.cost[0]) > building.cost[1]:  # TODO CONVERT FOR AI
-
+		worksite = WorkSite(map_position, faction, building_name)
+		if self.game.players[faction].get_resource(worksite.zone_to_build.cost[0]) > worksite.zone_to_build.cost[1]:
 			# Step 2: Search for an entity that can build: a Villager.
 			for entity in self.selection[faction]:
 				if isinstance(entity, Villager):
 					entity.action_timer = 0
-					entity.aimed_entity = building
+					entity.aimed_entity = worksite
 					# Step 3: Start searching if it is possible to move toward the aimed map_position
-					for i in range(entity.aimed_entity.tile_size[0]):
-						for j in range(entity.aimed_entity.tile_size[1]):
+					for i in range(entity.aimed_entity.zone_to_build.tile_size[0]):
+						for j in range(entity.aimed_entity.zone_to_build.tile_size[1]):
 							tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
 							if tile.pointer_to_entity is not None or tile.is_free == 0:
 								entity.aimed_entity = None
@@ -257,6 +269,7 @@ class Controller():
 					else:
 						entity.is_moving = False
 						if entity.aimed_entity:
+							entity.is_interacting = True
 							self.interacting_entities.add(entity)
 
 				else:  # If it is not close to where it aims and not out of bounds, move.
@@ -267,8 +280,10 @@ class Controller():
 		for entity in self.interacting_entities:
 			if isinstance(entity.aimed_entity, Resources):
 				self.harvest_zone(entity, delta_time)
-			elif isinstance(entity.aimed_entity, Buildable):
+			elif isinstance(entity.aimed_entity, WorkSite):
 				self.build_zone(entity, delta_time)
+			elif isinstance(entity.aimed_entity, TownCenter):
+				self.stock_resources(entity)
 
 		for entity in self.producing_entities:
 			if isinstance(entity, TownCenter):
@@ -279,7 +294,7 @@ class Controller():
 			self.moving_entities = {e for e in self.moving_entities if e.is_moving}
 
 		if self.interacting_entities:
-			self.interacting_entities = {e for e in self.interacting_entities if e.aimed_entity}
+			self.interacting_entities = {e for e in self.interacting_entities if e.is_interacting}
 
 		if self.producing_entities:
 			self.producing_entities = {e for e in self.producing_entities if e.is_producing}
@@ -300,12 +315,13 @@ class Controller():
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
-		if entity.action_timer > entity.aimed_entity.build_time:  # build_time
+		if entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			current_player = self.game.players[entity.faction]
-			if current_player.get_resource(entity.aimed_entity.cost[0]) > entity.aimed_entity.cost[1]:  # TODO CONVERT FOR AI
-				current_player.sub_resource(*entity.aimed_entity.cost)  # TODO CONVERT FOR AI
+			cost = entity.aimed_entity.zone_to_build.cost
+			if current_player.get_resource(cost[0]) > cost[1]:
+				current_player.sub_resource(*cost)
 				self.game.game_view.update_resources_gui()
-				self.add_entity_to_game(entity.aimed_entity)
+				self.add_entity_to_game(entity.aimed_entity.create_zone())
 			else:
 				print("not enough resources to build!")
 			entity.action_timer = 0
@@ -318,16 +334,28 @@ class Controller():
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
 			print(f"[harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
-			harvested = aimed_entity.harvest(entity.damage)
-			if harvested > 0:
-				print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-				# entity.resource[Resource[type(aimed_entity).__name__.upper()]] = harvested
-				# print(entity.resource)
-				self.game.players[entity.faction].add_resource(aimed_entity.get_resource_nbr(), harvested)  # TODO CONVERT FOR AI
-				self.game.game_view.update_resources_gui()
-			elif harvested == -1:
-				entity.aimed_entity = None
-				self.dead_entities.add(aimed_entity)
+			if not entity.is_full():
+				harvested = aimed_entity.harvest(entity.damage)
+				if harvested > 0:
+					entity.resource[aimed_entity.get_resource_nbr()] += harvested
+					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					print(f"[harvesting] -> {type(entity).__name__} has {entity.resource} - max_resources : {entity.max_resource}")
+					self.game.game_view.update_resources_gui()
+				elif harvested == -1:
+					entity.aimed_entity = None
+					self.dead_entities.add(aimed_entity)
+			else:
+				entity.reset_flags()
+				stock_zone = next(iter(self.game.players[entity.faction].my_entities["towncenter"]))
+				self.order_stock_resources(entity.faction, entity, stock_zone)
+
+	def stock_resources(self, entity):
+		print(entity.resource.items())
+		for resource, resource_val in entity.resource.items():
+			self.game.players[entity.faction].add_resource(resource, resource_val)
+			self.game.game_view.update_resources_gui()
+			entity.resource[resource] = 0
+			entity.reset_flags()
 
 	def produce_villagers(self, tc, delta_time):
 		tc.action_timer += delta_time

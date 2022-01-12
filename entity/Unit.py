@@ -24,10 +24,16 @@ class Unit(Entity):
 		# Movement
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
 		self.aimed_entity = None
+		self.is_moving = False
+		self.is_interacting = False
 		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
 		self.speed = SPEED_UNITS * speed  # Speed of the unit
+
+	def reset_flags(self):
+		self.action_timer = 0
 		self.is_moving = False
+		self.is_interacting = False
 
 	def set_path(self, path):
 		self.path = path
