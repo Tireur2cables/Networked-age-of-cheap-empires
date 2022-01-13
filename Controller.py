@@ -76,6 +76,8 @@ class Controller():
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
 
+
+
 # --- Selection (Called once) ---
 
 	def select(self, faction, sprites_at_point):
@@ -92,6 +94,12 @@ class Controller():
 		if zone_found:
 			zone_found.selected = True
 			self.selection[faction].add(zone_found)
+		else:
+			if sprites_at_point:
+				other_zone_found = sprites_at_point[0].entity
+				other_zone_found.selected = True
+				self.selection[faction].add(other_zone_found)
+
 
 	def clear_faction_selection(self, faction):
 		for entity in self.selection[faction]:
@@ -144,7 +152,7 @@ class Controller():
 	def human_order_with_zone(self, action, faction):
 		if action == "populate":
 			for entity in self.selection[faction]:
-				if isinstance(entity, TownCenter):
+				if entity.faction == faction and isinstance(entity, TownCenter):
 					self.order_zone_villagers(entity)
 
 

@@ -200,12 +200,12 @@ class View():
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
 				self.draw_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
-				if (aimed_entity := s.entity.aimed_entity):
+				if entity.is_interacting and (aimed_entity := entity.aimed_entity):
 					if isinstance(aimed_entity, Resources):
 						self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED)
 						self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE,nbr_health_bar=2)
 					elif isinstance(aimed_entity, WorkSite):
-						self.draw_bar(entity.iso_position, int(entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN)
+						self.draw_bar(entity.iso_position, int(entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN, nbr_health_bar=2)
 			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
