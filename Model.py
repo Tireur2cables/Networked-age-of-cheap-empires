@@ -76,6 +76,7 @@ class Model():
 			self.unit_list.append(new_entity)
 		elif isinstance(new_entity, Zone) and new_entity not in self.zone_list:
 			self.zone_list.append(new_entity)
+			self.map.add_entity_to_pos(new_entity)
 			self.map.reserve_tile_at(new_entity.grid_position, new_entity.tile_size)
 
 	def discard_entity(self, dead_entity):

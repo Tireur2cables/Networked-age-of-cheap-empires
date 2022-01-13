@@ -130,7 +130,7 @@ class Controller():
 					if zone_found:
 						self.order_harvest(entity, zone_found)
 				elif action == "stock":
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(TownCenter))
+					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(tuple(TownCenter, StoragePit, Granary)))
 					if zone_found:
 						self.order_stock_resources(entity, zone_found)
 
@@ -183,11 +183,29 @@ class Controller():
 			else:
 				self.move_entity(entity, aimed_tile.grid_position)
 
+	def order_search_stock_resources(self, entity, resource_nbr):
+		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
+		if resource_nbr == Res.FOOD:
+			stock_zones = self.game.players[entity.faction].food_storage
+		else:
+			stock_zones = self.game.players[entity.faction].other_storage
+
+		aimed_tile, stock_zone = self.game.game_model.map.get_closest_tile_nearby_collection(entity_grid_pos, stock_zones)
+		print(aimed_tile, stock_zone)
+		# Step 2: Start moving toward the aimed entity
+		if aimed_tile is not None:
+			entity.set_aimed_entity(stock_zone)
+			if aimed_tile.grid_position == entity_grid_pos:
+				entity.set_aimed_entity(stock_zone)
+			else:
+				self.move_entity(entity, aimed_tile.grid_position)
+
+
 	def order_stock_resources(self, entity, stock_zone):
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 
 		# Step 1: Search the closest tile near the zone_found to harvest it.
-		aimed_tile = self.game.game_model.map.get_closest_tile_nearby(entity_grid_pos, iso_to_grid_pos(stock_zone.iso_position))
+		aimed_tile = self.game.game_model.map.get_closest_tile_nearby(entity_grid_pos, stock_zone.grid_position)
 
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
@@ -276,8 +294,8 @@ class Controller():
 				self.harvest_zone(entity, delta_time)
 			elif isinstance(entity.aimed_entity, WorkSite):
 				self.build_zone(entity, delta_time)
-			elif isinstance(entity.aimed_entity, TownCenter):
-				self.stock_resources(entity)
+			elif isinstance(entity.aimed_entity, (TownCenter, StoragePit, Granary)):
+				self.stock_resources(entity, entity.aimed_entity.get_name())
 
 		for entity in producing_entities:
 			if isinstance(entity, TownCenter):
@@ -332,18 +350,27 @@ class Controller():
 					self.dead_entities.add(aimed_entity)
 			else: # the entity is full and needs to go back to the town center.
 				entity.set_goal("stock")
-				stock_zone = next(iter(self.game.players[entity.faction].my_entities["towncenter"]))
-				self.order_stock_resources(entity, stock_zone)
+				self.order_search_stock_resources(entity, aimed_entity.get_resource_nbr())
 
 	# Stock les resources qui ont été récolté définitivement et s'arrête
-	def stock_resources(self, entity):
-		for resource, resource_val in entity.resource.items():
-			self.game.players[entity.faction].add_resource(resource, resource_val)
+	def stock_resources(self, entity, storage_type):
+		items_to_store = ()
+		if storage_type == "towncenter":
+			items_to_store = (Res.FOOD, Res.GOLD, Res.STONE, Res.WOOD)
+		elif storage_type == "granary":
+			items_to_store = (Res.FOOD,)
+		elif storage_type == "storage_pit":
+			items_to_store = (Res.GOLD, Res.STONE, Res.WOOD)
+
+		for resource in items_to_store:
+			self.game.players[entity.faction].add_resource(resource, entity.resource[resource])
 			self.game.game_view.update_resources_gui()
 			entity.resource[resource] = 0
-			can_harvest = entity.go_back_to_harvest()
-			if can_harvest:
-				self.order_harvest(entity, entity.previous_aimed_entity)
+		can_harvest = entity.go_back_to_harvest()
+		if can_harvest:
+			self.order_harvest(entity, entity.previous_aimed_entity)
+
+
 
 	# produit un villageois et s'arrête
 	def produce_villagers(self, tc, delta_time):

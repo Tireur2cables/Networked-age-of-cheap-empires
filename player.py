@@ -1,6 +1,6 @@
 from CONSTANTS import Resource as Res
 from entity.Unit import Unit
-from entity.Zone import House
+from entity.Zone import House, StoragePit, Granary, TownCenter
 
 class Player:
 	def __init__(self,
@@ -13,7 +13,7 @@ class Player:
 		"""
 		Create a player.
 
-		:param bool IA: The player is an IA (True) or a human (False)
+		:param str player_type: The player can be an human, an IA, ...etc
 		:param int qty[Resource]: The initial qty of the 4 types of Resource
 		"""
 		self.game = game
@@ -26,6 +26,8 @@ class Player:
 		self.nb_unit = 0
 		self.max_unit = 4
 		self.my_entities = dict()
+		self.food_storage = set()
+		self.other_storage = set()
 
 
 	def setup(self, resources):
@@ -37,10 +39,18 @@ class Player:
 		if my_entities is None:
 			self.my_entities[new_entity.get_name()] = set()
 		self.my_entities[new_entity.get_name()].add(new_entity)
+
 		if isinstance(new_entity, Unit):
 			self.nb_unit += 1
 		elif isinstance(new_entity, House):
 			self.max_unit += 4
+		elif isinstance(new_entity, TownCenter):
+			self.food_storage.add(new_entity)
+			self.other_storage.add(new_entity)
+		elif isinstance(new_entity, Granary):
+			self.food_storage.add(new_entity)
+		elif isinstance(new_entity, StoragePit):
+			self.other_storage.add(new_entity)
 
 	def discard_entity(self, dead_entity):
 		self.my_entities[dead_entity.get_name()].discard(dead_entity)
@@ -49,6 +59,10 @@ class Player:
 			self.nb_unit -= 1
 		elif isinstance(dead_entity, House):
 			self.max_unit -= 4
+		elif isinstance(dead_entity, StoragePit):
+			self.food_storage.discard(dead_entity)
+		elif isinstance(dead_entity, Granary):
+			self.other_storage.discard(dead_entity)
 
 	# unit
 	def get_nb_unit(self) -> int:
@@ -72,10 +86,10 @@ class Player:
 		self.resource[Res.STONE] += qtyRes
 
 	def reset_all_res(self):
-		self.resource[Res.FOOD] += 200
-		self.resource[Res.WOOD] += 200
-		self.resource[Res.GOLD] += 100
-		self.resource[Res.STONE] += 200
+		self.resource[Res.FOOD] = 200
+		self.resource[Res.WOOD] = 200
+		self.resource[Res.GOLD] = 100
+		self.resource[Res.STONE] = 200
 
 	def set_all_res(self, qtyFood, qtyWood, qtyGold, qtyStone):
 		self.resource[Res.FOOD] += qtyFood

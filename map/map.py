@@ -103,6 +103,25 @@ class Map():
 				return tile
 		return aimed_tile
 
+	def get_tiles_nearby_collection(self, collection):
+		return tuple((self.tile_array[element.grid_position.x + i][element.grid_position.y + j], element) for element in collection for i in range(-1, 2) for j in range(-1, 2))
+
+	def get_closest_tile_nearby_collection(self, start_position, collection):
+		aimed_tile = None
+		aimed_element = None
+		min_path_len = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
+		for tile_element in self.get_tiles_nearby_collection(collection):
+			tile, element = tile_element
+			path, path_len = self.get_path(start_position, tile.grid_position)
+
+			if path_len > 0 and min_path_len > path_len:
+				aimed_tile = tile
+				aimed_element = element
+				min_path_len = path_len
+			elif path_len == 0:
+				return tile
+		return aimed_tile, aimed_element
+
 	def free_tile_at(self, map_position, tile_size):
 		for x in range(map_position.x, map_position.x + tile_size[0]):
 			for y in range(map_position.y, map_position.y + tile_size[1]):
@@ -110,6 +129,9 @@ class Map():
 					self.objects_array[x][y] = None
 					self.tile_array[x][y].pointer_to_entity = None
 				self.tile_array[x][y].is_free = 1
+
+	def add_entity_to_pos(self, entity):
+		self.tile_array[entity.grid_position.x][entity.grid_position.y].pointer_to_entity = entity
 
 	def reserve_tile_at(self, map_position, tile_size):
 		for x in range(map_position.x, map_position.x + tile_size[0]):
