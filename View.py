@@ -320,11 +320,12 @@ class View():
 					self.game.game_controller.clear_faction_selection("player")
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			# if units_at_point:
-			# 	print("unit!")
-			# else
-			self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
+			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
+			if zones_at_point:
+				self.game.game_controller.human_order_towards_sprites("stock", "player", zones_at_point)
+			else:
+				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")

@@ -130,7 +130,7 @@ class Controller():
 					if zone_found:
 						self.order_harvest(entity, zone_found)
 				elif action == "stock":
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(tuple(TownCenter, StoragePit, Granary)))
+					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type((TownCenter, StoragePit, Granary)))
 					if zone_found:
 						self.order_stock_resources(entity, zone_found)
 
