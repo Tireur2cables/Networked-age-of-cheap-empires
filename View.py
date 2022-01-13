@@ -176,14 +176,14 @@ class View():
 						arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				nbr_health_bar = 1
 				if zone.health > 0:
-					self.draw_health_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+					self.draw_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
 					nbr_health_bar += 1
 
 				if isinstance(zone, Resources):
-					self.draw_health_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
+					self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
 					nbr_health_bar +=1
 				elif isinstance(zone, TownCenter) and zone.is_producing:
-					self.draw_health_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+					self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
 					nbr_health_bar +=1
 			s.draw(pixelated=True)
 
@@ -199,10 +199,13 @@ class View():
 				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
-				self.draw_health_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
-				if (aimed_entity := s.entity.aimed_entity) and isinstance(aimed_entity, Resources):
-					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED)
-					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE,nbr_health_bar=2)
+				self.draw_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
+				if (aimed_entity := s.entity.aimed_entity):
+					if isinstance(aimed_entity, Resources):
+						self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED)
+						self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE,nbr_health_bar=2)
+					elif isinstance(aimed_entity, WorkSite):
+						self.draw_bar(entity.iso_position, int(entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN)
 			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
@@ -376,7 +379,7 @@ class View():
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
 
-	def draw_health_bar(self, pos, health, max_health, color, nbr_health_bar=1):
+	def draw_bar(self, pos, health, max_health, color, nbr_health_bar=1):
 		if max_health:
 			y_offset = 10
 			arcade.draw_rectangle_filled(pos.x, pos.y - nbr_health_bar*y_offset, 36, 12, arcade.color.GRAY)

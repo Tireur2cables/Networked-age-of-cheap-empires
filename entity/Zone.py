@@ -3,7 +3,7 @@ from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
 
-from LAUNCH_SETUP import LAUNCH_FAST_BUILD
+from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS
 
 # ----- GENERAL CLASS -----
 class Zone(Entity):
@@ -96,7 +96,7 @@ class TownCenter(Buildable):
 	#LineOfSight : 7
 	#Equiv AOE2: TownCenter
 	cost=(Res.WOOD, 200)
-	build_time=2 if LAUNCH_FAST_BUILD else 60
+	build_time=2 if LAUNCH_FAST_ACTIONS else 60
 	tile_size=(4, 4) # (3, 3) sur AOE
 
 	def __init__(self, grid_position, faction):
@@ -113,7 +113,7 @@ class Barracks(Buildable):
 	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
 	#Equiv AOE2: Barracks
 	cost=(Res.WOOD, 125)
-	build_time=2 if LAUNCH_FAST_BUILD else 30
+	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(3, 3)
 
 	def __init__(self, grid_position, faction):
@@ -128,7 +128,7 @@ class StoragePit(Buildable):
 	#LineOfSight:4
 	#Equiv AOE2: Lumber Camp & Mining Camp
 	cost=(Res.WOOD, 120)
-	build_time=2 if LAUNCH_FAST_BUILD else 30
+	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2) # (3, 3) sur AOE, (2, 2) sur AOE2
 
 	def __init__(self, grid_position, faction):
@@ -141,7 +141,7 @@ class Granary(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
 	#Equiv AOE2: Mill
 	cost=(Res.WOOD, 120)
-	build_time=2 if LAUNCH_FAST_BUILD else 30
+	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2)
 
 	def __init__(self, grid_position, faction):
@@ -155,7 +155,7 @@ class Dock(Buildable):
 	#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
 	#Equiv AOE2: Dock
 	cost=(Res.WOOD, 100)
-	build_time=2 if LAUNCH_FAST_BUILD else 35
+	build_time=2 if LAUNCH_FAST_ACTIONS else 35
 	tile_size=(3, 3)
 
 	def __init__(self, grid_position, faction):
@@ -168,7 +168,7 @@ class House(Buildable):
 	#WhoAmI : Cost : 30 Wood; Use : +4 population per house
 	#Equiv AOE2: House
 	cost=(Res.WOOD, 30)
-	build_time=2 if LAUNCH_FAST_BUILD else 25
+	build_time=2 if LAUNCH_FAST_ACTIONS else 25
 	tile_size=(2, 2)
 
 	def __init__(self, grid_position, faction):

@@ -1,3 +1,4 @@
+from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS
 from entity.Entity import Entity
 from utils.SpriteData import SpriteData
 from CONSTANTS import Resource as Res
@@ -117,7 +118,7 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 		line_sight=4)
 
 		self.resource = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
-		self.max_resource = 3
+		self.max_resource = 3 if LAUNCH_FAST_ACTIONS else 10
 
 	def nb_resources(self):
 		nb = 0
