@@ -112,9 +112,9 @@ class Controller():
 
 
 
-# --- Order (Called once) ----
+# --- Human Orders (Called once) ----
 
-	def order_towards_sprites(self, action, faction, sprites_at_point):
+	def human_order_towards_sprites(self, action, faction, sprites_at_point):
 		for entity in self.selection[faction]:
 			if isinstance(entity, Villager):
 				if action == "harvest":
@@ -126,7 +126,7 @@ class Controller():
 					if zone_found:
 						self.order_stock_resources(entity, zone_found)
 
-	def order_towards_position(self, action, faction, iso_position, *args):
+	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
 		for entity in self.selection[faction]:
 			if isinstance(entity, Unit):
@@ -141,7 +141,15 @@ class Controller():
 				elif action == "build":
 					self.order_build(entity, grid_position, *args)
 
+	def human_order_with_zone(self, action, faction):
+		if action == "populate":
+			for entity in self.selection[faction]:
+				if isinstance(entity, TownCenter):
+					self.order_zone_villagers(entity)
 
+
+
+# --- Orders (Called once) ----
 	def move_entity(self, entity, grid_position):
 		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 		if path_len > 0:
@@ -153,14 +161,12 @@ class Controller():
 
 	# Called once when you order an action on a zone
 	def order_harvest(self, entity, zone_to_harvest):
-		# Step 1: Search for a zone in the sprites_at_point
-
-
-		# Step 2: Search the closest tile near the zone_found to harvest it.
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
+
+		# Step 1: Search the closest tile near the zone_found to harvest it.
 		aimed_tile = self.game.game_model.map.get_closest_tile_nearby(entity_grid_pos, iso_to_grid_pos(zone_to_harvest.iso_position))
 
-		# Step 3: Start moving toward the aimed entity
+		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
 			entity.set_goal("harvest")
 			entity.set_aimed_entity(zone_to_harvest)
@@ -170,12 +176,12 @@ class Controller():
 				self.move_entity(entity, aimed_tile.grid_position)
 
 	def order_stock_resources(self, entity, stock_zone):
-		# Step 2: Search the closest tile near the zone_found to harvest it.
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 
+		# Step 1: Search the closest tile near the zone_found to harvest it.
 		aimed_tile = self.game.game_model.map.get_closest_tile_nearby(entity_grid_pos, iso_to_grid_pos(stock_zone.iso_position))
 
-		# Step 3: Start moving toward the aimed entity
+		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
 			entity.set_aimed_entity(stock_zone)
 			if aimed_tile.grid_position == entity_grid_pos:
@@ -185,7 +191,7 @@ class Controller():
 
 	# Called once
 	def order_build(self, entity, map_position, building_name):
-		# Step 1: Find which building building_name is
+		# Step 1: Create a worksite with the building_name
 		worksite = WorkSite(map_position, entity.faction, building_name)
 		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) > worksite.zone_to_build.cost[1]:
 			# Step 2: Search for an entity that can build: a Villager.
@@ -210,15 +216,12 @@ class Controller():
 		else:
 			print("not enough resources to build!")
 
-	def order_zone_villagers(self, faction):
-		for entity in self.selection[faction]:
-			if isinstance(entity, TownCenter):
-				tc = entity
-				current_player = self.game.players[faction]
-				if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
-					tc.is_producing = True
-					current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])  # TODO CONVERT FOR AI
-					self.game.game_view.update_resources_gui()
+	def order_zone_villagers(self, tc):
+		current_player = self.game.players[tc.faction]
+		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
+			tc.is_producing = True
+			current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
+			self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
 
 
 
@@ -302,7 +305,7 @@ class Controller():
 			entity.end_goal()
 
 	# Called every frame when an action is done on a zone (harvesting).
-	# Récupère les resources présentes à chaque seconde, jusqu'à ce que ce soit full. Dans ce cas, il doit retourner
+	# Récupère les resources présentes à chaque seconde, jusqu'à ce que ce soit full. Dans ce cas, il doit retourner au Town Center
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
 		if entity.action_timer > 1:

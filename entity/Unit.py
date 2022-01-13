@@ -37,8 +37,8 @@ class Unit(Entity):
 
 	def set_move_action(self):
 		self.aim = Vector(0, 0)
-		self.is_interacting = False
 		self.action_timer = 0
+		self.is_interacting = False
 		self.is_moving = True
 
 	def set_aimed_entity(self, entity):
@@ -64,6 +64,8 @@ class Unit(Entity):
 		if self.goal:
 			self.previous_goal = self.goal
 		self.goal = ""
+		self.is_moving = False
+		self.is_interacting = False
 
 
 	# def next_action(self):
