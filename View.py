@@ -321,7 +321,7 @@ class View():
 			# if units_at_point:
 			# 	print("unit!")
 			# else
-			self.game.game_controller.order_move("player", mouse_position_in_game)
+			self.game.game_controller.order_towards_position("move", "player", mouse_position_in_game)
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -333,27 +333,26 @@ class View():
 
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-		grid_pos = iso_to_grid_pos(mouse_position_in_game)
 		if self.game.game_controller.unit_in_selection("player"):
 			if self.mode == "move":
 				if symbol == arcade.key.F: # cheat window
 					self.triggerCheatInput()
 				elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-					self.game.game_controller.order_harvest("player", self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+					self.game.game_controller.order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
 				elif symbol == arcade.key.B:
 					self.mode = "build"
 					print("build mode!")
 			elif self.mode == "build":
 				if symbol == arcade.key.H: # Build something
-					self.game.game_controller.order_build("player", grid_pos, "House")
+					self.game.game_controller.order_towards_position("build", "player", mouse_position_in_game, "House")
 				elif symbol == arcade.key.S:
-					self.game.game_controller.order_build("player", grid_pos, "StoragePit")
+					self.game.game_controller.order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
 				elif symbol == arcade.key.G:
-					self.game.game_controller.order_build("player", grid_pos, "Granary")
+					self.game.game_controller.order_towards_position("build", "player", mouse_position_in_game, "Granary")
 				elif symbol == arcade.key.B:
-					self.game.game_controller.order_build("player", grid_pos, "Barracks")
+					self.game.game_controller.order_towards_position("build", "player", mouse_position_in_game, "Barracks")
 				# elif symbol == arcade.key.D:
-				# 	self.game.game_controller.order_build("player", grid_pos, "Dock")
+				# 	self.game.game_controller.order_towards_position("build", "player", mouse_position_in_game, "Dock")
 				self.mode = "move"
 				print("move mode!")
 		else:

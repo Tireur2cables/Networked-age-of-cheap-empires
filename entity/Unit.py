@@ -22,18 +22,58 @@ class Unit(Entity):
 		super().__init__(iso_position, **kwargs)
 
 		# Movement
+		self.previous_goal = ""
+
+		self.goal = ""
+		self.action = ""
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
 		self.aimed_entity = None
+		self.previous_aimed_entity = None
 		self.is_moving = False
 		self.is_interacting = False
 		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
 		self.speed = SPEED_UNITS * speed  # Speed of the unit
 
-	def reset_flags(self):
-		self.action_timer = 0
-		self.is_moving = False
+	def set_move_action(self):
+		self.aim = Vector(0, 0)
 		self.is_interacting = False
+		self.action_timer = 0
+		self.is_moving = True
+
+	def set_aimed_entity(self, entity):
+		if self.aimed_entity:
+			self.previous_aimed_entity = self.aimed_entity
+		self.aimed_entity = entity
+
+	def set_goal(self, goal):
+		self.action_timer = 0
+		if self.goal:
+			self.previous_goal = self.goal
+		self.goal = goal
+
+	def go_back_to_harvest(self):
+		if self.previous_goal == "harvest" and self.previous_aimed_entity:
+			self.goal = "harvest"
+			self.aimed_entity = self.previous_aimed_entity
+			return True
+		else:
+			return False
+
+	def end_goal(self):
+		if self.goal:
+			self.previous_goal = self.goal
+		self.goal = ""
+
+
+	# def next_action(self):
+	# 	if self.action == "move":
+	# 		if self.goal == "move":
+	# 			return
+	# 		elif self.goal == "harvest":
+	# 			self.set_action("harvest")
+	# 		elif self.goal == "build":
+	# 			self.set_action("build")
 
 	def set_path(self, path):
 		self.path = path
@@ -75,7 +115,7 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 		line_sight=4)
 
 		self.resource = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
-		self.max_resource = 10
+		self.max_resource = 3
 
 	def nb_resources(self):
 		nb = 0

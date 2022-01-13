@@ -90,6 +90,19 @@ class Map():
 	def get_tiles_nearby(self, map_position):
 		return tuple(self.tile_array[map_position.x + i][map_position.y + j] for i in range(-1, 2) for j in range(-1, 2))
 
+	def get_closest_tile_nearby(self, start_position, aim_grid_pos):
+		aimed_tile = None
+		min_path_len = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
+		for tile in self.get_tiles_nearby(aim_grid_pos):
+			path, path_len = self.get_path(start_position, tile.grid_position)
+
+			if path_len > 0 and min_path_len > path_len:
+				aimed_tile = tile
+				min_path_len = path_len
+			elif path_len == 0:
+				return tile
+		return aimed_tile
+
 	def free_tile_at(self, map_position, tile_size):
 		for x in range(map_position.x, map_position.x + tile_size[0]):
 			for y in range(map_position.y, map_position.y + tile_size[1]):
