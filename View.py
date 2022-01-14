@@ -51,6 +51,8 @@ class View():
 
 		self.mode = "move"
 
+		self.resource_label_list = []
+
 	def setup(self) :
 		#clear old lists
 		self.entity_sprite_list = arcade.SpriteList()
@@ -66,9 +68,6 @@ class View():
 		self.init_dynamic_gui()
 		self.init_cheats()
 
-		# Sync self.game_model.tile_list with unit_sprite_list
-		for e in self.game.game_model.unit_list:
-			self.unit_sprite_list.append(e.sprite)
 		# Sync self.game_model.tile_list with tile_sprite_list
 		for t in self.game.game_model.tile_list:
 			self.tile_sprite_list.append(t.sprite)
@@ -100,14 +99,14 @@ class View():
 		# Create a vertical BoxGroup to align buttons
 		self.v_box1 = arcade.gui.UIBoxLayout()
 
-		player_resources = self.game.player.resource
-		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		player = self.game.players["player"]
+		player_resources = player.resource
+		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 
 		self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
 		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
-		self.resource_label_list = []
 		for val in resources_tab :
 			label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
 			self.resource_label_list.append(label)
@@ -175,7 +174,17 @@ class View():
 					for y in range(zone.tile_size[1]):
 						tile_outline = self.get_tile_outline(grid_pos_to_iso(iso_to_grid_pos(zone.iso_position) + Vector(x, y)))
 						arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-						self.draw_health_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+				nbr_health_bar = 1
+				if zone.health > 0:
+					self.draw_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+					nbr_health_bar += 1
+
+				if isinstance(zone, Resources):
+					self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
+					nbr_health_bar +=1
+				elif isinstance(zone, TownCenter) and zone.is_producing:
+					self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+					nbr_health_bar +=1
 			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
@@ -190,9 +199,13 @@ class View():
 				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
 				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
-				self.draw_health_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
-				if (aimed_entity := s.entity.aimed_entity) and isinstance(aimed_entity, Resources):
-					self.draw_health_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE)
+				self.draw_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
+				if entity.is_interacting and (aimed_entity := entity.aimed_entity):
+					if isinstance(aimed_entity, Resources):
+						self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED)
+						self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE,nbr_health_bar=2)
+					elif isinstance(aimed_entity, WorkSite):
+						self.draw_bar(entity.iso_position, int(entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN, nbr_health_bar=2)
 			s.draw(pixelated=True)
 
 			if LAUNCH_DEBUG_DISPLAY:
@@ -297,20 +310,22 @@ class View():
 			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT:
 			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			if closest_unit_sprites :
-				self.game.game_controller.select(closest_unit_sprites)
+			if closest_unit_sprites:
+				self.game.game_controller.select("player", closest_unit_sprites)
 			else:
 				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
-				if closest_zone_sprites :
-					self.game.game_controller.select_zone(closest_zone_sprites)
+				if closest_zone_sprites:
+					self.game.game_controller.select_zone("player", closest_zone_sprites)
+				else:
+					self.game.game_controller.clear_faction_selection("player")
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			# if units_at_point:
-			# 	print("unit!")
-			# else
-			if self.is_a_unit(mouse_position_in_game):
-				self.game.game_controller.order_move(mouse_position_in_game)
+			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
+			if zones_at_point:
+				self.game.game_controller.human_order_towards_sprites("stock", "player", zones_at_point)
+			else:
+				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -322,38 +337,36 @@ class View():
 
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-		grid_pos = iso_to_grid_pos(mouse_position_in_game)
-		if self.mode == "move":
-			if symbol == arcade.key.F : # cheat window
-				self.triggerCheatInput()
-			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-				self.game.game_controller.order_harvest(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-			elif symbol == arcade.key.B:
-				self.mode = "build"
-				print("build mode!")
-		elif self.mode == "build":
-			if symbol == arcade.key.H: # Build something
-				self.game.game_controller.order_build(grid_pos, "House")
-			elif symbol == arcade.key.S:
-				self.game.game_controller.order_build(grid_pos, "StoragePit")
-			elif symbol == arcade.key.G:
-				self.game.game_controller.order_build(grid_pos, "Granary")
-			elif symbol == arcade.key.B:
-				self.game.game_controller.order_build(grid_pos, "Barracks")
-			# elif symbol == arcade.key.D:
-			# 	self.game.game_controller.order_build(grid_pos, "Dock")
-			self.mode = "move"
-			print("move mode!")
+		if self.game.game_controller.unit_in_selection("player"):
+			if self.mode == "move":
+				if symbol == arcade.key.F: # cheat window
+					self.triggerCheatInput()
+				elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+					self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+				elif symbol == arcade.key.B:
+					self.mode = "build"
+					print("build mode!")
+			elif self.mode == "build":
+				if symbol == arcade.key.H: # Build something
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
+				elif symbol == arcade.key.S:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
+				elif symbol == arcade.key.G:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
+				elif symbol == arcade.key.B:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
+				# elif symbol == arcade.key.D:
+				# 	self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
+				self.mode = "move"
+				print("move mode!")
+		else:
+			if symbol == arcade.key.V:
+				self.game.game_controller.human_order_with_zone("populate", "player")
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list):
 		sprites_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list)
 		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
 		return sprites_at_point_sorted
-
-	def is_a_unit(self, mouse_position_in_game):
-		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.unit_sprite_list)
-	def is_a_zone(self, mouse_position_in_game):
-		return bool(arcade.get_sprites_at_point(mouse_position_in_game), self.zone_sprite_list)
 
 
 
@@ -367,11 +380,12 @@ class View():
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
 
-	def draw_health_bar(self, pos, health, max_health, color):
+	def draw_bar(self, pos, health, max_health, color, nbr_health_bar=1):
 		if max_health:
 			y_offset = 10
-			arcade.draw_rectangle_filled(pos.x, pos.y - y_offset, 36, 12, arcade.color.GRAY)
-			arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - y_offset, (health*32)/max_health, 8, color)
+			arcade.draw_rectangle_filled(pos.x, pos.y - nbr_health_bar*y_offset, 36, 12, arcade.color.GRAY)
+			if health > 0:
+				arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - nbr_health_bar*y_offset, (health*32)/max_health, 8, color)
 
 	def init_dynamic_gui(self) :
 		# Create a box group to align the 'open' button in the center
@@ -451,9 +465,10 @@ class View():
 		)
 		self.coord_label.fit_content()
 
-	def update_vbox1(self):
-		player_resources = self.game.player.resource
-		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+	def update_resources_gui(self):
+		player = self.game.players["player"]
+		player_resources = player.resource
+		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 		for label, resource_text in zip(self.resource_label_list, resources_tab):
 			label.text = resource_text
 

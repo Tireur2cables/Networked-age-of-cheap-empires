@@ -91,17 +91,18 @@ class GameView(arcade.View):
 		self.game_model = Model(self)
 		self.game_view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
 		self.game_controller = Controller(self)
-		self.player = Player(IA=False)
 
 	def setMenuView(self, menu_view) :
 		self.menu_view = menu_view
 
 	def setup(self, ressources, ia, isPlayer):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		self.game_model.setup(ressources, ia, isPlayer)
+		self.players = {"player": Player(self, "player")}
+		self.game_model.setup(ressources, self.players.keys())
 		self.game_view.setup()
-		self.game_controller.setup()
-		self.player.setup(ressources)
+		self.game_controller.setup(self.players.keys())
+		for p in self.players.values():
+			p.setup(ressources)
 
 	def on_update(self, *args):  # Redirecting on_update to the Controller
 		self.game_controller.on_update(*args)
