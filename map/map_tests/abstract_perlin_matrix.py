@@ -9,9 +9,9 @@ from utils.vector import Vector
 
 
 def perlin_array(size = (50, 50),
-			scale=75, octaves = 50,
-			persistence = 0.3,
-			lacunarity = 0.8,
+			scale=21, octaves = 50,
+			persistence = 0.1,
+			lacunarity = 2,
 			seed = None):
 
 	if not seed:
@@ -45,17 +45,36 @@ def process_array(array, size = (50,50)):
 	out = [[0 for y in range(size[1])] for x in range(size[0])]
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] < 0.30:
+			if array[x][y] < 0.18:
 				#layer2=Stone(Vector(x,y))
-				out[x][y] = Tile("grass", Vector(x, y), "stone")
-			if array[x][y] < 0.45:
+				out[x][y] = Tile("grass", Vector(x, y))
+			elif array[x][y] < 0.287:
+				#layer2=Stone(Vector(x,y))
+				out[x][y] = Tile("grass", Vector(x, y))
+			elif array[x][y] < 0.315:
+				#layer2=Stone(Vector(x,y))
+				out[x][y] = Tile("grass", Vector(x, y))
+			elif array[x][y] < 0.32:
+				out[x][y] = Tile("grass", Vector(x, y),"stone")
+			elif array[x][y] < 0.45:
+				out[x][y] = Tile("grass", Vector(x, y))
+			elif array[x][y] < 0.47:
+				out[x][y] = Tile("grass", Vector(x, y),"tree")
+			elif array[x][y] < 0.578:
+				#layer2=Wood(Vector(x,y))
 				out[x][y] = Tile("grass", Vector(x, y))
 			elif array[x][y] < 0.58:
 				#layer2=Wood(Vector(x,y))
-				out[x][y] = Tile("grass", Vector(x, y), "tree")
+				out[x][y] = Tile("grass", Vector(x, y),"gold")
+			elif array[x][y] < 0.65:
+				#layer2=Wood(Vector(x,y))
+				out[x][y] = Tile("grass", Vector(x, y))
 			elif array[x][y] < 0.75:
 				#layer2=Gold(Vector(x,y))
-				out[x][y] = Tile("sand", Vector(x, y), "gold")
+				out[x][y] = Tile("sand", Vector(x, y))
+			elif array[x][y] < 0.755:
+				#layer2=Gold(Vector(x,y))
+				out[x][y] = Tile("sand", Vector(x, y),"gold")
 			else:
 				out[x][y] = Tile("water", Vector(x, y))
 	return out
