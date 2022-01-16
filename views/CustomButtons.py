@@ -8,24 +8,25 @@ from save.serializationTest import *
 from CONSTANTS import Resource as Res
 textureTicked = "Ressources/img/tick.png"
 textureEmpty = "Ressources/img/empty.png"
+button_texture = "Ressources/img/button_background.png"
 
 #############################################################
 #					Custom buttons							#
 #############################################################
 
 # Button to exit the game
-class QuitButton(arcade.gui.UIFlatButton) :
+class QuitButton(arcade.gui.UITextureButton) :
 	def __init__(self, window, text, width) :
-		super().__init__(text=text, width=width)
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
 		self.window = window
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		self.window.exit()
 
 
-class SaveButton(arcade.gui.UIFlatButton) :
+class SaveButton(arcade.gui.UITextureButton) :
 	def __init__(self, unit_list, tile_list, zone_list, text, width) :
-		super().__init__(text=text, width=width)
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
 		self.unit_list = unit_list
 		self.tile_list = tile_list
 		self.zone_list = zone_list
@@ -34,9 +35,9 @@ class SaveButton(arcade.gui.UIFlatButton) :
 		pickleSaving("savetest",self.unit_list,self.tile_list,self.zone_list)
 
 # Button to return to the main menu
-class NextViewButton(arcade.gui.UIFlatButton) :
+class NextViewButton(arcade.gui.UITextureButton) :
 	def __init__(self, window, nextView, text, width) :
-		super().__init__(text=text, width=width)
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
 		self.window = window
 		self.nextView = nextView
 
@@ -45,9 +46,9 @@ class NextViewButton(arcade.gui.UIFlatButton) :
 		self.window.show_view(self.nextView)
 
 # Button to return to the main menu
-class LaunchGameButton(arcade.gui.UIFlatButton) :
+class LaunchGameButton(arcade.gui.UITextureButton) :
 	def __init__(self, window, nextView, pregameview, text, width) :
-		super().__init__(text=text, width=width)
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
 		self.window = window
 		self.nextView = nextView
 		self.pregameview = pregameview
@@ -68,9 +69,9 @@ class LaunchGameButton(arcade.gui.UIFlatButton) :
 		self.window.show_view(self.nextView)
 
 # Button to display things or not
-class ListButton(arcade.gui.UIFlatButton) :
+class ListButton(arcade.gui.UITextureButton) :
 	def __init__(self, vbox, children, text, width) :
-		super().__init__(text=text, width=width)
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
 		self.vbox = vbox
 		self.list = children
 		self.isDisplayed = False
@@ -108,9 +109,9 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 			self.window.triggerVsync()
 
 # Selection de sa difficulté
-class SelctDifButton(arcade.gui.UIFlatButton):
+class SelctDifButton(arcade.gui.UITextureButton):
 	def __init__(self, text, size, name):
-		super().__init__(text=text + " : Facile ", width=size * 2, height=size / 4)
+		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Facile ", width=size * 2, height=size / 4)
 		self.count = 0
 		self.name = name
 		self.list = ["Facile", "Moyen", "Difficile"]
@@ -123,9 +124,9 @@ class SelctDifButton(arcade.gui.UIFlatButton):
 			self.count = self.count + 1
 		self.text = self.name + self.sep + self.list[self.count]
 
-class PlayerButton(arcade.gui.UIFlatButton):
+class PlayerButton(arcade.gui.UITextureButton):
 	def __init__(self, text, width, height):
-		super().__init__(text=text + " : Joueur Humain", width=width, height=height)
+		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Joueur Humain", width=width, height=height)
 		self.sep = " : "
 
 class NumInput(arcade.gui.UIInputText) :
@@ -144,10 +145,10 @@ class NumInput(arcade.gui.UIInputText) :
 
 class ConstructButton(arcade.gui.UITextureButton) :
 	def __init__(self,image, construct, width=60, height=90, text=""):
-		super().__init__(texture = arcade.load_texture(image),width=width, height=height, text=text)
+		super().__init__(texture = arcade.load_texture(image), width=width, height=height, text=text)
 		self.image = image
 		self.construct = construct
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
-		self.construct
+		#self.construct
 		print("Lezgo mon soleil")

@@ -90,7 +90,7 @@ class PreGameView(arcade.View) :
 		buttonsize = self.window.width / 6 # arbitrarys
 
 		#Couleur de fond pour les espaces ressources modifiables
-		bg_text = arcade.load_texture("Ressources/img/grey_fond.jpg")
+		bg_text = arcade.load_texture("Ressources/img/parchemin.jpg")
 
 		#Creation du text "Ressource :"
 		ressource_text = UITextArea(
@@ -99,7 +99,8 @@ class PreGameView(arcade.View) :
 			width=buttonsize / 2,
 			height=buttonsize / 10,
 			text="Ressources :",
-			text_color=(0, 0, 0, 255)
+			text_color=(0, 0, 0, 255),
+			font_name=('MS Office 97',),
 		)
 
 		name_ressources = ["Or", "Bois", "Nourriture", "Pierre"]
@@ -136,7 +137,8 @@ class PreGameView(arcade.View) :
 					text=str(ressources_default_value[name_ressource]), width=buttonsize/(2.5), height=buttonsize/10,
 					text_color=(1, 1, 1, 255)
 				),
-				tex=bg_text
+				tex=bg_text,
+				padding=(10, 10, 10, 10)
 			)
 
 			#Affichage des espaces ressources modifiables
