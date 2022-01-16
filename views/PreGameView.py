@@ -4,7 +4,12 @@ from arcade.gui.widgets import UITextArea, UITexturePane
 from views.CustomButtons import SelctDifButton, NextViewButton, NumInput, LaunchGameButton, PlayerButton
 
 #Constants
-BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
+BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint5.jpg"
+PIC_GOLD = "./Ressources/img/Ressources_Or_500x500.png"
+PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
+PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
+PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
+COLOR_STATIC_RESSOURCES_ICONE = arcade.color.DARK_GRAY
 
 class PreGameView(arcade.View) :
 
@@ -90,7 +95,7 @@ class PreGameView(arcade.View) :
 		buttonsize = self.window.width / 6 # arbitrarys
 
 		#Couleur de fond pour les espaces ressources modifiables
-		bg_text = arcade.load_texture("Ressources/img/parchemin.jpg")
+		bg_text = arcade.load_texture("Ressources/img/bouton_vert_age.png")
 
 		#Creation du text "Ressource :"
 		ressource_text = UITextArea(
@@ -100,14 +105,25 @@ class PreGameView(arcade.View) :
 			height=buttonsize / 10,
 			text="Ressources :",
 			text_color=(0, 0, 0, 255),
-			font_name=('MS Office 97',),
 		)
 
-		name_ressources = ["Or", "Bois", "Nourriture", "Pierre"]
-		ressources_default_value = {"Or": 100, "Bois": 200, "Nourriture": 200, "Pierre": 200}
+		name_ressources = ["Nourriture", "Bois", "Pierre", "Or"]
+		ressources_default_value = {"Nourriture": 200, "Bois": 200, "Pierre": 200, "Or": 200}
 
-		#COMPLETEMENT DINGUE : le nom de ressource sous format "" est écrasé mais après qu'on est
-		#deja implemente la valeur "" a notre fonction, diront nous.
+		# pics_tab = [PIC_FOOD, PIC_WOOD, PIC_STONE, PIC_GOLD]
+		# for i, val in enumerate(pics_tab) :
+		# 	icone = arcade.gui.UITextureButton(
+		# 		x=self.window.width - buttonsize * (3 / 2),
+		# 		y=self.window.height - buttonsize * (1.25 + i * 0.25),
+		# 		width=buttonsize / 5,
+		# 		height=buttonsize / 5,
+		# 		texture=arcade.load_texture(val)
+		# 	)
+			# self.manager.add(
+			# 	UITexturePane(
+			# 		icone.with_space_around(right=20)
+			# 	)
+			# )
 		for i, name_ressource in enumerate(name_ressources) :
 			text_area = UITextArea(
 				x=self.window.width - buttonsize * (3 / 2),
