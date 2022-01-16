@@ -30,6 +30,7 @@ class AoCE(arcade.Window):
 		# Call the initializer of arcade.Window
 		super().__init__(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=LAUNCH_FULLSCREEN, vsync=True)
 		#arcade.set_background_color(arcade.csscolor.WHITE)
+		self.set_update_rate(1/30)#set maximum fps
 
 		# Show the mouse cursor
 		self.set_mouse_visible(True)
