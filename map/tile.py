@@ -14,7 +14,7 @@ class Tile():
 			self.is_free = 0
 
 		# Sprite
-		#self.init_sprite()
+		self.init_sprite()
 
 	def __getstate__(self):
 		return [self.blockID, self.grid_position, self.is_free]
