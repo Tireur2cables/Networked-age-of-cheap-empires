@@ -10,8 +10,8 @@ from Controller import Controller
 from View import View
 
 # --- Constants ---
-DEFAULT_SCREEN_WIDTH = 1280
-DEFAULT_SCREEN_HEIGHT = 720
+DEFAULT_SCREEN_WIDTH = 800
+DEFAULT_SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
 
 MUSIC = "./Ressources/music/Marked.mp3"
@@ -30,7 +30,7 @@ class AoCE(arcade.Window):
 		# Call the initializer of arcade.Window
 		super().__init__(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=LAUNCH_FULLSCREEN, vsync=True)
 		#arcade.set_background_color(arcade.csscolor.WHITE)
-		self.set_update_rate(1/30)#set maximum fps
+		self.set_update_rate(1/60)#set maximum fps
 
 		# Show the mouse cursor
 		self.set_mouse_visible(True)
