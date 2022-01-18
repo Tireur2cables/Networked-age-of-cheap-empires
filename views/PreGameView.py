@@ -104,26 +104,12 @@ class PreGameView(arcade.View) :
 			width=buttonsize / 2,
 			height=buttonsize / 10,
 			text="Ressources :",
-			text_color=(0, 0, 0, 255),
+			text_color=(255, 255, 255, 255),
 		)
 
 		name_ressources = ["Nourriture", "Bois", "Pierre", "Or"]
 		ressources_default_value = {"Nourriture": 200, "Bois": 200, "Pierre": 200, "Or": 200}
 
-		# pics_tab = [PIC_FOOD, PIC_WOOD, PIC_STONE, PIC_GOLD]
-		# for i, val in enumerate(pics_tab) :
-		# 	icone = arcade.gui.UITextureButton(
-		# 		x=self.window.width - buttonsize * (3 / 2),
-		# 		y=self.window.height - buttonsize * (1.25 + i * 0.25),
-		# 		width=buttonsize / 5,
-		# 		height=buttonsize / 5,
-		# 		texture=arcade.load_texture(val)
-		# 	)
-			# self.manager.add(
-			# 	UITexturePane(
-			# 		icone.with_space_around(right=20)
-			# 	)
-			# )
 		for i, name_ressource in enumerate(name_ressources) :
 			text_area = UITextArea(
 				x=self.window.width - buttonsize * (3 / 2),
@@ -131,7 +117,7 @@ class PreGameView(arcade.View) :
 				width=buttonsize / 3,
 				height=buttonsize / 11,
 				text=f"{name_ressource} : ",
-				text_color=(0, 0, 0, 255)
+				text_color=(255, 255, 255, 255)
 			)
 
 			self.manager.add(
@@ -151,7 +137,7 @@ class PreGameView(arcade.View) :
 					x=self.window.width - buttonsize/(1.4),
 					y=self.window.height - buttonsize*(1.25+i*0.25),
 					text=str(ressources_default_value[name_ressource]), width=buttonsize/(2.5), height=buttonsize/10,
-					text_color=(1, 1, 1, 255)
+					text_color=(255, 255, 255, 255)
 				),
 				tex=bg_text,
 				padding=(10, 10, 10, 10)

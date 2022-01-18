@@ -60,6 +60,7 @@ class AoCE(arcade.Window):
 	# Set fulllscreen or defaults : SCREEN_WIDTH x SCREEN_HEIGHT
 	def triggerFullscreen(self) :
 		curr = self.current_view
+		curr.on_hide_view()
 		self.set_fullscreen(not self.fullscreen)
 		self.show_view(curr)
 
