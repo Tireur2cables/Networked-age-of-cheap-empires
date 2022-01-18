@@ -21,7 +21,7 @@ class Player:
 
 		# resource (dictionnary initialized with qty[Resource]
 		# BE CAREFUL: The dictionnary "resources" is the same for all players, this is why we create a new one with this comprehension.
-		self.resources = {key: 100000 for key, value in resources.items()}
+		self.resources = {key: value for key, value in resources.items()}
 
 		# unit
 		self.nb_unit = 0
