@@ -326,7 +326,7 @@ class View():
 			if closest_unit_sprites:
 				self.game.game_controller.select("player", closest_unit_sprites)
 			else:
-				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
+				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 				if closest_zone_sprites:
 					self.game.game_controller.select_zone("player", closest_zone_sprites)
 				else:
@@ -377,7 +377,7 @@ class View():
 				self.game.game_controller.human_order_with_zone("populate", "player")
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
-		sprites_at_point = (s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s, type))
+		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))
 		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
 		return sprites_at_point_sorted
 

@@ -351,8 +351,8 @@ class Controller():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
-					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
+					print(f"[{entity.faction}: harvestingharvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					print(f"[{entity.faction}: harvestingharvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 					self.game.game_view.update_resources_gui()
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
