@@ -35,15 +35,20 @@ class Map():
 
 				if object == "tree":  # Can't use match for now, not compatible with arcade library...
 					self.objects_array[x][y] = Wood(Vector(x, y))
+
 				elif object == "stone":
 					self.objects_array[x][y] = Stone(Vector(x, y))
+
 				elif object == "gold":
 					self.objects_array[x][y] = Gold(Vector(x, y))
+
 				elif object == "berry":
 					self.objects_array[x][y] = BerryBush(Vector(x, y))
+
 				elif object is not None and "spawn" in object:
 					self.spawn_array.append((Vector(x, y), object.split("_")[1]))
-				if self.objects_array[x][y] and self.objects_array[x][y].is_locking:
+
+				if self.objects_array[x][y]: # and self.objects_array[x][y].is_locking:
 					self.tile_array[x][y].is_free = 0
 
 		self.update_tile_list()

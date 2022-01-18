@@ -164,6 +164,42 @@ def process_array2(size = (50,50), seed=None):
 			if array[x][y] > 0.89 and out[x][y].blockID != "water":
 				out[x][y].pointer_to_entity = "stone"
 
+	#finding somewhere to put TownCenter
+	# nbofFreeTiles=0
+	zoneSize=6
+	# stop=0
+
+	# for x in range(size[0]):
+	# 	if stop == 1:
+	# 			break
+	# 	for y in range(size[1]):
+	# 		if stop == 1:
+	# 			break
+	# 		nbofFreeTiles=0
+	# 		for a in range(x,x+zoneSize):
+	# 			for b in range(y,y+zoneSize):
+	# 				if out[a][b].blockID == "water":
+	# 					nbofFreeTiles=0
+	# 					continue
+	# 				else:
+	# 					nbofFreeTiles+=1
+	# 		if nbofFreeTiles==zoneSize*zoneSize:
+	# 			towncenterpos=Vector(x,y)
+	# 			stop=1
+	for a in range(10,10+zoneSize):
+		for b in range(10,10+zoneSize):
+			out[a][b].blockID = "grass"
+			out[a][b].pointer_to_entity = None
+
+	out[11][11].pointer_to_entity = "spawn_0"
+	
+
+	for a in range(90,90+zoneSize):
+		for b in range(90,90+zoneSize):
+			out[a][b].blockID = "grass"
+			out[a][b].pointer_to_entity = None
+	out[91][91].pointer_to_entity = "spawn_1"
+
 	# genere la sprite
 	for x in range(size[0]):
 		for y in range(size[1]):
