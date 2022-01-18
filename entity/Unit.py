@@ -1,4 +1,4 @@
-from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS
+from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS, LAUNCH_LIGHTSPEED_MOVES
 from entity.Entity import Entity
 from utils.SpriteData import SpriteData
 from CONSTANTS import Resource as Res
@@ -33,7 +33,7 @@ class Unit(Entity):
 		self.is_interacting = False
 		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
-		self.speed = SPEED_UNITS * speed  # Speed of the unit
+		self.speed = SPEED_UNITS * 5 if LAUNCH_LIGHTSPEED_MOVES else SPEED_UNITS * speed  # Speed of the unit
 
 	def set_move_action(self):
 		self.aim = Vector(0, 0)

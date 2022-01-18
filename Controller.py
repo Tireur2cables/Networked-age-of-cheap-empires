@@ -415,6 +415,7 @@ class Controller():
 
 			if unit.aimed_entity.aimed_entity != unit:
 				self.order_attack_unit(unit.aimed_entity, unit)
+				unit.aimed_entity.is_interacting = True
 
 			if not alive:
 				unit.end_goal()
