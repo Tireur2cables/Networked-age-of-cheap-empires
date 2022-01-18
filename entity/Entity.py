@@ -76,8 +76,9 @@ class Entity:
 		self.pierce_armor = data[8]
 		self.line_sight = data[9]
 
-	def get_name(self):
-		return type(self).__name__.lower()
+	@classmethod
+	def get_name(cls):
+		return cls.__name__.lower()
 
 	# coordonnees
 	def get_x(self):

@@ -1,4 +1,5 @@
 # --- Imports ---
+from LAUNCH_SETUP import LAUNCH_ENABLE_IA
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
@@ -21,12 +22,13 @@ class Controller():
 		# Selection (will contain elements of type Entity)
 		self.selection = dict()  # self.section ---> convert to a dict, the key is "player" or "ai_1" or "ai_2" or ...
 		self.dead_entities = set()
+		self.ai = set()
 
-	def setup(self, players):
-		for p in players:
-			self.selection[p] = set()
-
-
+	def setup(self, players_dict):
+		for key, value in players_dict.items():
+			self.selection[key] = set()
+			if "ai" in key:
+				self.ai.add(value)
 
 # --- Utility methods ---
 	@staticmethod
@@ -190,7 +192,7 @@ class Controller():
 		else:
 			stock_zones = self.game.players[entity.faction].other_storage
 
-		aimed_tile, stock_zone = self.game.game_model.map.get_closest_tile_nearby_collection(entity_grid_pos, stock_zones)
+		aimed_tile, stock_zone = self.game.game_model.map.get_closest_tile_nearby_collection_fast(entity_grid_pos, stock_zones)
 		print(aimed_tile, stock_zone)
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
@@ -223,15 +225,17 @@ class Controller():
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
-				for i in range(worksite.zone_to_build.tile_size[0]):
-					for j in range(worksite.zone_to_build.tile_size[1]):
-						tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
-						if tile.pointer_to_entity is not None or tile.is_free == 0:
-							return
+
+				if not self.game.game_model.map.is_area_empty(map_position, worksite.zone_to_build.tile_size):
+					print("area not empty!")
+					return
+
 				# Step 4: if possible (no return), move one tile below the first tile of the building.
 				entity.set_goal("build")
 				entity.set_aimed_entity(worksite)
 				aim = map_position - Vector(1,1)
+
+				# A FAIRE : RESERVER LES TILES à l'avance !!! ---> Sinon pendant le temps de construction on peut en mettre d'autres par dessus.
 
 				if iso_to_grid_pos(entity.iso_position) == aim:
 					entity.is_interacting = True
@@ -255,6 +259,11 @@ class Controller():
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
+
+		# --- Update AI ---
+		if LAUNCH_ENABLE_IA:
+			for ai in self.ai:
+				ai.on_update()
 
 		# --- Updating Sets ---
 		moving_entities = set()
@@ -337,13 +346,13 @@ class Controller():
 		if entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
-			print(f"[harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
+			print(f"[{entity.faction}: harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
 			if not entity.is_full():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
-					entity.resource[aimed_entity.get_resource_nbr()] += harvested
+					entity.resources[aimed_entity.get_resource_nbr()] += harvested
 					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[harvesting] -> {type(entity).__name__} has {entity.resource} - max_resources : {entity.max_resource}")
+					print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 					self.game.game_view.update_resources_gui()
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
@@ -363,16 +372,14 @@ class Controller():
 			items_to_store = (Res.GOLD, Res.STONE, Res.WOOD)
 
 		for resource in items_to_store:
-			self.game.players[entity.faction].add_resource(resource, entity.resource[resource])
+			self.game.players[entity.faction].add_resource(resource, entity.resources[resource])
 			self.game.game_view.update_resources_gui()
-			entity.resource[resource] = 0
+			entity.resources[resource] = 0
 		can_harvest = entity.go_back_to_harvest()
 		if can_harvest:
 			self.order_harvest(entity, entity.previous_aimed_entity)
 
-
-
-	# produit un villageois et s'arrête
+	# Produit un villageois et s'arrête
 	def produce_villagers(self, tc, delta_time):
 		tc.action_timer += delta_time
 		if tc.action_timer > tc.villager_cooldown:

@@ -26,7 +26,6 @@ class Unit(Entity):
 		self.previous_goal = ""
 
 		self.goal = ""
-		self.action = ""
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
 		self.aimed_entity = None
 		self.previous_aimed_entity = None
@@ -68,16 +67,6 @@ class Unit(Entity):
 		self.is_moving = False
 		self.is_interacting = False
 
-
-	# def next_action(self):
-	# 	if self.action == "move":
-	# 		if self.goal == "move":
-	# 			return
-	# 		elif self.goal == "harvest":
-	# 			self.set_action("harvest")
-	# 		elif self.goal == "build":
-	# 			self.set_action("build")
-
 	def set_path(self, path):
 		self.path = path
 		self.is_moving = True
@@ -117,13 +106,13 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 		rate_fire=2,
 		line_sight=4)
 
-		self.resource = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
+		self.resources = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
 		self.max_resource = 3 if LAUNCH_FAST_ACTIONS else 10
 
 	def nb_resources(self):
 		nb = 0
-		for resource in self.resource:
-			nb += self.resource[resource]
+		for resource in self.resources:
+			nb += self.resources[resource]
 		return nb
 
 	def set_max_resource(self, max_resource):

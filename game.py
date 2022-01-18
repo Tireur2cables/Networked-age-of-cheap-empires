@@ -1,7 +1,7 @@
 # --- Imports ---
 # -- arcade --
 import arcade
-from player import Player
+from player import AI, Player
 # -- others --
 from views.MainView import MainView
 # -- mvc --
@@ -48,6 +48,7 @@ class AoCE(arcade.Window):
 	def on_show(self):
 		# Affiche le main menu
 		start_view = MainView(self.game_view)
+		print("test")
 		self.game_view.setMenuView(start_view)
 		start_view.setup() # useless : mainview.setup is empty
 		self.show_view(start_view)
@@ -97,12 +98,10 @@ class GameView(arcade.View):
 
 	def setup(self, ressources, ia, isPlayer):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		self.players = {"player": Player(self, "player")}
-		self.game_model.setup(ressources, self.players.keys())
+		self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
+		self.game_model.setup(self.players.keys())
 		self.game_view.setup()
-		self.game_controller.setup(self.players.keys())
-		for p in self.players.values():
-			p.setup(ressources)
+		self.game_controller.setup(self.players)
 
 	def on_update(self, *args):  # Redirecting on_update to the Controller
 		self.game_controller.on_update(*args)

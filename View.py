@@ -45,9 +45,8 @@ class View():
 		""" Initializer """
 		self.game = aoce_game
 
-		self.unit_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
-		self.zone_sprite_list = arcade.SpriteList()
+		self.sorted_sprite_list = arcade.SpriteList()
 
 		self.mode = "move"
 
@@ -55,9 +54,7 @@ class View():
 
 	def setup(self) :
 		#clear old lists
-		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
-		self.zone_sprite_list = arcade.SpriteList()
 
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
@@ -71,9 +68,15 @@ class View():
 		# Sync self.game_model.tile_list with tile_sprite_list
 		for t in self.game.game_model.tile_list:
 			self.tile_sprite_list.append(t.sprite)
-		# Sync self.game_model.zone_list with zone_sprite_list
+		# Sync self.game_model.zone_list with sorted_sprite_list
 		for z in self.game.game_model.zone_list:
-			self.zone_sprite_list.append(z.sprite)
+			if z.sprite not in self.sorted_sprite_list:
+				self.sorted_sprite_list.append(z.sprite)
+		# Sync self.game_model.unit_list with sorted_sprite_list
+		for u in self.game.game_model.unit_list:
+			if u.sprite not in self.sorted_sprite_list:
+				self.sorted_sprite_list.append(u.sprite)
+
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -100,7 +103,7 @@ class View():
 		self.v_box1 = arcade.gui.UIBoxLayout()
 
 		player = self.game.players["player"]
-		player_resources = player.resource
+		player_resources = player.resources
 		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 
 		self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
@@ -145,17 +148,20 @@ class View():
 # --- Adding/Discarding Sprites ---
 
 	def add_sprite(self, new_sprite):
-		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.unit_sprite_list:
-			self.unit_sprite_list.append(new_sprite)
-		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
-			self.zone_sprite_list.append(new_sprite)
+		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.sorted_sprite_list:
+			self.sorted_sprite_list.append(new_sprite)
+		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.sorted_sprite_list:
+			self.sorted_sprite_list.append(new_sprite)
+		self.sort_list()
 
 	def discard_sprite(self, dead_sprite):
-		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
-			self.unit_sprite_list.remove(dead_sprite)
-		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.zone_sprite_list:
-			self.zone_sprite_list.remove(dead_sprite)
+		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.sorted_sprite_list:
+			self.sorted_sprite_list.remove(dead_sprite)
+		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.sorted_sprite_list:
+			self.sorted_sprite_list.remove(dead_sprite)
 
+	def sort_list(self):
+		self.sorted_sprite_list.sort(key=lambda s: s.entity.iso_position.y, reverse=True)
 
 
 # --- Drawing ---
@@ -167,49 +173,56 @@ class View():
 		# --- Object sprite lists : Tiles, Zones & Entities
 		self.tile_sprite_list.draw(pixelated=True)
 
-		for s in self.zone_sprite_list:
-			zone = s.entity
-			if zone.selected:
-				for x in range(zone.tile_size[0]):
-					for y in range(zone.tile_size[1]):
-						tile_outline = self.get_tile_outline(grid_pos_to_iso(iso_to_grid_pos(zone.iso_position) + Vector(x, y)))
-						arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-				nbr_health_bar = 1
-				if zone.health > 0:
-					self.draw_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
-					nbr_health_bar += 1
+		# for s in self.tile_sprite_list:
+		# 	tile = s.tile
+		# 	if tile.is_free == 0 or tile.pointer_to_entity is not None:
+		# 		tile_outline = self.get_tile_outline(grid_pos_to_iso(tile.grid_position))
+		# 		arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 
-				if isinstance(zone, Resources):
-					self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
-					nbr_health_bar +=1
-				elif isinstance(zone, TownCenter) and zone.is_producing:
-					self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
-					nbr_health_bar +=1
-			s.draw(pixelated=True)
+		for s in self.sorted_sprite_list:
+			if s.entity.selected:
+				if isinstance(s.entity, Zone):
+					zone = s.entity
+					for x in range(zone.tile_size[0]):
+						for y in range(zone.tile_size[1]):
+							tile_outline = self.get_tile_outline(grid_pos_to_iso(iso_to_grid_pos(zone.iso_position) + Vector(x, y)))
+							arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+					nbr_health_bar = 1
+					if zone.health > 0:
+						self.draw_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+						nbr_health_bar += 1
 
-			if LAUNCH_DEBUG_DISPLAY:
-				self.draw_iso_position(s.entity.iso_position)
+					if isinstance(zone, Resources):
+						self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
+						nbr_health_bar +=1
+					elif isinstance(zone, TownCenter) and zone.is_producing:
+						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+						nbr_health_bar +=1
+					# s.draw(pixelated=True)
+					if LAUNCH_DEBUG_DISPLAY:
+						self.draw_iso_position(s.entity.iso_position)
 
-		for s in self.unit_sprite_list:
-			entity = s.entity
-			if entity.selected:
-				s.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_grid_pos(entity.iso_position)
-				# tile_below = self.game.game_model.map.get_tile_at(map_position)
-				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
-				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
-				self.draw_bar(entity.iso_position, entity.health, entity.max_health, arcade.color.RED)
-				if entity.is_interacting and (aimed_entity := entity.aimed_entity):
-					if isinstance(aimed_entity, Resources):
-						self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED)
-						self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE,nbr_health_bar=2)
-					elif isinstance(aimed_entity, WorkSite):
-						self.draw_bar(entity.iso_position, int(entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN, nbr_health_bar=2)
-			s.draw(pixelated=True)
+				elif isinstance(s.entity, Unit):
+					unit = s.entity
+					s.draw_hit_box((255, 0, 0), line_thickness=3)
+					map_position = iso_to_grid_pos(unit.iso_position)
+					# tile_below = self.game.game_model.map.get_tile_at(map_position)
+					tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
+					arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+					# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
+					self.draw_bar(unit.iso_position, unit.health, unit.max_health, arcade.color.RED)
+					if unit.is_interacting and (aimed_entity := unit.aimed_entity):
+						if isinstance(aimed_entity, Resources):
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED)
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.BLUE,nbr_health_bar=2)
+						elif isinstance(aimed_entity, WorkSite):
+							self.draw_bar(unit.iso_position, int(unit.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN, nbr_health_bar=2)
+					# s.draw(pixelated=True)
+					if LAUNCH_DEBUG_DISPLAY:
+						self.draw_iso_position(unit.iso_position)
 
-			if LAUNCH_DEBUG_DISPLAY:
-				self.draw_iso_position(entity.iso_position)
+		self.sort_list()
+		self.sorted_sprite_list.draw(pixelated=True)
 
 		if LAUNCH_DEBUG_DISPLAY:
 			for x in range(3):
@@ -309,7 +322,7 @@ class View():
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
 			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT:
-			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			if closest_unit_sprites:
 				self.game.game_controller.select("player", closest_unit_sprites)
 			else:
@@ -320,8 +333,8 @@ class View():
 					self.game.game_controller.clear_faction_selection("player")
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
+			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
+			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 			if zones_at_point:
 				self.game.game_controller.human_order_towards_sprites("stock", "player", zones_at_point)
 			else:
@@ -363,8 +376,8 @@ class View():
 			if symbol == arcade.key.V:
 				self.game.game_controller.human_order_with_zone("populate", "player")
 
-	def get_closest_sprites(self, mouse_position_in_game, sprite_list):
-		sprites_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list)
+	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
+		sprites_at_point = (s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s, type))
 		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
 		return sprites_at_point_sorted
 
@@ -467,7 +480,7 @@ class View():
 
 	def update_resources_gui(self):
 		player = self.game.players["player"]
-		player_resources = player.resource
+		player_resources = player.resources
 		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 		for label, resource_text in zip(self.resource_label_list, resources_tab):
 			label.text = resource_text
