@@ -337,6 +337,8 @@ class View():
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 			if zones_at_point:
 				self.game.game_controller.human_order_towards_sprites("stock", "player", zones_at_point)
+			# elif units_at_point:
+			# 	self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
 
@@ -355,7 +357,7 @@ class View():
 				if symbol == arcade.key.F: # cheat window
 					self.triggerCheatInput()
 				elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-					self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+					self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone))
 				elif symbol == arcade.key.B:
 					self.mode = "build"
 					print("build mode!")

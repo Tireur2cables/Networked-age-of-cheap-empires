@@ -35,8 +35,11 @@ class Controller():
 	def filter_type(type):
 		return lambda entity: isinstance(entity, type)
 	@staticmethod
-	def filter_faction(faction):
-		return lambda entity: entity.faction == faction
+	def filter_faction(faction, reverse=False):
+		if reverse:
+			return lambda entity: entity.faction != faction
+		else:
+			return lambda entity: entity.faction == faction
 	@staticmethod
 	def filter_both(type, faction):
 		return lambda entity: isinstance(entity, type) and entity.faction == faction
@@ -135,6 +138,8 @@ class Controller():
 					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type((TownCenter, StoragePit, Granary)))
 					if zone_found:
 						self.order_stock_resources(entity, zone_found)
+			elif action == "attack":
+				unit_found = self.find_entity_in_sprites(sprites_at_point)
 
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
@@ -351,8 +356,8 @@ class Controller():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
-					print(f"[{entity.faction}: harvestingharvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[{entity.faction}: harvestingharvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
+					print(f"[{entity.faction}: harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					print(f"[{entity.faction}: harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 					self.game.game_view.update_resources_gui()
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
