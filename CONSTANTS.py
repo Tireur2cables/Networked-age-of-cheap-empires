@@ -12,7 +12,7 @@ class Resource(Enum):
 	STONE = auto()
 
 # Default number of tiles on each side of the map
-DEFAULT_MAP_SIZE = 50
+DEFAULT_MAP_SIZE = 100
 
 # Some basics sizes about tiles
 TILE_WIDTH = 64 # arbitrary ?

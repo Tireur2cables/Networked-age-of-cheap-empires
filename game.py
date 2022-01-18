@@ -10,8 +10,8 @@ from Controller import Controller
 from View import View
 
 # --- Constants ---
-DEFAULT_SCREEN_WIDTH = 800
-DEFAULT_SCREEN_HEIGHT = 600
+DEFAULT_SCREEN_WIDTH = 1280
+DEFAULT_SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Age Of Cheap Empire"
 
 MUSIC = "./Ressources/music/Marked.mp3"
