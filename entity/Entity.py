@@ -76,8 +76,9 @@ class Entity:
 		self.pierce_armor = data[8]
 		self.line_sight = data[9]
 
-	def get_name(self):
-		return type(self).__name__.lower()
+	@classmethod
+	def get_name(cls):
+		return cls.__name__.lower()
 
 	# coordonnees
 	def get_x(self):
@@ -110,8 +111,10 @@ class Entity:
 
 	def lose_health(self, qty_health):
 		self.health -= qty_health
-		if self.health < 0:# on corrige le nb de pt de vie si celui-ci est negatif
+		if self.health <= 0:# on corrige le nb de pt de vie si celui-ci est negatif
 			self.health = 0
+			return False
+		return True
 
 	def is_alive(self):
 		return self.health > 0

@@ -1,4 +1,5 @@
 # --- Imports ---
+from LAUNCH_SETUP import LAUNCH_ENABLE_IA
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
@@ -21,20 +22,24 @@ class Controller():
 		# Selection (will contain elements of type Entity)
 		self.selection = dict()  # self.section ---> convert to a dict, the key is "player" or "ai_1" or "ai_2" or ...
 		self.dead_entities = set()
+		self.ai = set()
 
-	def setup(self, players):
-		for p in players:
-			self.selection[p] = set()
-
-
+	def setup(self, players_dict):
+		for key, value in players_dict.items():
+			self.selection[key] = set()
+			if "ai" in key:
+				self.ai.add(value)
 
 # --- Utility methods ---
 	@staticmethod
 	def filter_type(type):
 		return lambda entity: isinstance(entity, type)
 	@staticmethod
-	def filter_faction(faction):
-		return lambda entity: entity.faction == faction
+	def filter_faction(faction, reverse=False):
+		if reverse:
+			return lambda entity: entity.faction != faction
+		else:
+			return lambda entity: entity.faction == faction
 	@staticmethod
 	def filter_both(type, faction):
 		return lambda entity: isinstance(entity, type) and entity.faction == faction
@@ -133,6 +138,10 @@ class Controller():
 					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type((TownCenter, StoragePit, Granary)))
 					if zone_found:
 						self.order_stock_resources(entity, zone_found)
+			if action == "attack":
+				unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
+				if unit_found:
+					self.order_attack_unit(entity, unit_found)
 
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
@@ -190,14 +199,12 @@ class Controller():
 		else:
 			stock_zones = self.game.players[entity.faction].other_storage
 
-		aimed_tile, stock_zone = self.game.game_model.map.get_closest_tile_nearby_collection(entity_grid_pos, stock_zones)
+		aimed_tile, stock_zone = self.game.game_model.map.get_closest_tile_nearby_collection_fast(entity_grid_pos, stock_zones)
 		print(aimed_tile, stock_zone)
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
 			entity.set_aimed_entity(stock_zone)
-			if aimed_tile.grid_position == entity_grid_pos:
-				entity.set_aimed_entity(stock_zone)
-			else:
+			if aimed_tile.grid_position != entity_grid_pos:
 				self.move_entity(entity, aimed_tile.grid_position)
 
 
@@ -210,9 +217,7 @@ class Controller():
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
 			entity.set_aimed_entity(stock_zone)
-			if aimed_tile.grid_position == entity_grid_pos:
-				entity.set_aimed_entity(stock_zone)
-			else:
+			if aimed_tile.grid_position != entity_grid_pos:
 				self.move_entity(entity, aimed_tile.grid_position)
 
 	# Called once
@@ -223,15 +228,17 @@ class Controller():
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
-				for i in range(worksite.zone_to_build.tile_size[0]):
-					for j in range(worksite.zone_to_build.tile_size[1]):
-						tile = self.game.game_model.map.get_tile_at(map_position + Vector(i, j))
-						if tile.pointer_to_entity is not None or tile.is_free == 0:
-							return
+
+				if not self.game.game_model.map.is_area_empty(map_position, worksite.zone_to_build.tile_size):
+					print("area not empty!")
+					return
+
 				# Step 4: if possible (no return), move one tile below the first tile of the building.
 				entity.set_goal("build")
 				entity.set_aimed_entity(worksite)
 				aim = map_position - Vector(1,1)
+
+				# A FAIRE : RESERVER LES TILES à l'avance !!! ---> Sinon pendant le temps de construction on peut en mettre d'autres par dessus.
 
 				if iso_to_grid_pos(entity.iso_position) == aim:
 					entity.is_interacting = True
@@ -250,11 +257,23 @@ class Controller():
 			self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
 
 
+	def order_attack_unit(self, entity: Unit, aimed_unit: Unit):
+		# print(f"{entity} ---> VS {aimed_unit}")
+		entity.set_goal("attack")
+		entity.set_aimed_entity(aimed_unit)
+		self.move_entity(entity, iso_to_grid_pos(aimed_unit.iso_position))
+
+
 
 # --- On_update (Called every frame) ---
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
+
+		# --- Update AI ---
+		if LAUNCH_ENABLE_IA:
+			for ai in self.ai:
+				ai.on_update()
 
 		# --- Updating Sets ---
 		moving_entities = set()
@@ -283,6 +302,11 @@ class Controller():
 					entity.is_moving = False
 					if entity.goal in ("harvest", "stock", "build"):
 						entity.is_interacting = True
+					elif entity.goal == "attack":
+						if iso_to_grid_pos(entity.iso_position) == iso_to_grid_pos(entity.aimed_entity.iso_position):
+							entity.is_interacting = True
+						else:
+							self.order_attack_unit(entity, entity.aimed_entity)
 
 			else:  # If it is not close to where it aims and not out of bounds, move.
 				entity.iso_position += entity.change
@@ -296,6 +320,8 @@ class Controller():
 				self.build_zone(entity, delta_time)
 			elif isinstance(entity.aimed_entity, (TownCenter, StoragePit, Granary)):
 				self.stock_resources(entity, entity.aimed_entity.get_name())
+			elif isinstance(entity.aimed_entity, Unit):
+				self.attack_unit(entity, delta_time)
 
 		for entity in producing_entities:
 			if isinstance(entity, TownCenter):
@@ -337,13 +363,13 @@ class Controller():
 		if entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
-			print(f"[harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
+			print(f"[{entity.faction}: harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
 			if not entity.is_full():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
-					entity.resource[aimed_entity.get_resource_nbr()] += harvested
-					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[harvesting] -> {type(entity).__name__} has {entity.resource} - max_resources : {entity.max_resource}")
+					entity.resources[aimed_entity.get_resource_nbr()] += harvested
+					print(f"[{entity.faction}: harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					print(f"[{entity.faction}: harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 					self.game.game_view.update_resources_gui()
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
@@ -363,16 +389,14 @@ class Controller():
 			items_to_store = (Res.GOLD, Res.STONE, Res.WOOD)
 
 		for resource in items_to_store:
-			self.game.players[entity.faction].add_resource(resource, entity.resource[resource])
+			self.game.players[entity.faction].add_resource(resource, entity.resources[resource])
 			self.game.game_view.update_resources_gui()
-			entity.resource[resource] = 0
+			entity.resources[resource] = 0
 		can_harvest = entity.go_back_to_harvest()
 		if can_harvest:
 			self.order_harvest(entity, entity.previous_aimed_entity)
 
-
-
-	# produit un villageois et s'arrête
+	# Produit un villageois et s'arrête
 	def produce_villagers(self, tc, delta_time):
 		tc.action_timer += delta_time
 		if tc.action_timer > tc.villager_cooldown:
@@ -380,3 +404,17 @@ class Controller():
 			tc.is_producing = False
 			grid_position = iso_to_grid_pos(tc.iso_position) - Vector(1, 1)
 			self.add_entity_to_game(Villager(grid_pos_to_iso(grid_position), tc.faction))
+
+	def attack_unit(self, unit: Unit, delta_time):
+		unit.action_timer += delta_time
+		if unit.action_timer > 1/unit.rate_fire:
+			unit.action_timer = 0
+			print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
+			alive = unit.aimed_entity.lose_health(unit.damage)
+
+			if unit.aimed_entity.aimed_entity != unit:
+				self.order_attack_unit(unit.aimed_entity, unit)
+
+			if not alive:
+				unit.end_goal()
+				self.dead_entities.add(unit.aimed_entity)

@@ -105,7 +105,7 @@ class TownCenter(Buildable):
 		faction=faction,
 		health=600,
 		line_sight=7)
-		self.villager_cooldown = 20  # in seconds
+		self.villager_cooldown = 3 if LAUNCH_FAST_ACTIONS else 20 # in seconds
 		self.villager_cost = (Res.FOOD, 50)
 		self.is_producing = False
 

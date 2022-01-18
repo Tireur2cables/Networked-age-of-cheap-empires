@@ -89,6 +89,15 @@ class Map():
 		# path_len > 0 : means there is a path between start and end.
 		return path, path_len
 
+	def is_area_empty(self, map_position, tile_size):
+		for i in range(tile_size[0]):
+			for j in range(tile_size[1]):
+				tile = self.get_tile_at(map_position + Vector(i, j))
+				if not tile.is_empty():
+					return False
+		print(tile.grid_position)
+		return True
+
 	def get_tile_at(self, map_position):
 		return self.tile_array[map_position.x][map_position.y]
 
@@ -109,13 +118,31 @@ class Map():
 		return aimed_tile
 
 	def get_tiles_nearby_collection(self, collection):
-		return tuple((self.tile_array[element.grid_position.x + i][element.grid_position.y + j], element) for element in collection for i in range(-1, 2) for j in range(-1, 2))
+		return tuple((tile, element) for element in collection for i in range(-1, 2) for j in range(-1, 2) if (tile := self.tile_array[element.grid_position.x + i][element.grid_position.y + j]).is_empty())
+
+	def get_closest_tile_nearby_collection_fast(self, start_position, collection):
+		aimed_tile = None
+		aimed_element = None
+		min_dist = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
+		for tile_element in self.get_tiles_nearby_collection(collection):
+			# Beaucoup trop long : fait freeze le jeu. -> Solution possible : faire un calcul direct sur la distance.
+			tile, element = tile_element
+			dist = (tile.grid_position - start_position).norm()
+
+			if dist > 0 and min_dist > dist:
+				aimed_tile = tile
+				aimed_element = element
+				min_dist = dist
+			elif dist == 0:
+				return tile, element
+		return aimed_tile, aimed_element
 
 	def get_closest_tile_nearby_collection(self, start_position, collection):
 		aimed_tile = None
 		aimed_element = None
 		min_path_len = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
 		for tile_element in self.get_tiles_nearby_collection(collection):
+			# Beaucoup trop long : fait freeze le jeu. -> Solution possible : faire un calcul direct sur la distance.
 			tile, element = tile_element
 			path, path_len = self.get_path(start_position, tile.grid_position)
 
@@ -124,7 +151,7 @@ class Map():
 				aimed_element = element
 				min_path_len = path_len
 			elif path_len == 0:
-				return tile
+				return tile, element
 		return aimed_tile, aimed_element
 
 	def free_tile_at(self, map_position, tile_size):

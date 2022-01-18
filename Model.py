@@ -26,7 +26,7 @@ class Model():
 		self.tile_list = []
 		self.zone_list = []
 
-	def setup(self, ressources, players):
+	def setup(self, players):
 		# clear old lists
 		self.unit_list.clear()
 		self.tile_list.clear()
@@ -34,8 +34,7 @@ class Model():
 
 		# pre game view infos
 		self.players = players
-		self.default_ressources = ressources
-		print(ressources)
+		# self.default_ressources = ressources
 
 		# Set up the villager and add it to the unit_list.
 		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
