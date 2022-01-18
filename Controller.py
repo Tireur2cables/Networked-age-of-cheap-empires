@@ -1,4 +1,5 @@
 # --- Imports ---
+import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
 from utils.isometric import *
 from entity.Unit import *
@@ -157,7 +158,6 @@ class Controller():
 						return
 				elif action == "build":
 					self.order_build(entity, grid_position, *args)
-
 	def human_order_with_zone(self, action, faction):
 		if action == "populate":
 			for entity in self.selection[faction]:
@@ -169,6 +169,7 @@ class Controller():
 # --- Orders (Called once) ----
 	def move_entity(self, entity, grid_position):
 		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -181,7 +182,8 @@ class Controller():
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 
 		# Step 1: Search the closest tile near the zone_found to harvest it.
-		aimed_tile = self.game.game_model.map.get_closest_tile_nearby(entity_grid_pos, iso_to_grid_pos(zone_to_harvest.iso_position))
+		print(f"h: {zone_to_harvest}")
+		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(zone_to_harvest.iso_position))
 
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
@@ -212,7 +214,7 @@ class Controller():
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 
 		# Step 1: Search the closest tile near the zone_found to harvest it.
-		aimed_tile = self.game.game_model.map.get_closest_tile_nearby(entity_grid_pos, stock_zone.grid_position)
+		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, stock_zone.grid_position)
 
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
@@ -239,7 +241,6 @@ class Controller():
 				aim = map_position - Vector(1,1)
 
 				# A FAIRE : RESERVER LES TILES à l'avance !!! ---> Sinon pendant le temps de construction on peut en mettre d'autres par dessus.
-
 				if iso_to_grid_pos(entity.iso_position) == aim:
 					entity.is_interacting = True
 				else:
@@ -248,6 +249,7 @@ class Controller():
 				print("Not a Villager!")
 		else:
 			print("not enough resources to build!")
+
 
 	def order_zone_villagers(self, tc):
 		current_player = self.game.players[tc.faction]
@@ -294,7 +296,6 @@ class Controller():
 			# Check if the next position is on the map
 			if not self.is_on_map(iso_to_grid_pos(entity.iso_position+entity.change)):
 				entity.is_moving = False
-				print("OUT OF BOUND !!!")
 			elif entity.iso_position.isalmost(entity.aim, entity.speed):
 				if entity.path:
 					entity.next_aim()
@@ -333,7 +334,7 @@ class Controller():
 		self.dead_entities.clear()
 
 	def is_on_map(self, grid_position):
-		return grid_position.x >= 0 and grid_position.x < DEFAULT_MAP_SIZE and grid_position.y >= 0 and grid_position.y < DEFAULT_MAP_SIZE
+		return self.game.game_model.map.is_on_map(grid_position)
 
 
 

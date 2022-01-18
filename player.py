@@ -1,4 +1,5 @@
 import random
+import time
 from CONSTANTS import Resource as Res
 from entity.Unit import Unit, Villager
 from entity.Zone import BerryBush, Gold, House, Stone, StoragePit, Granary, TownCenter, Wood, WorkSite, Zone
@@ -130,18 +131,20 @@ class AI(Player):
 
 	def search_pos_to_build(self, start_position, tile_size):
 		area_found = False
-
 		current_iter = 0
 		map_position = None
+
 		while not area_found and current_iter < 1000:
 			rand_x = random.choice((random.randint(-10, -3), random.randint(3, 10)))
 			rand_y = random.choice((random.randint(-10, -3), random.randint(3, 10)))
 			map_position = start_position + Vector(rand_x, rand_y)
-			area_found = self.game.game_model.map.is_area_empty(map_position, tile_size)
+			#print("position_to_build:", map_position)
+			if self.game.game_model.map.is_on_map(map_position):
+				area_found = self.game.game_model.map.is_area_empty(map_position, tile_size)
 			current_iter += 1
 		if current_iter == 1000:
 			map_position = None
-		print(f"final choice : {map_position}")
+
 		return map_position
 
 	def search_closest_harvest_zone(self, unit, resource):
@@ -160,7 +163,6 @@ class AI(Player):
 		return harvest_zone
 
 	def on_update(self):
-
 		if not self.town_center.is_producing and self.resources[Res.FOOD] > 50:
 			self.game.game_controller.order_zone_villagers(self.town_center)
 
@@ -168,6 +170,7 @@ class AI(Player):
 		ongoing_actions = set()
 		for unit_list in self.my_units.values():
 			for unit in unit_list:
+				# print(iso_to_grid_pos(unit.iso_position), unit.is_moving, unit.is_interacting)
 				if not unit.is_moving and not unit.is_interacting:
 					idle_units.add(unit)
 				else:

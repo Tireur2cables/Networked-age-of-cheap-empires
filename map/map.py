@@ -1,5 +1,6 @@
 # Imports
 
+import time
 from map.tile import Tile
 from entity.Zone import Wood, Stone, Gold, BerryBush
 from map.defaultmap import default_map_2d, default_map_objects_2d
@@ -61,6 +62,9 @@ class Map():
 				if self.objects_array[x][y]:
 					self.objects.append(self.objects_array[x][y])
 
+	def is_on_map(self, grid_position):
+		return grid_position.x >= 0 and grid_position.x < self.map_size and grid_position.y >= 0 and grid_position.y < self.map_size
+
 	def get_pathfinding_matrix(self):  # @kenzo6c: The pathfinding_matrix has to be created on the fly, otherwise it won't change if the map changes
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		# Swapping x and y here, because of the library implementation
@@ -73,7 +77,9 @@ class Map():
 		if start != end:
 			pathfinding_matrix = self.get_pathfinding_matrix()
 			grid = Grid(matrix=pathfinding_matrix)
+			# DEBUG_start = time.time()
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+			# print(f"time: {time.time() - DEBUG_start}")
 			start = grid.node(*start)
 			end = grid.node(*end)
 			path, runs = finder.find_path(start, end, grid)
@@ -92,10 +98,11 @@ class Map():
 	def is_area_empty(self, map_position, tile_size):
 		for i in range(tile_size[0]):
 			for j in range(tile_size[1]):
-				tile = self.get_tile_at(map_position + Vector(i, j))
-				if not tile.is_empty():
-					return False
-		print(tile.grid_position)
+				new_position = map_position + Vector(i, j)
+				if self.is_on_map(new_position):
+					tile = self.get_tile_at(new_position)
+					if not tile.is_empty():
+						return False
 		return True
 
 	def get_tile_at(self, map_position):
@@ -103,6 +110,19 @@ class Map():
 
 	def get_tiles_nearby(self, map_position):
 		return tuple(self.tile_array[map_position.x + i][map_position.y + j] for i in range(-1, 2) for j in range(-1, 2))
+
+	def get_closest_tile_nearby(self, start_position, aim_grid_pos):
+		aimed_tile = None
+		min_dist = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
+		for tile in self.get_tiles_nearby(aim_grid_pos):
+			dist = (tile.grid_position - start_position).norm()
+
+			if dist > 0 and min_dist > dist:
+				aimed_tile = tile
+				min_dist = dist
+			elif dist == 0:
+				return tile
+		return aimed_tile
 
 	def get_closest_tile_nearby(self, start_position, aim_grid_pos):
 		aimed_tile = None

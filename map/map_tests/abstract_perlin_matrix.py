@@ -79,12 +79,12 @@ def process_array(array, size = (50,50)):
 				out[x][y] = Tile("sand", Vector(x, y),"gold")
 			else:
 				out[x][y] = Tile("water", Vector(x, y))
-	
+
 	#genere la sprite
 	for x in range(size[0]):
 		for y in range(size[1]):
 			out[x][y].init_sprite()
-	
+
 	return out
 
 #########################################
@@ -147,7 +147,7 @@ def process_array2(size = (50,50), seed=None):
 		for y in range(size[1]):
 			if array[x][y] > 0.75 and out[x][y].blockID != "water":
 				out[x][y].pointer_to_entity = "tree"
-	
+
 	#gold
 	seed = (seed+5)%100
 	array = perlin_array2(size=size, seed=seed, octaves=20, scale=4)
@@ -192,13 +192,13 @@ def process_array2(size = (50,50), seed=None):
 			out[a][b].pointer_to_entity = None
 
 	out[11][11].pointer_to_entity = "spawn_0"
-	
 
-	for a in range(90,90+zoneSize):
-		for b in range(90,90+zoneSize):
+
+	for a in range(size[0]-10,size[0]-10+zoneSize):
+		for b in range(size[1]-10,size[1]-10+zoneSize):
 			out[a][b].blockID = "grass"
 			out[a][b].pointer_to_entity = None
-	out[91][91].pointer_to_entity = "spawn_1"
+	out[size[0]-10+1][size[1]-10+1].pointer_to_entity = "spawn_1"
 
 	# genere la sprite
 	for x in range(size[0]):

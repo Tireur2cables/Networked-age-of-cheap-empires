@@ -199,8 +199,8 @@ class View():
 						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
 					# s.draw(pixelated=True)
-					if LAUNCH_DEBUG_DISPLAY:
-						self.draw_iso_position(s.entity.iso_position)
+					# if LAUNCH_DEBUG_DISPLAY:
+					# 	self.draw_iso_position(s.entity.iso_position)
 
 				elif isinstance(s.entity, Unit):
 					unit = s.entity
@@ -220,21 +220,21 @@ class View():
 						elif isinstance(aimed_entity, Unit):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 					# s.draw(pixelated=True)
-					if LAUNCH_DEBUG_DISPLAY:
-						self.draw_iso_position(unit.iso_position)
+					# if LAUNCH_DEBUG_DISPLAY:
+					# 	self.draw_iso_position(unit.iso_position)
 
 		self.sort_list()
 		self.sorted_sprite_list.draw(pixelated=True)
 
-		if LAUNCH_DEBUG_DISPLAY:
-			for x in range(3):
-				for y in range(3):
-					tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
-					arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-					self.draw_grid_position(Vector(x, y))
+		# if LAUNCH_DEBUG_DISPLAY:
+		# 	for x in range(3):
+		# 		for y in range(3):
+		# 			tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+		# 			arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+		# 			self.draw_grid_position(Vector(x, y))
 
-		# Update the minimap
-		self.minimap.draw()
+		# # Update the minimap
+		# self.minimap.draw()
 
 		#
 		# --- In-game GUI ---
@@ -372,8 +372,8 @@ class View():
 					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
 				elif symbol == arcade.key.B:
 					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
-				# elif symbol == arcade.key.D:
-				# 	self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
+				elif symbol == arcade.key.D:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
 				self.mode = "move"
 				print("move mode!")
 		else:
