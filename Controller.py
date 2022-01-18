@@ -138,8 +138,10 @@ class Controller():
 					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type((TownCenter, StoragePit, Granary)))
 					if zone_found:
 						self.order_stock_resources(entity, zone_found)
-			elif action == "attack":
-				unit_found = self.find_entity_in_sprites(sprites_at_point)
+			if action == "attack":
+				unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
+				if unit_found:
+					self.order_attack_unit(entity, unit_found)
 
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
@@ -202,9 +204,7 @@ class Controller():
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
 			entity.set_aimed_entity(stock_zone)
-			if aimed_tile.grid_position == entity_grid_pos:
-				entity.set_aimed_entity(stock_zone)
-			else:
+			if aimed_tile.grid_position != entity_grid_pos:
 				self.move_entity(entity, aimed_tile.grid_position)
 
 
@@ -217,9 +217,7 @@ class Controller():
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
 			entity.set_aimed_entity(stock_zone)
-			if aimed_tile.grid_position == entity_grid_pos:
-				entity.set_aimed_entity(stock_zone)
-			else:
+			if aimed_tile.grid_position != entity_grid_pos:
 				self.move_entity(entity, aimed_tile.grid_position)
 
 	# Called once
@@ -257,6 +255,13 @@ class Controller():
 			tc.is_producing = True
 			current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
 			self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
+
+
+	def order_attack_unit(self, entity: Unit, aimed_unit: Unit):
+		# print(f"{entity} ---> VS {aimed_unit}")
+		entity.set_goal("attack")
+		entity.set_aimed_entity(aimed_unit)
+		self.move_entity(entity, iso_to_grid_pos(aimed_unit.iso_position))
 
 
 
@@ -297,6 +302,11 @@ class Controller():
 					entity.is_moving = False
 					if entity.goal in ("harvest", "stock", "build"):
 						entity.is_interacting = True
+					elif entity.goal == "attack":
+						if iso_to_grid_pos(entity.iso_position) == iso_to_grid_pos(entity.aimed_entity.iso_position):
+							entity.is_interacting = True
+						else:
+							self.order_attack_unit(entity, entity.aimed_entity)
 
 			else:  # If it is not close to where it aims and not out of bounds, move.
 				entity.iso_position += entity.change
@@ -310,6 +320,8 @@ class Controller():
 				self.build_zone(entity, delta_time)
 			elif isinstance(entity.aimed_entity, (TownCenter, StoragePit, Granary)):
 				self.stock_resources(entity, entity.aimed_entity.get_name())
+			elif isinstance(entity.aimed_entity, Unit):
+				self.attack_unit(entity, delta_time)
 
 		for entity in producing_entities:
 			if isinstance(entity, TownCenter):
@@ -392,3 +404,17 @@ class Controller():
 			tc.is_producing = False
 			grid_position = iso_to_grid_pos(tc.iso_position) - Vector(1, 1)
 			self.add_entity_to_game(Villager(grid_pos_to_iso(grid_position), tc.faction))
+
+	def attack_unit(self, unit: Unit, delta_time):
+		unit.action_timer += delta_time
+		if unit.action_timer > 1/unit.rate_fire:
+			unit.action_timer = 0
+			print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
+			alive = unit.aimed_entity.lose_health(unit.damage)
+
+			if unit.aimed_entity.aimed_entity != unit:
+				self.order_attack_unit(unit.aimed_entity, unit)
+
+			if not alive:
+				unit.end_goal()
+				self.dead_entities.add(unit.aimed_entity)

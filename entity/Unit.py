@@ -42,7 +42,7 @@ class Unit(Entity):
 		self.is_moving = True
 
 	def set_aimed_entity(self, entity):
-		if self.aimed_entity:
+		if self.aimed_entity and self.previous_aimed_entity != self.aimed_entity:
 			self.previous_aimed_entity = self.aimed_entity
 		self.aimed_entity = entity
 

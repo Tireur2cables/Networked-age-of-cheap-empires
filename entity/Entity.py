@@ -111,8 +111,10 @@ class Entity:
 
 	def lose_health(self, qty_health):
 		self.health -= qty_health
-		if self.health < 0:# on corrige le nb de pt de vie si celui-ci est negatif
+		if self.health <= 0:# on corrige le nb de pt de vie si celui-ci est negatif
 			self.health = 0
+			return False
+		return True
 
 	def is_alive(self):
 		return self.health > 0
