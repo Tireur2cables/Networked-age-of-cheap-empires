@@ -267,7 +267,7 @@ class View():
 		self.mouse_y = self.game.window.height / 2
 		#self.set_mouse_visible(False)
 
-		arcade.set_background_color(arcade.csscolor.YELLOW_GREEN)
+		arcade.set_background_color(arcade.csscolor.BLACK)
 
 		self.manager.enable()
 
