@@ -42,11 +42,7 @@ class Minimap() :
 		with self.sprite_list.atlas.render_into(self.texture, projection=proj) as fbo:
 			fbo.clear(self.background_color)
 			self.view.tile_sprite_list.draw()
-			for s in self.view.sorted_sprite_list:
-				if isinstance(s.entity, Zone):
-					s.draw()
-			# for s in self.view.sorted_sprite_list:
-			# 	s.draw()
+			self.view.sorted_sprite_list.draw()
 			top_left_x = self.view.camera_x + self.view.camera.viewport_width / 2
 			top_left_y = self.view.camera_y + self.view.camera.viewport_height / 2
 			arcade.draw_rectangle_outline(top_left_x, top_left_y, self.view.camera.viewport_width, self.view.camera.viewport_height, WHITE, BORDER_MINI_RECTANGLE)

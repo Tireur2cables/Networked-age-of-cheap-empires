@@ -198,7 +198,6 @@ class View():
 					elif isinstance(zone, TownCenter) and zone.is_producing:
 						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
-					# s.draw(pixelated=True)
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(s.entity.iso_position)
 
@@ -219,7 +218,6 @@ class View():
 							self.draw_bar(unit.iso_position, int(unit.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Unit):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
-					# s.draw(pixelated=True)
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(unit.iso_position)
 
@@ -233,8 +231,8 @@ class View():
 		# 			arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 		# 			self.draw_grid_position(Vector(x, y))
 
-		# # Update the minimap
-		# self.minimap.draw()
+		# Update the minimap
+		self.minimap.draw()
 
 		#
 		# --- In-game GUI ---
