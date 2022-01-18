@@ -1,6 +1,6 @@
 # --- Imports ---
 from map.map import Map
-from map.map_tests.abstract_perlin_matrix import perlin_array,process_array
+from map.map_tests.abstract_perlin_matrix import perlin_array,process_array, process_array2
 from utils.vector import Vector
 from entity.Unit import *
 from entity.Zone import *
@@ -43,7 +43,9 @@ class Model():
 		if use_default:
 			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		else:
-			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array(perlin_array(seed=69)))
+			#self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array(perlin_array(seed=69), (DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE)))
+			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array2(seed=69, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE)))
+
 
 		for pos_spawn in self.map.spawn_array:
 			faction = "player" if pos_spawn[1] == "0" else "ai_" + pos_spawn[1]

@@ -7,7 +7,9 @@ import noise
 import numpy as np
 from utils.vector import Vector
 
-
+################################
+# 1 generation de perlin noise #
+################################
 def perlin_array(size = (50, 50),
 			scale=21, octaves = 50,
 			persistence = 0.1,
@@ -77,7 +79,98 @@ def process_array(array, size = (50,50)):
 				out[x][y] = Tile("sand", Vector(x, y),"gold")
 			else:
 				out[x][y] = Tile("water", Vector(x, y))
+	
+	#genere la sprite
+	for x in range(size[0]):
+		for y in range(size[1]):
+			out[x][y].init_sprite()
+	
 	return out
+
+#########################################
+# plusieurs generations de perlin noise #
+#########################################
+def perlin_array2(size = (50, 50),
+			scale=21, octaves = 50,
+			persistence = 0.1,
+			lacunarity = 2,
+			seed = None):
+
+	if not seed:
+		seed = np.random.randint(0, 100)
+		print("seed was {}".format(seed))
+
+	arr = np.zeros(size)
+	for i in range(size[0]):
+		for j in range(size[1]):
+			arr[i][j] = noise.pnoise2(i / scale,
+										j / scale,
+										octaves=octaves,
+										persistence=persistence,
+										lacunarity=lacunarity,
+										repeatx=1024,
+										repeaty=1024,
+										base=seed)
+	max_arr = np.max(arr)
+	min_arr = np.min(arr)
+	norm_me = lambda x: (x-min_arr)/(max_arr - min_arr)
+	norm_me = np.vectorize(norm_me)
+	arr = norm_me(arr)
+	return arr
+
+def process_array2(size = (50,50), seed=None):
+	#baseTile = Tile("grass", 0,0,None)
+	# default => grass everywhere
+	out = [[Tile("grass", Vector(x, y)) for y in range(size[1])] for x in range(size[0])]
+	if seed is None:
+		seed = np.random.randint(0, 100)
+		print("seed was {}".format(seed))
+
+	# layer 1 => ground
+	array = perlin_array2(size=size, seed=seed)
+	for x in range(size[0]):
+		for y in range(size[1]):
+			if array[x][y] < 0.67:
+				#grass by default
+				pass
+			elif array[x][y] < 0.75:
+				out[x][y].blockID = "sand"
+			else:
+				out[x][y].blockID = "water"
+				out[x][y].is_free = 0
+
+	# layer 2 => ressources
+	#trees
+	seed = (seed+5)%100
+	array = perlin_array2(size=size, seed=seed, octaves=20, scale=8)
+	for x in range(size[0]):
+		for y in range(size[1]):
+			if array[x][y] > 0.75 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "tree"
+	
+	#gold
+	seed = (seed+5)%100
+	array = perlin_array2(size=size, seed=seed, octaves=20, scale=4)
+	for x in range(size[0]):
+		for y in range(size[1]):
+			if array[x][y] > 0.87 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "gold"
+
+	#stone
+	seed = (seed+5)%100
+	array = perlin_array2(size=size, seed=seed, octaves=20, scale=4)
+	for x in range(size[0]):
+		for y in range(size[1]):
+			if array[x][y] > 0.89 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "stone"
+
+	# genere la sprite
+	for x in range(size[0]):
+		for y in range(size[1]):
+			out[x][y].init_sprite()
+
+	return out
+
 
 #a = process_array(perlin_array())
 #print(a)
