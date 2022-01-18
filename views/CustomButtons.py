@@ -65,7 +65,7 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 		for texture_pane in self.pregameview.name_input_ressources :
 			ressources[tab[indice]] = int(texture_pane.child.text)
 			indice += 1
-		self.nextView.setup(ressources, ia, self.pregameview.isPlayer)
+		self.nextView.setup(ressources, ia, self.pregameview.isPlayer, int(self.pregameview.map_pane.child.text))
 		self.window.show_view(self.nextView)
 
 # Button to display things or not
@@ -130,14 +130,17 @@ class PlayerButton(arcade.gui.UITextureButton):
 		self.sep = " : "
 
 class NumInput(arcade.gui.UIInputText) :
-	def __init__(self, x, y, text, width, height, text_color) :
+	def __init__(self, x, y, text, width, height, text_color, limit=None) :
 		super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
+		self.limit = limit
 
 	def on_event(self, event) :
-		if self._active and isinstance(event, arcade.gui.events.UITextEvent) and not (event.text.isnumeric() or event.text == "") :
-			pass
+		bool = True
+		if self._active and isinstance(event, arcade.gui.events.UITextEvent) :
+			if (not (event.text.isnumeric() or event.text == "") or (self.limit != None and int(self.text + event.text) >= self.limit)) :
+				bool = False
 
-		else :
+		if bool :
 			super().on_event(event)
 
 		if self.text == "" :

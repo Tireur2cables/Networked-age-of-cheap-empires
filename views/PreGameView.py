@@ -5,10 +5,6 @@ from views.CustomButtons import SelctDifButton, NextViewButton, NumInput, Launch
 
 #Constants
 BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint5.jpg"
-PIC_GOLD = "./Ressources/img/Ressources_Or_500x500.png"
-PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
-PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
-PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
 COLOR_STATIC_RESSOURCES_ICONE = arcade.color.DARK_GRAY
 
 class PreGameView(arcade.View) :
@@ -98,9 +94,43 @@ class PreGameView(arcade.View) :
 		bg_text = arcade.load_texture("Ressources/img/bouton_vert_age.png")
 
 		#Creation du text "Ressource :"
-		ressource_text = UITextArea(
+		map_text = UITextArea(
 			x=self.window.width - buttonsize * (3 / 2), # arbitrary
 			y=self.window.height - buttonsize * (0.75), # arbitrary
+			width=buttonsize / 3,
+			height=buttonsize / 10,
+			text="Map seed :",
+			text_color=(255, 255, 255, 255),
+		)
+
+		#Affichage de "Ressource :"
+		self.manager.add(
+			UITexturePane(
+				map_text.with_space_around(right=20),
+				tex=bg_text,
+				padding=(10, 10, 10, 10)
+			)
+		)
+
+		self.map_pane = arcade.gui.UITexturePane(
+			NumInput(
+				x=self.window.width - buttonsize/(1.4),
+				y=self.window.height - buttonsize * (0.75),
+				text="70", width=buttonsize/(2.5), height=buttonsize/10,
+				text_color=(255, 255, 255, 255),
+				limit=100
+			),
+			tex=bg_text,
+			padding=(10, 10, 10, 10)
+		)
+
+		#Affichage des espaces ressources modifiables
+		self.manager.add(self.map_pane)
+
+		#Creation du text "Ressource :"
+		ressource_text = UITextArea(
+			x=self.window.width - buttonsize * (3 / 2), # arbitrary
+			y=self.window.height - buttonsize, # arbitrary
 			width=buttonsize / 2,
 			height=buttonsize / 10,
 			text="Ressources :",
