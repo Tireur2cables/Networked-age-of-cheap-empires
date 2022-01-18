@@ -144,7 +144,7 @@ class NumInput(arcade.gui.UIInputText) :
 			self.caret.on_text("0")
 
 class ConstructButton(arcade.gui.UITextureButton) :
-	def __init__(self,image, construct, width=60, height=90, text=""):
+	def __init__(self,image, construct, width, height, text=""):
 		super().__init__(texture = arcade.load_texture(image), width=width, height=height, text=text)
 		self.image = image
 		self.construct = construct

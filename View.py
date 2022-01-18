@@ -1,5 +1,6 @@
 # --- Imports ---
 ## -- arcade --
+from turtle import window_height, window_width
 import arcade
 from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
@@ -389,10 +390,12 @@ class View():
 
 	def init_dynamic_gui(self) :
 		# Create a box group to align the 'open' button in the center
+		# Box pour le UITextArea qui contiens les stats du personnage
 		self.v_box4 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="right",
+				align_x= - self.game.window.width / 3,
 				anchor_y="bottom",
 				child=self.v_box4
 			)
@@ -403,22 +406,33 @@ class View():
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="center",
-				align_x= 200,
+				align_x= self.game.window.width/4, #200, plus à 200 apres calcul 
 				anchor_y="bottom",
-				align_y=15,
+				align_y=self.game.window.height/60, #15
 				child=self.v_box5
 			)
 		)
 
 		# Create a box for the button in the precedent box, maybe redondant
+		# Heberge la sprite 
 		self.v_box6 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="center",
-				align_x= 400,
+				align_x= self.game.window.width/50,  #window.width sur ordi Guillaume == 1600
 				anchor_y="bottom",
-				align_y=15,
+				align_y= self.game.window.height/16, #15 #window.heigth su ordi Guillaume == 900
 				child=self.v_box6
+			)
+		)
+
+		# Box pour le UITextArea qui contiens les actions du personnage
+		self.v_box7 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				anchor_y="bottom",
+				child=self.v_box7
 			)
 		)
 
@@ -473,10 +487,11 @@ class View():
 			label.text = resource_text
 
 	# test pour les coins mais dois bouger TODO
-	def trigger_coin_GUI(self, selected_list) :
+	def trigger_Villager_GUI(self, selected_list) :
 		self.v_box4.clear()
 		self.v_box5.clear()
 		self.v_box6.clear()
+		self.v_box7.clear()
 
 		self.boolean_dynamic_gui = False
 
@@ -484,15 +499,21 @@ class View():
 			self.boolean_dynamic_gui = True
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
-			coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width=width, height=height)
-			self.v_box4.add(coin_box.with_space_around(0, 0, 0, 0, arcade.color.BRONZE))
+			print(height)
+			villager_box_stat = arcade.gui.UITextArea(text="Villager", width=width/3, height=height)
+			self.v_box4.add(villager_box_stat.with_space_around(0, 0, 0, 0, arcade.color.GREEN))
 
-			# Button for coin, you wan click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
+			# Button for coin, you want to click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
 			coin_button = arcade.gui.UIFlatButton(text = "Machala",height = 70, width=110)
 			self.v_box5.add(coin_button.with_space_around(15,15,15,15,arcade.color.BRONZE))
 
 			coin_button2 = arcade.gui.UIFlatButton(text = "Attaquer", height = 70, width = 110)
 			self.v_box5.add(coin_button2.with_space_around(15,15,15,15,arcade.color.BRONZE))
 
-			coin_button3 = ConstructButton(image="Ressources/img/zones/buildables/Tower.png",construct=None)
+			coin_button3 = ConstructButton(image="Ressources/img/units/villager_stand.png",construct=None,width= width/12,height= self.game.window.height/10)
 			self.v_box6.add(coin_button3.with_space_around(15,15,15,15,arcade.color.BRONZE))
+
+			villager_box_action = arcade.gui.UITextArea(text="Actions",width = width * (2/3), height=height)
+			self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.BLUE))
+
+
