@@ -111,7 +111,7 @@ class Map():
 	def get_tiles_nearby(self, map_position):
 		return tuple(self.tile_array[map_position.x + i][map_position.y + j] for i in range(-1, 2) for j in range(-1, 2))
 
-	def get_closest_tile_nearby(self, start_position, aim_grid_pos):
+	def get_closest_tile_nearby_fast(self, start_position, aim_grid_pos):
 		aimed_tile = None
 		min_dist = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
 		for tile in self.get_tiles_nearby(aim_grid_pos):

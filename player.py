@@ -202,4 +202,8 @@ class AI(Player):
 					self.game.game_controller.order_harvest(unit, harvest_zone)
 					ongoing_actions.add(action)
 				else:
-					pass
+					resources_name = "berrybush", "gold", "stone", "wood", "stone"
+					c = random.choice(resources_name)
+					harvest_zone = self.search_closest_harvest_zone(unit, c)
+					self.game.game_controller.order_harvest(unit, harvest_zone)
+					ongoing_actions.add(action)
