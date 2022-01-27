@@ -81,25 +81,18 @@ class Controller():
 # --- Selection (Called once) ---
 
 	def select(self, faction, sprites_at_point):
-		unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(Unit, faction))
 		self.clear_faction_selection(faction)
-		if unit_found is not None:
+		unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
+		if unit_found :
 			unit_found.selected = True
 			self.selection[faction].add(unit_found)
-			self.game.game_view.trigger_Villager_GUI(self.selection)
 
 	def select_zone(self, faction, sprites_at_point):
 		self.clear_faction_selection(faction)
-		zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
+		zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
 		if zone_found:
 			zone_found.selected = True
 			self.selection[faction].add(zone_found)
-		else:
-			if sprites_at_point:
-				other_zone_found = sprites_at_point[0].entity
-				other_zone_found.selected = True
-				self.selection[faction].add(other_zone_found)
-
 
 	def clear_faction_selection(self, faction):
 		for entity in self.selection[faction]:
@@ -137,7 +130,7 @@ class Controller():
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
 		for entity in self.selection[faction]:
-			if isinstance(entity, Unit):
+			if isinstance(entity, Unit) and entity.faction == faction :
 				if action == "move":
 					entity.set_goal("move")
 					if self.is_on_map(grid_position):

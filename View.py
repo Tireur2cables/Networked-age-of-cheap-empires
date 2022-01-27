@@ -194,7 +194,7 @@ class View():
 
 		for s in self.unit_sprite_list:
 			entity = s.entity
-			if entity.selected:
+			if entity.selected :
 				s.draw_hit_box((255, 0, 0), line_thickness=3)
 				map_position = iso_to_grid_pos(entity.iso_position)
 				# tile_below = self.game.game_model.map.get_tile_at(map_position)
@@ -219,6 +219,9 @@ class View():
 					tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
 					arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 					self.draw_grid_position(Vector(x, y))
+
+		# draw interactive ui of selected
+		self.trigger_Villager_GUI(self.game.game_controller.selection)
 
 		# Update the minimap
 		self.minimap.draw()
@@ -417,7 +420,7 @@ class View():
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="center",
-				align_x= self.game.window.width/4, #200, plus à 200 apres calcul 
+				align_x= self.game.window.width/4, #200, plus à 200 apres calcul
 				anchor_y="bottom",
 				align_y=self.game.window.height/60, #15
 				child=self.v_box5
@@ -425,7 +428,7 @@ class View():
 		)
 
 		# Create a box for the button in the precedent box, maybe redondant
-		# Heberge la sprite 
+		# Heberge la sprite
 		self.v_box6 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
@@ -510,9 +513,9 @@ class View():
 		self.v_box8.clear()
 
 		self.boolean_dynamic_gui = False
-
-		if selected_list :
+		if selected_list["player"] : # someting is selected
 			self.boolean_dynamic_gui = True
+
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
 			
@@ -536,7 +539,7 @@ class View():
 			#print(selected_list["player"][0].nb_resources())
 			s = list(selected_list["player"])
 			print(s[0].nb_resources())
-			villager_ressources = arcade.gui.UITextArea(text ="Ressources "+str(s[0].nb_resources()),text_color= arcade.color.PINK,width=120 ) #+(s[0].nb_resources())
+			villager_ressources = arcade.gui.UITextArea(text ="Ressources : "+str(s[0].nb_resources()),text_color= arcade.color.PINK,width=120 ) #+(s[0].nb_resources())
 			self.v_box8.add(villager_ressources.with_border())
 			
 			villager_box_stat = arcade.gui.UITextArea(text="Villager", width=width/3, height=height)
