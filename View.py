@@ -5,7 +5,7 @@ import arcade
 from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
 ## -- Others --
-from views.CustomButtons import ConstructButton, NextViewButton, ListButton, SaveButton
+from views.CustomButtons import ActionButton, ConstructButton, NextViewButton, ListButton, SaveButton
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
 from cheats.fonctions import CheatsInput
@@ -30,6 +30,7 @@ PIC_GOLD = "./Ressources/img/Ressources_Or_500x500.png"
 PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
 PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
 PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
+button_texture = "Ressources/img/button_background.png"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
@@ -401,6 +402,16 @@ class View():
 			)
 		)
 
+		# Box pour le UITextArea qui contiens les actions du personnage
+		self.v_box7 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				anchor_y="bottom",
+				child=self.v_box7
+			)
+		)
+
 		# Create a box for the button in the precedent box, maybe redondant
 		self.v_box5 = arcade.gui.UIBoxLayout()
 		self.manager.add(
@@ -419,22 +430,26 @@ class View():
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="center",
-				align_x= self.game.window.width/50,  #window.width sur ordi Guillaume == 1600
+				align_x= self.game.window.width/30,  #window.width sur ordi Guillaume == 1600
 				anchor_y="bottom",
-				align_y= self.game.window.height/16, #15 #window.heigth su ordi Guillaume == 900
+				align_y= self.game.window.height/12, #15 #window.heigth su ordi Guillaume == 900
 				child=self.v_box6
 			)
 		)
 
-		# Box pour le UITextArea qui contiens les actions du personnage
-		self.v_box7 = arcade.gui.UIBoxLayout()
+		# Heberge l affichage des ressources 
+		self.v_box8 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="right",
-				anchor_y="bottom",
-				child=self.v_box7
+				align_x= - self.game.window.width * (2/5) ,  #window.width sur ordi Guillaume == 1600
+				anchor_y="bottom", #15 #window.heigth su ordi Guillaume == 900
+				align_y= 10,
+				child=self.v_box8
 			)
 		)
+
+		
 
 	def addButton(self):
 		# def button size
@@ -492,6 +507,7 @@ class View():
 		self.v_box5.clear()
 		self.v_box6.clear()
 		self.v_box7.clear()
+		self.v_box8.clear()
 
 		self.boolean_dynamic_gui = False
 
@@ -499,21 +515,31 @@ class View():
 			self.boolean_dynamic_gui = True
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
-			print(height)
-			villager_box_stat = arcade.gui.UITextArea(text="Villager", width=width/3, height=height)
-			self.v_box4.add(villager_box_stat.with_space_around(0, 0, 0, 0, arcade.color.GREEN))
+			
+			
 
 			# Button for coin, you want to click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
-			coin_button = arcade.gui.UIFlatButton(text = "Machala",height = 70, width=110)
-			self.v_box5.add(coin_button.with_space_around(15,15,15,15,arcade.color.BRONZE))
+			villager_button = ActionButton(text = "Machala",height = 70, width=110)
+			self.v_box5.add(villager_button.with_space_around(15,15,15,15))
 
-			coin_button2 = arcade.gui.UIFlatButton(text = "Attaquer", height = 70, width = 110)
-			self.v_box5.add(coin_button2.with_space_around(15,15,15,15,arcade.color.BRONZE))
+			villager_button2 = ActionButton(text = "Attaquer", height = 70, width = 110)
+			self.v_box5.add(villager_button2.with_space_around(15,15,15,15))
 
-			coin_button3 = ConstructButton(image="Ressources/img/units/villager_stand.png",construct=None,width= width/12,height= self.game.window.height/10)
-			self.v_box6.add(coin_button3.with_space_around(15,15,15,15,arcade.color.BRONZE))
+			villager_button3 = ConstructButton(image="Ressources/img/units/villager_stand.png",construct=None,width= width/12,height= self.game.window.height/10)
+			self.v_box6.add(villager_button3.with_background(texture=arcade.load_texture(button_texture)))
 
 			villager_box_action = arcade.gui.UITextArea(text="Actions",width = width * (2/3), height=height)
-			self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.BLUE))
+			self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.METALLIC_SEAWEED))
+
+			#print(self.selected_list["player"][0].nb_resources()) # Affichent les ressources du Villageois
+			# issue : il faut trouver le chemin d acces a la fonction nb_ressources du villageoi selectionne 
+			#print(selected_list["player"][0].nb_resources())
+			s = list(selected_list["player"])
+			print(s[0].nb_resources())
+			villager_ressources = arcade.gui.UITextArea(text ="Ressources "+str(s[0].nb_resources()),text_color= arcade.color.PINK,width=120 ) #+(s[0].nb_resources())
+			self.v_box8.add(villager_ressources.with_border())
+			
+			villager_box_stat = arcade.gui.UITextArea(text="Villager", width=width/3, height=height)
+			self.v_box4.add(villager_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
 
 

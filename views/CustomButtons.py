@@ -155,3 +155,10 @@ class ConstructButton(arcade.gui.UITextureButton) :
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
 		#self.construct
 		print("Lezgo mon soleil")
+
+class ActionButton(arcade.gui.UITextureButton) :
+	def __init__(self, text, width, height) :
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width, height=height)
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		pass
