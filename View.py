@@ -193,7 +193,7 @@ class View():
 
 		for s in self.unit_sprite_list:
 			entity = s.entity
-			if entity.selected:
+			if entity.selected :
 				s.draw_hit_box((255, 0, 0), line_thickness=3)
 				map_position = iso_to_grid_pos(entity.iso_position)
 				# tile_below = self.game.game_model.map.get_tile_at(map_position)
@@ -218,6 +218,9 @@ class View():
 					tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
 					arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 					self.draw_grid_position(Vector(x, y))
+
+		# draw interactive ui of selected
+		self.trigger_Villager_GUI(self.game.game_controller.selection)
 
 		# Update the minimap
 		self.minimap.draw()
@@ -406,7 +409,7 @@ class View():
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="center",
-				align_x= self.game.window.width/4, #200, plus à 200 apres calcul 
+				align_x= self.game.window.width/4, #200, plus à 200 apres calcul
 				anchor_y="bottom",
 				align_y=self.game.window.height/60, #15
 				child=self.v_box5
@@ -414,7 +417,7 @@ class View():
 		)
 
 		# Create a box for the button in the precedent box, maybe redondant
-		# Heberge la sprite 
+		# Heberge la sprite
 		self.v_box6 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
@@ -494,12 +497,12 @@ class View():
 		self.v_box7.clear()
 
 		self.boolean_dynamic_gui = False
-
-		if selected_list :
+		if selected_list["player"] : # someting is selected
 			self.boolean_dynamic_gui = True
+
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
-			print(height)
+			
 			villager_box_stat = arcade.gui.UITextArea(text="Villager", width=width/3, height=height)
 			self.v_box4.add(villager_box_stat.with_space_around(0, 0, 0, 0, arcade.color.GREEN))
 
@@ -515,5 +518,3 @@ class View():
 
 			villager_box_action = arcade.gui.UITextArea(text="Actions",width = width * (2/3), height=height)
 			self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.BLUE))
-
-

@@ -86,7 +86,6 @@ class Controller():
 		if unit_found is not None:
 			unit_found.selected = True
 			self.selection[faction].add(unit_found)
-			self.game.game_view.trigger_Villager_GUI(self.selection)
 
 	def select_zone(self, faction, sprites_at_point):
 		self.clear_faction_selection(faction)
@@ -99,7 +98,6 @@ class Controller():
 				other_zone_found = sprites_at_point[0].entity
 				other_zone_found.selected = True
 				self.selection[faction].add(other_zone_found)
-
 
 	def clear_faction_selection(self, faction):
 		for entity in self.selection[faction]:
