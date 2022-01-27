@@ -130,7 +130,7 @@ class Controller():
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
 		for entity in self.selection[faction]:
-			if isinstance(entity, Unit):
+			if isinstance(entity, Unit) and entity.faction == faction :
 				if action == "move":
 					entity.set_goal("move")
 					if self.is_on_map(grid_position):
