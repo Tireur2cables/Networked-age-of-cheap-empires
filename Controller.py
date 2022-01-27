@@ -178,6 +178,8 @@ class Controller():
 # --- Orders (Called once) ----
 	def move_entity(self, entity, grid_position):
 		path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
+		# TODO: add flag so that the user uses the classical get_path, and the ia uses get_path_fast.
 
 		if path_len > 0:
 			entity.set_move_action()
