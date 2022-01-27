@@ -1,4 +1,5 @@
 from entity.Entity import Entity
+from entity.Unit import Clubman
 from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
@@ -121,6 +122,18 @@ class Barracks(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
 		faction=faction,
 		health=350)
+		self.unit_cooldown = None
+		self.unit_cost = None
+		self.class_produced = None
+		self.class_name = None
+		self.is_producing = False
+
+	def set_class_produced(self, class_produced_name):
+		self.class_name = class_produced_name
+		if class_produced_name == "clubman":
+			self.class_produced = Clubman
+			self.unit_cooldown = Clubman.creation_time
+			self.unit_cost = Clubman.creation_cost
 
 class StoragePit(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)

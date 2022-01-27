@@ -198,6 +198,9 @@ class View():
 					elif isinstance(zone, TownCenter) and zone.is_producing:
 						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
+					elif isinstance(zone, Barracks) and zone.is_producing:
+						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.unit_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+						nbr_health_bar +=1
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(s.entity.iso_position)
 
@@ -377,6 +380,8 @@ class View():
 		else:
 			if symbol == arcade.key.V:
 				self.game.game_controller.human_order_with_zone("populate", "player")
+			elif symbol == arcade.key.C:
+				self.game.game_controller.human_order_with_zone("train clubman", "player")
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
 		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))

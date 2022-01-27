@@ -128,6 +128,7 @@ class AI(Player):
 			player_type: str,
 			resources: dict) -> None:
 		super().__init__(game, player_type, resources)
+		self.delta_time = 0
 
 	def search_pos_to_build(self, start_position, tile_size):
 		area_found = False
@@ -138,8 +139,7 @@ class AI(Player):
 			rand_x = random.choice((random.randint(-10, -3), random.randint(3, 10)))
 			rand_y = random.choice((random.randint(-10, -3), random.randint(3, 10)))
 			map_position = start_position + Vector(rand_x, rand_y)
-			#print("position_to_build:", map_position)
-			if self.game.game_model.map.is_on_map(map_position):
+			if self.game.game_model.map.is_area_on_map(map_position, tile_size):
 				area_found = self.game.game_model.map.is_area_empty(map_position, tile_size)
 			current_iter += 1
 		if current_iter == 1000:
@@ -159,15 +159,25 @@ class AI(Player):
 			class_to_harvest = Stone
 
 		harvest_zones = {zone for zone in self.game.game_model.zone_list if isinstance(zone, class_to_harvest)}
+		print("start1!")
 		aimed_tile, harvest_zone = self.game.game_model.map.get_closest_tile_nearby_collection_fast(iso_to_grid_pos(unit.iso_position), harvest_zones)
+		print(f"fstop1! - {harvest_zone}")
 		return harvest_zone
 
-	def on_update(self):
+	def on_update(self, delta_time):
+		self.delta_time += delta_time
+
+		if self.delta_time < 0.5:
+			return
+		else:
+			self.delta_time = 0
+
 		if not self.town_center.is_producing and self.resources[Res.FOOD] > 50:
 			self.game.game_controller.order_zone_villagers(self.town_center)
 
 		idle_units = set()
 		ongoing_actions = set()
+		impossible_actions = set()
 		for unit_list in self.my_units.values():
 			for unit in unit_list:
 				# print(iso_to_grid_pos(unit.iso_position), unit.is_moving, unit.is_interacting)
@@ -179,12 +189,20 @@ class AI(Player):
 						aimed_entity = aimed_entity.zone_to_build
 					ongoing_actions.add((unit.goal, aimed_entity.get_name()))
 
+		unit = None
 		for unit in idle_units:
+			break
+
+		if unit is not None:
 			if isinstance(unit, Villager):
-				if (action := ("harvest", "berrybush")) not in ongoing_actions and self.resources[Res.FOOD] < 100:
+				if (action := ("harvest", "berrybush")) not in ongoing_actions and action not in impossible_actions and self.resources[Res.FOOD] < 100:
 					harvest_zone = self.search_closest_harvest_zone(unit, "food")
-					self.game.game_controller.order_harvest(unit, harvest_zone)
-					ongoing_actions.add(action)
+					if harvest_zone is not None:
+						self.game.game_controller.order_harvest(unit, harvest_zone)
+						ongoing_actions.add(action)
+					else:
+						impossible_actions.add(action)
+
 				elif (action := ("build", "house")) not in ongoing_actions and self.max_unit - self.nb_unit < 2:
 					map_position = self.search_pos_to_build(self.town_center.grid_position, House.tile_size)
 					self.game.game_controller.order_build(unit, map_position, "House")
@@ -202,8 +220,11 @@ class AI(Player):
 					self.game.game_controller.order_harvest(unit, harvest_zone)
 					ongoing_actions.add(action)
 				else:
-					resources_name = "berrybush", "gold", "stone", "wood", "stone"
-					c = random.choice(resources_name)
-					harvest_zone = self.search_closest_harvest_zone(unit, c)
+					harvest_zone = None
+					while harvest_zone is None:
+						print("i take to much time")
+						resources_name = "food", "gold", "stone", "wood", "stone"
+						c = random.choice(resources_name)
+						harvest_zone = self.search_closest_harvest_zone(unit, c)
 					self.game.game_controller.order_harvest(unit, harvest_zone)
-					ongoing_actions.add(action)
+					ongoing_actions.add("harvest")

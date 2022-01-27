@@ -158,17 +158,26 @@ class Controller():
 						return
 				elif action == "build":
 					self.order_build(entity, grid_position, *args)
-	def human_order_with_zone(self, action, faction):
+	def human_order_with_zone(self, action: str, faction: str):
+		print("yay")
 		if action == "populate":
 			for entity in self.selection[faction]:
 				if entity.faction == faction and isinstance(entity, TownCenter):
 					self.order_zone_villagers(entity)
+					return
+		elif "train" in action:
+			print("yay2")
+			trained_entity = action.split(' ')[1]
+			for entity in self.selection[faction]:
+				if entity.faction == faction and isinstance(entity, Barracks):
+					self.order_zone_units(entity, trained_entity)
+
 
 
 
 # --- Orders (Called once) ----
 	def move_entity(self, entity, grid_position):
-		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+		path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 
 		if path_len > 0:
 			entity.set_move_action()
@@ -182,17 +191,20 @@ class Controller():
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 
 		# Step 1: Search the closest tile near the zone_found to harvest it.
-		print(f"h: {zone_to_harvest}")
+
 		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(zone_to_harvest.iso_position))
 
 		# Step 2: Start moving toward the aimed entity
+
 		if aimed_tile is not None:
 			entity.set_goal("harvest")
 			entity.set_aimed_entity(zone_to_harvest)
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
+				print("start3!")
 				self.move_entity(entity, aimed_tile.grid_position)
+				print("end3!")
 
 	def order_search_stock_resources(self, entity, resource_nbr):
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
@@ -202,7 +214,7 @@ class Controller():
 			stock_zones = self.game.players[entity.faction].other_storage
 
 		aimed_tile, stock_zone = self.game.game_model.map.get_closest_tile_nearby_collection_fast(entity_grid_pos, stock_zones)
-		print(aimed_tile, stock_zone)
+		print(f"{entity} get_closest {aimed_tile}, {stock_zone}")
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile is not None:
 			entity.set_aimed_entity(stock_zone)
@@ -231,6 +243,10 @@ class Controller():
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
 
+				if not self.game.game_model.map.is_area_on_map(map_position, worksite.zone_to_build.tile_size):
+					print("out of bound!")
+					return
+
 				if not self.game.game_model.map.is_area_empty(map_position, worksite.zone_to_build.tile_size):
 					print("area not empty!")
 					return
@@ -253,10 +269,26 @@ class Controller():
 
 	def order_zone_villagers(self, tc):
 		current_player = self.game.players[tc.faction]
-		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
+		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) >= tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
 			tc.is_producing = True
 			current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
 			self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
+
+	def order_zone_units(self, bar: Barracks, entity_produced: str):
+		current_player = self.game.players[bar.faction]
+		bar.set_class_produced(entity_produced)
+
+		if bar.is_producing or current_player.nb_unit >= current_player.max_unit:
+			return
+
+		for key, value in bar.unit_cost.items():
+			if current_player.get_resource(key) < value:
+				return
+
+		bar.is_producing = True
+		for key, value in bar.unit_cost.items():
+			current_player.sub_resource(key, value)
+		self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
 
 
 	def order_attack_unit(self, entity: Unit, aimed_unit: Unit):
@@ -275,7 +307,7 @@ class Controller():
 		# --- Update AI ---
 		if LAUNCH_ENABLE_IA:
 			for ai in self.ai:
-				ai.on_update()
+				ai.on_update(delta_time)
 
 		# --- Updating Sets ---
 		moving_entities = set()
@@ -288,7 +320,7 @@ class Controller():
 
 		producing_entities = set()
 		for e in self.game.game_model.zone_list:
-			if isinstance(e, TownCenter) and e.is_producing:
+			if (isinstance(e, TownCenter) or isinstance(e, Barracks)) and e.is_producing:
 				producing_entities.add(e)
 
 		# --- Action - Moving entities ---
@@ -327,6 +359,8 @@ class Controller():
 		for entity in producing_entities:
 			if isinstance(entity, TownCenter):
 				self.produce_villagers(entity, delta_time)
+			elif isinstance(entity, Barracks):
+				self.produce_units(entity, delta_time)
 
 		# --- Deleting dead entities ---
 		for dead_entity in self.dead_entities:
@@ -364,13 +398,10 @@ class Controller():
 		if entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
-			print(f"[{entity.faction}: harvesting] zone health = {aimed_entity.health} - zone amount = {aimed_entity.amount}")
 			if not entity.is_full():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
-					print(f"[{entity.faction}: harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[{entity.faction}: harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 					self.game.game_view.update_resources_gui()
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
@@ -405,6 +436,16 @@ class Controller():
 			tc.is_producing = False
 			grid_position = iso_to_grid_pos(tc.iso_position) - Vector(1, 1)
 			self.add_entity_to_game(Villager(grid_pos_to_iso(grid_position), tc.faction))
+
+	# Produit une unité (pour les barracks) et s'arrête
+	def produce_units(self, bar:Barracks, delta_time):
+		bar.action_timer += delta_time
+		if bar.action_timer > bar.unit_cooldown:
+			bar.action_timer = 0
+			bar.is_producing = False
+			grid_position = iso_to_grid_pos(bar.iso_position) - Vector(1, 1)
+			Class_produced = bar.class_produced
+			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), bar.faction))
 
 	def attack_unit(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time

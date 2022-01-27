@@ -1,6 +1,8 @@
 # Imports
 
 import time
+
+from arcade import clamp
 from map.tile import Tile
 from entity.Zone import Wood, Stone, Gold, BerryBush
 from map.defaultmap import default_map_2d, default_map_objects_2d
@@ -65,10 +67,76 @@ class Map():
 	def is_on_map(self, grid_position):
 		return grid_position.x >= 0 and grid_position.x < self.map_size and grid_position.y >= 0 and grid_position.y < self.map_size
 
+	def is_area_on_map(self, grid_position, tile_size):
+		return all(self.is_on_map(grid_position + Vector(x, y)) for x in range(tile_size[0]) for y in range(tile_size[1]))
+
 	def get_pathfinding_matrix(self):  # @kenzo6c: The pathfinding_matrix has to be created on the fly, otherwise it won't change if the map changes
 		# @tidalwaave, 19/12, 23h50 : Time to replace the movements methods, fit 'em in tiles
 		# Swapping x and y here, because of the library implementation
 		return [[self.tile_array[x][y].is_free for x in range(self.map_size)] for y in range(self.map_size)]
+
+	def get_restricted_pathfinding_matrix(self, start, end):
+		start_node_pos = Vector()
+		end_node_pos = Vector()
+		if start.x < end.x:
+			left = start.x
+			right = end.x
+			start_node_pos += Vector(0,0)
+			end_node_pos += Vector(right - left, 0)
+		else:
+			left = end.x
+			right = start.x
+			start_node_pos += Vector(right - left, 0)
+			end_node_pos += Vector(0, 0)
+
+		if start.y < end.y:
+			bottom = start.y
+			top = end.y
+			start_node_pos += Vector(0,0)
+			end_node_pos += Vector(0, top - bottom)
+		else:
+			bottom = end.y
+			top = start.y
+			start_node_pos += Vector(0, top - bottom)
+			end_node_pos += Vector(0, 0)
+
+
+		bottom = start.y if start.y < end.y else end.y
+		top = end.y if start.y < end.y else start.y
+
+		return left, bottom, start_node_pos, end_node_pos, [[self.tile_array[x][y].is_free for x in range(left, right+1)] for y in range(bottom, top+1)]
+
+	def get_path_fast(self, start:Vector, end:Vector):
+		# Pathfinding algorithm
+		path = []
+		path_len = -1
+		if start != end:
+			print("is this taking time?")
+			left_offset, bottom_offset, start_pos, end_pos, pathfinding_matrix = self.get_restricted_pathfinding_matrix(start, end)
+			print(f"{start} -> {end}")
+			grid = Grid(matrix=pathfinding_matrix)
+			# DEBUG_start = time.time()
+			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+			# print(f"time: {time.time() - DEBUG_start}")
+			start_node = grid.node(*start_pos)
+			end_node = grid.node(*end_pos)
+			path, runs = finder.find_path(start_node, end_node, grid)
+
+			new_path = [(pos[0] + left_offset, pos[1] + bottom_offset) for pos in path]
+
+			# c_path, c_path_len = self.get_path(start, end)
+			# print(path, new_path, c_path)
+
+			if new_path:
+				new_path.pop(0)
+				path_len = len(new_path)
+		else:
+			path_len = 0
+
+		# path_len == -1 : means end is inacessible
+		# path_len == 0 : means start == end
+		# path_len > 0 : means there is a path between start and end.
+		return new_path, path_len
 
 	def get_path(self, start, end):
 		# Pathfinding algorithm
@@ -124,21 +192,21 @@ class Map():
 				return tile
 		return aimed_tile
 
-	def get_closest_tile_nearby(self, start_position, aim_grid_pos):
-		aimed_tile = None
-		min_path_len = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
-		for tile in self.get_tiles_nearby(aim_grid_pos):
-			path, path_len = self.get_path(start_position, tile.grid_position)
+	# def get_closest_tile_nearby(self, start_position, aim_grid_pos):
+	# 	aimed_tile = None
+	# 	min_path_len = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
+	# 	for tile in self.get_tiles_nearby(aim_grid_pos):
+	# 		path, path_len = self.get_path(start_position, tile.grid_position)
 
-			if path_len > 0 and min_path_len > path_len:
-				aimed_tile = tile
-				min_path_len = path_len
-			elif path_len == 0:
-				return tile
-		return aimed_tile
+	# 		if path_len > 0 and min_path_len > path_len:
+	# 			aimed_tile = tile
+	# 			min_path_len = path_len
+	# 		elif path_len == 0:
+	# 			return tile
+	# 	return aimed_tile
 
 	def get_tiles_nearby_collection(self, collection):
-		return tuple((tile, element) for element in collection for i in range(-1, 2) for j in range(-1, 2) if (tile := self.tile_array[element.grid_position.x + i][element.grid_position.y + j]).is_empty())
+		return tuple((tile, element) for element in collection for i in range(-1, 2) for j in range(-1, 2) if (tile := self.tile_array[clamp(element.grid_position.x + i, 0, self.map_size - 1)][clamp(element.grid_position.y + j, 0, self.map_size - 1)]).is_empty())
 
 	def get_closest_tile_nearby_collection_fast(self, start_position, collection):
 		aimed_tile = None
@@ -157,22 +225,22 @@ class Map():
 				return tile, element
 		return aimed_tile, aimed_element
 
-	def get_closest_tile_nearby_collection(self, start_position, collection):
-		aimed_tile = None
-		aimed_element = None
-		min_path_len = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
-		for tile_element in self.get_tiles_nearby_collection(collection):
-			# Beaucoup trop long : fait freeze le jeu. -> Solution possible : faire un calcul direct sur la distance.
-			tile, element = tile_element
-			path, path_len = self.get_path(start_position, tile.grid_position)
+	# def get_closest_tile_nearby_collection(self, start_position, collection):
+	# 	aimed_tile = None
+	# 	aimed_element = None
+	# 	min_path_len = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
+	# 	for tile_element in self.get_tiles_nearby_collection(collection):
+	# 		# Beaucoup trop long : fait freeze le jeu. -> Solution possible : faire un calcul direct sur la distance.
+	# 		tile, element = tile_element
+	# 		path, path_len = self.get_path(start_position, tile.grid_position)
 
-			if path_len > 0 and min_path_len > path_len:
-				aimed_tile = tile
-				aimed_element = element
-				min_path_len = path_len
-			elif path_len == 0:
-				return tile, element
-		return aimed_tile, aimed_element
+	# 		if path_len > 0 and min_path_len > path_len:
+	# 			aimed_tile = tile
+	# 			aimed_element = element
+	# 			min_path_len = path_len
+	# 		elif path_len == 0:
+	# 			return tile, element
+	# 	return aimed_tile, aimed_element
 
 	def free_tile_at(self, map_position, tile_size):
 		for x in range(map_position.x, map_position.x + tile_size[0]):
