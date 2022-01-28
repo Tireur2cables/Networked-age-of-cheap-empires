@@ -209,8 +209,44 @@ def process_array2(size = (50,50), seed=None):
 				
 			
 	out[size[0]-10+1][size[1]-10+1].pointer_to_entity = "spawn_1"
+
 	for a in range(size[0]-10,size[0]-10+zoneSize+1,zoneSize):
 		for b in range(size[0]-10,size[0]-10+zoneSize+1,zoneSize):
+			out[a][b].blockID = "grass"
+			out[a][b].pointer_to_entity = "berry"
+	
+
+
+
+
+
+	for a in range(10,10+zoneSize):
+		for b in range(size[1]-10,size[1]-10+zoneSize):
+			out[a][b].blockID = "grass"
+			out[a][b].pointer_to_entity = None
+			#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
+				
+			
+	out[10+1][size[1]-10+1].pointer_to_entity = "spawn_2"
+	
+	for a in range(10,10+zoneSize+1,zoneSize):
+		for b in range(size[0]-10,size[0]-10+zoneSize+1,zoneSize):
+			out[a][b].blockID = "grass"
+			out[a][b].pointer_to_entity = "berry"
+
+
+
+	for b in range(10,10+zoneSize):
+		for a in range(size[1]-10,size[1]-10+zoneSize):
+			out[a][b].blockID = "grass"
+			out[a][b].pointer_to_entity = None
+			#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
+				
+			
+	out[size[1]-10+1][10+1].pointer_to_entity = "spawn_3"
+	
+	for b in range(10,10+zoneSize+1,zoneSize):
+		for a in range(size[0]-10,size[0]-10+zoneSize+1,zoneSize):
 			out[a][b].blockID = "grass"
 			out[a][b].pointer_to_entity = "berry"
 
