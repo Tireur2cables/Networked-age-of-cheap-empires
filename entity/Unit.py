@@ -131,12 +131,12 @@ class Knight(Military):
 	creation_time = 30
 	def __init__(self, iso_position, health=-1):
 		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/knight_stand.png", y_offset=90//2), speed=1.35, health=health, max_health=100, damage=10, rate_fire=1.8, melee_armor=2, pierce_armor=2, line_sight=4)
-
+	
 #BigDaddy (CheatCode)
 class BigDaddy(Military):
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 0
 	def __init__(self, iso_position, health=-1):
-		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/scoutcavalry_stand.png", \
+		super().__init__(iso_position, sprite_data=SpriteData("Ressources/img/units/bigdaddy.png", \
 			y_offset=90//2), speed=1.6, health=health, max_health=500, damage=600, rate_fire=3, pierce_armor=10, \
 				line_sight=17)

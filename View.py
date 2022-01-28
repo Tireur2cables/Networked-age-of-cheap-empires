@@ -125,7 +125,7 @@ class View():
 	def init_cheats(self) :
 		self.display_cheat_input = False
 
-		cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
+		#cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
 
 		width = self.game.window.width  # arbitrary
 		height = self.game.window.height / 22 # arbitrary
@@ -134,8 +134,9 @@ class View():
 			CheatsInput(
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
-				text=f"Enter a cheatcode among {cheat_list_display}", width=width, height=height,
-				text_color=(255, 255, 255, 255)
+				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG", width=width, height=height,
+				text_color=(255, 255, 255, 255), 
+				player = self.game.players["player"]
 			),
 			tex=bg_text
 		)
