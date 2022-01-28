@@ -532,10 +532,13 @@ class View():
 					self.v_box6.add(sprite_image.with_background(s.sprite.texture))
 
 				if s.faction == "player" : # ouvre les actions seulement si la selection nnous appartient
-				
+
 					if isinstance(s, Villager) : # add villager options
 						villager_ressources = arcade.gui.UITextArea(text ="Ressources : "+str(s.nb_resources()), text_color=arcade.color.PINK, width=width / 8)
 						self.v_box8.add(villager_ressources.with_border())
+
+					villager_box_action = arcade.gui.UITextArea(text="Actions",width = width * (2/3), height=height)
+					self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.METALLIC_SEAWEED))
 
 					# Button for coin, you want to click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
 					villager_button = ActionButton(text = "Machala",height = 70, width=110)
@@ -544,7 +547,5 @@ class View():
 					villager_button2 = ActionButton(text = "Attaquer", height = 70, width = 110)
 					self.v_box5.add(villager_button2.with_space_around(15,15,15,15))
 
-					villager_box_action = arcade.gui.UITextArea(text="Actions",width = width * (2/3), height=height)
-					self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.METALLIC_SEAWEED))
 
 				break # ce break sera a enlever si on gere la selection multiple
