@@ -3,6 +3,7 @@ from multiprocessing.connection import wait
 from player import Player
 import arcade
 import arcade.gui
+
 """
 NINJALUI: get 10000 of each resource.
 \
@@ -10,8 +11,6 @@ BIGDADDY: spawn very powerful unit at town center.
 \
 STEROIDS: training, building, research, foraging, farming, and mining times are
 instantaneous. . . for all players, not just you.
-\
-
 \
 Additionally, you should have a few commands to influence the AI, force it to launch
 an immediate attack, check its state of mind, put your civilisation on autopilot, or
@@ -25,6 +24,7 @@ if un cheat code est rentré : execute cheatcode pour un player en particulier
 else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
 cheat codes available ;
 """
+
 class CheatsInput(arcade.gui.UIInputText):
     def __init__(self, x, y, text, width, height, text_color) : #player : Player
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
@@ -38,7 +38,7 @@ class CheatsInput(arcade.gui.UIInputText):
     def Steroids(self):
         print("debug steroidz")
     def reset_text(self):
-        self.text = "Enter a cheat code"
+        self.text = "Enter a cheat code [PRESS ENTER TO HIDE THIS MESSAGE]"
     def NotImplemented(self):
         self.reset_text()
         

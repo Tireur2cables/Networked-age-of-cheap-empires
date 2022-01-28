@@ -365,7 +365,9 @@ class View():
 				self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
 			elif symbol == arcade.key.B: # Build something
 				self.game.game_controller.build_on_tiles(grid_pos)
-		if symbol == arcade.key.F : # cheat window
+		elif symbol == arcade.key.ENTER:
+			self.cheatsinput.text = ""
+		if symbol == arcade.key.F1 : # cheat window
 			self.triggerCheatInput()
 
 	def on_mouse_motion(self, x, y, dx, dy):
