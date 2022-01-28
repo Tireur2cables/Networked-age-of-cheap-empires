@@ -13,6 +13,8 @@ from save.serializationTest import *
 from entity.Unit import *
 from entity.Zone import *
 from utils.isometric import *
+from game import GameView
+from player import Player
 
 # --- Constants ---
 CAMERA_MOVE_STEP = 15
@@ -41,7 +43,7 @@ class View():
 
 # --- Setup ---
 
-	def __init__(self, aoce_game):
+	def __init__(self, aoce_game: GameView):
 		""" Initializer """
 		self.game = aoce_game
 
