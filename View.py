@@ -13,7 +13,7 @@ from save.serializationTest import *
 from entity.Unit import *
 from entity.Zone import *
 from utils.isometric import *
-from game import GameView
+# from game import GameView
 from player import Player
 
 # --- Constants ---
@@ -43,7 +43,7 @@ class View():
 
 # --- Setup ---
 
-	def __init__(self, aoce_game: GameView):
+	def __init__(self, aoce_game):#: GameView):
 		""" Initializer """
 		self.game = aoce_game
 
