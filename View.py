@@ -440,7 +440,7 @@ class View():
 			)
 		)
 
-		# Heberge l affichage des ressources 
+		# Heberge l affichage des ressources
 		self.v_box8 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
@@ -452,7 +452,7 @@ class View():
 			)
 		)
 
-		
+
 
 	def addButton(self):
 		# def button size
@@ -518,31 +518,36 @@ class View():
 
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
-			
-			
 
-			# Button for coin, you want to click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
-			villager_button = ActionButton(text = "Machala",height = 70, width=110)
-			self.v_box5.add(villager_button.with_space_around(15,15,15,15))
+			for s in selected_list["player"] :
+				if isinstance(s, Entity) : # add entiity info
+					entity_box_stat = arcade.gui.UITextArea(text=s.name, width=width / 3, height=height)
+					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
 
-			villager_button2 = ActionButton(text = "Attaquer", height = 70, width = 110)
-			self.v_box5.add(villager_button2.with_space_around(15,15,15,15))
+					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 10)
+					self.v_box8.add(entity_life.with_border())
 
-			villager_button3 = ConstructButton(image="Ressources/img/units/villager_stand.png",construct=None,width= width/12,height= self.game.window.height/10)
-			self.v_box6.add(villager_button3.with_background(texture=arcade.load_texture(button_texture)))
-
-			villager_box_action = arcade.gui.UITextArea(text="Actions",width = width * (2/3), height=height)
-			self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.METALLIC_SEAWEED))
-
-			#print(self.selected_list["player"][0].nb_resources()) # Affichent les ressources du Villageois
-			# issue : il faut trouver le chemin d acces a la fonction nb_ressources du villageoi selectionne 
-			#print(selected_list["player"][0].nb_resources())
-			s = list(selected_list["player"])
-			print(s[0].nb_resources())
-			villager_ressources = arcade.gui.UITextArea(text ="Ressources : "+str(s[0].nb_resources()),text_color= arcade.color.PINK,width=120 ) #+(s[0].nb_resources())
-			self.v_box8.add(villager_ressources.with_border())
-			
-			villager_box_stat = arcade.gui.UITextArea(text="Villager", width=width/3, height=height)
-			self.v_box4.add(villager_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
+				if isinstance(s, Villager) : # add villager options
+					#print(self.selected_list["player"][0].nb_resources()) # Affichent les ressources du Villageois
+					# issue : il faut trouver le chemin d acces a la fonction nb_ressources du villageoi selectionne
+					#print(selected_list["player"][0].nb_resources())
+					villager_ressources = arcade.gui.UITextArea(text ="Ressources : "+str(s.nb_resources()),text_color= arcade.color.PINK,width=120 ) #+(s[0].nb_resources())
+					self.v_box8.add(villager_ressources.with_border())
 
 
+
+					villager_button3 = ConstructButton(image="Ressources/img/units/villager_stand.png",construct=None,width= width/12,height= self.game.window.height/10)
+					self.v_box6.add(villager_button3.with_background(texture=arcade.load_texture(button_texture)))
+
+				if s.faction == "player" : # ouvre les actions seulement si la selection nnous appartient
+					# Button for coin, you want to click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
+					villager_button = ActionButton(text = "Machala",height = 70, width=110)
+					self.v_box5.add(villager_button.with_space_around(15,15,15,15))
+
+					villager_button2 = ActionButton(text = "Attaquer", height = 70, width = 110)
+					self.v_box5.add(villager_button2.with_space_around(15,15,15,15))
+
+					villager_box_action = arcade.gui.UITextArea(text="Actions",width = width * (2/3), height=height)
+					self.v_box7.add(villager_box_action.with_space_around(0,0,0,0,arcade.color.METALLIC_SEAWEED))
+
+				break # ce break sera a enlever si on gere la selection multiple

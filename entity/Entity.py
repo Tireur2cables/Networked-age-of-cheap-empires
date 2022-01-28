@@ -16,8 +16,8 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, iso_position, sprite_data, faction="None", health=-1, max_health=-1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
-
+	def __init__(self, iso_position, sprite_data, faction="None", health=-1, max_health=-1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4, name=""):
+		self.name = name
 		# Position
 		self.iso_position = iso_position
 
