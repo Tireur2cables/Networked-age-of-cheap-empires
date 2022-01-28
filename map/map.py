@@ -111,9 +111,7 @@ class Map():
 		path = []
 		path_len = -1
 		if start != end:
-			print("is this taking time?")
 			left_offset, bottom_offset, start_pos, end_pos, pathfinding_matrix = self.get_restricted_pathfinding_matrix(start, end)
-			print(f"{start} -> {end}")
 			grid = Grid(matrix=pathfinding_matrix)
 			# DEBUG_start = time.time()
 			finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
