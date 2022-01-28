@@ -159,9 +159,7 @@ class AI(Player):
 			class_to_harvest = Stone
 
 		harvest_zones = {zone for zone in self.game.game_model.zone_list if isinstance(zone, class_to_harvest)}
-		print("start1!")
 		aimed_tile, harvest_zone = self.game.game_model.map.get_closest_tile_nearby_collection_fast(iso_to_grid_pos(unit.iso_position), harvest_zones)
-		print(f"fstop1! - {harvest_zone}")
 		return harvest_zone
 
 	def on_update(self, delta_time):
@@ -222,7 +220,6 @@ class AI(Player):
 				else:
 					harvest_zone = None
 					while harvest_zone is None:
-						print("i take to much time")
 						resources_name = "food", "gold", "stone", "wood", "stone"
 						c = random.choice(resources_name)
 						harvest_zone = self.search_closest_harvest_zone(unit, c)

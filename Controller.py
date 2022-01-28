@@ -165,7 +165,6 @@ class Controller():
 					self.order_zone_units(entity)
 					return
 		elif "train" in action:
-			print("yay2")
 			trained_entity = action.split(' ')[1]
 			for entity in self.selection[faction]:
 				if entity.faction == faction and isinstance(entity, Barracks):
@@ -203,9 +202,7 @@ class Controller():
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
-				print("start3!")
 				self.move_entity(entity, aimed_tile.grid_position)
-				print("end3!")
 
 	def order_search_stock_resources(self, entity, resource_nbr):
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
