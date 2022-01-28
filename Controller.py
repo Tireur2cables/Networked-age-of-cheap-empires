@@ -4,7 +4,7 @@ from LAUNCH_SETUP import LAUNCH_ENABLE_IA
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
-from game import GameView
+# from game import GameView
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -17,7 +17,7 @@ class Controller():
 
 # --- Setup ---
 
-	def __init__(self, aoce_game: GameView):
+	def __init__(self, aoce_game):#: GameView):
 		""" Initializer """
 		self.game = aoce_game
 
