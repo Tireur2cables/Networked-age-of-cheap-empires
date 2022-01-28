@@ -130,16 +130,16 @@ class View():
 		width = self.game.window.width  # arbitrary
 		height = self.game.window.height / 22 # arbitrary
 		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
-		self.cheat_pane = arcade.gui.UITexturePane(
-			CheatsInput(
+
+		self.cheatsinput = CheatsInput( #test
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
 				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG", width=width, height=height,
 				text_color=(255, 255, 255, 255), 
-				player = self.game.players["player"]
-			),
-			tex=bg_text
-		)
+				#player = self.game.players["player"]
+			)
+
+		self.cheat_pane = arcade.gui.UITexturePane(self.cheatsinput, tex=bg_text)
 
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
@@ -357,15 +357,16 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		grid_pos = iso_to_grid_pos(mouse_position_in_game)
-		if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
-			tCent = TownCenter(grid_pos)
-			self.game.game_controller.add_entity_to_game(tCent)
-		elif symbol == arcade.key.F : # cheat window
+		if not self.cheatsinput.triggered:
+			if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
+				tCent = TownCenter(grid_pos)
+				self.game.game_controller.add_entity_to_game(tCent)
+			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+				self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
+			elif symbol == arcade.key.B: # Build something
+				self.game.game_controller.build_on_tiles(grid_pos)
+		if symbol == arcade.key.F : # cheat window
 			self.triggerCheatInput()
-		elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-			self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-		elif symbol == arcade.key.B: # Build something
-			self.game.game_controller.build_on_tiles(grid_pos)
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		"""Called whenever the mouse moves."""
@@ -380,6 +381,7 @@ class View():
 		else :
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
+		self.cheatsinput.triggered = not self.cheatsinput.triggered
 
 	# test pour les coins mais dois bouger TODO
 	def trigger_coin_GUI(self, selected_list) :

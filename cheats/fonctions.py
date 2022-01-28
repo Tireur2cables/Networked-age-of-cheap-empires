@@ -1,3 +1,5 @@
+from asyncio import sleep
+from multiprocessing.connection import wait
 from player import Player
 import arcade
 import arcade.gui
@@ -24,23 +26,26 @@ else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
 cheat codes available ;
 """
 class CheatsInput(arcade.gui.UIInputText):
-    def __init__(self, x, y, text, width, height, text_color, player : Player) :
+    def __init__(self, x, y, text, width, height, text_color) : #player : Player
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
-        self.player = player
-
+        #self.player = player
+        self.triggered = False #permet de pouvoir taper des keys quand on tape un cheat code sans faire spawn n'importe quoi
     def Ninjalui(self):
         self.player.add_all(10000)
-    def Bigdaddy(self):
-        print("debug big daddz")
+    def Bigdaddy(self): #if bool_BigDaddz is True then when we call "BIGDADDY" and unit spawns
+        bool_BigDaddz = False
     def Steroids(self):
         print("debug steroidz")
-
     def reset_text(self):
-        self.text = "Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG"
+        self.text = "Enter a cheat code"
+    def NotImplemented(self):
+        self.reset_text()
+        
         
     def on_event(self, event) :
         super().on_event(event)
+        self.activated = True #test
         if self._active and isinstance(event, arcade.gui.events.UITextEvent):
             if self.text == "NINJALUI":
                 self.Ninjalui()
@@ -48,4 +53,6 @@ class CheatsInput(arcade.gui.UIInputText):
                 self.Bigdaddy()
             elif self.text == "STEROIDS":
                 self.Steroids()
-    
+            elif self.text == "REVEAL MAP" or self.text == "NO FOG":
+                self.NotImplemented()
+        
