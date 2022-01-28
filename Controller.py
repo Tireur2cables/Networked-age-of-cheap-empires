@@ -159,11 +159,10 @@ class Controller():
 				elif action == "build":
 					self.order_build(entity, grid_position, *args)
 	def human_order_with_zone(self, action: str, faction: str):
-		print("yay")
 		if action == "populate":
 			for entity in self.selection[faction]:
 				if entity.faction == faction and isinstance(entity, TownCenter):
-					self.order_zone_villagers(entity)
+					self.order_zone_units(entity)
 					return
 		elif "train" in action:
 			print("yay2")
@@ -268,27 +267,21 @@ class Controller():
 		else:
 			print("not enough resources to build!")
 
+	def order_zone_units(self, producing_zone, entity_produced = None):
 
-	def order_zone_villagers(self, tc):
-		current_player = self.game.players[tc.faction]
-		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) >= tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
-			tc.is_producing = True
-			current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
-			self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
+		current_player = self.game.players[producing_zone.faction]
+		if isinstance(producing_zone, Barracks):
+			producing_zone.set_class_produced(entity_produced)
 
-	def order_zone_units(self, bar: Barracks, entity_produced: str):
-		current_player = self.game.players[bar.faction]
-		bar.set_class_produced(entity_produced)
-
-		if bar.is_producing or current_player.nb_unit >= current_player.max_unit:
+		if producing_zone.is_producing or current_player.nb_unit >= current_player.max_unit:
 			return
 
-		for key, value in bar.unit_cost.items():
+		for key, value in producing_zone.unit_cost.items():
 			if current_player.get_resource(key) < value:
 				return
 
-		bar.is_producing = True
-		for key, value in bar.unit_cost.items():
+		producing_zone.is_producing = True
+		for key, value in producing_zone.unit_cost.items():
 			current_player.sub_resource(key, value)
 		self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
 
@@ -359,9 +352,7 @@ class Controller():
 				self.attack_unit(entity, delta_time)
 
 		for entity in producing_entities:
-			if isinstance(entity, TownCenter):
-				self.produce_villagers(entity, delta_time)
-			elif isinstance(entity, Barracks):
+			if isinstance(entity, (TownCenter, Barracks)):
 				self.produce_units(entity, delta_time)
 
 		# --- Deleting dead entities ---
@@ -430,24 +421,15 @@ class Controller():
 		if can_harvest:
 			self.order_harvest(entity, entity.previous_aimed_entity)
 
-	# Produit un villageois et s'arrête
-	def produce_villagers(self, tc, delta_time):
-		tc.action_timer += delta_time
-		if tc.action_timer > tc.villager_cooldown:
-			tc.action_timer = 0
-			tc.is_producing = False
-			grid_position = iso_to_grid_pos(tc.iso_position) - Vector(1, 1)
-			self.add_entity_to_game(Villager(grid_pos_to_iso(grid_position), tc.faction))
-
-	# Produit une unité (pour les barracks) et s'arrête
-	def produce_units(self, bar:Barracks, delta_time):
-		bar.action_timer += delta_time
-		if bar.action_timer > bar.unit_cooldown:
-			bar.action_timer = 0
-			bar.is_producing = False
-			grid_position = iso_to_grid_pos(bar.iso_position) - Vector(1, 1)
-			Class_produced = bar.class_produced
-			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), bar.faction))
+	# Produit une unité et s'arrête
+	def produce_units(self, producing_zone, delta_time):
+		producing_zone.action_timer += delta_time
+		if producing_zone.action_timer > producing_zone.unit_cooldown:
+			producing_zone.action_timer = 0
+			producing_zone.is_producing = False
+			grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
+			Class_produced = producing_zone.class_produced
+			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), producing_zone.faction))
 
 	def attack_unit(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time

@@ -195,10 +195,7 @@ class View():
 					if isinstance(zone, Resources):
 						self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
-					elif isinstance(zone, TownCenter) and zone.is_producing:
-						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.villager_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
-						nbr_health_bar +=1
-					elif isinstance(zone, Barracks) and zone.is_producing:
+					elif isinstance(zone, (Barracks, TownCenter)) and zone.is_producing:
 						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.unit_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
 					# if LAUNCH_DEBUG_DISPLAY:
@@ -216,9 +213,9 @@ class View():
 					if unit.is_interacting and (aimed_entity := unit.aimed_entity):
 						if isinstance(aimed_entity, Resources):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.BLUE)
-							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.YELLOW,nbr_health_bar=2)
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.YELLOW, nbr_health_bar=2)
 						elif isinstance(aimed_entity, WorkSite):
-							self.draw_bar(unit.iso_position, int(unit.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.GREEN, nbr_health_bar=2)
+							self.draw_bar(unit.iso_position, int(unit.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Unit):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 					# if LAUNCH_DEBUG_DISPLAY:

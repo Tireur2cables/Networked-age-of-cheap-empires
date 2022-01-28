@@ -173,7 +173,7 @@ class AI(Player):
 			self.delta_time = 0
 
 		if not self.town_center.is_producing and self.resources[Res.FOOD] > 50:
-			self.game.game_controller.order_zone_villagers(self.town_center)
+			self.game.game_controller.order_zone_units(self.town_center)
 
 		idle_units = set()
 		ongoing_actions = set()

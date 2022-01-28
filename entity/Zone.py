@@ -1,5 +1,5 @@
 from entity.Entity import Entity
-from entity.Unit import Clubman
+from entity.Unit import Clubman, Villager
 from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
@@ -106,9 +106,10 @@ class TownCenter(Buildable):
 		faction=faction,
 		health=600,
 		line_sight=7)
-		self.villager_cooldown = 3 if LAUNCH_FAST_ACTIONS else 20 # in seconds
-		self.villager_cost = (Res.FOOD, 50)
 		self.is_producing = False
+		self.class_produced = Villager
+		self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Villager.creation_time # in seconds
+		self.unit_cost = Villager.creation_cost
 
 class Barracks(Buildable):
 	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
