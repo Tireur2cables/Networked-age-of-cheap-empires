@@ -147,14 +147,28 @@ class NumInput(arcade.gui.UIInputText) :
 			self.caret.on_text("0")
 
 class ConstructButton(arcade.gui.UITextureButton) :
-	def __init__(self,image, construct, width, height, text=""):
+	def __init__(self,aoce_game,image, construct, width, height, text=""):
 		super().__init__(texture = arcade.load_texture(image), width=width, height=height, text=text)
 		self.image = image
 		self.construct = construct
+		self.game = aoce_game
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
-		#self.construct
-		print("Lezgo mon soleil")
+		#On initialise à zero au cas ou le player changerai d avis sur ce qu il veut construire
+		self.game.game_view.StoragePitRequest = 0
+		self.game.game_view.HouseRequest = 0
+		self.game.game_view.GranaryRequest = 0
+		self.game.game_view.BarracksRequest = 0
+
+		if self.construct == 0 : 
+			self.game.game_view.StoragePitRequest = 1
+		elif self.construct == 1 :
+			self.game.game_view.HouseRequest = 1
+		elif self.construct == 2 :
+			self.game.game_view.GranaryRequest = 1
+		elif self.construct == 3 :
+			self.game.game_view.BarracksRequest = 1
+
 
 class ActionButton(arcade.gui.UITextureButton) :
 	def __init__(self, text, width, height) :

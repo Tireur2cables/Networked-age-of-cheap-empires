@@ -53,6 +53,12 @@ class View():
 
 		self.mode = "move"
 
+		#Pour le GUI, les flags indiquant si on veut construire un batiment
+		self.HouseRequest = 0
+		self.StoragePitRequest = 0
+		self.GranaryRequest = 0
+		self.BarracksRequest = 0
+
 		self.resource_label_list = []
 
 	def setup(self) :
@@ -308,20 +314,34 @@ class View():
 			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
 			self.camera.move_to([self.camera_x, self.camera_y], 1)
 		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
-		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
+		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :
 			pass
 		elif button == arcade.MOUSE_BUTTON_LEFT:
-			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			if closest_unit_sprites:
-				self.game.game_controller.select("player", closest_unit_sprites)
+			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
+			if(self.HouseRequest==1):
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
+				self.HouseRequest = 0
+			elif self.StoragePitRequest==1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
+				self.StoragePitRequest = 0
+			elif self.GranaryRequest==1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
+				self.GranaryRequest = 0
+			elif self.BarracksRequest==1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
+				self.BarracksRequest = 0
 			else:
-				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
-				if closest_zone_sprites:
-					self.game.game_controller.select_zone("player", closest_zone_sprites)
+				closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
+				if closest_unit_sprites:
+					self.game.game_controller.select("player", closest_unit_sprites)
 				else:
-					self.game.game_controller.clear_faction_selection("player")
-			# draw interactive ui of selected
-			self.trigger_Villager_GUI(self.game.game_controller.selection)
+					closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
+					if closest_zone_sprites:
+						self.game.game_controller.select_zone("player", closest_zone_sprites)
+					else:
+						self.game.game_controller.clear_faction_selection("player")
+				# draw interactive ui of selected
+				self.trigger_Villager_GUI(self.game.game_controller.selection)
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
@@ -414,7 +434,7 @@ class View():
 			)
 		)
 
-		# Create a box for the button in the precedent box, maybe redondant
+		# Create a box for the batiment buildable by villagers
 		self.v_box5 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
@@ -425,6 +445,20 @@ class View():
 				child=self.v_box5
 			)
 		)
+
+		# Create a box for the batiment buildable by villagers
+		self.v_box9 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				align_x= self.game.window.width/4 + self.game.window.width/8, #200, plus à 200 apres calcul
+				anchor_y="bottom",
+				align_y=self.game.window.height/60, #15
+				child=self.v_box9
+			)
+		)
+
+
 
 		# Create a box for the button in the precedent box, maybe redondant
 		# Heberge la sprite
@@ -512,6 +546,7 @@ class View():
 		self.v_box6.clear()
 		self.v_box7.clear()
 		self.v_box8.clear()
+		self.v_box9.clear()
 
 		self.boolean_dynamic_gui = False
 		if selected_list["player"] : # someting is selected
@@ -528,8 +563,9 @@ class View():
 					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
 					self.v_box8.add(entity_life.with_border())
 
-					sprite_image = arcade.gui.UITextArea(text="", width=width / 6, height=height / 2)
-					self.v_box6.add(sprite_image.with_background(s.sprite.texture))
+					#Commented because it does not work and because he cut the execution of the GUI affichage next in this fonction
+					#sprite_image = arcade.gui.UITextArea(text="", width=width / 6, height=height / 2)
+					#self.v_box6.add(sprite_image.with_background(s.sprite.texture))
 
 				if s.faction == "player" : # ouvre les actions seulement si la selection nnous appartient
 
@@ -541,11 +577,25 @@ class View():
 						self.v_box8.add(villager_ressources.with_border())
 
 						# Button for coin, you want to click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
-						villager_button = ActionButton(text= "Machala", height = 70, width=110)
-						self.v_box5.add(villager_button.with_space_around(15,15,15,15))
+						#villager_button = ActionButton(text= "Machala", height = 70, width=110)
+						#self.v_box5.add(villager_button.with_space_around(15,15,15,15))
 
-						villager_button2 = ActionButton(text = "Attaquer", height = 70, width = 110)
-						self.v_box5.add(villager_button2.with_space_around(15,15,15,15))
+						#villager_button2 = ActionButton(text = "Attaquer", height = 70, width = 110)
+						#self.v_box5.add(villager_button2.with_space_around(15,15,15,15))
+
+						storagepit_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/StoragePit.png",text="StoragePit",width = 110, height = 70, construct =0)
+						self.v_box5.add(storagepit_villager.with_space_around(15,15,15,15))
+
+						house_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/house.png",text="house",width = 110, height = 70, construct =1)
+						self.v_box5.add(house_villager.with_space_around(15,15,15,15))
+
+						granary_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/Granary.png",text="Granary",width = 110, height = 70, construct =2)
+						self.v_box9.add(granary_villager.with_space_around(15,15,15,15))
+
+						barracks_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/Barracks.png",text="Barracks",width = 110, height = 70, construct =3)
+						self.v_box9.add(barracks_villager.with_space_around(15,15,15,15))
+
+
 
 					elif isinstance(s, Zone) : # batiment du joueur
 						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
@@ -558,6 +608,5 @@ class View():
 						elif isinstance(s, Barracks) :
 							militia_button = ActionButton(text="Former milice", height=70, width=110)
 							self.v_box5.add(militia_button.with_space_around(15, 15, 15, 15))
-
 
 				break # ce break sera a enlever si on gere la selection multiple
