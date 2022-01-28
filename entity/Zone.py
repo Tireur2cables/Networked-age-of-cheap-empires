@@ -96,6 +96,9 @@ class TownCenter(Buildable):
 	#Size: 3x3
 	#LineOfSight : 7
 	#Equiv AOE2: TownCenter
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 200, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 60
 	cost=(Res.WOOD, 200)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 60
 	tile_size=(4, 4) # (3, 3) sur AOE
@@ -114,6 +117,9 @@ class TownCenter(Buildable):
 class Barracks(Buildable):
 	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
 	#Equiv AOE2: Barracks
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 125, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 125)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(3, 3)
@@ -141,6 +147,9 @@ class StoragePit(Buildable):
 	#Size : 3x3
 	#LineOfSight:4
 	#Equiv AOE2: Lumber Camp & Mining Camp
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 120)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2) # (3, 3) sur AOE, (2, 2) sur AOE2
@@ -154,6 +163,9 @@ class StoragePit(Buildable):
 class Granary(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
 	#Equiv AOE2: Mill
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 120)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2)
@@ -168,6 +180,9 @@ class Granary(Buildable):
 class Dock(Buildable):
 	#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
 	#Equiv AOE2: Dock
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 35
 	cost=(Res.WOOD, 100)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 35
 	tile_size=(3, 3)
@@ -181,6 +196,9 @@ class Dock(Buildable):
 class House(Buildable):
 	#WhoAmI : Cost : 30 Wood; Use : +4 population per house
 	#Equiv AOE2: House
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 30, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 25
 	cost=(Res.WOOD, 30)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 25
 	tile_size=(2, 2)

@@ -4,6 +4,7 @@ from LAUNCH_SETUP import LAUNCH_ENABLE_IA
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
+from game import GameView
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -16,7 +17,7 @@ class Controller():
 
 # --- Setup ---
 
-	def __init__(self, aoce_game):
+	def __init__(self, aoce_game: GameView):
 		""" Initializer """
 		self.game = aoce_game
 
@@ -51,14 +52,14 @@ class Controller():
 			return lambda entity: isinstance(entity, type) and entity.faction == faction
 
 	@staticmethod
-	def find_entity_in_sprites(sprites_collection, filter):
+	def find_entity_in_sprites(sprites_collection, filter) -> Entity:
 		for s in sprites_collection:
 			entity = s.entity
 			if entity and filter(entity):
 				return entity
 		return None
 	@staticmethod
-	def find_entity(entity_collection, filter):
+	def find_entity(entity_collection, filter) -> Entity:
 		for e in entity_collection:
 			if e and filter(e):
 				return e
