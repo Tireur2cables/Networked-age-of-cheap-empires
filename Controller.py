@@ -337,7 +337,8 @@ class Controller():
 					entity.resource[aimed_entity.get_resource_nbr()] += harvested
 					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 					print(f"[harvesting] -> {type(entity).__name__} has {entity.resource} - max_resources : {entity.max_resource}")
-					self.game.game_view.update_resources_gui()
+					if entity.faction == "player" :
+						self.game.game_view.update_villager_resources_gui()
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)

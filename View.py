@@ -220,9 +220,6 @@ class View():
 					arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 					self.draw_grid_position(Vector(x, y))
 
-		# draw interactive ui of selected
-		self.trigger_Villager_GUI(self.game.game_controller.selection)
-
 		# Update the minimap
 		self.minimap.draw()
 
@@ -323,6 +320,8 @@ class View():
 					self.game.game_controller.select_zone("player", closest_zone_sprites)
 				else:
 					self.game.game_controller.clear_faction_selection("player")
+			# draw interactive ui of selected
+			self.trigger_Villager_GUI(self.game.game_controller.selection)
 
 		elif button == arcade.MOUSE_BUTTON_RIGHT:
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
@@ -433,26 +432,24 @@ class View():
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="center",
-				align_x= self.game.window.width/30,  #window.width sur ordi Guillaume == 1600
+				align_x=self.game.window.width / 24 + (self.game.window.width / 6 - self.game.window.width / 12) / 2, # center sprite in rectangle
 				anchor_y="bottom",
-				align_y= self.game.window.height/12, #15 #window.heigth su ordi Guillaume == 900
+				align_y=self.game.window.height * 1 / 8 - (self.game.window.height * 2 / 32), # center sprite in rectangle
 				child=self.v_box6
 			)
 		)
 
 		# Heberge l affichage des ressources
-		self.v_box8 = arcade.gui.UIBoxLayout()
+		self.v_box8 = arcade.gui.UIBoxLayout(vertical=False)
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
-				anchor_x="right",
-				align_x= - self.game.window.width * (2/5) ,  #window.width sur ordi Guillaume == 1600
-				anchor_y="bottom", #15 #window.heigth su ordi Guillaume == 900
-				align_y= 10,
+				anchor_x="left",
+				align_x=self.game.window.width / 2 + (self.game.window.width / 6 - self.game.window.width / 8) / 2,
+				anchor_y="bottom",
+				align_y=10,
 				child=self.v_box8
 			)
 		)
-
-
 
 	def addButton(self):
 		# def button size
@@ -504,6 +501,10 @@ class View():
 		for label, resource_text in zip(self.resource_label_list, resources_tab):
 			label.text = resource_text
 
+	def update_villager_resources_gui(self) :
+		if self.boolean_dynamic_gui :
+			self.trigger_Villager_GUI(self.game.game_controller.selection)
+
 	# test pour les coins mais dois bouger TODO
 	def trigger_Villager_GUI(self, selected_list) :
 		self.v_box4.clear()
@@ -524,22 +525,18 @@ class View():
 					entity_box_stat = arcade.gui.UITextArea(text=s.name, width=width / 3, height=height)
 					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
 
-					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 10)
+					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
 					self.v_box8.add(entity_life.with_border())
 
-				if isinstance(s, Villager) : # add villager options
-					#print(self.selected_list["player"][0].nb_resources()) # Affichent les ressources du Villageois
-					# issue : il faut trouver le chemin d acces a la fonction nb_ressources du villageoi selectionne
-					#print(selected_list["player"][0].nb_resources())
-					villager_ressources = arcade.gui.UITextArea(text ="Ressources : "+str(s.nb_resources()),text_color= arcade.color.PINK,width=120 ) #+(s[0].nb_resources())
-					self.v_box8.add(villager_ressources.with_border())
-
-
-
-					villager_button3 = ConstructButton(image="Ressources/img/units/villager_stand.png",construct=None,width= width/12,height= self.game.window.height/10)
-					self.v_box6.add(villager_button3.with_background(texture=arcade.load_texture(button_texture)))
+					sprite_image = arcade.gui.UITextArea(text="", width=width / 6, height=height / 2)
+					self.v_box6.add(sprite_image.with_background(s.sprite.texture))
 
 				if s.faction == "player" : # ouvre les actions seulement si la selection nnous appartient
+				
+					if isinstance(s, Villager) : # add villager options
+						villager_ressources = arcade.gui.UITextArea(text ="Ressources : "+str(s.nb_resources()), text_color=arcade.color.PINK, width=width / 8)
+						self.v_box8.add(villager_ressources.with_border())
+
 					# Button for coin, you want to click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
 					villager_button = ActionButton(text = "Machala",height = 70, width=110)
 					self.v_box5.add(villager_button.with_space_around(15,15,15,15))
