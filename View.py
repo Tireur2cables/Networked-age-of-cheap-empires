@@ -583,17 +583,17 @@ class View():
 						#villager_button2 = ActionButton(text = "Attaquer", height = 70, width = 110)
 						#self.v_box5.add(villager_button2.with_space_around(15,15,15,15))
 
-						storagepit_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/StoragePit.png",text="StoragePit",width = 110, height = 70, construct =0)
-						self.v_box5.add(storagepit_villager.with_space_around(15,15,15,15))
+						storagepit_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/StoragePit.png",text="StoragePit",width = 110, height = 90, construct =0)
+						self.v_box5.add(storagepit_villager.with_background(arcade.load_texture(button_texture)))
 
-						house_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/house.png",text="house",width = 110, height = 70, construct =1)
-						self.v_box5.add(house_villager.with_space_around(15,15,15,15))
+						house_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/house.png",text="House",width = 110, height = 90, construct =1)
+						self.v_box5.add(house_villager.with_background(arcade.load_texture(button_texture)))
 
-						granary_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/Granary.png",text="Granary",width = 110, height = 70, construct =2)
-						self.v_box9.add(granary_villager.with_space_around(15,15,15,15))
+						granary_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/Granary.png",text="Granary",width = 110, height = 90, construct =2)
+						self.v_box9.add(granary_villager.with_background(arcade.load_texture(button_texture)))
 
-						barracks_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/Barracks.png",text="Barracks",width = 110, height = 70, construct =3)
-						self.v_box9.add(barracks_villager.with_space_around(15,15,15,15))
+						barracks_villager = ConstructButton(aoce_game=self.game,image="Ressources/img/zones/buildables/Barracks.png",text="Barracks",width = 110, height = 90, construct =3)
+						self.v_box9.add(barracks_villager.with_background(arcade.load_texture(button_texture)))
 
 
 
