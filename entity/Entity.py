@@ -40,6 +40,7 @@ class Entity:
 		self.health = max_health if health == -1 else health
 		self.max_health = max_health if health == -1 else health
 		self.damage = damage
+		self.is_dead = False
 
 		# Battle
 		self.rate_fire = rate_fire

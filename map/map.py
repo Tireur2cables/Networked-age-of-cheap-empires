@@ -109,6 +109,7 @@ class Map():
 	def get_path_fast(self, start:Vector, end:Vector):
 		# Pathfinding algorithm
 		path = []
+		new_path = []
 		path_len = -1
 		if start != end:
 			left_offset, bottom_offset, start_pos, end_pos, pathfinding_matrix = self.get_restricted_pathfinding_matrix(start, end)

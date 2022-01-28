@@ -214,9 +214,11 @@ class View():
 						if isinstance(aimed_entity, Resources):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.BLUE)
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.YELLOW, nbr_health_bar=2)
-						elif isinstance(aimed_entity, WorkSite):
+						elif isinstance(aimed_entity, WorkSite) and aimed_entity.faction == unit.faction:
 							self.draw_bar(unit.iso_position, int(unit.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Unit):
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
+						elif isinstance(aimed_entity, Buildable) and aimed_entity.faction != unit.faction:
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(unit.iso_position)
@@ -336,7 +338,7 @@ class View():
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 			if zones_at_point:
-				self.game.game_controller.human_order_towards_sprites("stock", "player", zones_at_point)
+				self.game.game_controller.human_order_towards_sprites("stock/attack", "player", zones_at_point)
 			elif units_at_point:
 				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
 			else:

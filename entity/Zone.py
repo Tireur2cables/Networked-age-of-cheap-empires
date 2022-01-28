@@ -104,7 +104,7 @@ class TownCenter(Buildable):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		faction=faction,
-		health=600,
+		health=20,
 		line_sight=7)
 		self.is_producing = False
 		self.class_produced = Villager
