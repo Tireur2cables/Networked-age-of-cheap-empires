@@ -6,7 +6,7 @@ from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
 # from game import GameView
-from player import AI
+from player import AI, Player
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -29,7 +29,7 @@ class Controller():
 		self.ai = set()
 		self.players = set()
 
-	def setup(self, players_dict):
+	def setup(self, players_dict: dict):
 		self.selection["player"] = set()
 		for key, value in players_dict.items():
 			self.players.add(value)
@@ -91,6 +91,11 @@ class Controller():
 			player.discard_entity(dead_entity)
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
+
+	def discard_player_from_game(self, player: Player):
+		for entity in player.my_units | player.my_zones:
+			entity.faction = None
+			self.discard_entity_from_game(entity)
 
 
 
@@ -314,16 +319,28 @@ class Controller():
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
 
-
+	def end_game(self):
+		print("youpiiii !!!")
 
 # --- On_update (Called every frame) ---
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 
-		# # --- Check End Conditions ---
-		# for player in self.players:
-		# 	player.
+		# --- Check End Conditions ---
+		dead_players = set()
+		for player in self.players:
+			if player.town_center.is_dead == True:
+				self.discard_player_from_game(player)
+				player.is_alive = False
+				dead_players.add(player)
+
+		for dead_player in dead_players:
+			self.players.remove(dead_player)
+			del self.game.players[dead_player.player_type]
+
+		if len(self.game.players) == 1:
+			self.end_game()
 
 		# --- Update AI ---
 		if LAUNCH_ENABLE_IA:
