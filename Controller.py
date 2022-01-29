@@ -358,8 +358,13 @@ class Controller():
 
 		for resource in items_to_store:
 			self.game.players[entity.faction].add_resource(resource, entity.resource[resource])
-			self.game.game_view.update_resources_gui()
 			entity.resource[resource] = 0
+			if entity.faction == "player" :
+				self.game.game_view.update_resources_gui()
+
+		if entity.faction == "player" :
+			self.game.game_view.trigger_Villager_GUI(self.selection)
+			
 		can_harvest = entity.go_back_to_harvest()
 		if can_harvest:
 			self.order_harvest(entity, entity.previous_aimed_entity)
