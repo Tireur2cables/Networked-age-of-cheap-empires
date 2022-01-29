@@ -246,6 +246,9 @@ class Controller():
 		# Step 1: Create a worksite with the building_name
 		worksite = WorkSite(map_position, entity.faction, building_name)
 		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) >= worksite.zone_to_build.cost[1]:
+			#Pour le gui, on baisse le flag si on peut finalement construire
+			if entity.faction == "player":
+				self.game.game_view.NoRessourcesForBuild = 0
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
@@ -272,6 +275,9 @@ class Controller():
 				print("Not a Villager!")
 		else:
 			print("not enough resources to order a build!")
+			#Pour le GUI, on leve un flag pour le message d erreur
+			if entity.faction == "player":
+				self.game.game_view.NoRessourcesForBuild = 1
 
 	def order_zone_units(self, producing_zone, entity_produced = ""):
 

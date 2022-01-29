@@ -1,6 +1,6 @@
 # --- Imports ---
 ## -- arcade --
-from turtle import window_height, window_width
+from turtle import width, window_height, window_width
 import arcade
 from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
@@ -63,6 +63,9 @@ class View():
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
 		self.reset_construct_flags()
 
+		#GUI, les flags indiquant
+		self.message_error_flags()
+
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
@@ -87,6 +90,9 @@ class View():
 
 	def reset_construct_flags(self) :
 		self.build_request = ""
+	
+	def message_error_flags(self):
+		self.NoRessourcesForBuild = 0
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -269,6 +275,9 @@ class View():
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
 
+		#GUI dynamic error message
+		self.trigger_attention_message()
+
 	def get_tile_outline(self, map_position):
 		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
 		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
@@ -444,6 +453,9 @@ class View():
 				arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - nbr_health_bar*y_offset, (health*32)/max_health, 8, color)
 
 	def init_dynamic_gui(self) :
+		#Compteur de "temps" pour l affichage des messages d erreurs, pour qu ils restent un petit temps a l ecran
+		self.count_time = 0
+
 		# Create a box group to align the 'open' button in the center
 		# Box pour le UITextArea qui contiens les stats du personnage
 		self.v_box4 = arcade.gui.UIBoxLayout()
@@ -552,6 +564,17 @@ class View():
 				child=self.v_box12
 			)
 		)
+
+		# Create a box for the military buildable by barracks
+		self.v_box13 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				anchor_y="center",
+				child=self.v_box13
+			)
+		)
+
 
 	def addButton(self):
 		# def button size
@@ -699,3 +722,15 @@ class View():
 
 
 				break # ce break sera a enlever si on gere la selection multiple
+
+	def trigger_attention_message(self):
+		self.v_box13.clear()
+		width = self.game.window.width /2
+		height = self.game.window.height / 2
+		self.count_time = self.count_time + 1
+		if self.NoRessourcesForBuild == 1:
+			NoRessourcesForBuildButton = arcade.gui.UITextArea(text="Vous manquez de ressources pour construire", width=width, height=height, font_size=24, text_color=arcade.color.RED)
+			self.v_box13.add(NoRessourcesForBuildButton)
+			if self.count_time > 50:
+				self.NoRessourcesForBuild =0
+				self.count_time = 0

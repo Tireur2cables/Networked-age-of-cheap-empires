@@ -155,6 +155,7 @@ class ConstructButton(arcade.gui.UITextureButton) :
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
 		#On initialise à zero au cas ou le player changerai d avis sur ce qu il veut construire
 		self.game.game_view.reset_construct_flags()
+		self.game.game_view.count_time = 0
 
 		if self.text in ("StoragePit", "House", "Granary", "Barracks", "TownCenter"):
 			self.game.game_view.build_request = self.text.lower()
