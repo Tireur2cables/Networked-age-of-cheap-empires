@@ -142,20 +142,20 @@ class Military(Unit):#un Militaire est une Unit particuliere
 
 #Infantry (Trained at Barracks)
 # AOE 1 Military
-class Clubman(Military):
-	creation_cost = {Res.FOOD : 50, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
-	creation_time = 26
-	def __init__(self, iso_position, faction, health=-1):
-		super().__init__(iso_position,
-		sprite_data=SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2),
-		faction=faction,
-		speed=1, # la valeur de base était trop haut alors j'ai modifié
-		health=health,
-		max_health=40,
-		damage=4,
-		rate_fire=1.5,
-		pierce_armor=0,
-		line_sight=4)
+# class Clubman(Military):
+# 	creation_cost = {Res.FOOD : 50, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
+# 	creation_time = 26
+# 	def __init__(self, iso_position, faction, health=-1):
+# 		super().__init__(iso_position,
+# 		sprite_data=SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2),
+# 		faction=faction,
+# 		speed=1, # la valeur de base était trop haut alors j'ai modifié
+# 		health=health,
+# 		max_health=40,
+# 		damage=4,
+# 		rate_fire=1.5,
+# 		pierce_armor=0,
+# 		line_sight=4)
 
 # AOE 2 Military
 class Militia(Military):

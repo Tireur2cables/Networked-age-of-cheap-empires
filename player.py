@@ -2,7 +2,7 @@ import random
 import time
 from entity.Entity import Entity
 from CONSTANTS import Resource as Res
-from entity.Unit import Clubman, Military, Unit, Villager
+from entity.Unit import Military, Unit, Villager
 from entity.Zone import Barracks, BerryBush, Buildable, Gold, House, Stone, StoragePit, Granary, TownCenter, Wood, WorkSite, Zone
 from utils.isometric import iso_to_grid_pos
 from utils.vector import Vector
@@ -24,7 +24,7 @@ class Player:
 
 		# resource (dictionnary initialized with qty[Resource]
 		# BE CAREFUL: The dictionnary "resources" is the same for all players, this is why we create a new one with this comprehension.
-		self.resources = {key: value for key, value in resources.items()}
+		self.resources = {key: 100000 for key, value in resources.items()}
 
 		# unit
 		self.nb_unit = 0
@@ -299,4 +299,4 @@ class AI(Player):
 					if isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nb_class_in_unit(Villager) < 10 + self.get_nb_class_in_unit(Military):
 						self.game.game_controller.order_zone_units(zone)
 					elif isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
-						self.game.game_controller.order_zone_units(zone, "clubman")
+						self.game.game_controller.order_zone_units(zone, "militia")

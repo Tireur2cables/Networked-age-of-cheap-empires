@@ -1,5 +1,5 @@
 from entity.Entity import Entity
-from entity.Unit import Clubman, Villager
+from entity.Unit import Militia, Villager
 from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
@@ -121,7 +121,7 @@ class TownCenter(Buildable):
 		self.class_produced = Villager
 		self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Villager.creation_time # in seconds
 		self.unit_cost = Villager.creation_cost
-    
+
 	@staticmethod
 	def TownCenter_1():
 		TownCenter.villager_cooldown_upgr=(Res.WOOD,30)
@@ -143,7 +143,7 @@ class Barracks(Buildable):
 		faction=faction,
 		health=350,
 		name="Barracks")
-    
+
 		self.unit_cooldown = None
 		self.unit_cost = None
 		self.class_produced = None
@@ -152,11 +152,11 @@ class Barracks(Buildable):
 
 	def set_class_produced(self, class_produced_name):
 		self.class_name = class_produced_name
-		if class_produced_name == "clubman":
-			self.class_produced = Clubman
-			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Clubman.creation_time
-			self.unit_cost = Clubman.creation_cost
-      
+		if class_produced_name == "militia":
+			self.class_produced = Militia
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Militia.creation_time
+			self.unit_cost = Militia.creation_cost
+
 	@staticmethod
 	def Barracks_1():
 		House.cost=(Res.WOOD,100)
@@ -179,7 +179,7 @@ class StoragePit(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
 		health=350,
 		name="StoragePit")
-    
+
 	@staticmethod
 	def StoragePit_1():
 		StoragePit.cost=(Res.WOOD,100)
@@ -200,7 +200,7 @@ class Granary(Buildable):
 		faction=faction,
 		health=350,
 		name="Granary")
-    
+
 	@staticmethod
 	def Granary_1():
 		Granary.cost=(Res.WOOD,90)
@@ -239,7 +239,7 @@ class House(Buildable):
 		faction=faction,
 		health=75,
 		name="House")
-    
+
 	@staticmethod
 	def House_1():
 		House.cost=(Res.WOOD,20)
