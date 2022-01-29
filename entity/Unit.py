@@ -1,4 +1,4 @@
-from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS
+from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS, LAUNCH_LIGHTSPEED_MOVES
 from entity.Entity import Entity
 from utils.SpriteData import SpriteData
 from CONSTANTS import Resource as Res
@@ -33,7 +33,7 @@ class Unit(Entity):
 		self.is_interacting = False
 		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
-		self.speed = SPEED_UNITS * speed  # Speed of the unit
+		self.speed = SPEED_UNITS * 5 if LAUNCH_LIGHTSPEED_MOVES else SPEED_UNITS * speed  # Speed of the unit
 
 	def set_move_action(self):
 		self.aim = Vector(0, 0)
@@ -140,6 +140,23 @@ class Military(Unit):#un Militaire est une Unit particuliere
 # Rq : Il n'est peut-être pas utile de creer les implementation de chaque type de militaire car cela n'apporte pas vraiment d'interet
 
 #Infantry (Trained at Barracks)
+# AOE 1 Military
+class Clubman(Military):
+	creation_cost = {Res.FOOD : 50, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 26
+	def __init__(self, iso_position, faction, health=-1):
+		super().__init__(iso_position,
+		sprite_data=SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2),
+		faction=faction,
+		speed=1, # la valeur de base était trop haut alors j'ai modifié
+		health=health,
+		max_health=40,
+		damage=4,
+		rate_fire=1.5,
+		pierce_armor=0,
+		line_sight=4)
+
+# AOE 2 Military
 class Militia(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 20, Res.STONE : 0}
 	creation_time = 21

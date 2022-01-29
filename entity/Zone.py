@@ -1,4 +1,5 @@
 from entity.Entity import Entity
+from entity.Unit import Clubman, Villager
 from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
@@ -50,8 +51,9 @@ class Zone(Entity):
 # ----- GENERAL CLASS -----
 
 class Buildable(Zone):
-	def __init__(self, grid_position, **kwargs):
+	def __init__(self, grid_position, can_produce=False, **kwargs):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
+		self.can_produce = can_produce
 
 # -------------------------
 
@@ -95,6 +97,9 @@ class TownCenter(Buildable):
 	#Size: 3x3
 	#LineOfSight : 7
 	#Equiv AOE2: TownCenter
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 200, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 60
 	cost=(Res.WOOD, 200)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 60
 	tile_size=(4, 4) # (3, 3) sur AOE
@@ -103,13 +108,16 @@ class TownCenter(Buildable):
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
+		can_produce=True,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		faction=faction,
 		health=600,
 		line_sight=7)
-		self.villager_cooldown = 3 if LAUNCH_FAST_ACTIONS else 20 # in seconds
-		self.villager_cost = (Res.FOOD, 50)
 		self.is_producing = False
+		self.class_produced = Villager
+		self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Villager.creation_time # in seconds
+		self.unit_cost = Villager.creation_cost
+    
 	@staticmethod
 	def TownCenter_1():
 		TownCenter.villager_cooldown_upgr=(Res.WOOD,30)
@@ -117,15 +125,32 @@ class TownCenter(Buildable):
 class Barracks(Buildable):
 	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
 	#Equiv AOE2: Barracks
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 125, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 125)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(3, 3)
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
+		can_produce=True,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
 		faction=faction,
 		health=350)
+		self.unit_cooldown = None
+		self.unit_cost = None
+		self.class_produced = None
+		self.class_name = None
+		self.is_producing = False
+
+	def set_class_produced(self, class_produced_name):
+		self.class_name = class_produced_name
+		if class_produced_name == "clubman":
+			self.class_produced = Clubman
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Clubman.creation_time
+			self.unit_cost = Clubman.creation_cost
+      
 	@staticmethod
 	def Barracks_1():
 		House.cost=(Res.WOOD,100)
@@ -135,6 +160,9 @@ class StoragePit(Buildable):
 	#Size : 3x3
 	#LineOfSight:4
 	#Equiv AOE2: Lumber Camp & Mining Camp
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 120)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2) # (3, 3) sur AOE, (2, 2) sur AOE2
@@ -151,6 +179,9 @@ class StoragePit(Buildable):
 class Granary(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
 	#Equiv AOE2: Mill
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 120)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2)
@@ -168,6 +199,9 @@ class Granary(Buildable):
 class Dock(Buildable):
 	#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
 	#Equiv AOE2: Dock
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 35
 	cost=(Res.WOOD, 100)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 35
 	tile_size=(3, 3)
@@ -181,6 +215,9 @@ class Dock(Buildable):
 class House(Buildable):
 	#WhoAmI : Cost : 30 Wood; Use : +4 population per house
 	#Equiv AOE2: House
+	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 30, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 2 if LAUNCH_FAST_ACTIONS else 25
 	cost=(Res.WOOD, 30)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 25
 	tile_size=(2, 2)

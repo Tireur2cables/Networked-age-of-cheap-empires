@@ -1,5 +1,5 @@
 from entity.EntitySprite import EntitySprite
-
+from CONSTANTS import Resource as Res
 
 #   ______           _     _   _
 #  |  ____|         | |   (_) | |
@@ -16,7 +16,10 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, iso_position, sprite_data, faction="None", health=-1, max_health=-1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+	#static attributs which must be redefined in leaf classes
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 0
+	def __init__(self, iso_position, sprite_data, faction: str ="None", health=-1, max_health=-1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
 
 		# Position
 		self.iso_position = iso_position
@@ -40,6 +43,7 @@ class Entity:
 		self.health = max_health if health == -1 else health
 		self.max_health = max_health if health == -1 else health
 		self.damage = damage
+		self.is_dead = False
 
 		# Battle
 		self.rate_fire = rate_fire
