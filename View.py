@@ -366,14 +366,11 @@ class View():
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 			if zones_at_point:
-				self.game.game_controller.human_order_towards_sprites("stock/attack", "player", zones_at_point)
+				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
 			elif units_at_point:
 				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
-				# TODO ici, reparer le batiment s'il est abimé et que on a pas de ressources a deposer et batiment a nous
-
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
-			# TODO ici attquer si batiment ou unité pas a nous
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -384,39 +381,11 @@ class View():
 			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
-
 		if symbol == arcade.key.ENTER:
 			self.cheatsinput.on_enter_pressed()
 
 		if symbol == arcade.key.F: # cheat window
 			self.triggerCheatInput()
-		else:
-			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-			if self.game.game_controller.unit_in_selection("player"):
-				if self.mode == "move":
-					if symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-						self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone))
-					elif symbol == arcade.key.B:
-						self.mode = "build"
-						print("build mode!")
-				elif self.mode == "build":
-					if symbol == arcade.key.H: # Build something
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
-					elif symbol == arcade.key.S:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
-					elif symbol == arcade.key.G:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
-					elif symbol == arcade.key.B:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
-					elif symbol == arcade.key.D:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
-					self.mode = "move"
-					print("move mode!")
-			else:
-				if symbol == arcade.key.V:
-					self.game.game_controller.human_order_with_zone("populate", "player")
-				elif symbol == arcade.key.C:
-					self.game.game_controller.human_order_with_zone("train militia", "player")
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
 		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))

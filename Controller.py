@@ -134,20 +134,22 @@ class Controller():
 
 	def human_order_towards_sprites(self, action, faction, sprites_at_point):
 		for entity in self.selection[faction]:
-			if isinstance(entity, Villager):
-				if action == "harvest":
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
-					if zone_found:
-						self.order_harvest(entity, zone_found)
-				elif action == "stock/attack":
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
-					if zone_found:
-						self.order_stock_resources(entity, zone_found)
-					else:
+			if action == "harvest/stock/attack/repair" : # click on batiment
+				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
+				if isinstance(entity, Villager) and zone_found: # harvest ressources
+					self.order_harvest(entity, zone_found)
+				else :
+					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
+					stock_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
+					if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0 : #stock zone found and resources to stock
+						self.order_stock_resources(entity, stock_found)
+					elif isinstance(entity, Villager) and zone_found : # zone of faction found, ask repairation
+						self.order_repairation(entity, zone_found)
+					else :
 						other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
-						if other_zone_found:
+						if other_zone_found: # no ally zone
 							self.order_attack(entity, other_zone_found)
-			if action == "attack":
+			if action == "attack" : # click on unit
 				unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
 				if unit_found:
 					self.order_attack(entity, unit_found)
@@ -314,6 +316,21 @@ class Controller():
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
 
+	def order_repairation(self, entity, aimed_entity) :
+		entity.set_goal("repair")
+		entity.set_aimed_entity(aimed_entity)
+
+		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
+		# Step 1: Search the closest tile near the zone_found to harvest it.
+		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
+		print(f"aimed_tile : {aimed_tile}")
+		# Step 2: Start moving toward the aimed entity
+		if aimed_tile :
+			print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
+			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
+				entity.is_interacting = True
+			else:
+				self.move_entity(entity, aimed_tile.grid_position)
 
 
 # --- On_update (Called every frame) ---
@@ -358,7 +375,7 @@ class Controller():
 					entity.next_aim()
 				else: # ça veut dire qu'il est arrivé
 					entity.is_moving = False
-					if entity.goal in ("harvest", "stock", "build"):
+					if entity.goal in ("harvest", "stock", "build", "repair"):
 						entity.is_interacting = True
 					elif entity.goal == "attack":
 						if isinstance(entity.aimed_entity, Unit):
@@ -384,12 +401,14 @@ class Controller():
 						self.attack_entity(entity, delta_time)
 				else:
 					self.attack_entity(entity, delta_time)
-			elif isinstance(entity.aimed_entity, Resources):
+			elif entity.goal == "harvest" and isinstance(entity.aimed_entity, Resources):
 				self.harvest_zone(entity, delta_time)
-			elif isinstance(entity.aimed_entity, WorkSite):
+			elif entity.goal == "build" and isinstance(entity.aimed_entity, WorkSite):
 				self.build_zone(entity, delta_time)
-			elif isinstance(entity.aimed_entity, (TownCenter, StoragePit, Granary)):
+			elif entity.goal == "stock" and  isinstance(entity.aimed_entity, (TownCenter, StoragePit, Granary)):
 				self.stock_resources(entity, entity.aimed_entity.get_name())
+			elif entity.goal == "repair" and isinstance(entity.aimed_entity, Buildable) :
+				self.repair_zone(entity, delta_time)
 
 		for entity in producing_entities:
 			if isinstance(entity, (TownCenter, Barracks)):
@@ -407,6 +426,17 @@ class Controller():
 
 
 # --- Updating interaction (Called every frame) ---
+
+	def repair_zone(self, entity, delta_time) :
+		entity.action_timer += delta_time
+		if entity.action_timer > 1 : # commence à réparer ou continue
+			if entity.aimed_entity.health < entity.aimed_entity.max_health :
+				entity.aimed_entity.health += 1 # repare 1 point de vie
+
+				if entity.faction == "player" :
+					self.game.game_view.update_resources_gui()
+			else : # fin de la réparation
+				entity.end_goal()
 
 	# Called every frame
 	def build_zone(self, entity, delta_time):
