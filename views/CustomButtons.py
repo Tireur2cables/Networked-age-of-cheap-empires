@@ -147,10 +147,8 @@ class NumInput(arcade.gui.UIInputText) :
 			self.caret.on_text("0")
 
 class ConstructButton(arcade.gui.UITextureButton) :
-	def __init__(self,aoce_game,image, construct, width, height, text=""):
-		super().__init__(texture = arcade.load_texture(image), width=width, height=height, text=text)
-		self.image = image
-		self.construct = construct
+	def __init__(self, aoce_game, image, width, height, text=""):
+		super().__init__(texture=arcade.load_texture(image), width=width, height=height, text=text)
 		self.game = aoce_game
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
@@ -159,20 +157,38 @@ class ConstructButton(arcade.gui.UITextureButton) :
 		self.game.game_view.HouseRequest = 0
 		self.game.game_view.GranaryRequest = 0
 		self.game.game_view.BarracksRequest = 0
+		self.game.game_view.TownCenterRequest = 0
 
-		if self.construct == 0 : 
+		if self.text == "StoragePit" :
 			self.game.game_view.StoragePitRequest = 1
-		elif self.construct == 1 :
+		elif self.text == "House" :
 			self.game.game_view.HouseRequest = 1
-		elif self.construct == 2 :
+		elif self.text == "Granary" :
 			self.game.game_view.GranaryRequest = 1
-		elif self.construct == 3 :
+		elif self.text == "Barracks" :
 			self.game.game_view.BarracksRequest = 1
+		elif self.text == "TownCenter" :
+			self.game.game_view.TownCenterRequest = 1
 
 
 class ActionButton(arcade.gui.UITextureButton) :
-	def __init__(self, text, width, height) :
-		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width, height=height)
+	def __init__(self, text, width, height, batiment, aoce_game, image) :
+		super().__init__(texture=arcade.load_texture(image), text=text, width=width, height=height)
+		self.batiment = batiment
+		self.aoce_game = aoce_game
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		pass
+		if self.text == "Villageois" :
+			self.aoce_game.game_controller.order_zone_villagers(self.batiment)
+		elif self.text == "Milice" :
+			pass
+		elif self.text == "Lancier" :
+			pass
+		elif self.text == "Archer" :
+			pass
+		elif self.text == "Escarmoucheur" :
+			pass
+		elif self.text == "Eclaireur" :
+			pass
+		elif self.text == "Chevalier" :
+			pass

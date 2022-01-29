@@ -212,7 +212,7 @@ class Controller():
 	def order_build(self, entity, map_position, building_name):
 		# Step 1: Create a worksite with the building_name
 		worksite = WorkSite(map_position, entity.faction, building_name)
-		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) > worksite.zone_to_build.cost[1]:
+		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) >= worksite.zone_to_build.cost[1]:
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
@@ -237,10 +237,11 @@ class Controller():
 
 	def order_zone_villagers(self, tc):
 		current_player = self.game.players[tc.faction]
-		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) > tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
+		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) >= tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
 			tc.is_producing = True
 			current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
-			self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
+			if tc.faction == "player" : # Shouldn't be used with AI
+				self.game.game_view.update_resources_gui()
 
 
 
@@ -314,12 +315,11 @@ class Controller():
 
 			current_player = self.game.players[entity.faction]
 			cost = entity.aimed_entity.zone_to_build.cost
-			if current_player.get_resource(cost[0]) > cost[1]:
-				current_player.sub_resource(*cost)
+			current_player.sub_resource(*cost)
+			if entity.faction == "player" :
 				self.game.game_view.update_resources_gui()
-				self.add_entity_to_game(entity.aimed_entity.create_zone())
-			else:
-				print("not enough resources to build!")
+
+			self.add_entity_to_game(entity.aimed_entity.create_zone())
 
 			entity.end_goal()
 

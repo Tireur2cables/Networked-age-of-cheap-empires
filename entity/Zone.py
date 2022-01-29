@@ -78,6 +78,8 @@ class WorkSite(Zone):
 			return Granary
 		elif name_zone == "barracks":
 			return Barracks
+		elif name_zone == "towncenter":
+			return TownCenter
 		elif name_zone == "dock":
 			return Dock
 
