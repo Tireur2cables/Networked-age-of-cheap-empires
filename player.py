@@ -6,10 +6,11 @@ from entity.Unit import Clubman, Military, Unit, Villager
 from entity.Zone import Barracks, BerryBush, Buildable, Gold, House, Stone, StoragePit, Granary, TownCenter, Wood, WorkSite, Zone
 from utils.isometric import iso_to_grid_pos
 from utils.vector import Vector
+# from game import GameView
 
 class Player:
 	def __init__(self,
-				game,
+				game,#: GameView,
 				player_type: str,
 				resources: dict) -> None:
 		"""

@@ -103,6 +103,8 @@ class TownCenter(Buildable):
 	cost=(Res.WOOD, 200)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 60
 	tile_size=(4, 4) # (3, 3) sur AOE
+	villager_cooldown_upgr = 3 if LAUNCH_FAST_ACTIONS else 20 # in seconds
+	villager_cost_upgr = (Res.FOOD, 50)
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
@@ -115,6 +117,10 @@ class TownCenter(Buildable):
 		self.class_produced = Villager
 		self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Villager.creation_time # in seconds
 		self.unit_cost = Villager.creation_cost
+    
+	@staticmethod
+	def TownCenter_1():
+		TownCenter.villager_cooldown_upgr=(Res.WOOD,30)
 
 class Barracks(Buildable):
 	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
@@ -144,6 +150,10 @@ class Barracks(Buildable):
 			self.class_produced = Clubman
 			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Clubman.creation_time
 			self.unit_cost = Clubman.creation_cost
+      
+	@staticmethod
+	def Barracks_1():
+		House.cost=(Res.WOOD,100)
 
 class StoragePit(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)
@@ -162,6 +172,9 @@ class StoragePit(Buildable):
 		faction=faction,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
 		health=350)
+	@staticmethod
+	def StoragePit_1():
+		StoragePit.cost=(Res.WOOD,100)
 
 class Granary(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
@@ -178,6 +191,9 @@ class Granary(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15),
 		faction=faction,
 		health=350)
+	@staticmethod
+	def Granary_1():
+		Granary.cost=(Res.WOOD,90)
 
 
 class Dock(Buildable):
@@ -211,6 +227,9 @@ class House(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10),
 		faction=faction,
 		health=75)
+	@staticmethod
+	def House_1():
+		House.cost=(Res.WOOD,20)
 
 
 
