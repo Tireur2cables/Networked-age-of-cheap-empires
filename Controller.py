@@ -442,7 +442,7 @@ class Controller():
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
 					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[harvesting] -> {type(entity).__name__} has {entity.resource} - max_resources : {entity.max_resource}")
+					print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 					if entity.faction == "player" :
 						self.game.game_view.update_villager_resources_gui()
 

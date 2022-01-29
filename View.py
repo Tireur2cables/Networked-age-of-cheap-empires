@@ -195,7 +195,7 @@ class View():
 		if self.StoragePitRequest == 1 :
 			StoragePit_sprite = arcade.Sprite("Ressources/img/zones/buildables/storagepit.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
 			StoragePit_sprite.draw(pixelated=True)
-		
+
 		if self.GranaryRequest == 1 :
 			Granary_sprite = arcade.Sprite("Ressources/img/zones/buildables/granary.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
 			Granary_sprite.draw(pixelated=True)
@@ -203,7 +203,7 @@ class View():
 		if self.TownCenterRequest == 1 :
 			TownCenter_sprite = arcade.Sprite("Ressources/img/zones/buildables/towncenter.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
 			TownCenter_sprite.draw(pixelated=True)
-		
+
 		if self.BarracksRequest == 1 :
 			Barracks_sprite = arcade.Sprite("Ressources/img/zones/buildables/barracks.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
 			Barracks_sprite.draw(pixelated=True)
@@ -358,7 +358,7 @@ class View():
 		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :
 			pass
-    
+
 		elif button == arcade.MOUSE_BUTTON_LEFT :
 			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
 			if self.HouseRequest == 1 :
@@ -378,14 +378,14 @@ class View():
 				self.TownCenterRequest = 0
 			else:
 				closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
-        if closest_unit_sprites:
-          self.game.game_controller.select("player", closest_unit_sprites)
-        else:
-          closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
-          if closest_zone_sprites:
-            self.game.game_controller.select_zone("player", closest_zone_sprites)
-          else:
-            self.game.game_controller.clear_faction_selection("player")
+				if closest_unit_sprites:
+					self.game.game_controller.select("player", closest_unit_sprites)
+				else:
+					closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+					if closest_zone_sprites:
+						self.game.game_controller.select_zone("player", closest_zone_sprites)
+					else:
+						self.game.game_controller.clear_faction_selection("player")
 				# draw interactive ui of selected
 				self.trigger_Villager_GUI(self.game.game_controller.selection)
 
