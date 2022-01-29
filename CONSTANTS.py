@@ -2,7 +2,7 @@
 
 # Doc pour les enumerations: https://docs.python.org/fr/3/library/enum.html
 from enum import Enum, auto
-
+from LAUNCH_SETUP import LAUNCH_DEFAULT_MAP
 class Resource(Enum):
 	# On utilise les 4 ressources du jeu a de nombreux endroits dans le code
 	# Voici donc une enumeration pour harmoniser le tout
@@ -12,7 +12,7 @@ class Resource(Enum):
 	STONE = auto()
 
 # Default number of tiles on each side of the map
-DEFAULT_MAP_SIZE = 50
+DEFAULT_MAP_SIZE = 50 if LAUNCH_DEFAULT_MAP else 100
 
 # Some basics sizes about tiles
 TILE_WIDTH = 64 # arbitrary ?

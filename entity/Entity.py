@@ -1,5 +1,5 @@
 from entity.EntitySprite import EntitySprite
-
+from CONSTANTS import Resource as Res
 
 #   ______           _     _   _
 #  |  ____|         | |   (_) | |
@@ -16,7 +16,12 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-	def __init__(self, iso_position, sprite_data, health=-1, max_health=1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4):
+  
+  #static attributs which must be redefined in leaf classes
+	creation_cost = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 0
+	def __init__(self, iso_position, sprite_data, faction: str ="None", health=-1, max_health=-1, damage=0, rate_fire=1, range=0, melee_armor=0, pierce_armor=0, line_sight=4, name=""):
+		self.name = name
 
 		# Position
 		self.iso_position = iso_position
@@ -24,6 +29,9 @@ class Entity:
 		# Sprite
 		self.sprite_data = sprite_data
 		self.sprite = EntitySprite(self, sprite_data, hit_box_algorithm="Simple")
+
+		# Faction
+		self.faction = faction
 
 		# Backend
 		self.action_timer = 0
@@ -35,8 +43,9 @@ class Entity:
 		#by default, initialize the life with max_health
 		#health is when we load a game from a save file
 		self.health = max_health if health == -1 else health
-		self.max_health = max_health
+		self.max_health = max_health if health == -1 else health
 		self.damage = damage
+		self.is_dead = False
 
 		# Battle
 		self.rate_fire = rate_fire
@@ -46,7 +55,7 @@ class Entity:
 		self.line_sight = line_sight
 
 	def __getstate__(self):
-		return [self.iso_position, self.sprite_data, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
+		return [self.iso_position, self.sprite_data, self.faction, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
 	def __setstate__(self, data):
 		# Position
 		self.iso_position = data[0]
@@ -72,6 +81,10 @@ class Entity:
 		self.melee_armor = data[7]
 		self.pierce_armor = data[8]
 		self.line_sight = data[9]
+
+	@classmethod
+	def get_name(cls):
+		return cls.__name__.lower()
 
 	# coordonnees
 	def get_x(self):
@@ -104,8 +117,10 @@ class Entity:
 
 	def lose_health(self, qty_health):
 		self.health -= qty_health
-		if self.health < 0:# on corrige le nb de pt de vie si celui-ci est negatif
+		if self.health <= 0:# on corrige le nb de pt de vie si celui-ci est negatif
 			self.health = 0
+			return False
+		return True
 
 	def is_alive(self):
 		return self.health > 0

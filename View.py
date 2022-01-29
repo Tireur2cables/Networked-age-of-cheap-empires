@@ -1,10 +1,11 @@
 # --- Imports ---
 ## -- arcade --
+from turtle import window_height, window_width
 import arcade
 from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
 ## -- Others --
-from views.CustomButtons import ConstructButton, NextViewButton, ListButton, SaveButton
+from views.CustomButtons import ActionButton, ConstructButton, NextViewButton, ListButton, SaveButton
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
 from cheats.fonctions import CheatsInput
@@ -13,6 +14,8 @@ from save.serializationTest import *
 from entity.Unit import *
 from entity.Zone import *
 from utils.isometric import *
+# from game import GameView
+from player import Player
 
 # --- Constants ---
 CAMERA_MOVE_STEP = 15
@@ -29,6 +32,7 @@ PIC_GOLD = "./Ressources/img/Ressources_Or_500x500.png"
 PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
 PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
 PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
+button_texture = "Ressources/img/button_background.png"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
@@ -39,33 +43,25 @@ from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
 
 class View():
 
-	def __init__(self, aoce_game):
+# --- Setup ---
+
+	def __init__(self, aoce_game):#: GameView):
 		""" Initializer """
 		self.game = aoce_game
 
-		self.unit_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
-		self.zone_sprite_list = arcade.SpriteList()
+		self.sorted_sprite_list = arcade.SpriteList()
 
-	def get_tile_outline(self, map_position):
-		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
-		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
-		bottom_vertex = tuple(map_position - Vector(0, TILE_HEIGHT//2))
-		top_vertex = tuple(map_position + Vector(0, TILE_HEIGHT//2))
-		return left_vertex, bottom_vertex, right_vertex, top_vertex
+		self.mode = "move"
 
-	def draw_grid_position(self, grid_position):
-		iso_position = grid_pos_to_iso(grid_position)
-		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
-
-	def draw_iso_position(self, iso_position):
-		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+		self.resource_label_list = []
 
 	def setup(self) :
 		#clear old lists
-		self.entity_sprite_list = arcade.SpriteList()
 		self.tile_sprite_list = arcade.SpriteList()
-		self.zone_sprite_list = arcade.SpriteList()
+
+		#Pour le GUI, les flags indiquant si on veut construire un batiment
+		self.reset_construct_flags()
 
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
@@ -76,51 +72,21 @@ class View():
 		self.init_dynamic_gui()
 		self.init_cheats()
 
-		# Sync self.game_model.tile_list with unit_sprite_list
-		for e in self.game.game_model.unit_list:
-			self.unit_sprite_list.append(e.sprite)
 		# Sync self.game_model.tile_list with tile_sprite_list
 		for t in self.game.game_model.tile_list:
 			self.tile_sprite_list.append(t.sprite)
-		# Sync self.game_model.zone_list with zone_sprite_list
+		# Sync self.game_model.zone_list with sorted_sprite_list
 		for z in self.game.game_model.zone_list:
-			self.zone_sprite_list.append(z.sprite)
+			if z.sprite not in self.sorted_sprite_list:
+				self.sorted_sprite_list.append(z.sprite)
+		# Sync self.game_model.unit_list with sorted_sprite_list
+		for u in self.game.game_model.unit_list:
+			if u.sprite not in self.sorted_sprite_list:
+				self.sorted_sprite_list.append(u.sprite)
 
-	def init_dynamic_gui(self) :
-		# Create a box group to align the 'open' button in the center
-		self.v_box4 = arcade.gui.UIBoxLayout()
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="right",
-				anchor_y="bottom",
-				child=self.v_box4
-			)
-		)
 
-		# Create a box for the button in the precedent box, maybe redondant
-		self.v_box5 = arcade.gui.UIBoxLayout()
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="center",
-				align_x= 200,
-				anchor_y="bottom",
-				align_y=15,
-				child=self.v_box5
-			)
-		)
-
-		# Create a box for the button in the precedent box, maybe redondant
-		self.v_box6 = arcade.gui.UIBoxLayout()
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="center",
-				align_x= 400,
-				anchor_y="bottom",
-				align_y=15,
-				child=self.v_box6
-			)
-		)
-
+	def reset_construct_flags(self) :
+		self.build_request = ""
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -147,14 +113,14 @@ class View():
 		# Create a vertical BoxGroup to align buttons
 		self.v_box1 = arcade.gui.UIBoxLayout()
 
-		player_resources = self.game.player.resource
-		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		player = self.game.players["player"]
+		player_resources = player.resources
+		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 
 		self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
 		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
-		self.resource_label_list = []
 		for val in resources_tab :
 			label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
 			self.resource_label_list.append(label)
@@ -188,44 +154,103 @@ class View():
 			)
 		)
 
-	def update_vbox1(self):
-		player_resources = self.game.player.resource
-		resources_tab = ["  = 1 ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
-		for label, resource_text in zip(self.resource_label_list, resources_tab):
-			label.text = resource_text
+
+
+# --- Adding/Discarding Sprites ---
+
+	def add_sprite(self, new_sprite):
+		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.sorted_sprite_list:
+			self.sorted_sprite_list.append(new_sprite)
+		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.sorted_sprite_list:
+			self.sorted_sprite_list.append(new_sprite)
+		self.sort_list()
+
+	def discard_sprite(self, dead_sprite):
+		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.sorted_sprite_list:
+			self.sorted_sprite_list.remove(dead_sprite)
+		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.sorted_sprite_list:
+			self.sorted_sprite_list.remove(dead_sprite)
+
+	def sort_list(self):
+		self.sorted_sprite_list.sort(key=lambda s: s.entity.iso_position.y, reverse=True)
+
+
+# --- Drawing ---
 
 	def on_draw(self):
 		""" Draw everything """
 		arcade.start_render()
 
 		# --- Object sprite lists : Tiles, Zones & Entities
-		self.tile_sprite_list.draw()
+		self.tile_sprite_list.draw(pixelated=True)
 
-		for i in self.zone_sprite_list:
-			i.draw()
+		#Affichage des sprites des batiments suivant la souris avant d etre pose
+		if self.build_request:
+			path = f"Ressources/img/zones/buildables/{self.build_request}.png"
+			pos = grid_pos_to_iso(iso_to_grid_pos(Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)) + Vector(1, 1))
+			build_sprite = arcade.Sprite(path, scale=0.7, center_x=pos.x, center_y=pos.y)
+			build_sprite.draw(pixelated=True)
 
-			if LAUNCH_DEBUG_DISPLAY:
-				self.draw_iso_position(i.entity.iso_position)
 
-		for i in self.unit_sprite_list:
-			if i.entity.selected:
-				i.draw_hit_box((255, 0, 0), line_thickness=3)
-				map_position = iso_to_grid_pos(i.entity.iso_position)
-				# tile_below = self.game.game_model.map.get_tile_at(map_position)
-				tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
-				arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-				# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
-			i.draw()
+		# for s in self.tile_sprite_list:
+		# 	tile = s.tile
+		# 	if tile.is_free == 0 or tile.pointer_to_entity is not None:
+		# 		tile_outline = self.get_tile_outline(grid_pos_to_iso(tile.grid_position))
+		# 		arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 
-			if LAUNCH_DEBUG_DISPLAY:
-				self.draw_iso_position(i.entity.iso_position)
+		for s in self.sorted_sprite_list:
+			if s.entity.selected:
+				if isinstance(s.entity, Zone):
+					zone = s.entity
+					for x in range(zone.tile_size[0]):
+						for y in range(zone.tile_size[1]):
+							tile_outline = self.get_tile_outline(grid_pos_to_iso(iso_to_grid_pos(zone.iso_position) + Vector(x, y)))
+							arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+					nbr_health_bar = 1
+					if zone.health > 0:
+						self.draw_bar(zone.iso_position, zone.health, zone.max_health, arcade.color.RED)
+						nbr_health_bar += 1
 
-		if LAUNCH_DEBUG_DISPLAY:
-			for x in range(3):
-				for y in range(3):
-					tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+					if isinstance(zone, Resources):
+						self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
+						nbr_health_bar +=1
+					elif isinstance(zone, (Barracks, TownCenter)) and zone.is_producing:
+						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.unit_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+						nbr_health_bar +=1
+					# if LAUNCH_DEBUG_DISPLAY:
+					# 	self.draw_iso_position(s.entity.iso_position)
+
+				elif isinstance(s.entity, Unit):
+					unit = s.entity
+					s.draw_hit_box((255, 0, 0), line_thickness=3)
+					map_position = iso_to_grid_pos(unit.iso_position)
+					# tile_below = self.game.game_model.map.get_tile_at(map_position)
+					tile_outline = self.get_tile_outline(grid_pos_to_iso(map_position))
 					arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-					self.draw_grid_position(Vector(x, y))
+					# tile_below.sprite.draw_hit_box((255, 0, 0), line_thickness=3)
+					self.draw_bar(unit.iso_position, unit.health, unit.max_health, arcade.color.GREEN)
+					if unit.is_interacting and (aimed_entity := unit.aimed_entity):
+						if isinstance(aimed_entity, Resources):
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.BLUE)
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.YELLOW, nbr_health_bar=2)
+						elif isinstance(aimed_entity, WorkSite) and aimed_entity.faction == unit.faction:
+							self.draw_bar(unit.iso_position, int(unit.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
+						elif isinstance(aimed_entity, Unit):
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
+						elif isinstance(aimed_entity, Buildable) and aimed_entity.faction != unit.faction:
+							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
+					# if LAUNCH_DEBUG_DISPLAY:
+					# 	self.draw_iso_position(unit.iso_position)
+
+		self.sort_list()
+		self.sorted_sprite_list.draw(pixelated=True)
+
+		# if LAUNCH_DEBUG_DISPLAY:
+		# 	for x in range(3):
+		# 		for y in range(3):
+		# 			tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+		# 			arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+		# 			self.draw_grid_position(Vector(x, y))
 
 		# Update the minimap
 		self.minimap.draw()
@@ -244,6 +269,23 @@ class View():
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
 
+	def get_tile_outline(self, map_position):
+		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
+		right_vertex = tuple(map_position + Vector(TILE_WIDTH//2, 0))
+		bottom_vertex = tuple(map_position - Vector(0, TILE_HEIGHT//2))
+		top_vertex = tuple(map_position + Vector(0, TILE_HEIGHT//2))
+		return left_vertex, bottom_vertex, right_vertex, top_vertex
+
+	def draw_grid_position(self, grid_position):
+		iso_position = grid_pos_to_iso(grid_position)
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+
+	def draw_iso_position(self, iso_position):
+		arcade.draw_point(iso_position.x, iso_position.y, (0, 255, 0), 5)
+
+
+
+# --- View & Camera ---
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -258,13 +300,253 @@ class View():
 		self.mouse_y = self.game.window.height / 2
 		#self.set_mouse_visible(False)
 
-		arcade.set_background_color(arcade.csscolor.YELLOW_GREEN)
+		arcade.set_background_color(arcade.csscolor.BLACK)
 
 		self.manager.enable()
 
 		self.static_menu()
 		self.addButton()
 		self.addCoordLabel()
+
+	def on_hide_view(self) :
+		self.manager.disable()
+
+	def camera_move(self) :
+		# Update the camera coords if the mouse is on the edges
+		# The movement of the camera is handled in the on_draw() function with move_to()
+		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE :
+			self.camera_x += CAMERA_MOVE_STEP
+		elif self.mouse_x <= CAMERA_MOVE_EDGE :
+			self.camera_x -= CAMERA_MOVE_STEP
+		if self.mouse_y <= CAMERA_MOVE_EDGE :
+			self.camera_y -= CAMERA_MOVE_STEP
+		elif self.mouse_y >= self.game.window.height - CAMERA_MOVE_EDGE :
+			self.camera_y += CAMERA_MOVE_STEP
+
+
+
+# --- Inputs ---
+
+	def on_mouse_motion(self, x, y, dx, dy):
+		"""Called whenever the mouse moves."""
+		# Update the coords of the mouse
+		self.mouse_x = x
+		self.mouse_y = y
+
+	def on_mouse_press(self, x, y, button, key_modifiers) :
+		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
+		if self.minimap.is_on_minimap_sprite(x, y) :
+			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
+			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
+			self.camera.move_to([self.camera_x, self.camera_y], 1)
+		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
+		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :
+			pass
+
+		elif button == arcade.MOUSE_BUTTON_LEFT :
+			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
+			if self.build_request:
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, self.build_request)
+				self.build_request = ""
+			else:
+				closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
+				if closest_unit_sprites:
+					self.game.game_controller.select("player", closest_unit_sprites)
+				else:
+					closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+					if closest_zone_sprites:
+						self.game.game_controller.select_zone("player", closest_zone_sprites)
+					else:
+						self.game.game_controller.clear_faction_selection("player")
+				# draw interactive ui of selected
+				self.trigger_Villager_GUI(self.game.game_controller.selection)
+
+		elif button == arcade.MOUSE_BUTTON_RIGHT :
+			self.reset_construct_flags() # permet d'annuler une construction
+			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
+			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+			if zones_at_point:
+				self.game.game_controller.human_order_towards_sprites("stock/attack", "player", zones_at_point)
+			elif units_at_point:
+				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
+				# TODO ici, reparer le batiment s'il est abimé et que on a pas de ressources a deposer et batiment a nous
+
+			else:
+				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
+			# TODO ici attquer si batiment ou unité pas a nous
+
+		elif button == arcade.MOUSE_BUTTON_MIDDLE:
+			print(f"position de la souris : {mouse_position_in_game}")
+			print(f"position sur la grille : {iso_to_grid_pos(mouse_position_in_game)}")
+			pos = mouse_position_in_game
+			grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
+			grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
+			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
+
+	def on_key_press(self, symbol, modifier):
+		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+		if self.game.game_controller.unit_in_selection("player"):
+			if self.mode == "move":
+				if symbol == arcade.key.F: # cheat window
+					self.triggerCheatInput()
+				elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+					self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone))
+				elif symbol == arcade.key.B:
+					self.mode = "build"
+					print("build mode!")
+			elif self.mode == "build":
+				if symbol == arcade.key.H: # Build something
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
+				elif symbol == arcade.key.S:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
+				elif symbol == arcade.key.G:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
+				elif symbol == arcade.key.B:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
+				elif symbol == arcade.key.D:
+					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
+				self.mode = "move"
+				print("move mode!")
+		else:
+			if symbol == arcade.key.V:
+				self.game.game_controller.human_order_with_zone("populate", "player")
+			elif symbol == arcade.key.C:
+				self.game.game_controller.human_order_with_zone("train clubman", "player")
+
+	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
+		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))
+		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
+		return sprites_at_point_sorted
+
+
+
+# --- GUI ---
+
+	def triggerCheatInput(self) :
+		if self.display_cheat_input :
+			self.manager.remove(self.cheat_pane)
+			self.cheat_pane.child.reset_text()
+		else :
+			self.manager.add(self.cheat_pane)
+		self.display_cheat_input = not self.display_cheat_input
+		self.cheatsinput.triggered = not self.cheatsinput.triggered
+
+	def draw_bar(self, pos, health, max_health, color, nbr_health_bar=1):
+		if max_health:
+			y_offset = 10
+			arcade.draw_rectangle_filled(pos.x, pos.y - nbr_health_bar*y_offset, 36, 12, arcade.color.GRAY)
+			if health > 0:
+				arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - nbr_health_bar*y_offset, (health*32)/max_health, 8, color)
+
+	def init_dynamic_gui(self) :
+		# Create a box group to align the 'open' button in the center
+		# Box pour le UITextArea qui contiens les stats du personnage
+		self.v_box4 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x= - self.game.window.width / 3,
+				anchor_y="bottom",
+				child=self.v_box4
+			)
+		)
+
+		# Box pour le UITextArea qui contiens les actions du personnage
+		self.v_box7 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				anchor_y="bottom",
+				child=self.v_box7
+			)
+		)
+
+		# Create a box for the batiment buildable by villagers
+		self.v_box5 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 6) / 3,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
+				child=self.v_box5
+			)
+		)
+
+		# Create a box for the batiment buildable by villagers
+		self.v_box9 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 6 + (self.game.window.width / 3 - self.game.window.width / 6) * 2 / 3,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 2 / 12) / 2,
+				child=self.v_box9
+			)
+		)
+
+
+
+		# Create a box for the button in the precedent box, maybe redondant
+		# Heberge la sprite
+		self.v_box6 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				align_x=self.game.window.width / 24 + (self.game.window.width / 6 - self.game.window.width / 12) / 2, # center sprite in rectangle
+				anchor_y="bottom",
+				align_y=self.game.window.height * 1 / 8 - (self.game.window.height * 2 / 32), # center sprite in rectangle
+				child=self.v_box6
+			)
+		)
+
+		# Heberge l affichage des ressources
+		self.v_box8 = arcade.gui.UIBoxLayout(vertical=False)
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="left",
+				align_x=self.game.window.width / 2 + (self.game.window.width / 6 - self.game.window.width / 8) / 2,
+				anchor_y="bottom",
+				align_y=10,
+				child=self.v_box8
+			)
+		)
+
+		# Create a box for the villagers buildable by towncenters
+		self.v_box10 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 12) / 2,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height / 12) / 2,
+				child=self.v_box10
+			)
+		)
+
+		# Create a box for the military buildable by barracks
+		self.v_box11 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 6) / 3,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
+				child=self.v_box11
+			)
+		)
+
+		# Create a box for the military buildable by barracks
+		self.v_box12 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 6 + (self.game.window.width / 3 - self.game.window.width / 6) * 2 / 3,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
+				child=self.v_box12
+			)
+		)
 
 	def addButton(self):
 		# def button size
@@ -309,118 +591,106 @@ class View():
 		)
 		self.coord_label.fit_content()
 
+	def update_resources_gui(self):
+		player = self.game.players["player"]
+		player_resources = player.resources
+		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		for label, resource_text in zip(self.resource_label_list, resources_tab):
+			label.text = resource_text
 
-	def camera_move(self) :
-		# Update the camera coords if the mouse is on the edges
-		# The movement of the camera is handled in the on_draw() function with move_to()
-		if self.mouse_x >= self.game.window.width - CAMERA_MOVE_EDGE :
-			self.camera_x += CAMERA_MOVE_STEP
-		elif self.mouse_x <= CAMERA_MOVE_EDGE :
-			self.camera_x -= CAMERA_MOVE_STEP
-		if self.mouse_y <= CAMERA_MOVE_EDGE :
-			self.camera_y -= CAMERA_MOVE_STEP
-		elif self.mouse_y >= self.game.window.height - CAMERA_MOVE_EDGE :
-			self.camera_y += CAMERA_MOVE_STEP
-
-	def on_mouse_press(self, x, y, button, key_modifiers) :
-		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
-		if self.minimap.is_on_minimap_sprite(x, y) :
-			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
-			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
-			self.camera.move_to([self.camera_x, self.camera_y], 1)
-		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
-		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
-			pass
-		elif button == arcade.MOUSE_BUTTON_LEFT:
-			self.game.game_controller.select(self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list))
-
-		elif button == arcade.MOUSE_BUTTON_RIGHT:
-			# units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
-			# if units_at_point:
-			# 	print("unit!")
-			# else:
-			self.game.game_controller.move_selection(mouse_position_in_game)
-
-		elif button == arcade.MOUSE_BUTTON_MIDDLE:
-			print(f"position de la souris : {mouse_position_in_game}")
-			print(f"position sur la grille : {iso_to_grid_pos(mouse_position_in_game)}")
-			pos = mouse_position_in_game
-			grid_x = (pos.x / TILE_WIDTH_HALF + pos.y / TILE_HEIGHT_HALF) / 2
-			grid_y = (pos.y / TILE_HEIGHT_HALF - (pos.x / TILE_WIDTH_HALF)) / 2
-			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
-
-	def get_closest_sprites(self, mouse_position_in_game, sprite_list):
-		sprites_at_point = arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list)
-		sprites_at_point_sorted = sorted(sprites_at_point, key=lambda sprite: sprite.center_y)
-		return sprites_at_point_sorted
-
-	def on_key_press(self, symbol, modifier):
-		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-		grid_pos = iso_to_grid_pos(mouse_position_in_game)
-		if not self.cheatsinput.triggered:
-			if symbol == arcade.key.T:  # Faire apparaitre un bâtiment (Town Center pour l'instant...)
-				tCent = TownCenter(grid_pos)
-				self.game.game_controller.add_entity_to_game(tCent)
-			elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-				self.game.game_controller.action_on_zone(self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list))
-			elif symbol == arcade.key.B: # Build something
-				self.game.game_controller.build_on_tiles(grid_pos)
-		elif symbol == arcade.key.ENTER:
-			self.cheatsinput.text = ""
-		if symbol == arcade.key.F1 : # cheat window
-			self.triggerCheatInput()
-
-	def on_mouse_motion(self, x, y, dx, dy):
-		"""Called whenever the mouse moves."""
-		# Update the coords of the mouse
-		self.mouse_x = x
-		self.mouse_y = y
-
-	def triggerCheatInput(self) :
-		if self.display_cheat_input :
-			self.manager.remove(self.cheat_pane)
-			self.cheat_pane.child.reset_text()
-		else :
-			self.manager.add(self.cheat_pane)
-		self.display_cheat_input = not self.display_cheat_input
-		self.cheatsinput.triggered = not self.cheatsinput.triggered
+	def update_villager_resources_gui(self) :
+		if self.boolean_dynamic_gui :
+			self.trigger_Villager_GUI(self.game.game_controller.selection)
 
 	# test pour les coins mais dois bouger TODO
-	def trigger_coin_GUI(self, selected_list) :
+	def trigger_Villager_GUI(self, selected_list) :
 		self.v_box4.clear()
 		self.v_box5.clear()
 		self.v_box6.clear()
+		self.v_box7.clear()
+		self.v_box8.clear()
+		self.v_box9.clear()
+		self.v_box10.clear()
+		self.v_box11.clear()
+		self.v_box12.clear()
 
 		self.boolean_dynamic_gui = False
-
-		if selected_list :
+		if selected_list["player"] : # someting is selected
 			self.boolean_dynamic_gui = True
+
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
-			coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width=width, height=height)
-			self.v_box4.add(coin_box.with_space_around(0, 0, 0, 0, arcade.color.BRONZE))
 
-			# Button for coin, you wan click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
-			coin_button = arcade.gui.UIFlatButton(text = "Machala",height = 70, width=110)
-			self.v_box5.add(coin_button.with_space_around(15,15,15,15,arcade.color.BRONZE))
+			for s in selected_list["player"] :
+				if isinstance(s, Entity) : # add entiity info
+					titre = s.name if s.faction == "None" else s.name + " [" + s.faction + "] "
+					entity_box_stat = arcade.gui.UITextArea(text=titre, width=width / 3, height=height)
+					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
 
-			coin_button2 = arcade.gui.UIFlatButton(text = "Attaquer", height = 70, width = 110)
-			self.v_box5.add(coin_button2.with_space_around(15,15,15,15,arcade.color.BRONZE))
+					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
+					self.v_box8.add(entity_life.with_border())
 
-			coin_button3 = ConstructButton(image="Ressources/img/zones/buildables/Tower.png",construct=None)
-			self.v_box6.add(coin_button3.with_space_around(15,15,15,15,arcade.color.BRONZE))
+					sprite_image = arcade.gui.UITextArea(text=" ", width=width / 6, height=height / 2)
+					self.v_box6.add(sprite_image.with_background(s.sprite.texture))
 
-	def on_hide_view(self) :
-		self.manager.disable()
+				if isinstance(s, Resources) : # montre les ressources restantes
+					ressources_restantes = arcade.gui.UITextArea(text="Ressources : " + str(s.amount) + " / " + str(s.max_amount), text_color=arcade.color.GREEN, width=width / 8)
+					self.v_box8.add(ressources_restantes.with_border())
 
-	def discard_sprite(self, dead_sprite):
-		if isinstance(dead_sprite.entity, Unit) and dead_sprite in self.unit_sprite_list:
-			self.unit_sprite_list.remove(dead_sprite)
-		elif isinstance(dead_sprite.entity, Zone) and dead_sprite in self.zone_sprite_list:
-			self.zone_sprite_list.remove(dead_sprite)
+				elif s.faction == "player" : # ouvre les actions seulement si la selection nnous appartient
 
-	def add_sprite(self, new_sprite):
-		if isinstance(new_sprite.entity, Unit) and new_sprite not in self.unit_sprite_list:
-			self.unit_sprite_list.append(new_sprite)
-		elif isinstance(new_sprite.entity, Zone) and new_sprite not in self.zone_sprite_list:
-			self.zone_sprite_list.append(new_sprite)
+					if isinstance(s, Villager) : # add villager options
+						villager_ressources = arcade.gui.UITextArea(text="Ressources : " + str(s.nb_resources()), text_color=arcade.color.PINK, width=width / 8)
+						self.v_box8.add(villager_ressources.with_border())
+
+						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
+						self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+
+						storagepit_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/storagepit.png", text="StoragePit", width=width / 6, height=self.game.window.height / 12)
+						self.v_box5.add(storagepit_villager.with_background(arcade.load_texture(button_texture)))
+
+						house_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/house.png", text="House", width=width / 6, height=self.game.window.height / 12)
+						self.v_box5.add(house_villager.with_background(arcade.load_texture(button_texture)))
+
+						granary_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/granary.png", text="Granary", width=width / 6, height=self.game.window.height / 12)
+						self.v_box5.add(granary_villager.with_background(arcade.load_texture(button_texture)))
+
+						barracks_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/barracks.png", text="Barracks", width=width / 6, height=self.game.window.height / 12)
+						self.v_box9.add(barracks_villager.with_background(arcade.load_texture(button_texture)))
+
+						towncenter_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/towncenter.png", text="TownCenter", width=width / 6, height=self.game.window.height / 12)
+						self.v_box9.add(towncenter_villager.with_background(arcade.load_texture(button_texture)))
+
+
+
+					elif isinstance(s, Zone) : # batiment du joueur
+						if not isinstance(s, House) : # ne pas l'afficher sur les batiments qui ne possèdent aucune action
+							villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
+							self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+
+						if isinstance(s, TownCenter) :
+							villager_button = ActionButton(text="Villageois", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/villager_stand.png", aoce_game=self.game)
+							self.v_box10.add(villager_button.with_background(arcade.load_texture(button_texture)))
+
+						elif isinstance(s, Barracks) :
+							militia_button = ActionButton(text="Milice", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/militia_stand.png", aoce_game=self.game)
+							self.v_box11.add(militia_button.with_background(arcade.load_texture(button_texture)))
+
+							spearman_button = ActionButton(text="Lancier", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/spearman_stand.png", aoce_game=self.game)
+							self.v_box11.add(spearman_button.with_background(arcade.load_texture(button_texture)))
+
+							archer_button = ActionButton(text="Archer", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/archer_stand.png", aoce_game=self.game)
+							self.v_box11.add(archer_button.with_background(arcade.load_texture(button_texture)))
+
+							skirmisher_button = ActionButton(text="Escarmoucheur", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/skirmisher_stand.png", aoce_game=self.game)
+							self.v_box12.add(skirmisher_button.with_background(arcade.load_texture(button_texture)))
+
+							scout_button = ActionButton(text="Eclaireur", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/scoutcavalry_stand.png", aoce_game=self.game)
+							self.v_box12.add(scout_button.with_background(arcade.load_texture(button_texture)))
+
+							knight_button = ActionButton(text="Chevalier", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/knight_stand.png", aoce_game=self.game)
+							self.v_box12.add(knight_button.with_background(arcade.load_texture(button_texture)))
+
+
+
+				break # ce break sera a enlever si on gere la selection multiple

@@ -1,5 +1,6 @@
 # Imports
 import arcade
+from arcade.gui.widgets import UITextArea, UITexturePane
 from views.CustomButtons import NextViewButton, CheckboxButton
 
 # Constants
@@ -36,26 +37,51 @@ class SettingsView(arcade.View) :
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
 
+		# create the title text
+		bg_text = arcade.load_texture("Ressources/img/parchemin3.png")
+		settings = UITextArea(text="Paramètres", text_color=(0, 0, 0, 255), font_size=50)
+		settings.fit_content()
+		self.v_box.add(settings)
+
 		# Create checkboxes
-		music_button = CheckboxButton(self.window, text="Musique", size=checkboxsize, ticked=self.window.isPlayingMusic(), music=True)
-		self.v_box.add(music_button.with_space_around(bottom=20))
+		self.h_box_music = arcade.gui.UIBoxLayout(vertical=False, align='left')
+		music_button = CheckboxButton(self.window, text="", size=checkboxsize, ticked=self.window.isPlayingMusic(), music=True)
+		self.h_box_music.add(music_button.with_space_around(right=20))
+		music_text = UITextArea(text="Musique", text_color=(0, 0, 0, 255), font_size=20)
+		music_text.fit_content()
+		self.h_box_music.add(music_text)
+		self.v_box.add(self.h_box_music.with_space_around(top=20))
 
-		fullscreen_button = CheckboxButton(self.window, text="Plein écran", size=checkboxsize, ticked=self.window.fullscreen, fullscreen=True)
-		self.v_box.add(fullscreen_button.with_space_around(bottom=20))
+		self.h_box_fullscreen = arcade.gui.UIBoxLayout(vertical=False, align='left')
+		fullscreen_button = CheckboxButton(self.window, text="", size=checkboxsize, ticked=not self.window.fullscreen, fullscreen=True)
+		self.h_box_fullscreen.add(fullscreen_button.with_space_around(right=20))
+		fullscreen_text = UITextArea(text="Fenêtré", text_color=(0, 0, 0, 255), font_size=20)
+		fullscreen_text.fit_content()
+		self.h_box_fullscreen.add(fullscreen_text)
+		self.v_box.add(self.h_box_fullscreen.with_space_around(top=20))
 
-		vsync_button = CheckboxButton(self.window, text="Vsync", size=checkboxsize, ticked=self.window.vsync, vsync=True)
-		self.v_box.add(vsync_button.with_space_around(bottom=20))
+		self.h_box_vsync = arcade.gui.UIBoxLayout(vertical=False, align='left')
+		vsync_button = CheckboxButton(self.window, text="", size=checkboxsize, ticked=self.window.vsync, vsync=True)
+		self.h_box_vsync.add(vsync_button.with_space_around(right=20))
+		vsync_text = UITextArea(text="V-Sync", text_color=(0, 0, 0, 255), font_size=20)
+		vsync_text.fit_content()
+		self.h_box_vsync.add(vsync_text)
+		self.v_box.add(self.h_box_vsync.with_space_around(top=20))
 
 		# Create the return menu
 		retour_button = NextViewButton(self.window, self.main_view, text="Retour", width=buttonsize)
-		self.v_box.add(retour_button.with_space_around(bottom=20))
+		self.v_box.add(retour_button.with_space_around(top=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x = "center_x",
 				anchor_y = "center_y",
-				child = self.v_box
+				child = UITexturePane(
+					self.v_box,
+					tex=bg_text,
+					padding=(150, 150, 150, 150)
+				)
 			)
 		)
 
@@ -64,7 +90,6 @@ class SettingsView(arcade.View) :
 		arcade.start_render()
 
 		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
-		arcade.draw_text("Settings Screen", self.window.width / 2, self.window.height * 5 / 6, arcade.color.WARM_BLACK, font_size=50, anchor_x="center") # arbitrary
 
 		self.manager.draw()
 

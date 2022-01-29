@@ -4,7 +4,8 @@ from arcade.gui.widgets import UITextArea, UITexturePane
 from views.CustomButtons import SelctDifButton, NextViewButton, NumInput, LaunchGameButton, PlayerButton
 
 #Constants
-BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint4.png" #A changer, c'est moche
+BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint5.jpg"
+COLOR_STATIC_RESSOURCES_ICONE = arcade.color.DARK_GRAY
 
 class PreGameView(arcade.View) :
 
@@ -90,23 +91,55 @@ class PreGameView(arcade.View) :
 		buttonsize = self.window.width / 6 # arbitrarys
 
 		#Couleur de fond pour les espaces ressources modifiables
-		bg_text = arcade.load_texture("Ressources/img/grey_fond.jpg")
+		bg_text = arcade.load_texture("Ressources/img/bouton_vert_age.png")
+
+		#Creation du text "Ressource :"
+		map_text = UITextArea(
+			x=self.window.width - buttonsize * (3 / 2), # arbitrary
+			y=self.window.height - buttonsize * (0.75), # arbitrary
+			width=buttonsize / 3,
+			height=buttonsize / 10,
+			text="Map seed :",
+			text_color=(255, 255, 255, 255),
+		)
+
+		#Affichage de "Ressource :"
+		self.manager.add(
+			UITexturePane(
+				map_text.with_space_around(right=20),
+				tex=bg_text,
+				padding=(10, 10, 10, 10)
+			)
+		)
+
+		self.map_pane = arcade.gui.UITexturePane(
+			NumInput(
+				x=self.window.width - buttonsize/(1.4),
+				y=self.window.height - buttonsize * (0.75),
+				text="70", width=buttonsize/(2.5), height=buttonsize/10,
+				text_color=(255, 255, 255, 255),
+				limit=100
+			),
+			tex=bg_text,
+			padding=(10, 10, 10, 10)
+		)
+
+		#Affichage des espaces ressources modifiables
+		self.manager.add(self.map_pane)
 
 		#Creation du text "Ressource :"
 		ressource_text = UITextArea(
 			x=self.window.width - buttonsize * (3 / 2), # arbitrary
-			y=self.window.height - buttonsize * (0.75), # arbitrary
+			y=self.window.height - buttonsize, # arbitrary
 			width=buttonsize / 2,
 			height=buttonsize / 10,
 			text="Ressources :",
-			text_color=(0, 0, 0, 255)
+			text_color=(255, 255, 255, 255),
 		)
 
-		name_ressources = ["Or", "Bois", "Nourriture", "Pierre"]
-		ressources_default_value = {"Or": 100, "Bois": 200, "Nourriture": 200, "Pierre": 200}
+		name_ressources = ["Nourriture", "Bois", "Pierre", "Or"]
+		ressources_default_value = {"Nourriture": 200, "Bois": 200, "Pierre": 200, "Or": 200}
 
-		#COMPLETEMENT DINGUE : le nom de ressource sous format "" est écrasé mais après qu'on est
-		#deja implemente la valeur "" a notre fonction, diront nous.
 		for i, name_ressource in enumerate(name_ressources) :
 			text_area = UITextArea(
 				x=self.window.width - buttonsize * (3 / 2),
@@ -114,7 +147,7 @@ class PreGameView(arcade.View) :
 				width=buttonsize / 3,
 				height=buttonsize / 11,
 				text=f"{name_ressource} : ",
-				text_color=(0, 0, 0, 255)
+				text_color=(255, 255, 255, 255)
 			)
 
 			self.manager.add(
@@ -134,9 +167,10 @@ class PreGameView(arcade.View) :
 					x=self.window.width - buttonsize/(1.4),
 					y=self.window.height - buttonsize*(1.25+i*0.25),
 					text=str(ressources_default_value[name_ressource]), width=buttonsize/(2.5), height=buttonsize/10,
-					text_color=(1, 1, 1, 255)
+					text_color=(255, 255, 255, 255)
 				),
-				tex=bg_text
+				tex=bg_text,
+				padding=(10, 10, 10, 10)
 			)
 
 			#Affichage des espaces ressources modifiables
