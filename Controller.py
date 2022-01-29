@@ -263,7 +263,7 @@ class Controller():
 				entity.set_aimed_entity(worksite)
 				aim = map_position - Vector(1,1)
 
-				# A FAIRE : RESERVER LES TILES à l'avance !!! ---> Sinon pendant le temps de construction on peut en mettre d'autres par dessus.
+				# TODO: RESERVER LES TILES à l'avance !!! ---> Sinon pendant le temps de construction on peut en mettre d'autres par dessus.
 				if iso_to_grid_pos(entity.iso_position) == aim:
 					entity.is_interacting = True
 				else:

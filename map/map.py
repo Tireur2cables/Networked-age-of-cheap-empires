@@ -182,13 +182,14 @@ class Map():
 		aimed_tile = None
 		min_dist = self.map_size**2  # Value that shouldn't be reached when searching a path through the map.
 		for tile in self.get_tiles_nearby(aim_grid_pos):
-			dist = (tile.grid_position - start_position).norm()
+			if tile.is_free:
+				dist = (tile.grid_position - start_position).norm()
 
-			if dist > 0 and min_dist > dist:
-				aimed_tile = tile
-				min_dist = dist
-			elif dist == 0:
-				return tile
+				if dist > 0 and min_dist > dist:
+					aimed_tile = tile
+					min_dist = dist
+				elif dist == 0:
+					return tile
 		return aimed_tile
 
 	# def get_closest_tile_nearby(self, start_position, aim_grid_pos):
