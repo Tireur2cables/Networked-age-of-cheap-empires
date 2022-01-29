@@ -118,6 +118,20 @@ def perlin_array2(size = (50, 50),
 	arr = norm_me(arr)
 	return arr
 
+def reserve_towncenter(out, position, zone_size, spawn_id):
+	for a in range(position.x, position.x + zone_size):
+		for b in range(position.y, position.y + zone_size):
+			out[a][b]["tile"] = "grass"
+			out[a][b]["obj"] = None
+
+	out[position.x + 1][position.y + 1]["obj"] = f"spawn_{spawn_id}"
+
+	for a in range(position.x - 1, position.x + zone_size + 2, zone_size + 1):
+		for b in range(position.y - 1, position.y + zone_size + 2, zone_size + 1):
+			out[a][b]["tile"] = "grass"
+			out[a][b]["obj"] = "berry"
+
+
 def process_array2(size = (50,50), seed=None, nbr_players=1):
 	# baseTile = Tile("grass", 0,0,None)
 	# default => grass everywhere
@@ -163,91 +177,16 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 			if array[x][y] > 0.89 and out[x][y]["tile"] != "water":
 				out[x][y]["obj"]= "stone"
 
-	#finding somewhere to put TownCenter
-	# nbofFreeTiles=0
 	zoneSize=6
-	# stop=0
-
-	# for x in range(size[0]):
-	# 	if stop == 1:
-	# 			break
-	# 	for y in range(size[1]):
-	# 		if stop == 1:
-	# 			break
-	# 		nbofFreeTiles=0
-	# 		for a in range(x,x+zoneSize):
-	# 			for b in range(y,y+zoneSize):
-	# 				if out[a][b].blockID == "water":
-	# 					nbofFreeTiles=0
-	# 					continue
-	# 				else:
-	# 					nbofFreeTiles+=1
-	# 		if nbofFreeTiles==zoneSize*zoneSize:
-	# 			towncenterpos=Vector(x,y)
-	# 			stop=1
 
 	if nbr_players > 0:
-		for a in range(10,10+zoneSize):
-			for b in range(10,10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
-
-		out[11][11]["obj"] = "spawn_0"
-
-		for a in range(9,9+zoneSize+2,zoneSize+1):
-			for b in range(9,9+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
-
+		reserve_towncenter(out, Vector(10, 10), zoneSize, 0)
 	if nbr_players > 1:
-		for a in range(size[0]-10,size[0]-10+zoneSize):
-			for b in range(size[1]-10,size[1]-10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
-				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
-
-		out[size[0]-10+1][size[1]-10+1]["obj"] = "spawn_1"
-
-		for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
-
+		reserve_towncenter(out, Vector(size[0] - 10, size[1] - 10), zoneSize, 1)
 	if nbr_players > 2:
-		for a in range(10,10+zoneSize):
-			for b in range(size[1]-10,size[1]-10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
-				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
-
-		out[10+1][size[1]-10+1]["obj"] = "spawn_2"
-
-		for a in range(9,9+zoneSize+2,zoneSize+1):
-			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
-
-
+		reserve_towncenter(out, Vector(10, size[1] - 10), zoneSize, 2)
 	if nbr_players > 3:
-		for b in range(10,10+zoneSize):
-			for a in range(size[1]-10,size[1]-10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
-				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
-
-		out[size[1]-10+1][10+1]["obj"] = "spawn_3"
-
-		for b in range(9,9+zoneSize+2,zoneSize+1):
-			for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
-
-
-
-	# # genere la sprite
-	# for x in range(size[0]):
-	# 	for y in range(size[1]):
-	# 		out[x][y].init_sprite()
+		reserve_towncenter(out, Vector(size[0] - 10, 10), zoneSize, 3)
 
 	tile_map = [[Tile(out[x][y]["tile"], Vector(x,y), out[x][y]["obj"]) for y in range(size[1])] for x in range(size[0])]
 	return tile_map
