@@ -179,6 +179,14 @@ class View():
 		# --- Object sprite lists : Tiles, Zones & Entities
 		self.tile_sprite_list.draw(pixelated=True)
 
+		#ICI QUE SA SE PASE
+		if self.HouseRequest == 1 :
+			for s in self.zone_sprite_list:
+				zone = s.entity
+				if isinstance(zone, House):
+					s.set_position(self.mouse_x,self.mouse_y)
+					s.draw(pixelated=True)
+
 		for s in self.zone_sprite_list:
 			zone = s.entity
 			if zone.selected:
@@ -613,7 +621,7 @@ class View():
 					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
 					self.v_box8.add(entity_life.with_border())
 
-					sprite_image = arcade.gui.UITextArea(text="", width=width / 6, height=height / 2)
+					sprite_image = arcade.gui.UITextArea(text=" ", width=width / 6, height=height / 2)
 					self.v_box6.add(sprite_image.with_background(s.sprite.texture))
 
 				if isinstance(s, Resources) : # montre les ressources restantes
