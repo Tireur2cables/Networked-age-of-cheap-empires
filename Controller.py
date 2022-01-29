@@ -1,4 +1,5 @@
 # --- Imports ---
+import arcade
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
@@ -86,6 +87,8 @@ class Controller():
 		if unit_found :
 			unit_found.selected = True
 			self.selection[faction].add(unit_found)
+			if isinstance(unit_found, Villager) :
+				arcade.load_sound("./Ressources/music/newmail_aoe_scoutahem.wav").play()
 
 	def select_zone(self, faction, sprites_at_point):
 		self.clear_faction_selection(faction)
@@ -364,7 +367,7 @@ class Controller():
 
 		if entity.faction == "player" :
 			self.game.game_view.trigger_Villager_GUI(self.selection)
-			
+
 		can_harvest = entity.go_back_to_harvest()
 		if can_harvest:
 			self.order_harvest(entity, entity.previous_aimed_entity)
