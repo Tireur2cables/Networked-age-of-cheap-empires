@@ -3,7 +3,6 @@
 import arcade
 from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
-from game import GameView
 ## -- Others --
 from views.CustomButtons import ConstructButton, NextViewButton, ListButton, SaveButton
 from map.tileSprite import TileSprite
@@ -42,7 +41,7 @@ class View():
 
 # --- Setup ---
 
-	def __init__(self, aoce_game: GameView):
+	def __init__(self, aoce_game):
 		""" Initializer """
 		self.game = aoce_game
 

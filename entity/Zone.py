@@ -109,7 +109,7 @@ class TownCenter(Buildable):
 		can_produce=True,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		faction=faction,
-		health=20,
+		health=600,
 		line_sight=7)
 		self.is_producing = False
 		self.class_produced = Villager
@@ -142,7 +142,7 @@ class Barracks(Buildable):
 		self.class_name = class_produced_name
 		if class_produced_name == "clubman":
 			self.class_produced = Clubman
-			self.unit_cooldown = Clubman.creation_time
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Clubman.creation_time
 			self.unit_cost = Clubman.creation_cost
 
 class StoragePit(Buildable):

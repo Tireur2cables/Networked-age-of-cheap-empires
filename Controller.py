@@ -1,11 +1,11 @@
 # --- Imports ---
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
-from game import GameView
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
 # from game import GameView
+from player import AI
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -148,7 +148,6 @@ class Controller():
 					if zone_found:
 						self.order_stock_resources(entity, zone_found)
 					else:
-						print("yay")
 						other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
 						if other_zone_found:
 							self.order_attack(entity, other_zone_found)
@@ -187,8 +186,11 @@ class Controller():
 
 
 # --- Orders (Called once) ----
-	def move_entity(self, entity, grid_position):
-		path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+	def move_entity(self, entity, grid_position, fast=True):
+		if fast:
+			path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+		else:
+			path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# TODO: add flag so that the user uses the classical get_path, and the ia uses get_path_fast.
 		if path_len > 0:
@@ -214,7 +216,7 @@ class Controller():
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
-				self.move_entity(entity, aimed_tile.grid_position)
+				self.move_entity(entity, aimed_tile.grid_position, False)
 
 	def order_search_stock_resources(self, entity, resource_nbr):
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
@@ -273,9 +275,9 @@ class Controller():
 			else:
 				print("Not a Villager!")
 		else:
-			print("not enough resources to build!")
+			print("not enough resources to order a build!")
 
-	def order_zone_units(self, producing_zone, entity_produced = None):
+	def order_zone_units(self, producing_zone, entity_produced = ""):
 
 		current_player = self.game.players[producing_zone.faction]
 		if isinstance(producing_zone, Barracks):
@@ -300,14 +302,16 @@ class Controller():
 		entity.set_aimed_entity(aimed_entity)
 
 		if isinstance(aimed_entity, Unit):
-			self.move_entity(entity, iso_to_grid_pos(aimed_entity.iso_position))
+			self.move_entity(entity, iso_to_grid_pos(aimed_entity.iso_position), False)
 		else:
+			entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
-			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(iso_to_grid_pos(entity.iso_position), iso_to_grid_pos(aimed_entity.iso_position))
-
+			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
+			print(f"aimed_tile : {aimed_tile}")
 			# Step 2: Start moving toward the aimed entity
 			if aimed_tile is not None:
-				if aimed_tile.grid_position == aimed_entity: # Dans ce cas c'est que nous sommes déjà arrivé
+				print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
+				if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 					entity.is_interacting = True
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
@@ -378,14 +382,13 @@ class Controller():
 			if entity.goal == "attack":
 				if isinstance(entity.aimed_entity, Unit):
 					if iso_to_grid_pos(entity.iso_position) != iso_to_grid_pos(entity.aimed_entity.iso_position):
-						print("yo tlm")
 						entity.is_interacting = False
 						self.order_attack(entity, entity.aimed_entity)
 					else:
 						self.attack_entity(entity, delta_time)
 				else:
 					self.attack_entity(entity, delta_time)
-			if isinstance(entity.aimed_entity, Resources):
+			elif isinstance(entity.aimed_entity, Resources):
 				self.harvest_zone(entity, delta_time)
 			elif isinstance(entity.aimed_entity, WorkSite):
 				self.build_zone(entity, delta_time)
@@ -398,6 +401,7 @@ class Controller():
 
 		# --- Deleting dead entities ---
 		for dead_entity in self.dead_entities:
+			print("DEAD ENTITY DETECTED")
 			self.discard_entity_from_game(dead_entity)
 		self.dead_entities.clear()
 
@@ -472,7 +476,6 @@ class Controller():
 			Class_produced = producing_zone.class_produced
 			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), producing_zone.faction))
 
-	# TODO: Actuellement on continue de se faire attaquer même si on s'en va.
 	def attack_entity(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time
 		if unit.action_timer > 1/unit.rate_fire:
@@ -484,6 +487,10 @@ class Controller():
 				self.order_attack(unit.aimed_entity, unit)
 				unit.aimed_entity.is_interacting = True
 
+			print(alive)
 			if not alive:
 				unit.end_goal()
 				self.dead_entities.add(unit.aimed_entity)
+				player_controlling = self.game.players[unit.faction]
+				if isinstance(player_controlling, AI):
+					player_controlling.aimed_enemy = None
