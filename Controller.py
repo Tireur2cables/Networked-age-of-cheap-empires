@@ -194,7 +194,6 @@ class Controller():
 		else:
 			path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
-		# TODO: add flag so that the user uses the classical get_path, and the ia uses get_path_fast.
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -495,7 +494,8 @@ class Controller():
 			producing_zone.is_producing = False
 			grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
 			Class_produced = producing_zone.class_produced
-			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), producing_zone.faction))
+			random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
+			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
 
 	def attack_entity(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time

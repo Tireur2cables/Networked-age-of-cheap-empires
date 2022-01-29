@@ -5,7 +5,7 @@
 # 2) Never commit changes on this file (except to add lines), so that everyone still has his own version.
 # Note: If you add lines, remember to put the default values back before commiting.
 
-# Defaults, in this order: True, True, False, False, False, True, False, False, False, False
+# Defaults, in this order: True, True, False, False, False, True, False, False, False, False, False
 LAUNCH_FULLSCREEN = True
 LAUNCH_MUSIC = True
 LAUNCH_DEFAULT_MAP = False
@@ -16,3 +16,4 @@ LAUNCH_LIGHTSPEED_MOVES = False
 LAUNCH_NINJALUI = False
 LAUNCH_SAFEWAY_SAND = False
 LAUNCH_PAPER_TOWNCENTER = False
+LAUNCH_DISABLE_RANDOM_PLACEMENT = False
