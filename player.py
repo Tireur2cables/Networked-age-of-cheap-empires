@@ -1,5 +1,6 @@
 import random
 import time
+from entity.Entity import Entity
 from CONSTANTS import Resource as Res
 from entity.Unit import Military, Unit, Villager
 from entity.Zone import Barracks, BerryBush, Buildable, Gold, House, Stone, StoragePit, Granary, TownCenter, Wood, WorkSite, Zone
@@ -116,6 +117,9 @@ class Player:
 		self.resources[Res.WOOD] += qtyWood
 		self.resources[Res.GOLD] += qtyGold
 		self.resources[Res.STONE] += qtyStone
+
+	def can_create(self, type_entity: Entity) -> bool:
+		return all(self.resources[k] >= type_entity.creation_cost[k] for k in Res)
 
 	# Resource
 	def get_resource(self, resource):
