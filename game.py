@@ -59,10 +59,6 @@ class AoCE(arcade.Window):
 		self.media_player.delete()
 		arcade.exit()
 
-	def on_key_press(self, *args):
-		if args[0] == arcade.key.SPACE: # fullscreen
-			self.triggerFullscreen()
-
 	# Set fullscreen or defaults : SCREEN_WIDTH x SCREEN_HEIGHT
 	def triggerFullscreen(self) :
 		curr = self.current_view
