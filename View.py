@@ -196,6 +196,7 @@ class View():
 			pos = grid_pos_to_iso(iso_to_grid_pos(Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)) + Vector(1, 1))
 			build_sprite = arcade.Sprite(path, scale=0.7, center_x=pos.x, center_y=pos.y)
 			build_sprite.draw(pixelated=True)
+			self.count_time = 0
 
 
 		# for s in self.tile_sprite_list:
@@ -731,6 +732,6 @@ class View():
 		if self.NoRessourcesForBuild == 1:
 			NoRessourcesForBuildButton = arcade.gui.UITextArea(text="Vous manquez de ressources pour construire", width=width, height=height, font_size=24, text_color=arcade.color.RED)
 			self.v_box13.add(NoRessourcesForBuildButton)
-			if self.count_time > 50:
+			if self.count_time > 40:
 				self.NoRessourcesForBuild =0
 				self.count_time = 0
