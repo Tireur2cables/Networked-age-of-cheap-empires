@@ -295,6 +295,7 @@ class Controller():
 		producing_zone.is_producing = True
 		for key, value in producing_zone.unit_cost.items():
 			current_player.sub_resource(key, value)
+
 		if producing_zone.faction == "player" : # Shouldn't be used with AI
 			self.game.game_view.update_resources_gui()
 
@@ -438,13 +439,12 @@ class Controller():
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
 				harvested = aimed_entity.harvest(entity.damage)
+				if entity.faction == "player" :
+					self.game.game_view.update_villager_resources_gui()
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
 					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 					print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
-					if entity.faction == "player" :
-						self.game.game_view.update_villager_resources_gui()
-
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
@@ -491,6 +491,9 @@ class Controller():
 			unit.action_timer = 0
 			print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
+
+			if unit.faction == "player" : # Shouldn't be used with AI
+				self.game.game_view.trigger_Villager_GUI(self.selection)
 
 			if isinstance(unit.aimed_entity, Unit) and unit.aimed_entity.aimed_entity != unit:
 				self.order_attack(unit.aimed_entity, unit)
