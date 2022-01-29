@@ -291,8 +291,8 @@ class Controller():
 			if isinstance(producing_zone, Barracks) :
 				producing_zone.set_class_produced(entity_produced)
 
-			if self.game.players[producing_zone.faction].can_create(producing_zone.class_produced) :
-				
+			if current_player.can_create(producing_zone.class_produced) :
+
 				for key, value in producing_zone.unit_cost.items():
 					if current_player.get_resource(key) < value:
 						return
@@ -457,15 +457,16 @@ class Controller():
 		entity.action_timer += delta_time
 		if entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
-
 			current_player = self.game.players[entity.faction]
-			cost = entity.aimed_entity.zone_to_build.cost
-			current_player.sub_resource(*cost)
-			if entity.faction == "player" :
-				self.game.game_view.update_resources_gui()
+			if current_player.can_create(entity.aimed_entity.zone_to_build) :
+				cost = entity.aimed_entity.zone_to_build.cost
+				current_player.sub_resource(*cost)
+				if entity.faction == "player" :
+					self.game.game_view.update_resources_gui()
 
-			self.add_entity_to_game(entity.aimed_entity.create_zone())
-
+				self.add_entity_to_game(entity.aimed_entity.create_zone())
+			elif entiity.faction == "player" :
+				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 			entity.end_goal()
 
 	# Called every frame when an action is done on a zone (harvesting).
@@ -519,9 +520,16 @@ class Controller():
 		if producing_zone.action_timer > producing_zone.unit_cooldown:
 			producing_zone.action_timer = 0
 			producing_zone.is_producing = False
-			grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
-			Class_produced = producing_zone.class_produced
-			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), producing_zone.faction))
+			current_player = self.game.players[producing_zone.faction]
+			if current_player.nb_unit < current_player.max_unit :
+				if current_player.can_create(producing_zone.class_produced) :
+					grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
+					Class_produced = producing_zone.class_produced
+					self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), producing_zone.faction))
+				elif producing_zone.faction == "player" :
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+			elif producing_zone.faction == "player":
+				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def attack_entity(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time
