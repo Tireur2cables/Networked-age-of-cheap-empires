@@ -289,7 +289,8 @@ class Controller():
 		producing_zone.is_producing = True
 		for key, value in producing_zone.unit_cost.items():
 			current_player.sub_resource(key, value)
-		self.game.game_view.update_resources_gui()  # TODO: Shouldn't be used with AI
+		if producing_zone.faction == "player" : # Shouldn't be used with AI
+			self.game.game_view.update_resources_gui()
 
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
@@ -311,14 +312,6 @@ class Controller():
 					entity.is_interacting = True
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
-
-	def order_zone_villagers(self, tc):
-		current_player = self.game.players[tc.faction]
-		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) >= tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
-			tc.is_producing = True
-			current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
-			if tc.faction == "player" : # Shouldn't be used with AI
-				self.game.game_view.update_resources_gui()
 
 
 

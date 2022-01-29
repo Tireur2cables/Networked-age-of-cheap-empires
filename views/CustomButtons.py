@@ -3,6 +3,7 @@ from ctypes import string_at
 from arcade.arcade_types import Color
 import arcade.gui
 from save.serializationTest import *
+from entity.Unit import *
 
 # Constants
 from CONSTANTS import Resource as Res
@@ -166,16 +167,16 @@ class ActionButton(arcade.gui.UITextureButton) :
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		if self.text == "Villageois" :
-			self.aoce_game.game_controller.order_zone_villagers(self.batiment)
+			self.aoce_game.game_controller.order_zone_units(self.batiment, Villager.get_name())
 		elif self.text == "Milice" :
-			pass
+			self.aoce_game.game_controller.order_zone_units(self.batiment, Militia.get_name())
 		elif self.text == "Lancier" :
-			pass
+			self.aoce_game.game_controller.order_zone_units(self.batiment, Spearman.get_name())
 		elif self.text == "Archer" :
-			pass
+			self.aoce_game.game_controller.order_zone_units(self.batiment, Archer.get_name())
 		elif self.text == "Escarmoucheur" :
-			pass
+			self.aoce_game.game_controller.order_zone_units(self.batiment, Skirmisher.get_name())
 		elif self.text == "Eclaireur" :
-			pass
+			self.aoce_game.game_controller.order_zone_units(self.batiment, Scout.get_name())
 		elif self.text == "Chevalier" :
-			pass
+			self.aoce_game.game_controller.order_zone_units(self.batiment, Knight.get_name())

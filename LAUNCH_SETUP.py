@@ -7,8 +7,8 @@
 
 # Defaults, in this order: True, True, False, False, False, True, False
 LAUNCH_FULLSCREEN = True
-LAUNCH_MUSIC = False
-LAUNCH_DEFAULT_MAP = True
+LAUNCH_MUSIC = True
+LAUNCH_DEFAULT_MAP = False
 LAUNCH_DEBUG_DISPLAY = False
 LAUNCH_FAST_ACTIONS = False
 LAUNCH_ENABLE_IA = True
