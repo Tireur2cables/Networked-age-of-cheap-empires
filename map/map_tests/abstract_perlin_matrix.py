@@ -1,4 +1,5 @@
 #from map.map import Map
+from LAUNCH_SETUP import LAUNCH_SAFEWAY_SAND
 from map.tile import Tile#, TileSprite
 
 from entity.Zone import Gold, Stone, Wood #, Zone,Resources
@@ -118,7 +119,7 @@ def perlin_array2(size = (50, 50),
 	arr = norm_me(arr)
 	return arr
 
-def reserve_towncenter(out, position, zone_size, spawn_id):
+def reserve_towncenter(out, position, zone_size, spawn_id, text_pos, map_size=(100,100)):
 	for a in range(position.x, position.x + zone_size):
 		for b in range(position.y, position.y + zone_size):
 			out[a][b]["tile"] = "grass"
@@ -131,6 +132,47 @@ def reserve_towncenter(out, position, zone_size, spawn_id):
 			out[a][b]["tile"] = "grass"
 			out[a][b]["obj"] = "berry"
 
+	tile_type = "sand" if LAUNCH_SAFEWAY_SAND else "grass"
+
+	if text_pos == "bottom":
+		for diag in range(0, 40):
+			out[position.x + diag][position.y + diag]["tile"] = tile_type
+
+			out[position.x + diag + 1][position.y + diag]["tile"] = tile_type
+			out[position.x + diag + 2][position.y + diag]["tile"] = tile_type
+
+			out[position.x + diag][position.y + diag + 1]["tile"] = tile_type
+			out[position.x + diag][position.y + diag + 2]["tile"] = tile_type
+
+	elif text_pos == "top":
+		for diag in range(0, 40):
+			out[position.x - diag][position.y - diag]["tile"] = tile_type
+
+			out[position.x - diag - 1][position.y - diag]["tile"] = tile_type
+			out[position.x - diag - 2][position.y - diag]["tile"] = tile_type
+
+			out[position.x - diag][position.y - diag - 1]["tile"] = tile_type
+			out[position.x - diag][position.y - diag - 2]["tile"] = tile_type
+
+	elif text_pos == "left":
+		for diag in range(0, 40):
+			out[position.x + diag][position.y - diag]["tile"] = tile_type
+
+			out[position.x + diag + 1][position.y - diag]["tile"] = tile_type
+			out[position.x + diag + 2][position.y - diag]["tile"] = tile_type
+
+			out[position.x + diag][position.y - diag - 1]["tile"] = tile_type
+			out[position.x + diag][position.y - diag - 2]["tile"] = tile_type
+
+	elif text_pos == "right":
+		for diag in range(0, 40):
+			out[position.x - diag][position.y + diag]["tile"] = tile_type
+
+			out[position.x - diag - 1][position.y + diag]["tile"] = tile_type
+			out[position.x - diag - 2][position.y + diag]["tile"] = tile_type
+
+			out[position.x - diag][position.y + diag + 1]["tile"] = tile_type
+			out[position.x - diag][position.y + diag + 2]["tile"] = tile_type
 
 def process_array2(size = (50,50), seed=None, nbr_players=1):
 	# baseTile = Tile("grass", 0,0,None)
@@ -180,13 +222,13 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 	zoneSize=6
 
 	if nbr_players > 0:
-		reserve_towncenter(out, Vector(10, 10), zoneSize, 0)
+		reserve_towncenter(out, Vector(10, 10), zoneSize, 0, text_pos="bottom")
 	if nbr_players > 1:
-		reserve_towncenter(out, Vector(size[0] - 10, size[1] - 10), zoneSize, 1)
+		reserve_towncenter(out, Vector(size[0] - 10, size[1] - 10), zoneSize, 1, text_pos="top")
 	if nbr_players > 2:
-		reserve_towncenter(out, Vector(10, size[1] - 10), zoneSize, 2)
+		reserve_towncenter(out, Vector(10, size[1] - 10), zoneSize, 2, text_pos="left")
 	if nbr_players > 3:
-		reserve_towncenter(out, Vector(size[0] - 10, 10), zoneSize, 3)
+		reserve_towncenter(out, Vector(size[0] - 10, 10), zoneSize, 3, text_pos="right")
 
 	tile_map = [[Tile(out[x][y]["tile"], Vector(x,y), out[x][y]["obj"]) for y in range(size[1])] for x in range(size[0])]
 	return tile_map
