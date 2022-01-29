@@ -179,10 +179,27 @@ class View():
 		# --- Object sprite lists : Tiles, Zones & Entities
 		self.tile_sprite_list.draw(pixelated=True)
 
-		#ICI QUE SA SE PASE
+		#Affichage des sprites des batiments suivant la souris avant d etre pose
 		if self.HouseRequest == 1 :
 			house_sprite = arcade.Sprite("Ressources/img/zones/buildables/house.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
 			house_sprite.draw(pixelated=True)
+
+		if self.StoragePitRequest == 1 :
+			StoragePit_sprite = arcade.Sprite("Ressources/img/zones/buildables/storagepit.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			StoragePit_sprite.draw(pixelated=True)
+		
+		if self.GranaryRequest == 1 :
+			Granary_sprite = arcade.Sprite("Ressources/img/zones/buildables/granary.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			Granary_sprite.draw(pixelated=True)
+
+		if self.TownCenterRequest == 1 :
+			TownCenter_sprite = arcade.Sprite("Ressources/img/zones/buildables/towncenter.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			TownCenter_sprite.draw(pixelated=True)
+		
+		if self.BarracksRequest == 1 :
+			Barracks_sprite = arcade.Sprite("Ressources/img/zones/buildables/barracks.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			Barracks_sprite.draw(pixelated=True)
+
 
 		for s in self.zone_sprite_list:
 			zone = s.entity
