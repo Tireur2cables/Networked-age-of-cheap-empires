@@ -90,9 +90,9 @@ class View():
 
 	def reset_construct_flags(self) :
 		self.build_request = ""
-	
+
 	def message_error_flags(self):
-		self.NoRessourcesForBuild = 0
+		self.errorMessage = ""
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -695,12 +695,12 @@ class View():
 
 	def trigger_attention_message(self):
 		self.v_box13.clear()
-		width = self.game.window.width /2
-		height = self.game.window.height / 2
-		self.count_time = self.count_time + 1
-		if self.NoRessourcesForBuild == 1:
-			NoRessourcesForBuildButton = arcade.gui.UITextArea(text="Vous manquez de ressources pour construire", width=width, height=height, font_size=24, text_color=arcade.color.RED)
-			self.v_box13.add(NoRessourcesForBuildButton)
+		if self.errorMessage != "" :
+			width = self.game.window.width /2
+			height = self.game.window.height / 2
+			self.count_time = self.count_time + 1
+			errorTextArea = arcade.gui.UITextArea(text=self.errorMessage, width=width, height=height, font_size=24, text_color=arcade.color.RED)
+			self.v_box13.add(errorTextArea)
 			if self.count_time > 40:
-				self.NoRessourcesForBuild =0
+				self.errorMessage = ""
 				self.count_time = 0

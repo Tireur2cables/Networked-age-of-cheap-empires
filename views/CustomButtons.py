@@ -61,7 +61,7 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 			ia[name] = diff
 
 		ressources = {}
-		tab = [Res.GOLD, Res.WOOD, Res.FOOD, Res.STONE]
+		tab = [Res.FOOD, Res.WOOD, Res.STONE, Res.GOLD]
 		indice = 0
 		for texture_pane in self.pregameview.name_input_ressources :
 			ressources[tab[indice]] = int(texture_pane.child.text)

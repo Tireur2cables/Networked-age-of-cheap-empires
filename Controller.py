@@ -250,7 +250,7 @@ class Controller():
 		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) >= worksite.zone_to_build.cost[1]:
 			#Pour le gui, on baisse le flag si on peut finalement construire
 			if entity.faction == "player":
-				self.game.game_view.NoRessourcesForBuild = 0
+				self.game.game_view.errorMessage = ""
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
@@ -279,28 +279,36 @@ class Controller():
 			print("not enough resources to order a build!")
 			#Pour le GUI, on leve un flag pour le message d erreur
 			if entity.faction == "player":
-				self.game.game_view.NoRessourcesForBuild = 1
+				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
 	def order_zone_units(self, producing_zone, entity_produced = ""):
 
-		current_player = self.game.players[producing_zone.faction]
-		if isinstance(producing_zone, Barracks):
-			producing_zone.set_class_produced(entity_produced)
-
-		if producing_zone.is_producing or current_player.nb_unit >= current_player.max_unit:
+		if producing_zone.is_producing :
 			return
 
-		for key, value in producing_zone.unit_cost.items():
-			if current_player.get_resource(key) < value:
-				return
+		current_player = self.game.players[producing_zone.faction]
+		if current_player.nb_unit < current_player.max_unit :
+			if isinstance(producing_zone, Barracks) :
+				producing_zone.set_class_produced(entity_produced)
 
-		producing_zone.is_producing = True
-		for key, value in producing_zone.unit_cost.items():
-			current_player.sub_resource(key, value)
+			if self.game.players[producing_zone.faction].can_create(producing_zone.class_produced) :
+				
+				for key, value in producing_zone.unit_cost.items():
+					if current_player.get_resource(key) < value:
+						return
 
-		if producing_zone.faction == "player" : # Shouldn't be used with AI
-			self.game.game_view.update_resources_gui()
+				producing_zone.is_producing = True
+				for key, value in producing_zone.unit_cost.items():
+					current_player.sub_resource(key, value)
 
+				if producing_zone.faction == "player" : # Shouldn't be used with AI
+					self.game.game_view.update_resources_gui()
+			else :
+				if producing_zone.faction == "player":
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+		else :
+			if producing_zone.faction == "player":
+				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
 		# print(f"{entity} ---> VS {aimed_unit}")
