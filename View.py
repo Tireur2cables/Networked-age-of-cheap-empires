@@ -62,12 +62,7 @@ class View():
 		self.zone_sprite_list = arcade.SpriteList()
 
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
-		self.HouseRequest = 0
-		self.StoragePitRequest = 0
-		self.GranaryRequest = 0
-		self.BarracksRequest = 0
-		self.TownCenterRequest = 0
-		self.TowerRequest = 0
+		self.reset_construct_flags()
 
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
@@ -84,6 +79,13 @@ class View():
 		# Sync self.game_model.zone_list with zone_sprite_list
 		for z in self.game.game_model.zone_list:
 			self.zone_sprite_list.append(z.sprite)
+
+	def reset_construct_flags(self) :
+		self.HouseRequest = 0
+		self.StoragePitRequest = 0
+		self.GranaryRequest = 0
+		self.BarracksRequest = 0
+		self.TownCenterRequest = 0
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -318,7 +320,7 @@ class View():
 		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :
 			pass
-		elif button == arcade.MOUSE_BUTTON_LEFT:
+		elif button == arcade.MOUSE_BUTTON_LEFT :
 			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
 			if self.HouseRequest == 1 :
 				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
@@ -348,13 +350,16 @@ class View():
 				# draw interactive ui of selected
 				self.trigger_Villager_GUI(self.game.game_controller.selection)
 
-		elif button == arcade.MOUSE_BUTTON_RIGHT:
+		elif button == arcade.MOUSE_BUTTON_RIGHT :
+			self.reset_construct_flags() # permet d'annuler une construction
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.unit_sprite_list)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.zone_sprite_list)
 			if zones_at_point:
 				self.game.game_controller.human_order_towards_sprites("stock", "player", zones_at_point)
+				# TODO ici, reparer le batiment s'il est abimé et que on a pas de ressources a deposer et batiment a nous
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
+			# TODO ici attquer si batiment ou unité pas a nous
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -601,7 +606,8 @@ class View():
 
 			for s in selected_list["player"] :
 				if isinstance(s, Entity) : # add entiity info
-					entity_box_stat = arcade.gui.UITextArea(text=s.name, width=width / 3, height=height)
+					titre = s.name if s.faction == "None" else s.name + " [" + s.faction + "] "
+					entity_box_stat = arcade.gui.UITextArea(text=titre, width=width / 3, height=height)
 					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
 
 					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
