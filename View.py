@@ -189,24 +189,18 @@ class View():
 
 		#Affichage des sprites des batiments suivant la souris avant d etre pose
 		if self.HouseRequest == 1 :
-			house_sprite = arcade.Sprite("Ressources/img/zones/buildables/house.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
-			house_sprite.draw(pixelated=True)
+			path = "Ressources/img/zones/buildables/house.png"
+		elif self.StoragePitRequest == 1 :
+			path = "Ressources/img/zones/buildables/storagepit.png"
+		elif self.GranaryRequest == 1 :
+			path = "Ressources/img/zones/buildables/granary.png"
+		elif self.TownCenterRequest == 1 :
+			path = "Ressources/img/zones/buildables/towncenter.png"
+		elif self.BarracksRequest == 1 :
+			path = "Ressources/img/zones/buildables/barracks.png"
+		build_sprite = arcade.Sprite(path, scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+		build_sprite.draw(pixelated=True)
 
-		if self.StoragePitRequest == 1 :
-			StoragePit_sprite = arcade.Sprite("Ressources/img/zones/buildables/storagepit.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
-			StoragePit_sprite.draw(pixelated=True)
-
-		if self.GranaryRequest == 1 :
-			Granary_sprite = arcade.Sprite("Ressources/img/zones/buildables/granary.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
-			Granary_sprite.draw(pixelated=True)
-
-		if self.TownCenterRequest == 1 :
-			TownCenter_sprite = arcade.Sprite("Ressources/img/zones/buildables/towncenter.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
-			TownCenter_sprite.draw(pixelated=True)
-
-		if self.BarracksRequest == 1 :
-			Barracks_sprite = arcade.Sprite("Ressources/img/zones/buildables/barracks.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
-			Barracks_sprite.draw(pixelated=True)
 
 		# for s in self.tile_sprite_list:
 		# 	tile = s.tile
