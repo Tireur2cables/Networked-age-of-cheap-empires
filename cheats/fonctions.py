@@ -1,6 +1,9 @@
+from asyncio import sleep
+from multiprocessing.connection import wait
 from player import Player
 import arcade
 import arcade.gui
+
 """
 NINJALUI: get 10000 of each resource.
 \
@@ -8,15 +11,6 @@ BIGDADDY: spawn very powerful unit at town center.
 \
 STEROIDS: training, building, research, foraging, farming, and mining times are
 instantaneous. . . for all players, not just you.
-\
-REVEAL MAP: Reveal the entire map, exactly as though you had explored it,
-which means that enemy units are not revealed, while trees, and stone and gold
-mines are. Enemy buildings are not revealed. Issuing the command again toggles
-effect.
-\
-NO FOG: Remove the fog of war. Any explored part of the is therefore fully
-visible as though under the line of sight of your units. Issuing the command again
-toggles effect.
 \
 Additionally, you should have a few commands to influence the AI, force it to launch
 an immediate attack, check its state of mind, put your civilisation on autopilot, or
@@ -30,27 +24,28 @@ if un cheat code est rentré : execute cheatcode pour un player en particulier
 else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
 cheat codes available ;
 """
+
 class CheatsInput(arcade.gui.UIInputText):
-    def __init__(self, x, y, text, width, height, text_color) :
+    def __init__(self, x, y, text, width, height, text_color) : #player : Player
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
-
+        #self.player = player
+        self.triggered = False #permet de pouvoir taper des keys quand on tape un cheat code sans faire spawn n'importe quoi
     def Ninjalui(self):
-        print("ninjalui")#player.add_all(player, 10000)
-    def Bigdaddy(self):
-        print("debug big daddz")
+        self.player.add_all(10000)
+    def Bigdaddy(self): #if bool_BigDaddz is True then when we call "BIGDADDY" and unit spawns
+        bool_BigDaddz = False
     def Steroids(self):
         print("debug steroidz")
-    def RevealMap(self):
-        print("debug reveal map")
-    def NoFog(self):
-        print("debug NoFog")
-
     def reset_text(self):
-        self.text = "Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG"
+        self.text = "Enter a cheat code [PRESS ENTER TO HIDE THIS MESSAGE]"
+    def NotImplemented(self):
+        self.reset_text()
+        
         
     def on_event(self, event) :
         super().on_event(event)
+        self.activated = True #test
         if self._active and isinstance(event, arcade.gui.events.UITextEvent):
             if self.text == "NINJALUI":
                 self.Ninjalui()
@@ -58,8 +53,6 @@ class CheatsInput(arcade.gui.UIInputText):
                 self.Bigdaddy()
             elif self.text == "STEROIDS":
                 self.Steroids()
-            elif self.text == "REVEAL MAP":
-                self.RevealMap()
-            elif self.text == "NO FOG":
-                self.NoFog()
-    
+            elif self.text == "REVEAL MAP" or self.text == "NO FOG":
+                self.NotImplemented()
+        
