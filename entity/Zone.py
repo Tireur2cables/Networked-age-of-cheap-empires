@@ -66,6 +66,7 @@ class WorkSite(Zone):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12), # not used for now
 		faction=faction,
+		name="WorkSite",
 		**kwargs)
 		self.zone_to_build = self.get_zone_class(name_zone_to_build.lower())
 
@@ -79,6 +80,8 @@ class WorkSite(Zone):
 			return Granary
 		elif name_zone == "barracks":
 			return Barracks
+		elif name_zone == "towncenter":
+			return TownCenter
 		elif name_zone == "dock":
 			return Dock
 
@@ -112,7 +115,8 @@ class TownCenter(Buildable):
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		faction=faction,
 		health=600,
-		line_sight=7)
+		line_sight=7,
+		name="TownCenter")
 		self.is_producing = False
 		self.class_produced = Villager
 		self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Villager.creation_time # in seconds
@@ -137,7 +141,9 @@ class Barracks(Buildable):
 		can_produce=True,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
 		faction=faction,
-		health=350)
+		health=350,
+		name="Barracks")
+    
 		self.unit_cooldown = None
 		self.unit_cost = None
 		self.class_produced = None
@@ -171,7 +177,9 @@ class StoragePit(Buildable):
 		super().__init__(grid_position,
 		faction=faction,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
-		health=350)
+		health=350,
+		name="StoragePit")
+    
 	@staticmethod
 	def StoragePit_1():
 		StoragePit.cost=(Res.WOOD,100)
@@ -190,7 +198,9 @@ class Granary(Buildable):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15),
 		faction=faction,
-		health=350)
+		health=350,
+		name="Granary")
+    
 	@staticmethod
 	def Granary_1():
 		Granary.cost=(Res.WOOD,90)
@@ -210,7 +220,8 @@ class Dock(Buildable):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10),
 		faction=faction,
-		health=600)
+		health=600,
+		name="Dock")
 
 class House(Buildable):
 	#WhoAmI : Cost : 30 Wood; Use : +4 population per house
@@ -226,7 +237,9 @@ class House(Buildable):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10),
 		faction=faction,
-		health=75)
+		health=75,
+		name="House")
+    
 	@staticmethod
 	def House_1():
 		House.cost=(Res.WOOD,20)
@@ -287,7 +300,8 @@ class Wood(Resources):
 		super().__init__(grid_position,
 		sprite_data=SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT//2 + 5),
 		health=25,
-		amount=10)
+		amount=10,
+		name="Wood")
 
 class Stone(Resources):
 	tile_size = (1, 1)
@@ -297,7 +311,8 @@ class Stone(Resources):
 		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
 		health=0,
-		amount=250)
+		amount=250,
+		name="Stone")
 
 class Gold(Resources):
 	tile_size = (1, 1)
@@ -307,7 +322,8 @@ class Gold(Resources):
 		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
 		health=0,
-		amount=450)
+		amount=450,
+		name="Gold")
 
 class BerryBush(Resources):
 	tile_size = (1, 1)
@@ -317,4 +333,5 @@ class BerryBush(Resources):
 		is_locking=True,
 		sprite_data=SpriteData("Ressources/img/zones/resources/berrybush.png", scale=1, y_offset=63//2 - TILE_HEIGHT//2),
 		health=0,
-		amount=150)
+		amount=150,
+		name="BeeryBush")

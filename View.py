@@ -1,10 +1,11 @@
 # --- Imports ---
 ## -- arcade --
+from turtle import window_height, window_width
 import arcade
 from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
 ## -- Others --
-from views.CustomButtons import ConstructButton, NextViewButton, ListButton, SaveButton
+from views.CustomButtons import ActionButton, ConstructButton, NextViewButton, ListButton, SaveButton
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
 from cheats.fonctions import CheatsInput
@@ -31,6 +32,7 @@ PIC_GOLD = "./Ressources/img/Ressources_Or_500x500.png"
 PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
 PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
 PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
+button_texture = "Ressources/img/button_background.png"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
@@ -58,6 +60,9 @@ class View():
 		#clear old lists
 		self.tile_sprite_list = arcade.SpriteList()
 
+		#Pour le GUI, les flags indiquant si on veut construire un batiment
+		self.reset_construct_flags()
+
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
@@ -79,6 +84,13 @@ class View():
 			if u.sprite not in self.sorted_sprite_list:
 				self.sorted_sprite_list.append(u.sprite)
 
+
+	def reset_construct_flags(self) :
+		self.HouseRequest = 0
+		self.StoragePitRequest = 0
+		self.GranaryRequest = 0
+		self.BarracksRequest = 0
+		self.TownCenterRequest = 0
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -174,6 +186,27 @@ class View():
 
 		# --- Object sprite lists : Tiles, Zones & Entities
 		self.tile_sprite_list.draw(pixelated=True)
+
+		#Affichage des sprites des batiments suivant la souris avant d etre pose
+		if self.HouseRequest == 1 :
+			house_sprite = arcade.Sprite("Ressources/img/zones/buildables/house.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			house_sprite.draw(pixelated=True)
+
+		if self.StoragePitRequest == 1 :
+			StoragePit_sprite = arcade.Sprite("Ressources/img/zones/buildables/storagepit.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			StoragePit_sprite.draw(pixelated=True)
+		
+		if self.GranaryRequest == 1 :
+			Granary_sprite = arcade.Sprite("Ressources/img/zones/buildables/granary.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			Granary_sprite.draw(pixelated=True)
+
+		if self.TownCenterRequest == 1 :
+			TownCenter_sprite = arcade.Sprite("Ressources/img/zones/buildables/towncenter.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			TownCenter_sprite.draw(pixelated=True)
+		
+		if self.BarracksRequest == 1 :
+			Barracks_sprite = arcade.Sprite("Ressources/img/zones/buildables/barracks.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			Barracks_sprite.draw(pixelated=True)
 
 		# for s in self.tile_sprite_list:
 		# 	tile = s.tile
@@ -323,28 +356,52 @@ class View():
 			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
 			self.camera.move_to([self.camera_x, self.camera_y], 1)
 		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
-		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - 50)) :
+		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :
 			pass
-		elif button == arcade.MOUSE_BUTTON_LEFT:
-			closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
-			if closest_unit_sprites:
-				self.game.game_controller.select("player", closest_unit_sprites)
+    
+		elif button == arcade.MOUSE_BUTTON_LEFT :
+			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
+			if self.HouseRequest == 1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
+				self.HouseRequest = 0
+			elif self.StoragePitRequest == 1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
+				self.StoragePitRequest = 0
+			elif self.GranaryRequest == 1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
+				self.GranaryRequest = 0
+			elif self.BarracksRequest == 1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
+				self.BarracksRequest = 0
+			elif self.TownCenterRequest == 1 :
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "TownCenter")
+				self.TownCenterRequest = 0
 			else:
-				closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
-				if closest_zone_sprites:
-					self.game.game_controller.select_zone("player", closest_zone_sprites)
-				else:
-					self.game.game_controller.clear_faction_selection("player")
+				closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
+        if closest_unit_sprites:
+          self.game.game_controller.select("player", closest_unit_sprites)
+        else:
+          closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+          if closest_zone_sprites:
+            self.game.game_controller.select_zone("player", closest_zone_sprites)
+          else:
+            self.game.game_controller.clear_faction_selection("player")
+				# draw interactive ui of selected
+				self.trigger_Villager_GUI(self.game.game_controller.selection)
 
-		elif button == arcade.MOUSE_BUTTON_RIGHT:
+		elif button == arcade.MOUSE_BUTTON_RIGHT :
+			self.reset_construct_flags() # permet d'annuler une construction
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 			if zones_at_point:
 				self.game.game_controller.human_order_towards_sprites("stock/attack", "player", zones_at_point)
 			elif units_at_point:
 				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
+				# TODO ici, reparer le batiment s'il est abimé et que on a pas de ressources a deposer et batiment a nous
+
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
+			# TODO ici attquer si batiment ou unité pas a nous
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -410,36 +467,111 @@ class View():
 
 	def init_dynamic_gui(self) :
 		# Create a box group to align the 'open' button in the center
+		# Box pour le UITextArea qui contiens les stats du personnage
 		self.v_box4 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="right",
+				align_x= - self.game.window.width / 3,
 				anchor_y="bottom",
 				child=self.v_box4
 			)
 		)
 
-		# Create a box for the button in the precedent box, maybe redondant
+		# Box pour le UITextArea qui contiens les actions du personnage
+		self.v_box7 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				anchor_y="bottom",
+				child=self.v_box7
+			)
+		)
+
+		# Create a box for the batiment buildable by villagers
 		self.v_box5 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
-				anchor_x="center",
-				align_x= 200,
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 6) / 3,
 				anchor_y="bottom",
-				align_y=15,
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
 				child=self.v_box5
 			)
 		)
 
+		# Create a box for the batiment buildable by villagers
+		self.v_box9 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 6 + (self.game.window.width / 3 - self.game.window.width / 6) * 2 / 3,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 2 / 12) / 2,
+				child=self.v_box9
+			)
+		)
+
+
+
 		# Create a box for the button in the precedent box, maybe redondant
+		# Heberge la sprite
 		self.v_box6 = arcade.gui.UIBoxLayout()
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="center",
-				align_x= 400,
+				align_x=self.game.window.width / 24 + (self.game.window.width / 6 - self.game.window.width / 12) / 2, # center sprite in rectangle
 				anchor_y="bottom",
-				align_y=15,
+				align_y=self.game.window.height * 1 / 8 - (self.game.window.height * 2 / 32), # center sprite in rectangle
 				child=self.v_box6
+			)
+		)
+
+		# Heberge l affichage des ressources
+		self.v_box8 = arcade.gui.UIBoxLayout(vertical=False)
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="left",
+				align_x=self.game.window.width / 2 + (self.game.window.width / 6 - self.game.window.width / 8) / 2,
+				anchor_y="bottom",
+				align_y=10,
+				child=self.v_box8
+			)
+		)
+
+		# Create a box for the villagers buildable by towncenters
+		self.v_box10 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 12) / 2,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height / 12) / 2,
+				child=self.v_box10
+			)
+		)
+
+		# Create a box for the military buildable by barracks
+		self.v_box11 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 6) / 3,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
+				child=self.v_box11
+			)
+		)
+
+		# Create a box for the military buildable by barracks
+		self.v_box12 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 6 + (self.game.window.width / 3 - self.game.window.width / 6) * 2 / 3,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
+				child=self.v_box12
 			)
 		)
 
@@ -493,27 +625,99 @@ class View():
 		for label, resource_text in zip(self.resource_label_list, resources_tab):
 			label.text = resource_text
 
+	def update_villager_resources_gui(self) :
+		if self.boolean_dynamic_gui :
+			self.trigger_Villager_GUI(self.game.game_controller.selection)
+
 	# test pour les coins mais dois bouger TODO
-	def trigger_coin_GUI(self, selected_list) :
+	def trigger_Villager_GUI(self, selected_list) :
 		self.v_box4.clear()
 		self.v_box5.clear()
 		self.v_box6.clear()
+		self.v_box7.clear()
+		self.v_box8.clear()
+		self.v_box9.clear()
+		self.v_box10.clear()
+		self.v_box11.clear()
+		self.v_box12.clear()
 
 		self.boolean_dynamic_gui = False
-
-		if selected_list :
+		if selected_list["player"] : # someting is selected
 			self.boolean_dynamic_gui = True
+
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
-			coin_box = arcade.gui.UITextArea(text="Coin I Chiwa", width=width, height=height)
-			self.v_box4.add(coin_box.with_space_around(0, 0, 0, 0, arcade.color.BRONZE))
 
-			# Button for coin, you wan click on it but unfortunately, it will unselect the coin which result in the disapearance of the button
-			coin_button = arcade.gui.UIFlatButton(text = "Machala",height = 70, width=110)
-			self.v_box5.add(coin_button.with_space_around(15,15,15,15,arcade.color.BRONZE))
+			for s in selected_list["player"] :
+				if isinstance(s, Entity) : # add entiity info
+					titre = s.name if s.faction == "None" else s.name + " [" + s.faction + "] "
+					entity_box_stat = arcade.gui.UITextArea(text=titre, width=width / 3, height=height)
+					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
 
-			coin_button2 = arcade.gui.UIFlatButton(text = "Attaquer", height = 70, width = 110)
-			self.v_box5.add(coin_button2.with_space_around(15,15,15,15,arcade.color.BRONZE))
+					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
+					self.v_box8.add(entity_life.with_border())
 
-			coin_button3 = ConstructButton(image="Ressources/img/zones/buildables/Tower.png",construct=None)
-			self.v_box6.add(coin_button3.with_space_around(15,15,15,15,arcade.color.BRONZE))
+					sprite_image = arcade.gui.UITextArea(text=" ", width=width / 6, height=height / 2)
+					self.v_box6.add(sprite_image.with_background(s.sprite.texture))
+
+				if isinstance(s, Resources) : # montre les ressources restantes
+					ressources_restantes = arcade.gui.UITextArea(text="Ressources : " + str(s.amount) + " / " + str(s.max_amount), text_color=arcade.color.GREEN, width=width / 8)
+					self.v_box8.add(ressources_restantes.with_border())
+
+				elif s.faction == "player" : # ouvre les actions seulement si la selection nnous appartient
+
+					if isinstance(s, Villager) : # add villager options
+						villager_ressources = arcade.gui.UITextArea(text="Ressources : " + str(s.nb_resources()), text_color=arcade.color.PINK, width=width / 8)
+						self.v_box8.add(villager_ressources.with_border())
+
+						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
+						self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+
+						storagepit_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/storagepit.png", text="StoragePit", width=width / 6, height=self.game.window.height / 12)
+						self.v_box5.add(storagepit_villager.with_background(arcade.load_texture(button_texture)))
+
+						house_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/house.png", text="House", width=width / 6, height=self.game.window.height / 12)
+						self.v_box5.add(house_villager.with_background(arcade.load_texture(button_texture)))
+
+						granary_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/granary.png", text="Granary", width=width / 6, height=self.game.window.height / 12)
+						self.v_box5.add(granary_villager.with_background(arcade.load_texture(button_texture)))
+
+						barracks_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/barracks.png", text="Barracks", width=width / 6, height=self.game.window.height / 12)
+						self.v_box9.add(barracks_villager.with_background(arcade.load_texture(button_texture)))
+
+						towncenter_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/towncenter.png", text="TownCenter", width=width / 6, height=self.game.window.height / 12)
+						self.v_box9.add(towncenter_villager.with_background(arcade.load_texture(button_texture)))
+
+
+
+					elif isinstance(s, Zone) : # batiment du joueur
+						if not isinstance(s, House) : # ne pas l'afficher sur les batiments qui ne possèdent aucune action
+							villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
+							self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+
+						if isinstance(s, TownCenter) :
+							villager_button = ActionButton(text="Villageois", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/villager_stand.png", aoce_game=self.game)
+							self.v_box10.add(villager_button.with_background(arcade.load_texture(button_texture)))
+
+						elif isinstance(s, Barracks) :
+							militia_button = ActionButton(text="Milice", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/militia_stand.png", aoce_game=self.game)
+							self.v_box11.add(militia_button.with_background(arcade.load_texture(button_texture)))
+
+							spearman_button = ActionButton(text="Lancier", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/spearman_stand.png", aoce_game=self.game)
+							self.v_box11.add(spearman_button.with_background(arcade.load_texture(button_texture)))
+
+							archer_button = ActionButton(text="Archer", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/archer_stand.png", aoce_game=self.game)
+							self.v_box11.add(archer_button.with_background(arcade.load_texture(button_texture)))
+
+							skirmisher_button = ActionButton(text="Escarmoucheur", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/skirmisher_stand.png", aoce_game=self.game)
+							self.v_box12.add(skirmisher_button.with_background(arcade.load_texture(button_texture)))
+
+							scout_button = ActionButton(text="Eclaireur", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/scoutcavalry_stand.png", aoce_game=self.game)
+							self.v_box12.add(scout_button.with_background(arcade.load_texture(button_texture)))
+
+							knight_button = ActionButton(text="Chevalier", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/knight_stand.png", aoce_game=self.game)
+							self.v_box12.add(knight_button.with_background(arcade.load_texture(button_texture)))
+
+
+
+				break # ce break sera a enlever si on gere la selection multiple

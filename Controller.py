@@ -1,4 +1,5 @@
 # --- Imports ---
+import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
 from utils.isometric import *
@@ -95,25 +96,20 @@ class Controller():
 # --- Selection (Called once) ---
 
 	def select(self, faction, sprites_at_point):
-		unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(Unit, faction))
 		self.clear_faction_selection(faction)
-		if unit_found is not None:
+		unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
+		if unit_found :
 			unit_found.selected = True
 			self.selection[faction].add(unit_found)
-			self.game.game_view.trigger_coin_GUI(self.selection)
+			if isinstance(unit_found, Villager) :
+				arcade.load_sound("./Ressources/music/newmail_aoe_scoutahem.wav").play()
 
 	def select_zone(self, faction, sprites_at_point):
 		self.clear_faction_selection(faction)
-		zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
+		zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
 		if zone_found:
 			zone_found.selected = True
 			self.selection[faction].add(zone_found)
-		else:
-			if sprites_at_point:
-				other_zone_found = sprites_at_point[0].entity
-				other_zone_found.selected = True
-				self.selection[faction].add(other_zone_found)
-
 
 	def clear_faction_selection(self, faction):
 		for entity in self.selection[faction]:
@@ -159,7 +155,7 @@ class Controller():
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
 		for entity in self.selection[faction]:
-			if isinstance(entity, Unit):
+			if isinstance(entity, Unit) and entity.faction == faction :
 				if action == "move":
 					entity.set_goal("move")
 					if self.is_on_map(grid_position):
@@ -249,7 +245,7 @@ class Controller():
 	def order_build(self, entity, map_position, building_name):
 		# Step 1: Create a worksite with the building_name
 		worksite = WorkSite(map_position, entity.faction, building_name)
-		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) > worksite.zone_to_build.cost[1]:
+		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) >= worksite.zone_to_build.cost[1]:
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
@@ -316,7 +312,13 @@ class Controller():
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
 
-
+	def order_zone_villagers(self, tc):
+		current_player = self.game.players[tc.faction]
+		if not tc.is_producing and current_player.get_resource(tc.villager_cost[0]) >= tc.villager_cost[1] and current_player.nb_unit < current_player.max_unit:
+			tc.is_producing = True
+			current_player.sub_resource(tc.villager_cost[0], tc.villager_cost[1])
+			if tc.faction == "player" : # Shouldn't be used with AI
+				self.game.game_view.update_resources_gui()
 
 
 
@@ -420,12 +422,11 @@ class Controller():
 
 			current_player = self.game.players[entity.faction]
 			cost = entity.aimed_entity.zone_to_build.cost
-			if current_player.get_resource(cost[0]) > cost[1]:
-				current_player.sub_resource(*cost)
+			current_player.sub_resource(*cost)
+			if entity.faction == "player" :
 				self.game.game_view.update_resources_gui()
-				self.add_entity_to_game(entity.aimed_entity.create_zone())
-			else:
-				print("not enough resources to build!")
+
+			self.add_entity_to_game(entity.aimed_entity.create_zone())
 
 			entity.end_goal()
 
@@ -440,7 +441,11 @@ class Controller():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
-					self.game.game_view.update_resources_gui()
+					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					print(f"[harvesting] -> {type(entity).__name__} has {entity.resource} - max_resources : {entity.max_resource}")
+					if entity.faction == "player" :
+						self.game.game_view.update_villager_resources_gui()
+
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
@@ -460,8 +465,13 @@ class Controller():
 
 		for resource in items_to_store:
 			self.game.players[entity.faction].add_resource(resource, entity.resources[resource])
-			self.game.game_view.update_resources_gui()
 			entity.resources[resource] = 0
+			if entity.faction == "player" :
+				self.game.game_view.update_resources_gui()
+
+		if entity.faction == "player" :
+			self.game.game_view.trigger_Villager_GUI(self.selection)
+
 		can_harvest = entity.go_back_to_harvest()
 		if can_harvest:
 			self.order_harvest(entity, entity.previous_aimed_entity)

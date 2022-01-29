@@ -26,7 +26,7 @@ class Model():
 		self.tile_list = []
 		self.zone_list = []
 
-	def setup(self, players):
+	def setup(self, ressources, players, map_seed):
 		# clear old lists
 		self.unit_list.clear()
 		self.tile_list.clear()
@@ -34,7 +34,10 @@ class Model():
 
 		# pre game view infos
 		self.players = players
-		# self.default_ressources = ressources
+		self.default_ressources = ressources
+		self.map_seed = map_seed
+		print(ressources)
+
 
 		# Set up the villager and add it to the unit_list.
 		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
@@ -42,9 +45,7 @@ class Model():
 		if use_default:
 			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		else:
-			#self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array(perlin_array(seed=69), (DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE)))
-			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array2(seed=69, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE)))
-
+			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array2(seed=self.map_seed, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE)))
 
 		for pos_spawn in self.map.spawn_array:
 			faction = "player" if pos_spawn[1] == "0" else "ai_" + pos_spawn[1]

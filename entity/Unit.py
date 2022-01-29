@@ -104,7 +104,8 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 		max_health=25,
 		damage=3,
 		rate_fire=2,
-		line_sight=4)
+		line_sight=4,
+		name="Villager")
 
 		self.resources = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
 		self.max_resource = 3 if LAUNCH_FAST_ACTIONS else 10
@@ -170,7 +171,8 @@ class Militia(Military):
 		damage=4,
 		rate_fire=2,
 		pierce_armor=1,
-		line_sight=4)
+		line_sight=4,
+		name="Militia")
 
 class Spearman(Military):
 	creation_cost = {Res.FOOD : 35, Res.WOOD : 25, Res.GOLD : 0, Res.STONE : 0}
@@ -184,7 +186,8 @@ class Spearman(Military):
 		max_health=45,
 		damage=3,
 		rate_fire=3,
-		line_sight=4)
+		line_sight=4,
+		name="Spearman")
 
 #Archery (Trained at Archery Range)
 #For the moment, all archery units deal instant damage (there is no projectile) and they aim parfectly well.
@@ -201,7 +204,8 @@ class Archer(Military):
 		damage=4,
 		rate_fire=2,
 		range=4,
-		line_sight=6)
+		line_sight=6,
+		name="Archer")
 
 class Skirmisher(Military):
 	creation_cost = {Res.FOOD : 25, Res.WOOD : 35, Res.GOLD : 0, Res.STONE : 0}
@@ -217,7 +221,8 @@ class Skirmisher(Military):
 		rate_fire=3,
 		range=4,
 		pierce_armor=3,
-		line_sight=6)
+		line_sight=6,
+		name="Skirmisher")
 
 #Cavalry (Trained at Stable)
 class ScoutCavalry(Military):
@@ -233,7 +238,8 @@ class ScoutCavalry(Military):
 		damage=3,
 		rate_fire=2,
 		pierce_armor=2,
-		line_sight=4)
+		line_sight=4,
+		name="ScoutCavalry")
 
 class Knight(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 75, Res.STONE : 0}
@@ -249,4 +255,5 @@ class Knight(Military):
 		rate_fire=1.8,
 		melee_armor=2,
 		pierce_armor=2,
-		line_sight=4)
+		line_sight=4,
+		name="Knight")
