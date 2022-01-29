@@ -36,3 +36,6 @@ class Tile():
 			self.is_free = 0
 		else:
 			self.is_free = 1
+
+	def is_empty(self):
+		return self.is_free > 0 and self.pointer_to_entity is None

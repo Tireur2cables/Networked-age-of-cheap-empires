@@ -1,6 +1,6 @@
 # --- Imports ---
 from map.map import Map
-from map.map_tests.abstract_perlin_matrix import perlin_array,process_array
+from map.map_tests.abstract_perlin_matrix import perlin_array,process_array, process_array2
 from utils.vector import Vector
 from entity.Unit import *
 from entity.Zone import *
@@ -38,13 +38,14 @@ class Model():
 		self.map_seed = map_seed
 		print(ressources)
 
+
 		# Set up the villager and add it to the unit_list.
 		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		use_default = LAUNCH_DEFAULT_MAP
 		if use_default:
 			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		else:
-			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array(perlin_array(seed=self.map_seed)))
+			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array2(seed=self.map_seed, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE)))
 
 		for pos_spawn in self.map.spawn_array:
 			faction = "player" if pos_spawn[1] == "0" else "ai_" + pos_spawn[1]

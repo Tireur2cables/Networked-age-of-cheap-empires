@@ -1,4 +1,4 @@
-from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS
+from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS, LAUNCH_LIGHTSPEED_MOVES
 from entity.Entity import Entity
 from utils.SpriteData import SpriteData
 from CONSTANTS import Resource as Res
@@ -26,7 +26,6 @@ class Unit(Entity):
 		self.previous_goal = ""
 
 		self.goal = ""
-		self.action = ""
 		self.aim = Vector(0, 0)  # coordinate aimed by the user when he clicked
 		self.aimed_entity = None
 		self.previous_aimed_entity = None
@@ -34,7 +33,7 @@ class Unit(Entity):
 		self.is_interacting = False
 		self.path = []
 		self.change = Vector(0, 0)  # The change of coordinate calculated from the speed. This may be moved in the Controller in the future.
-		self.speed = SPEED_UNITS * speed  # Speed of the unit
+		self.speed = SPEED_UNITS * 5 if LAUNCH_LIGHTSPEED_MOVES else SPEED_UNITS * speed  # Speed of the unit
 
 	def set_move_action(self):
 		self.aim = Vector(0, 0)
@@ -43,7 +42,7 @@ class Unit(Entity):
 		self.is_moving = True
 
 	def set_aimed_entity(self, entity):
-		if self.aimed_entity:
+		if self.aimed_entity and self.previous_aimed_entity != self.aimed_entity:
 			self.previous_aimed_entity = self.aimed_entity
 		self.aimed_entity = entity
 
@@ -67,16 +66,6 @@ class Unit(Entity):
 		self.goal = ""
 		self.is_moving = False
 		self.is_interacting = False
-
-
-	# def next_action(self):
-	# 	if self.action == "move":
-	# 		if self.goal == "move":
-	# 			return
-	# 		elif self.goal == "harvest":
-	# 			self.set_action("harvest")
-	# 		elif self.goal == "build":
-	# 			self.set_action("build")
 
 	def set_path(self, path):
 		self.path = path
@@ -118,13 +107,13 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 		line_sight=4,
 		name="Villager")
 
-		self.resource = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
+		self.resources = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
 		self.max_resource = 3 if LAUNCH_FAST_ACTIONS else 10
 
 	def nb_resources(self):
 		nb = 0
-		for resource in self.resource:
-			nb += self.resource[resource]
+		for resource in self.resources:
+			nb += self.resources[resource]
 		return nb
 
 	def set_max_resource(self, max_resource):
@@ -152,6 +141,23 @@ class Military(Unit):#un Militaire est une Unit particuliere
 # Rq : Il n'est peut-être pas utile de creer les implementation de chaque type de militaire car cela n'apporte pas vraiment d'interet
 
 #Infantry (Trained at Barracks)
+# AOE 1 Military
+class Clubman(Military):
+	creation_cost = {Res.FOOD : 50, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
+	creation_time = 26
+	def __init__(self, iso_position, faction, health=-1):
+		super().__init__(iso_position,
+		sprite_data=SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2),
+		faction=faction,
+		speed=1, # la valeur de base était trop haut alors j'ai modifié
+		health=health,
+		max_health=40,
+		damage=4,
+		rate_fire=1.5,
+		pierce_armor=0,
+		line_sight=4)
+
+# AOE 2 Military
 class Militia(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 20, Res.STONE : 0}
 	creation_time = 21
