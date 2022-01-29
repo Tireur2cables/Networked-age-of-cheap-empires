@@ -181,11 +181,8 @@ class View():
 
 		#ICI QUE SA SE PASE
 		if self.HouseRequest == 1 :
-			for s in self.zone_sprite_list:
-				zone = s.entity
-				if isinstance(zone, House):
-					s.set_position(self.mouse_x,self.mouse_y)
-					s.draw(pixelated=True)
+			house_sprite = arcade.Sprite("Ressources/img/zones/buildables/house.png", scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			house_sprite.draw(pixelated=True)
 
 		for s in self.zone_sprite_list:
 			zone = s.entity
