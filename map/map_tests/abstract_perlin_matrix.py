@@ -118,7 +118,7 @@ def perlin_array2(size = (50, 50),
 	arr = norm_me(arr)
 	return arr
 
-def process_array2(size = (50,50), seed=None):
+def process_array2(size = (50,50), seed=None, nbr_players=1):
 	#baseTile = Tile("grass", 0,0,None)
 	# default => grass everywhere
 	out = [[Tile("grass", Vector(x, y)) for y in range(size[1])] for x in range(size[0])]
@@ -186,69 +186,69 @@ def process_array2(size = (50,50), seed=None):
 	# 		if nbofFreeTiles==zoneSize*zoneSize:
 	# 			towncenterpos=Vector(x,y)
 	# 			stop=1
-	for a in range(10,10+zoneSize):
-		for b in range(10,10+zoneSize):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = None
-
-	out[11][11].pointer_to_entity = "spawn_0"
-
-	for a in range(9,9+zoneSize+2,zoneSize+1):
-		for b in range(9,9+zoneSize+2,zoneSize+1):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = "berry"
 
 
+	if nbr_players > 0:
+		for a in range(10,10+zoneSize):
+			for b in range(10,10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = None
 
+		out[11][11].pointer_to_entity = "spawn_0"
 
-	for a in range(size[0]-10,size[0]-10+zoneSize):
-		for b in range(size[1]-10,size[1]-10+zoneSize):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = None
-			#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
-
-
-	out[size[0]-10+1][size[1]-10+1].pointer_to_entity = "spawn_1"
-
-	for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-		for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = "berry"
+		for a in range(9,9+zoneSize+2,zoneSize+1):
+			for b in range(9,9+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = "berry"
 
 
 
+	if nbr_players > 1:
+		for a in range(size[0]-10,size[0]-10+zoneSize):
+			for b in range(size[1]-10,size[1]-10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = None
+				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
 
+		out[size[0]-10+1][size[1]-10+1].pointer_to_entity = "spawn_1"
 
-
-	for a in range(10,10+zoneSize):
-		for b in range(size[1]-10,size[1]-10+zoneSize):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = None
-			#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
-
-
-	out[10+1][size[1]-10+1].pointer_to_entity = "spawn_2"
-
-	for a in range(9,9+zoneSize+2,zoneSize+1):
-		for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = "berry"
-
-
-
-	for b in range(10,10+zoneSize):
-		for a in range(size[1]-10,size[1]-10+zoneSize):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = None
-			#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
-
-
-	out[size[1]-10+1][10+1].pointer_to_entity = "spawn_3"
-
-	for b in range(9,9+zoneSize+2,zoneSize+1):
 		for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-			out[a][b].blockID = "grass"
-			out[a][b].pointer_to_entity = "berry"
+			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = "berry"
+
+
+
+
+
+	if nbr_players > 2:
+		for a in range(10,10+zoneSize):
+			for b in range(size[1]-10,size[1]-10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = None
+				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
+
+		out[10+1][size[1]-10+1].pointer_to_entity = "spawn_2"
+
+		for a in range(9,9+zoneSize+2,zoneSize+1):
+			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = "berry"
+
+
+	if nbr_players > 3:
+		for b in range(10,10+zoneSize):
+			for a in range(size[1]-10,size[1]-10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = None
+				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
+
+		out[size[1]-10+1][10+1].pointer_to_entity = "spawn_3"
+
+		for b in range(9,9+zoneSize+2,zoneSize+1):
+			for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].pointer_to_entity = "berry"
 
 
 

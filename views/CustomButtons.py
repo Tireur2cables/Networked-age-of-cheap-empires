@@ -66,7 +66,7 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 		for texture_pane in self.pregameview.name_input_ressources :
 			ressources[tab[indice]] = int(texture_pane.child.text)
 			indice += 1
-		self.nextView.setup(ressources, ia, self.pregameview.isPlayer, int(self.pregameview.map_pane.child.text))
+		self.nextView.setup(ressources, ia, int(self.pregameview.map_pane.child.text))
 		self.window.show_view(self.nextView)
 
 # Button to display things or not

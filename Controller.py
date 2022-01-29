@@ -30,6 +30,7 @@ class Controller():
 		self.players = set()
 
 	def setup(self, players_dict):
+		self.selection["player"] = set()
 		for key, value in players_dict.items():
 			self.players.add(value)
 			self.selection[key] = set()
