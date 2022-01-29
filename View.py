@@ -186,7 +186,8 @@ class View():
 		#Affichage des sprites des batiments suivant la souris avant d etre pose
 		if self.build_request:
 			path = f"Ressources/img/zones/buildables/{self.build_request}.png"
-			build_sprite = arcade.Sprite(path, scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			pos = grid_pos_to_iso(iso_to_grid_pos(Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)) + Vector(1, 1))
+			build_sprite = arcade.Sprite(path, scale=0.7, center_x=pos.x, center_y=pos.y)
 			build_sprite.draw(pixelated=True)
 
 
