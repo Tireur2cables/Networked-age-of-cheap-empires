@@ -1,6 +1,7 @@
 # --- Imports ---
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
+from game import GameView
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
@@ -16,7 +17,7 @@ class Controller():
 
 # --- Setup ---
 
-	def __init__(self, aoce_game):
+	def __init__(self, aoce_game: GameView):
 		""" Initializer """
 		self.game = aoce_game
 

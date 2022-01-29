@@ -51,8 +51,9 @@ class Zone(Entity):
 # ----- GENERAL CLASS -----
 
 class Buildable(Zone):
-	def __init__(self, grid_position, **kwargs):
+	def __init__(self, grid_position, can_produce=False, **kwargs):
 		super().__init__(grid_position, **kwargs) # Calls parent class constructor
+		self.can_produce = can_produce
 
 # -------------------------
 
@@ -102,6 +103,7 @@ class TownCenter(Buildable):
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
+		can_produce=True,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		faction=faction,
 		health=20,
@@ -120,6 +122,7 @@ class Barracks(Buildable):
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
+		can_produce=True,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
 		faction=faction,
 		health=350)

@@ -1,8 +1,8 @@
 import random
 import time
 from CONSTANTS import Resource as Res
-from entity.Unit import Unit, Villager
-from entity.Zone import BerryBush, Gold, House, Stone, StoragePit, Granary, TownCenter, Wood, WorkSite, Zone
+from entity.Unit import Military, Unit, Villager
+from entity.Zone import Barracks, BerryBush, Buildable, Gold, House, Stone, StoragePit, Granary, TownCenter, Wood, WorkSite, Zone
 from utils.isometric import iso_to_grid_pos
 from utils.vector import Vector
 
@@ -44,7 +44,7 @@ class Player:
 
 			self.nb_unit += 1
 
-		elif isinstance(new_entity, Zone):
+		elif isinstance(new_entity, Buildable):
 			my_zones = self.my_zones.get(new_entity.get_name())
 			if my_zones is None:
 				self.my_zones[new_entity.get_name()] = set()
@@ -67,7 +67,7 @@ class Player:
 		if isinstance(dead_entity, Unit):
 			self.my_units[dead_entity.get_name()].discard(dead_entity)
 			self.nb_unit -= 1
-		elif isinstance(dead_entity, Zone):
+		elif isinstance(dead_entity, Buildable):
 			self.my_zones[dead_entity.get_name()].discard(dead_entity)
 			if isinstance(dead_entity, House):
 				self.max_unit -= 4
@@ -75,6 +75,14 @@ class Player:
 				self.food_storage.discard(dead_entity)
 			elif isinstance(dead_entity, Granary):
 				self.other_storage.discard(dead_entity)
+
+
+	def get_nb_class_in_unit(self, unit_class):
+		count = 0
+		for u in self.my_units:
+			if isinstance(u, unit_class):
+				count += 1
+		return count
 
 	# unit
 	def get_nb_unit(self) -> int:
@@ -129,6 +137,7 @@ class AI(Player):
 			resources: dict) -> None:
 		super().__init__(game, player_type, resources)
 		self.delta_time = 0
+		self.goal = "dev"
 
 	def search_pos_to_build(self, start_position, tile_size):
 		area_found = False
@@ -170,58 +179,73 @@ class AI(Player):
 		else:
 			self.delta_time = 0
 
-		if not self.town_center.is_producing and self.resources[Res.FOOD] > 50:
-			self.game.game_controller.order_zone_units(self.town_center)
-
-		idle_units = set()
+		idle_unit = None
 		ongoing_actions = set()
-		impossible_actions = set()
 		for unit_list in self.my_units.values():
 			for unit in unit_list:
 				# print(iso_to_grid_pos(unit.iso_position), unit.is_moving, unit.is_interacting)
 				if not unit.is_moving and not unit.is_interacting:
-					idle_units.add(unit)
+					idle_unit = unit
 				else:
 					aimed_entity = unit.aimed_entity
 					if isinstance(aimed_entity, WorkSite):
 						aimed_entity = aimed_entity.zone_to_build
 					ongoing_actions.add((unit.goal, aimed_entity.get_name()))
 
-		unit = None
-		for unit in idle_units:
-			break
-
+		unit = idle_unit
 		if unit is not None:
 			if isinstance(unit, Villager):
-				if (action := ("harvest", "berrybush")) not in ongoing_actions and action not in impossible_actions and self.resources[Res.FOOD] < 100:
+				if ("harvest", "berrybush") not in ongoing_actions and self.resources[Res.FOOD] < 100:
 					harvest_zone = self.search_closest_harvest_zone(unit, "food")
 					if harvest_zone is not None:
 						self.game.game_controller.order_harvest(unit, harvest_zone)
-						ongoing_actions.add(action)
-					else:
-						impossible_actions.add(action)
 
-				elif (action := ("build", "house")) not in ongoing_actions and self.max_unit - self.nb_unit < 2:
+				elif ("build", "house") not in ongoing_actions and self.max_unit - self.nb_unit < 2:
 					map_position = self.search_pos_to_build(self.town_center.grid_position, House.tile_size)
-					self.game.game_controller.order_build(unit, map_position, "House")
-					ongoing_actions.add(action)
-				elif (action := ("harvest", "wood")) not in ongoing_actions and self.resources[Res.WOOD] < 100:
+					if map_position is not None:
+						self.game.game_controller.order_build(unit, map_position, "House")
+
+				elif ("harvest", "wood") not in ongoing_actions and self.resources[Res.WOOD] < 100:
 					harvest_zone = self.search_closest_harvest_zone(unit, "wood")
-					self.game.game_controller.order_harvest(unit, harvest_zone)
-					ongoing_actions.add(action)
-				elif (action := ("harvest", "stone")) not in ongoing_actions and self.resources[Res.STONE] < 100:
+					if harvest_zone is not None:
+						self.game.game_controller.order_harvest(unit, harvest_zone)
+
+				elif ("harvest", "stone") not in ongoing_actions and self.resources[Res.STONE] < 100:
 					harvest_zone = self.search_closest_harvest_zone(unit, "stone")
-					self.game.game_controller.order_harvest(unit, harvest_zone)
-					ongoing_actions.add(action)
-				elif (action := ("harvest", "gold")) not in ongoing_actions and self.resources[Res.GOLD] < 100:
+					if harvest_zone is not None:
+						self.game.game_controller.order_harvest(unit, harvest_zone)
+
+				elif ("harvest", "gold") not in ongoing_actions and self.resources[Res.GOLD] < 100:
 					harvest_zone = self.search_closest_harvest_zone(unit, "gold")
-					self.game.game_controller.order_harvest(unit, harvest_zone)
-					ongoing_actions.add(action)
+					if harvest_zone is not None:
+						self.game.game_controller.order_harvest(unit, harvest_zone)
+
+				elif ("build", "barracks") not in ongoing_actions and Barracks not in self.my_zones:
+					map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
+					if map_position is not None:
+						self.game.game_controller.order_build(unit, map_position, "barracks")
+
 				else:
+					iteration_guard = 0
 					harvest_zone = None
-					while harvest_zone is None:
-						resources_name = "food", "gold", "stone", "wood", "stone"
+					while harvest_zone is None and iteration_guard < 20:
+						resources_name = "food", "gold", "stone", "wood"
 						c = random.choice(resources_name)
 						harvest_zone = self.search_closest_harvest_zone(unit, c)
-					self.game.game_controller.order_harvest(unit, harvest_zone)
-					ongoing_actions.add("harvest")
+						iteration_guard += 1
+					if harvest_zone is not None:
+						self.game.game_controller.order_harvest(unit, harvest_zone)
+
+		# if self.get_nb_class_in_unit(Military) > 20:
+		# 	self.send_army()
+
+		for zone_list in self.my_zones.values():
+			for zone in zone_list:
+				if isinstance(zone, (TownCenter, Barracks)):
+					if zone.is_producing:
+						ongoing_actions.add(("produce", zone.class_produced.get_name()))
+
+					if isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nb_class_in_unit(Villager) < 10 + self.get_nb_class_in_unit(Military):
+						self.game.game_controller.order_zone_units(zone)
+					elif isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
+						self.game.game_controller.order_zone_units(zone)

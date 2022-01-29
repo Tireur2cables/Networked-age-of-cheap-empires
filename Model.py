@@ -1,4 +1,5 @@
 # --- Imports ---
+from game import GameView
 from map.map import Map
 from map.map_tests.abstract_perlin_matrix import perlin_array,process_array, process_array2
 from utils.vector import Vector
@@ -18,7 +19,7 @@ from LAUNCH_SETUP import LAUNCH_DEFAULT_MAP
 
 class Model():
 
-	def __init__(self, aoce_game):
+	def __init__(self, aoce_game: GameView):
 		""" Initializer """
 		self.game = aoce_game
 
