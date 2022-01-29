@@ -161,7 +161,7 @@ class Controller():
 					entity.set_goal("move")
 					if self.is_on_map(grid_position):
 						for entity in self.selection[faction]:
-							self.move_entity(entity, grid_position)
+							self.move_entity(entity, grid_position, False)
 					else:
 						print("out of bound!")
 						return

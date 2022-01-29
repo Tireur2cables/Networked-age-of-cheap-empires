@@ -119,9 +119,9 @@ def perlin_array2(size = (50, 50),
 	return arr
 
 def process_array2(size = (50,50), seed=None, nbr_players=1):
-	# baseTile = Tile("grass", 0,0,None)
+	#baseTile = Tile("grass", 0,0,None)
 	# default => grass everywhere
-	out = [[{"tile": "grass", "obj": None} for y in range(size[1])] for x in range(size[0])]
+	out = [[Tile("grass", Vector(x, y)) for y in range(size[1])] for x in range(size[0])]
 	if seed is None:
 		seed = np.random.randint(0, 100)
 		print("seed was {}".format(seed))
@@ -134,9 +134,10 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 				#grass by default
 				pass
 			elif array[x][y] < 0.75:
-				out[x][y]["tile"] = "sand"
+				out[x][y].blockID = "sand"
 			else:
-				out[x][y]["tile"] = "water"
+				out[x][y].blockID = "water"
+				out[x][y].is_free = 0
 
 	# layer 2 => ressources
 	#trees
@@ -144,24 +145,24 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 	array = perlin_array2(size=size, seed=seed, octaves=20, scale=8)
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] > 0.75 and out[x][y]["tile"] != "water":
-				out[x][y]["obj"] = "tree"
+			if array[x][y] > 0.75 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "tree"
 
 	#gold
 	seed = (seed+5)%100
 	array = perlin_array2(size=size, seed=seed, octaves=20, scale=4)
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] > 0.87 and out[x][y]["tile"] != "water":
-				out[x][y]["obj"]= "gold"
+			if array[x][y] > 0.87 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "gold"
 
 	#stone
 	seed = (seed+5)%100
 	array = perlin_array2(size=size, seed=seed, octaves=20, scale=4)
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] > 0.89 and out[x][y]["tile"] != "water":
-				out[x][y]["obj"]= "stone"
+			if array[x][y] > 0.89 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "stone"
 
 	#finding somewhere to put TownCenter
 	# nbofFreeTiles=0
@@ -186,71 +187,85 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 	# 			towncenterpos=Vector(x,y)
 	# 			stop=1
 
+
 	if nbr_players > 0:
 		for a in range(10,10+zoneSize):
 			for b in range(10,10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
 
-		out[11][11]["obj"] = "spawn_0"
+		out[11][11].pointer_to_entity = "spawn_0"
 
 		for a in range(9,9+zoneSize+2,zoneSize+1):
 			for b in range(9,9+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
+
+
 
 	if nbr_players > 1:
 		for a in range(size[0]-10,size[0]-10+zoneSize):
 			for b in range(size[1]-10,size[1]-10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
 				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
 
-		out[size[0]-10+1][size[1]-10+1]["obj"] = "spawn_1"
+		out[size[0]-10+1][size[1]-10+1].pointer_to_entity = "spawn_1"
 
 		for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
 			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
+
+
+
+
 
 	if nbr_players > 2:
 		for a in range(10,10+zoneSize):
 			for b in range(size[1]-10,size[1]-10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
 				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
 
-		out[10+1][size[1]-10+1]["obj"] = "spawn_2"
+		out[10+1][size[1]-10+1].pointer_to_entity = "spawn_2"
 
 		for a in range(9,9+zoneSize+2,zoneSize+1):
 			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
 
 
 	if nbr_players > 3:
 		for b in range(10,10+zoneSize):
 			for a in range(size[1]-10,size[1]-10+zoneSize):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = None
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
 				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
 
-		out[size[1]-10+1][10+1]["obj"] = "spawn_3"
+		out[size[1]-10+1][10+1].pointer_to_entity = "spawn_3"
 
 		for b in range(9,9+zoneSize+2,zoneSize+1):
 			for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
-				out[a][b]["tile"] = "grass"
-				out[a][b]["obj"] = "berry"
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
 
 
 
-	# # genere la sprite
-	# for x in range(size[0]):
-	# 	for y in range(size[1]):
-	# 		out[x][y].init_sprite()
+	# genere la sprite
+	for x in range(size[0]):
+		for y in range(size[1]):
+			out[x][y].init_sprite()
 
-	tile_map = [[Tile(out[x][y]["tile"], Vector(x,y), out[x][y]["obj"]) for y in range(size[1])] for x in range(size[0])]
-	return tile_map
+	return out
 
 
 #a = process_array(perlin_array())
