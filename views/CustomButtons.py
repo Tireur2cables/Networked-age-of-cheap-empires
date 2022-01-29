@@ -155,17 +155,8 @@ class ConstructButton(arcade.gui.UITextureButton) :
 		#On initialise à zero au cas ou le player changerai d avis sur ce qu il veut construire
 		self.game.game_view.reset_construct_flags()
 
-		if self.text == "StoragePit" :
-			self.game.game_view.StoragePitRequest = 1
-		elif self.text == "House" :
-			self.game.game_view.HouseRequest = 1
-		elif self.text == "Granary" :
-			self.game.game_view.GranaryRequest = 1
-		elif self.text == "Barracks" :
-			self.game.game_view.BarracksRequest = 1
-		elif self.text == "TownCenter" :
-			self.game.game_view.TownCenterRequest = 1
-
+		if self.text in ("StoragePit", "House", "Granary", "Barracks", "TownCenter"):
+			self.game.game_view.build_request = self.text.lower()
 
 class ActionButton(arcade.gui.UITextureButton) :
 	def __init__(self, text, width, height, batiment, aoce_game, image) :

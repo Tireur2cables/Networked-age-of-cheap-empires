@@ -86,11 +86,7 @@ class View():
 
 
 	def reset_construct_flags(self) :
-		self.HouseRequest = 0
-		self.StoragePitRequest = 0
-		self.GranaryRequest = 0
-		self.BarracksRequest = 0
-		self.TownCenterRequest = 0
+		self.build_request = ""
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -188,18 +184,10 @@ class View():
 		self.tile_sprite_list.draw(pixelated=True)
 
 		#Affichage des sprites des batiments suivant la souris avant d etre pose
-		if self.HouseRequest == 1 :
-			path = "Ressources/img/zones/buildables/house.png"
-		elif self.StoragePitRequest == 1 :
-			path = "Ressources/img/zones/buildables/storagepit.png"
-		elif self.GranaryRequest == 1 :
-			path = "Ressources/img/zones/buildables/granary.png"
-		elif self.TownCenterRequest == 1 :
-			path = "Ressources/img/zones/buildables/towncenter.png"
-		elif self.BarracksRequest == 1 :
-			path = "Ressources/img/zones/buildables/barracks.png"
-		build_sprite = arcade.Sprite(path, scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
-		build_sprite.draw(pixelated=True)
+		if self.build_request:
+			path = f"Ressources/img/zones/buildables/{self.build_request}.png"
+			build_sprite = arcade.Sprite(path, scale=0.7, center_x=self.mouse_x + self.camera.position.x, center_y=self.mouse_y + self.camera.position.y)
+			build_sprite.draw(pixelated=True)
 
 
 		# for s in self.tile_sprite_list:
@@ -355,21 +343,9 @@ class View():
 
 		elif button == arcade.MOUSE_BUTTON_LEFT :
 			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
-			if self.HouseRequest == 1 :
-				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
-				self.HouseRequest = 0
-			elif self.StoragePitRequest == 1 :
-				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
-				self.StoragePitRequest = 0
-			elif self.GranaryRequest == 1 :
-				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
-				self.GranaryRequest = 0
-			elif self.BarracksRequest == 1 :
-				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
-				self.BarracksRequest = 0
-			elif self.TownCenterRequest == 1 :
-				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "TownCenter")
-				self.TownCenterRequest = 0
+			if self.build_request:
+				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, self.build_request)
+				self.build_request = ""
 			else:
 				closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 				if closest_unit_sprites:
