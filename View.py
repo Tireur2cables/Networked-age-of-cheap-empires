@@ -101,8 +101,8 @@ class View():
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
 				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG", width=width, height=height,
-				text_color=(255, 255, 255, 255), 
-				#player = self.game.players["player"]
+				text_color=(255, 255, 255, 255),
+				game = self.game
 			)
 
 		self.cheat_pane = arcade.gui.UITexturePane(self.cheatsinput, tex=bg_text)
@@ -384,34 +384,39 @@ class View():
 			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
-		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-		if self.game.game_controller.unit_in_selection("player"):
-			if self.mode == "move":
-				if symbol == arcade.key.F: # cheat window
-					self.triggerCheatInput()
-				elif symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-					self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone))
-				elif symbol == arcade.key.B:
-					self.mode = "build"
-					print("build mode!")
-			elif self.mode == "build":
-				if symbol == arcade.key.H: # Build something
-					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
-				elif symbol == arcade.key.S:
-					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
-				elif symbol == arcade.key.G:
-					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
-				elif symbol == arcade.key.B:
-					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
-				elif symbol == arcade.key.D:
-					self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
-				self.mode = "move"
-				print("move mode!")
+
+		if symbol == arcade.key.ENTER:
+			self.cheatsinput.on_enter_pressed()
+
+		if symbol == arcade.key.F: # cheat window
+			self.triggerCheatInput()
 		else:
-			if symbol == arcade.key.V:
-				self.game.game_controller.human_order_with_zone("populate", "player")
-			elif symbol == arcade.key.C:
-				self.game.game_controller.human_order_with_zone("train clubman", "player")
+			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
+			if self.game.game_controller.unit_in_selection("player"):
+				if self.mode == "move":
+					if symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
+						self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone))
+					elif symbol == arcade.key.B:
+						self.mode = "build"
+						print("build mode!")
+				elif self.mode == "build":
+					if symbol == arcade.key.H: # Build something
+						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
+					elif symbol == arcade.key.S:
+						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
+					elif symbol == arcade.key.G:
+						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
+					elif symbol == arcade.key.B:
+						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
+					elif symbol == arcade.key.D:
+						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
+					self.mode = "move"
+					print("move mode!")
+			else:
+				if symbol == arcade.key.V:
+					self.game.game_controller.human_order_with_zone("populate", "player")
+				elif symbol == arcade.key.C:
+					self.game.game_controller.human_order_with_zone("train clubman", "player")
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
 		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))

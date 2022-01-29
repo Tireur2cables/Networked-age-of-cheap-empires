@@ -269,7 +269,6 @@ class AI(Player):
 							impossible_actions.add(action)
 
 					elif (action := ("build", "barracks")) not in (ongoing_actions | impossible_actions) and not self.my_zones_contains(Barracks):
-						print("mais what sérieuuuuux")
 						map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
 						if map_position is not None:
 							self.game.game_controller.order_build(unit, map_position, "barracks")
