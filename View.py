@@ -59,6 +59,7 @@ class View():
 	def setup(self) :
 		#clear old lists
 		self.tile_sprite_list = arcade.SpriteList()
+		self.sorted_sprite_list = arcade.SpriteList()
 
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
 		self.reset_construct_flags()
@@ -116,18 +117,16 @@ class View():
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
 
+		self.HEIGHT_LABEL = self.minimap.size[1] / 5 # in order to have same height as minimap at the end
+		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 		player = self.game.players.get("player")
 		if player is not None:
 			# Create a vertical BoxGroup to align buttons
 			self.v_box1 = arcade.gui.UIBoxLayout()
 
-
 			player_resources = player.resources
 			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
-
-			self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
-			self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 			# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 			for val in resources_tab :

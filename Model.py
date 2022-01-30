@@ -34,9 +34,8 @@ class Model():
 
 		# pre game view infos
 		self.players = players
-		self.default_ressources = ressources
 		self.map_seed = map_seed
-		print(ressources)
+		#print(ressources)
 
 
 		# Set up the villager and add it to the unit_list.
