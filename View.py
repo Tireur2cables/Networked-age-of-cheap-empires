@@ -195,9 +195,9 @@ class View():
 
 		#Affichage des sprites des batiments suivant la souris avant d etre pose
 		if self.build_request:
-			path = f"Ressources/img/zones/buildables/{self.build_request}.png"
-			pos = grid_pos_to_iso(iso_to_grid_pos(Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)) + Vector(1, 1))
-			build_sprite = arcade.Sprite(path, scale=0.7, center_x=pos.x, center_y=pos.y)
+			pos = grid_pos_to_iso(iso_to_grid_pos(Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)))
+			sprite_data = WorkSite.get_zone_class(self.build_request).sprite_data
+			build_sprite = arcade.Sprite(filename=sprite_data.file, scale=sprite_data.scale, center_x=pos.x + sprite_data.x_offset, center_y=pos.y + sprite_data.y_offset)
 			build_sprite.draw(pixelated=True)
 			self.count_time = 0
 
@@ -244,7 +244,7 @@ class View():
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.BLUE)
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.YELLOW, nbr_health_bar=2)
 						elif isinstance(aimed_entity, WorkSite) and aimed_entity.faction == unit.faction:
-							self.draw_bar(unit.iso_position, int(unit.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
+							self.draw_bar(unit.iso_position, int(aimed_entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Unit):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Buildable) and aimed_entity.faction != unit.faction:

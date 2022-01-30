@@ -115,6 +115,7 @@ class TownCenter(Buildable):
 	#LineOfSight : 7
 	#Equiv AOE2: TownCenter
 	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	sprite_data = SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 200, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 60
 	cost=(Res.WOOD, 200)
@@ -126,7 +127,7 @@ class TownCenter(Buildable):
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		can_produce=True,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
+		sprite_data=TownCenter.sprite_data,
 		faction=faction,
 		health=10 if LAUNCH_PAPER_TOWNCENTER else 600,
 		line_sight=7)
@@ -143,6 +144,7 @@ class Barracks(Buildable):
 	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
 	#Equiv AOE2: Barracks
 	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	sprite_data = SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 125, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 125)
@@ -152,7 +154,7 @@ class Barracks(Buildable):
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		can_produce=True,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20),
+		sprite_data=Barracks.sprite_data,
 		faction=faction,
 		health=350)
 
@@ -199,6 +201,7 @@ class StoragePit(Buildable):
 	#LineOfSight:4
 	#Equiv AOE2: Lumber Camp & Mining Camp
 	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	sprite_data = SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - TILE_HEIGHT//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 120)
@@ -208,7 +211,7 @@ class StoragePit(Buildable):
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
 		faction=faction,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - 10),
+		sprite_data=StoragePit.sprite_data,
 		health=350)
 
 	@staticmethod
@@ -219,6 +222,7 @@ class Granary(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
 	#Equiv AOE2: Mill
 	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 120)
@@ -227,7 +231,7 @@ class Granary(Buildable):
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15),
+		sprite_data=Granary.sprite_data,
 		faction=faction,
 		health=350)
 
@@ -240,6 +244,7 @@ class Dock(Buildable):
 	#WhoAmI : Cost : 100 Wood; Use : Train & upgrade ships
 	#Equiv AOE2: Dock
 	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 35
 	cost=(Res.WOOD, 100)
@@ -248,7 +253,7 @@ class Dock(Buildable):
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10),
+		sprite_data=Dock.sprite_data,
 		faction=faction,
 		health=600)
 
@@ -256,6 +261,7 @@ class House(Buildable):
 	#WhoAmI : Cost : 30 Wood; Use : +4 population per house
 	#Equiv AOE2: House
 	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
+	sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 30, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 25
 	cost=(Res.WOOD, 30)
@@ -264,7 +270,7 @@ class House(Buildable):
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10),
+		sprite_data=House.sprite_data,
 		faction=faction,
 		health=75)
 
@@ -322,40 +328,44 @@ class Resources(Zone):
 
 
 class Wood(Resources):
+	sprite_data = SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT//2 + 5)
 	tile_size = (1, 1)
 
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/resources/tree.png", scale=1, x_offset=-5, y_offset=187//2 - TILE_HEIGHT//2 + 5),
+		sprite_data=Wood.sprite_data,
 		health=25,
 		amount=10)
 
 class Stone(Resources):
+	sprite_data = SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2)
 	tile_size = (1, 1)
 
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
-		sprite_data=SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
+		sprite_data=Stone.sprite_data,
 		health=0,
 		amount=250)
 
 class Gold(Resources):
+	sprite_data = SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2)
 	tile_size = (1, 1)
 
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
-		sprite_data=SpriteData("Ressources/img/zones/resources/goldmine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2),
+		sprite_data=Gold.sprite_data,
 		health=0,
 		amount=450)
 
 class BerryBush(Resources):
+	sprite_data = SpriteData("Ressources/img/zones/resources/berrybush.png", scale=1, y_offset=63//2 - TILE_HEIGHT//2)
 	tile_size = (1, 1)
 
 	def __init__(self, grid_position):
 		super().__init__(grid_position,
 		is_locking=True,
-		sprite_data=SpriteData("Ressources/img/zones/resources/berrybush.png", scale=1, y_offset=63//2 - TILE_HEIGHT//2),
+		sprite_data=BerryBush.sprite_data,
 		health=0,
 		amount=150)

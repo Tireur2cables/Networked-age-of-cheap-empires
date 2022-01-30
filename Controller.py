@@ -153,12 +153,16 @@ class Controller():
 					self.order_harvest(entity, zone_found)
 				else :
 					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
+					worksite_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(WorkSite,faction))
 					stock_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
-					if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0 : #stock zone found and resources to stock
+					if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0: #stock zone found and resources to stock
 						self.order_stock_resources(entity, stock_found)
-					elif isinstance(entity, Villager) and zone_found : # zone of faction found, ask repairation
+
+					elif isinstance(entity, Villager) and worksite_found:
+						self.order_resume_build(entity, worksite_found)
+					elif isinstance(entity, Villager) and zone_found: # zone of faction found, ask repairation
 						self.order_repairation(entity, zone_found)
-					else :
+					else:
 						other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
 						if other_zone_found: # no ally zone
 							self.order_attack(entity, other_zone_found)
@@ -292,6 +296,22 @@ class Controller():
 			#Pour le GUI, on leve un flag pour le message d erreur
 			if entity.faction == "player":
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+
+	# Called once
+	def order_resume_build(self, entity, worksite):
+		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
+
+		# Step 1: Search the closest tile near the worksite to resume the building.
+		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(worksite.iso_position))
+
+		# Step 2: Start moving toward the aimed entity
+		if aimed_tile is not None:
+			entity.set_goal("build")
+			entity.set_aimed_entity(worksite)
+			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
+				entity.is_interacting = True
+			else:
+				self.move_entity(entity, aimed_tile.grid_position, False)
 
 	def order_zone_units(self, producing_zone, entity_produced = ""):
 
@@ -455,10 +475,6 @@ class Controller():
 				self.produce_units(entity, delta_time)
 
 		# --- Deleting dead entities ---
-		for worksite in self.working_sites:
-			if worksite.entity_building.aimed_entity != worksite:
-				self.dead_entities.add(worksite)
-
 		for dead_entity in self.dead_entities:
 			print("DEAD ENTITY DETECTED")
 			self.discard_entity_from_game(dead_entity)
@@ -484,12 +500,12 @@ class Controller():
 
 	# Called every frame
 	def build_zone(self, entity, delta_time):
-		entity.action_timer += delta_time
-		if entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
+		entity.aimed_entity.action_timer += delta_time
+		if entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
 
-			current_player.aimed_entity = None
+			self.discard_entity_from_game(entity.aimed_entity)
 
 			if current_player.can_create(entity.aimed_entity.zone_to_build):
 				cost = entity.aimed_entity.zone_to_build.cost
@@ -500,6 +516,8 @@ class Controller():
 				self.add_entity_to_game(entity.aimed_entity.create_zone())
 			elif entity.faction == "player" :
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+
+			entity.aimed_entity = None
 			entity.end_goal()
 
 	# Called every frame when an action is done on a zone (harvesting).
