@@ -28,6 +28,7 @@ class Controller():
 		self.dead_entities = set()
 		self.ai = set()
 		self.players = set()
+		self.working_sites = set()
 
 	def setup(self, players_dict: dict):
 		self.selection["player"] = set()
@@ -80,6 +81,9 @@ class Controller():
 		self.game.game_view.add_sprite(new_entity.sprite)
 		self.game.game_view.update_resources_gui()
 
+		if isinstance(new_entity, WorkSite):
+			self.working_sites.add(new_entity)
+
 	def discard_entity_from_game(self, dead_entity):
 		dead_entity.is_dead = True
 		if (selection_set := self.selection.get(dead_entity.faction)):
@@ -91,6 +95,9 @@ class Controller():
 			player.discard_entity(dead_entity)
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
+
+		if isinstance(dead_entity, WorkSite):
+			self.working_sites.discard(dead_entity)
 
 	def discard_player_from_game(self, player: Player):
 		for entity in player.my_units | player.my_zones:
@@ -251,29 +258,29 @@ class Controller():
 	# Called once
 	def order_build(self, entity, map_position, building_name):
 		# Step 1: Create a worksite with the building_name
-		worksite = WorkSite(map_position, entity.faction, building_name)
-		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) >= worksite.zone_to_build.cost[1]:
+		zone_to_build_class = WorkSite.get_zone_class(building_name)
+		if self.game.players[entity.faction].get_resource(zone_to_build_class.cost[0]) >= zone_to_build_class.cost[1]:
 			#Pour le gui, on baisse le flag si on peut finalement construire
 			if entity.faction == "player":
 				self.game.game_view.errorMessage = ""
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
-
-				if not self.game.game_model.map.is_area_on_map(map_position, worksite.zone_to_build.tile_size):
+				if not self.game.game_model.map.is_area_on_map(map_position, zone_to_build_class.tile_size):
 					print("out of bound!")
 					return
 
-				if not self.game.game_model.map.is_area_empty(map_position, worksite.zone_to_build.tile_size):
+				if not self.game.game_model.map.is_area_empty(map_position, zone_to_build_class.tile_size):
 					print("area not empty!")
 					return
 
-				# Step 4: if possible (no return), move one tile below the first tile of the building.
+				# Step 4: if possible (no return), move one tile below the first tile of the building and create the worksite
+				worksite = WorkSite(map_position, entity.faction, building_name, entity)
 				entity.set_goal("build")
+				self.add_entity_to_game(worksite)
 				entity.set_aimed_entity(worksite)
 				aim = map_position - Vector(1,1)
 
-				# TODO: RESERVER LES TILES à l'avance !!! ---> Sinon pendant le temps de construction on peut en mettre d'autres par dessus.
 				if iso_to_grid_pos(entity.iso_position) == aim:
 					entity.is_interacting = True
 				else:
@@ -352,7 +359,8 @@ class Controller():
 				self.move_entity(entity, aimed_tile.grid_position)
 
 	def end_game(self):
-		print("youpiiii !!!")
+		# print("youpiiii !!!")
+		pass
 
 # --- On_update (Called every frame) ---
 
@@ -447,6 +455,10 @@ class Controller():
 				self.produce_units(entity, delta_time)
 
 		# --- Deleting dead entities ---
+		for worksite in self.working_sites:
+			if worksite.entity_building.aimed_entity != worksite:
+				self.dead_entities.add(worksite)
+
 		for dead_entity in self.dead_entities:
 			print("DEAD ENTITY DETECTED")
 			self.discard_entity_from_game(dead_entity)
@@ -476,6 +488,9 @@ class Controller():
 		if entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
+
+			current_player.aimed_entity = None
+
 			if current_player.can_create(entity.aimed_entity.zone_to_build):
 				cost = entity.aimed_entity.zone_to_build.cost
 				current_player.sub_resource(*cost)

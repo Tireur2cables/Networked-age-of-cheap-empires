@@ -62,15 +62,30 @@ class Buildable(Zone):
 
 class WorkSite(Zone):
 	# == In progess building, Not Implemented Yet.
-	def __init__(self, grid_position, faction, name_zone_to_build, **kwargs):
+	def __init__(self, grid_position, faction, name_zone_to_build, entity_building, **kwargs):
+		self.zone_to_build = self.get_zone_class(name_zone_to_build.lower())
+		self.entity_building = entity_building
+		tile_size = self.zone_to_build.tile_size[0]
+
+		self.tile_size = (tile_size, tile_size)
+
+		sprite_data = None
+		if tile_size == 1:
+			sprite_data = SpriteData(f"Ressources/img/zones/buildables/Rubble{tile_size}x{tile_size}.png", scale=0.7, y_offset=51//2 - TILE_HEIGHT//2)
+		elif tile_size == 2:
+			sprite_data = SpriteData(f"Ressources/img/zones/buildables/Rubble{tile_size}x{tile_size}.png", scale=0.7, y_offset=79//2 - TILE_HEIGHT//2)
+		elif tile_size == 3:
+			sprite_data = SpriteData(f"Ressources/img/zones/buildables/Rubble{tile_size}x{tile_size}.png", scale=0.7, y_offset=122//2 - TILE_HEIGHT)
+		elif tile_size == 4:
+			sprite_data = SpriteData(f"Ressources/img/zones/buildables/Rubble{tile_size}x{tile_size}.png", scale=0.7, y_offset=156//2 - TILE_HEIGHT)
+
 		super().__init__(grid_position,
-		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12), # not used for now
+		sprite_data=sprite_data,
 		faction=faction,
 		**kwargs)
-		self.zone_to_build = self.get_zone_class(name_zone_to_build.lower())
 
 	@staticmethod
-	def get_zone_class(name_zone):
+	def get_zone_class(name_zone) -> Buildable:
 		if name_zone == "house":
 			return House
 		elif name_zone == "storagepit":
