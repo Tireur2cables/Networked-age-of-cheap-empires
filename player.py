@@ -22,6 +22,7 @@ class Player:
 		"""
 		self.game = game
 		self.player_type = player_type
+		self.is_alive = True
 
 		# resource (dictionnary initialized with qty[Resource]
 		# BE CAREFUL: The dictionnary "resources" is the same for all players, this is why we create a new one with this comprehension.
@@ -203,6 +204,10 @@ class AI(Player):
 		return False
 
 	def on_update(self, delta_time):
+
+		if not self.is_alive:
+			return
+
 		self.delta_time += delta_time
 
 		if self.delta_time < 0.5:

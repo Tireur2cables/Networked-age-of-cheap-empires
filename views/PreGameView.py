@@ -13,7 +13,6 @@ class PreGameView(arcade.View) :
 		super().__init__()
 		self.main_view = main_view
 		self.nbAdv = nbAdv
-		self.isPlayer = True
 
 	def setup(self) :
 		# add an UIManager to handle the UI.

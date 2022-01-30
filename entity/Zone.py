@@ -4,7 +4,7 @@ from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
 
-from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS
+from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS, LAUNCH_PAPER_TOWNCENTER
 
 # ----- GENERAL CLASS -----
 class Zone(Entity):
@@ -114,7 +114,7 @@ class TownCenter(Buildable):
 		can_produce=True,
 		sprite_data=SpriteData("Ressources/img/zones/buildables/towncenter.png", scale=0.7, y_offset=253//2 - TILE_HEIGHT//2 - 12),
 		faction=faction,
-		health=600,
+		health=10 if LAUNCH_PAPER_TOWNCENTER else 600,
 		line_sight=7,
 		name="TownCenter")
 		self.is_producing = False

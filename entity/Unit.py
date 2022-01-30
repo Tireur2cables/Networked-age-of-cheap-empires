@@ -1,4 +1,5 @@
-from LAUNCH_SETUP import LAUNCH_FAST_ACTIONS, LAUNCH_LIGHTSPEED_MOVES
+import random
+from LAUNCH_SETUP import LAUNCH_DISABLE_RANDOM_PLACEMENT, LAUNCH_FAST_ACTIONS, LAUNCH_LIGHTSPEED_MOVES
 from entity.Entity import Entity
 from utils.SpriteData import SpriteData
 from CONSTANTS import Resource as Res
@@ -74,6 +75,10 @@ class Unit(Entity):
 	# Function for movement, may change in the future when pathfinding will be needed.
 	def next_aim(self):
 		self.aim = grid_pos_to_iso(Vector(*self.path.pop(0)))
+
+		if not LAUNCH_DISABLE_RANDOM_PLACEMENT and len(self.path) == 0:
+			self.aim += Vector(random.randint(-8, 8), random.randint(-8, 8))
+
 		# The following calculation is necessary to have uniform speeds :
 		self.change = self.speed * ((self.aim - self.iso_position).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
