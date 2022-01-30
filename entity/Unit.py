@@ -172,7 +172,7 @@ class Military(Unit):#un Militaire est une Unit particuliere
 class Militia(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 20, Res.STONE : 0}
 	creation_time = 21
-	SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2)
+	sprite_data = SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2)
 	speed=0.9
 	max_health = 40
 	damage = 4

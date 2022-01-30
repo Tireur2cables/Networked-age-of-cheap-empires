@@ -10,6 +10,8 @@ class Tile():
 		self.pointer_to_entity = pointer_to_entity  # For now, pointer_to_entity is never used.
 
 		self.is_free = 1
+		self.build_guard = False  # If is_free == 0, this doesn't change anything. If is_free == 1 but build_guard = True, you cannot build.
+
 		if blockID == "water":
 			self.is_free = 0
 

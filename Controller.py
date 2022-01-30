@@ -274,11 +274,11 @@ class Controller():
 					print("out of bound!")
 					return
 
-				if not self.game.game_model.map.is_area_empty(map_position, zone_to_build_class.tile_size):
-					print("area not empty!")
+				if not self.game.game_model.map.is_area_buildable(map_position, zone_to_build_class.tile_size):
+					print("area not available!")
 					return
 
-				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_empty(map_position - Vector(1, 1), (1, 1)):
+				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1)):
 					print("no space to produce units!")
 					return
 
