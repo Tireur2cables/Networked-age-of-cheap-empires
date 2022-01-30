@@ -90,9 +90,12 @@ class Controller():
 			selection_set.discard(dead_entity)
 		self.game.game_view.update_resources_gui()
 
-		player = self.game.players.get(dead_entity.faction)
-		if player is not None:
-			player.discard_entity(dead_entity)
+		for player in self.game.players.values():
+			player.discard_from_selection(dead_entity)
+
+		owner = self.game.players.get(dead_entity.faction)
+		if owner is not None:
+			owner.discard_entity(dead_entity)
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
 
@@ -510,19 +513,20 @@ class Controller():
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
 
+			worksite = entity.aimed_entity
 			self.discard_entity_from_game(entity.aimed_entity)
+			entity.aimed_entity = None
 
-			if current_player.can_create(entity.aimed_entity.zone_to_build):
-				cost = entity.aimed_entity.zone_to_build.cost
+			if current_player.can_create(worksite.zone_to_build):
+				cost = worksite.zone_to_build.cost
 				current_player.sub_resource(*cost)
 				if entity.faction == "player":
 					self.game.game_view.update_resources_gui()
 
-				self.add_entity_to_game(entity.aimed_entity.create_zone())
+				self.add_entity_to_game(worksite.create_zone())
 			elif entity.faction == "player" :
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
-			entity.aimed_entity = None
 			entity.end_goal()
 
 	# Called every frame when an action is done on a zone (harvesting).

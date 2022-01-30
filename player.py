@@ -65,6 +65,13 @@ class Player:
 				self.other_storage.add(new_entity)
 
 
+	def discard_from_selection(self, dead_entity):
+		for unit in self.my_units:
+			if unit.aimed_entity == dead_entity:
+				unit.aimed_entity = None
+				unit.end_goal()
+
+
 	def discard_entity(self, dead_entity):
 		if isinstance(dead_entity, Unit):
 			self.my_units.discard(dead_entity)
