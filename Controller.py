@@ -383,6 +383,24 @@ class Controller():
 			else:
 				self.move_entity(entity, aimed_tile.grid_position)
 
+	def order_upgradebuilding(self, upgradeIt:Buildable):
+		if (upgradeIt.upgrade_cost[upgradeIt.upgrade_level] != None):
+			current_player = self.game.players[upgradeIt.faction]
+			current_player.sub_resource(upgradeIt.upgrade_cost[upgradeIt.upgrade_level])
+			if isinstance(upgradeIt,Barracks):
+				upgradeIt.Barracks_upgrade()
+			elif isinstance(upgradeIt,House):
+				upgradeIt.House_upgrade()
+			elif isinstance(upgradeIt,Dock):
+				#upgradeIt.Dock_upgrade()
+				pass
+			elif isinstance(upgradeIt,Granary):
+				upgradeIt.Granary_upgrade()
+			elif isinstance(upgradeIt,StoragePit):
+				upgradeIt.StoragePit_upgrade()
+			elif isinstance(upgradeIt,TownCenter):
+				upgradeIt.TownCenter_upgrade()
+
 	def end_game(self):
 		# print("youpiiii !!!")
 		pass
