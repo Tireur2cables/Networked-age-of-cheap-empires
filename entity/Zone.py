@@ -123,6 +123,7 @@ class TownCenter(Buildable):
 	tile_size=(4, 4) # (3, 3) sur AOE
 	villager_cooldown_upgr = 3 if LAUNCH_FAST_ACTIONS else 20 # in seconds
 	villager_cost_upgr = (Res.FOOD, 50)
+	# Problème : Le unit_cooldown et cost sont des variables d'instance, et devraient être des variables de classe...
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
@@ -238,6 +239,7 @@ class StoragePit(Buildable):
 	def StoragePit_upgrade():
 		StoragePit.upgrade_level=StoragePit.upgrade_level+1
 		StoragePit.cost=(Res.WOOD,100)
+		StoragePit.creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
 
 class Granary(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
@@ -264,6 +266,7 @@ class Granary(Buildable):
 	def Granary_upgrade():
 		Granary.upgrade_level=Granary.upgrade_level+1
 		Granary.cost=(Res.WOOD,90)
+		Granary.creation_cost = {Res.FOOD : 0, Res.WOOD : 90, Res.GOLD : 0, Res.STONE : 0}
 
 
 class Dock(Buildable):
@@ -312,6 +315,7 @@ class House(Buildable):
 	def House_upgrade():
 		House.upgrade_level=House.upgrade_level+1
 		House.cost=(Res.WOOD,20)
+		House.creation_cost = {Res.FOOD : 0, Res.WOOD : 20, Res.GOLD : 0, Res.STONE : 0}
 
 
 
