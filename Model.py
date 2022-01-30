@@ -86,7 +86,7 @@ class Model():
 			self.map.reserve_tile_at(new_entity.grid_position, new_entity.tile_size)
 
 			if isinstance(new_entity, (TownCenter, Barracks)):
-				self.map.reserve_tile_at(new_entity.grid_position - Vector(1,1), (1,1))
+				self.map.set_build_guard(new_entity.grid_position - Vector(1,1))
 
 	def discard_entity(self, dead_entity):
 		if isinstance(dead_entity, Unit) and dead_entity in self.unit_list:
@@ -96,4 +96,4 @@ class Model():
 			self.map.free_tile_at(dead_entity.grid_position, dead_entity.tile_size)
 
 			if isinstance(dead_entity, (TownCenter, Barracks)):
-				self.map.free_tile_at(dead_entity.grid_position - Vector(1,1), (1,1))
+				self.map.remove_build_guard(dead_entity.grid_position - Vector(1,1))
