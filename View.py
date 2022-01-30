@@ -52,14 +52,14 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.sorted_sprite_list = arcade.SpriteList()
 
-		self.mode = "move"
-
 		self.resource_label_list = []
 
 	def setup(self) :
 		#clear old lists
 		self.tile_sprite_list = arcade.SpriteList()
 		self.sorted_sprite_list = arcade.SpriteList()
+
+		self.resource_label_list = []
 
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
 		self.reset_construct_flags()
@@ -595,6 +595,7 @@ class View():
 		player = self.game.players.get("player")
 		if player is not None:
 			player_resources = player.resources
+			print(player_resources)
 			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 			for label, resource_text in zip(self.resource_label_list, resources_tab):
 				label.text = resource_text

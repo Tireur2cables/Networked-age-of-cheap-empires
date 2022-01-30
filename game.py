@@ -107,7 +107,7 @@ class GameView(arcade.View):
 			else:
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", resources)
 				i += 1
-		print(self.players)
+		#print(self.players)
 
 
 	def setup(self, ressources, players, map_seed):
