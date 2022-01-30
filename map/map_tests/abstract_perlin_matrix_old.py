@@ -1,5 +1,4 @@
 #from map.map import Map
-from LAUNCH_SETUP import LAUNCH_SAFEWAY_SAND
 from map.tile import Tile#, TileSprite
 
 from entity.Zone import Gold, Stone, Wood #, Zone,Resources
@@ -119,65 +118,10 @@ def perlin_array2(size = (50, 50),
 	arr = norm_me(arr)
 	return arr
 
-def reserve_towncenter(out, position, zone_size, spawn_id, text_pos, map_size=(100,100)):
-	for a in range(position.x, position.x + zone_size):
-		for b in range(position.y, position.y + zone_size):
-			out[a][b]["tile"] = "grass"
-			out[a][b]["obj"] = None
-
-	out[position.x + 1][position.y + 1]["obj"] = f"spawn_{spawn_id}"
-
-	for a in range(position.x - 1, position.x + zone_size + 2, zone_size + 1):
-		for b in range(position.y - 1, position.y + zone_size + 2, zone_size + 1):
-			out[a][b]["tile"] = "grass"
-			out[a][b]["obj"] = "berry"
-
-	tile_type = "sand" if LAUNCH_SAFEWAY_SAND else "grass"
-
-	if text_pos == "bottom":
-		for diag in range(0, 40):
-			out[position.x + diag][position.y + diag]["tile"] = tile_type
-
-			out[position.x + diag + 1][position.y + diag]["tile"] = tile_type
-			out[position.x + diag + 2][position.y + diag]["tile"] = tile_type
-
-			out[position.x + diag][position.y + diag + 1]["tile"] = tile_type
-			out[position.x + diag][position.y + diag + 2]["tile"] = tile_type
-
-	elif text_pos == "top":
-		for diag in range(0, 40):
-			out[position.x - diag][position.y - diag]["tile"] = tile_type
-
-			out[position.x - diag - 1][position.y - diag]["tile"] = tile_type
-			out[position.x - diag - 2][position.y - diag]["tile"] = tile_type
-
-			out[position.x - diag][position.y - diag - 1]["tile"] = tile_type
-			out[position.x - diag][position.y - diag - 2]["tile"] = tile_type
-
-	elif text_pos == "left":
-		for diag in range(0, 40):
-			out[position.x + diag][position.y - diag]["tile"] = tile_type
-
-			out[position.x + diag + 1][position.y - diag]["tile"] = tile_type
-			out[position.x + diag + 2][position.y - diag]["tile"] = tile_type
-
-			out[position.x + diag][position.y - diag - 1]["tile"] = tile_type
-			out[position.x + diag][position.y - diag - 2]["tile"] = tile_type
-
-	elif text_pos == "right":
-		for diag in range(0, 40):
-			out[position.x - diag][position.y + diag]["tile"] = tile_type
-
-			out[position.x - diag - 1][position.y + diag]["tile"] = tile_type
-			out[position.x - diag - 2][position.y + diag]["tile"] = tile_type
-
-			out[position.x - diag][position.y + diag + 1]["tile"] = tile_type
-			out[position.x - diag][position.y + diag + 2]["tile"] = tile_type
-
 def process_array2(size = (50,50), seed=None, nbr_players=1):
-	# baseTile = Tile("grass", 0,0,None)
+	#baseTile = Tile("grass", 0,0,None)
 	# default => grass everywhere
-	out = [[{"tile": "grass", "obj": None} for y in range(size[1])] for x in range(size[0])]
+	out = [[Tile("grass", Vector(x, y)) for y in range(size[1])] for x in range(size[0])]
 	if seed is None:
 		seed = np.random.randint(0, 100)
 		print("seed was {}".format(seed))
@@ -190,9 +134,10 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 				#grass by default
 				pass
 			elif array[x][y] < 0.75:
-				out[x][y]["tile"] = "sand"
+				out[x][y].blockID = "sand"
 			else:
-				out[x][y]["tile"] = "water"
+				out[x][y].blockID = "water"
+				out[x][y].is_free = 0
 
 	# layer 2 => ressources
 	#trees
@@ -200,38 +145,127 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 	array = perlin_array2(size=size, seed=seed, octaves=20, scale=8)
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] > 0.75 and out[x][y]["tile"] != "water":
-				out[x][y]["obj"] = "tree"
+			if array[x][y] > 0.75 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "tree"
 
 	#gold
 	seed = (seed+5)%100
 	array = perlin_array2(size=size, seed=seed, octaves=20, scale=4)
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] > 0.87 and out[x][y]["tile"] != "water":
-				out[x][y]["obj"]= "gold"
+			if array[x][y] > 0.87 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "gold"
 
 	#stone
 	seed = (seed+5)%100
 	array = perlin_array2(size=size, seed=seed, octaves=20, scale=4)
 	for x in range(size[0]):
 		for y in range(size[1]):
-			if array[x][y] > 0.89 and out[x][y]["tile"] != "water":
-				out[x][y]["obj"]= "stone"
+			if array[x][y] > 0.89 and out[x][y].blockID != "water":
+				out[x][y].pointer_to_entity = "stone"
 
+	#finding somewhere to put TownCenter
+	# nbofFreeTiles=0
 	zoneSize=6
+	# stop=0
+
+	# for x in range(size[0]):
+	# 	if stop == 1:
+	# 			break
+	# 	for y in range(size[1]):
+	# 		if stop == 1:
+	# 			break
+	# 		nbofFreeTiles=0
+	# 		for a in range(x,x+zoneSize):
+	# 			for b in range(y,y+zoneSize):
+	# 				if out[a][b].blockID == "water":
+	# 					nbofFreeTiles=0
+	# 					continue
+	# 				else:
+	# 					nbofFreeTiles+=1
+	# 		if nbofFreeTiles==zoneSize*zoneSize:
+	# 			towncenterpos=Vector(x,y)
+	# 			stop=1
+
 
 	if nbr_players > 0:
-		reserve_towncenter(out, Vector(10, 10), zoneSize, 0, text_pos="bottom")
-	if nbr_players > 1:
-		reserve_towncenter(out, Vector(size[0] - 10, size[1] - 10), zoneSize, 1, text_pos="top")
-	if nbr_players > 2:
-		reserve_towncenter(out, Vector(10, size[1] - 10), zoneSize, 2, text_pos="left")
-	if nbr_players > 3:
-		reserve_towncenter(out, Vector(size[0] - 10, 10), zoneSize, 3, text_pos="right")
+		for a in range(10,10+zoneSize):
+			for b in range(10,10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
 
-	tile_map = [[Tile(out[x][y]["tile"], Vector(x,y), out[x][y]["obj"]) for y in range(size[1])] for x in range(size[0])]
-	return tile_map
+		out[11][11].pointer_to_entity = "spawn_0"
+
+		for a in range(9,9+zoneSize+2,zoneSize+1):
+			for b in range(9,9+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
+
+
+
+	if nbr_players > 1:
+		for a in range(size[0]-10,size[0]-10+zoneSize):
+			for b in range(size[1]-10,size[1]-10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
+				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
+
+		out[size[0]-10+1][size[1]-10+1].pointer_to_entity = "spawn_1"
+
+		for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
+			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
+
+
+
+
+
+	if nbr_players > 2:
+		for a in range(10,10+zoneSize):
+			for b in range(size[1]-10,size[1]-10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
+				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
+
+		out[10+1][size[1]-10+1].pointer_to_entity = "spawn_2"
+
+		for a in range(9,9+zoneSize+2,zoneSize+1):
+			for b in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
+
+
+	if nbr_players > 3:
+		for b in range(10,10+zoneSize):
+			for a in range(size[1]-10,size[1]-10+zoneSize):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = None
+				#if (((a==size[0]-10) or (a==size[0]-10+zoneSize)) and ((b==size[1]-10) or (b==size[1]-10+zoneSize))):
+
+		out[size[1]-10+1][10+1].pointer_to_entity = "spawn_3"
+
+		for b in range(9,9+zoneSize+2,zoneSize+1):
+			for a in range(size[0]-11,size[0]-10+zoneSize+2,zoneSize+1):
+				out[a][b].blockID = "grass"
+				out[a][b].is_free = 1
+				out[a][b].pointer_to_entity = "berry"
+
+
+
+	# genere la sprite
+	for x in range(size[0]):
+		for y in range(size[1]):
+			out[x][y].init_sprite()
+
+	return out
 
 
 #a = process_array(perlin_array())

@@ -6,7 +6,7 @@ from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
 # from game import GameView
-from player import AI
+from player import AI, Player
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -29,7 +29,8 @@ class Controller():
 		self.ai = set()
 		self.players = set()
 
-	def setup(self, players_dict):
+	def setup(self, players_dict: dict):
+		self.selection["player"] = set()
 		for key, value in players_dict.items():
 			self.players.add(value)
 			self.selection[key] = set()
@@ -90,6 +91,11 @@ class Controller():
 			player.discard_entity(dead_entity)
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
+
+	def discard_player_from_game(self, player: Player):
+		for entity in player.my_units | player.my_zones:
+			entity.faction = None
+			self.discard_entity_from_game(entity)
 
 
 
@@ -160,7 +166,7 @@ class Controller():
 					entity.set_goal("move")
 					if self.is_on_map(grid_position):
 						for entity in self.selection[faction]:
-							self.move_entity(entity, grid_position)
+							self.move_entity(entity, grid_position, False)
 					else:
 						print("out of bound!")
 						return
@@ -188,7 +194,6 @@ class Controller():
 		else:
 			path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
-		# TODO: add flag so that the user uses the classical get_path, and the ia uses get_path_fast.
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -313,16 +318,28 @@ class Controller():
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
 
-
+	def end_game(self):
+		print("youpiiii !!!")
 
 # --- On_update (Called every frame) ---
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 
-		# # --- Check End Conditions ---
-		# for player in self.players:
-		# 	player.
+		# --- Check End Conditions ---
+		dead_players = set()
+		for player in self.players:
+			if player.town_center.is_dead == True:
+				self.discard_player_from_game(player)
+				player.is_alive = False
+				dead_players.add(player)
+
+		for dead_player in dead_players:
+			self.players.remove(dead_player)
+			del self.game.players[dead_player.player_type]
+
+		if len(self.game.players) == 1:
+			self.end_game()
 
 		# --- Update AI ---
 		if LAUNCH_ENABLE_IA:
@@ -477,7 +494,8 @@ class Controller():
 			producing_zone.is_producing = False
 			grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
 			Class_produced = producing_zone.class_produced
-			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position), producing_zone.faction))
+			random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
+			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
 
 	def attack_entity(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time

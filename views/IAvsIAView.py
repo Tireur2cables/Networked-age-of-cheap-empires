@@ -7,7 +7,6 @@ class IAPreGameView(PreGameView) :
 
 	def __init__(self, main_view, nbAdv=2) :
 		super().__init__(main_view, nbAdv)
-		self.isPlayer = False
 
 	def setup(self) :
 		# add an UIManager to handle the UI.

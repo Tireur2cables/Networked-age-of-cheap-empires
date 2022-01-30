@@ -20,7 +20,6 @@ class FakeGameView(arcade.View):
 
 		self.ressources_list = ressources_list
 		self.nbIA = nbIA
-		self.isPlayer = isPlayer
 
 		# Variables that will hold sprite lists
 		self.player_list = None
@@ -34,7 +33,6 @@ class FakeGameView(arcade.View):
 		for b in self.ressources_list :
 			print("ressource 1 :", b.child.text)
 		print("nb ia :", self.nbIA)
-		print("is there player in the game :", self.isPlayer)
 
 	def on_show(self):
 		""" Set up the game and initialize the variables. """

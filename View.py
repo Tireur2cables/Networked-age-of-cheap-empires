@@ -110,49 +110,52 @@ class View():
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
 
-		# Create a vertical BoxGroup to align buttons
-		self.v_box1 = arcade.gui.UIBoxLayout()
 
-		player = self.game.players["player"]
-		player_resources = player.resources
-		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+		player = self.game.players.get("player")
+		if player is not None:
+			# Create a vertical BoxGroup to align buttons
+			self.v_box1 = arcade.gui.UIBoxLayout()
 
-		self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
-		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
-		# Create a text label, contenant le nombre de ressources disponibles pour le joueur
-		for val in resources_tab :
-			label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
-			self.resource_label_list.append(label)
-			self.v_box1.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
+			player_resources = player.resources
+			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 
-		# Create a widget to hold the v_box widget, that will center the buttons
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="left",
-				align_x=self.HEIGHT_LABEL + int(self.minimap.size[0]), # just after minimap and icone
-				anchor_y="bottom",
-				child=self.v_box1
+			self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
+			self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
+
+			# Create a text label, contenant le nombre de ressources disponibles pour le joueur
+			for val in resources_tab :
+				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
+				self.resource_label_list.append(label)
+				self.v_box1.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
+
+			# Create a widget to hold the v_box widget, that will center the buttons
+			self.manager.add(
+				arcade.gui.UIAnchorWidget(
+					anchor_x="left",
+					align_x=self.HEIGHT_LABEL + int(self.minimap.size[0]), # just after minimap and icone
+					anchor_y="bottom",
+					child=self.v_box1
+				)
 			)
-		)
 
-		#Icones des ressources
-		self.v_box2 = arcade.gui.UIBoxLayout()
+			#Icones des ressources
+			self.v_box2 = arcade.gui.UIBoxLayout()
 
-		pics_tab = [PIC_CIVIL, PIC_FOOD, PIC_WOOD, PIC_STONE, PIC_GOLD]
-		for val in pics_tab :
-			icone = arcade.gui.UITextureButton(x=0, y=0, width=self.HEIGHT_LABEL, height=self.HEIGHT_LABEL, texture=arcade.load_texture(val))
-			self.v_box2.add(icone.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES_ICONE))
+			pics_tab = [PIC_CIVIL, PIC_FOOD, PIC_WOOD, PIC_STONE, PIC_GOLD]
+			for val in pics_tab :
+				icone = arcade.gui.UITextureButton(x=0, y=0, width=self.HEIGHT_LABEL, height=self.HEIGHT_LABEL, texture=arcade.load_texture(val))
+				self.v_box2.add(icone.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES_ICONE))
 
-		# Create a widget to hold the v_box widget, that will center the buttons
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x="left",
-				align_x=int(self.minimap.size[0]), # just after minimap
-				anchor_y="bottom",
-				child=self.v_box2
+			# Create a widget to hold the v_box widget, that will center the buttons
+			self.manager.add(
+				arcade.gui.UIAnchorWidget(
+					anchor_x="left",
+					align_x=int(self.minimap.size[0]), # just after minimap
+					anchor_y="bottom",
+					child=self.v_box2
+				)
 			)
-		)
 
 
 
@@ -597,11 +600,12 @@ class View():
 		self.coord_label.fit_content()
 
 	def update_resources_gui(self):
-		player = self.game.players["player"]
-		player_resources = player.resources
-		resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
-		for label, resource_text in zip(self.resource_label_list, resources_tab):
-			label.text = resource_text
+		player = self.game.players.get("player")
+		if player is not None:
+			player_resources = player.resources
+			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+			for label, resource_text in zip(self.resource_label_list, resources_tab):
+				label.text = resource_text
 
 	def update_villager_resources_gui(self) :
 		if self.boolean_dynamic_gui :
