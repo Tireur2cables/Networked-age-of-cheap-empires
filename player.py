@@ -182,7 +182,7 @@ class AI(Player):
 			rand_y = random.choice((random.randint(-10, -3), random.randint(3, 10)))
 			map_position = start_position + Vector(rand_x, rand_y)
 			if self.game.game_model.map.is_area_on_map(map_position, tile_size):
-				area_found = self.game.game_model.map.is_area_empty(map_position, tile_size)
+				area_found = self.game.game_model.map.is_area_buildable(map_position, tile_size)
 			current_iter += 1
 		if current_iter == 1000:
 			map_position = None

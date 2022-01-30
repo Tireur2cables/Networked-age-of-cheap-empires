@@ -162,13 +162,15 @@ class Map():
 		# path_len > 0 : means there is a path between start and end.
 		return path, path_len
 
-	def is_area_empty(self, map_position, tile_size):
+	def is_area_buildable(self, map_position, tile_size):
 		for i in range(tile_size[0]):
 			for j in range(tile_size[1]):
 				new_position = map_position + Vector(i, j)
 				if self.is_on_map(new_position):
 					tile = self.get_tile_at(new_position)
 					if not tile.is_empty():
+						return False
+					if tile.build_guard:
 						return False
 		return True
 
@@ -258,6 +260,12 @@ class Map():
 		for x in range(map_position.x, map_position.x + tile_size[0]):
 			for y in range(map_position.y, map_position.y + tile_size[1]):
 				self.tile_array[x][y].is_free = 0
+
+	def set_build_guard(self, map_position):
+		self.tile_array[map_position.x][map_position.y].build_guard = True
+
+	def remove_build_guard(self, map_position):
+		self.tile_array[map_position.x][map_position.y].build_guard = False
 
 ####################################################################
 #
