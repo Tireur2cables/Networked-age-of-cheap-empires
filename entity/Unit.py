@@ -106,7 +106,7 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 	damage = 3
 	rate_fire = 2
 	line_sight = 4
-	name = "Villager"
+
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		sprite_data=Villager.sprite_data,
@@ -116,8 +116,7 @@ class Villager(Unit):#un Villageois est une Unit particuliere
 		max_health=Villager.max_health,
 		damage=Villager.damage,
 		rate_fire=Villager.rate_fire,
-		line_sight=Villager.line_sight,
-		name=Villager.name)
+		line_sight=Villager.line_sight)
 
 		self.resources = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
 		self.max_resource = 3 if LAUNCH_FAST_ACTIONS else 10
@@ -180,7 +179,6 @@ class Militia(Military):
 	rate_fire = 2
 	pierce_armor = 1
 	line_sight = 4
-	name = "Militia"
 
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
@@ -192,8 +190,7 @@ class Militia(Military):
 		damage=Militia.damage,
 		rate_fire=Militia.rate_fire,
 		pierce_armor=Militia.pierce_armor,
-		line_sight=Militia.line_sight,
-		name=Militia.name)
+		line_sight=Militia.line_sight)
 
 class Spearman(Military):
 	creation_cost = {Res.FOOD : 35, Res.WOOD : 25, Res.GOLD : 0, Res.STONE : 0}
@@ -204,7 +201,6 @@ class Spearman(Military):
 	damage=3
 	rate_fire=3
 	line_sight=4
-	name="Spearman"
 
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
@@ -215,8 +211,7 @@ class Spearman(Military):
 		max_health=Spearman.max_health,
 		damage=Spearman.damage,
 		rate_fire=Spearman.rate_fire,
-		line_sight=Spearman.line_sight,
-		name=Spearman.name)
+		line_sight=Spearman.line_sight)
 
 #Archery (Trained at Archery Range)
 #For the moment, all archery units deal instant damage (there is no projectile) and they aim parfectly well.
@@ -230,7 +225,7 @@ class Archer(Military):
 	rate_fire=2
 	range=4
 	line_sight=6
-	name="Archer"
+
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		sprite_data=Archer.sprite_data,
@@ -241,8 +236,7 @@ class Archer(Military):
 		damage=Archer.damage,
 		rate_fire=Archer.rate_fire,
 		range=Archer.range,
-		line_sight=Archer.line_sight,
-		name=Archer.name)
+		line_sight=Archer.line_sight)
 
 class Skirmisher(Military):
 	creation_cost = {Res.FOOD : 25, Res.WOOD : 35, Res.GOLD : 0, Res.STONE : 0}
@@ -255,7 +249,7 @@ class Skirmisher(Military):
 	range=4
 	pierce_armor=3
 	line_sight=6
-	name="Skirmisher"
+
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		faction=faction,
@@ -267,8 +261,7 @@ class Skirmisher(Military):
 		rate_fire=Skirmisher.rate_fire,
 		range=Skirmisher.range,
 		pierce_armor=Skirmisher.pierce_armor,
-		line_sight=Skirmisher.line_sight,
-		name=Skirmisher.name)
+		line_sight=Skirmisher.line_sight)
 
 #Cavalry (Trained at Stable)
 class ScoutCavalry(Military):
@@ -281,7 +274,7 @@ class ScoutCavalry(Military):
 	rate_fire=2
 	pierce_armor=2
 	line_sight=4
-	name="ScoutCavalry"
+
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		faction=faction,
@@ -292,8 +285,7 @@ class ScoutCavalry(Military):
 		damage=ScoutCavalry.damage,
 		rate_fire=ScoutCavalry.rate_fire,
 		pierce_armor=ScoutCavalry.pierce_armor,
-		line_sight=ScoutCavalry.line_sight,
-		name=ScoutCavalry.name)
+		line_sight=ScoutCavalry.line_sight)
 
 class Knight(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 75, Res.STONE : 0}
@@ -306,7 +298,6 @@ class Knight(Military):
 	melee_armor=2
 	pierce_armor=2
 	line_sight=4
-	name="Knight"
 
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
@@ -319,8 +310,7 @@ class Knight(Military):
 		rate_fire=Knight.rate_fire,
 		melee_armor=Knight.melee_armor,
 		pierce_armor=Knight.pierce_armor,
-		line_sight=Knight.line_sight,
-		name=Knight.name)
+		line_sight=Knight.line_sight)
 
 #BigDaddy (CheatCode)
 class BigDaddy(Military):
@@ -333,7 +323,6 @@ class BigDaddy(Military):
 	rate_fire=3
 	pierce_armor=10
 	line_sight=17
-	name="BigDaddy"
 
 	def __init__(self, iso_position, health=-1):
 		super().__init__(iso_position,
@@ -344,5 +333,4 @@ class BigDaddy(Military):
 		damage=BigDaddy.damage,
 		rate_fire=BigDaddy.rate_fire,
 		pierce_armor=BigDaddy.pierce_armor,
-		line_sight=BigDaddy.line_sight,
-		name=BigDaddy.name)
+		line_sight=BigDaddy.line_sight)
