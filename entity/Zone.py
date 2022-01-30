@@ -1,5 +1,5 @@
 from entity.Entity import Entity
-from entity.Unit import Militia, Villager
+from entity.Unit import *
 from utils.SpriteData import SpriteData
 from utils.isometric import grid_pos_to_iso, TILE_HEIGHT
 from CONSTANTS import Resource as Res
@@ -156,10 +156,30 @@ class Barracks(Buildable):
 			self.class_produced = Militia
 			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Militia.creation_time
 			self.unit_cost = Militia.creation_cost
+		elif class_produced_name == "spearman":
+			self.class_produced = Spearman
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Spearman.creation_time
+			self.unit_cost = Spearman.creation_cost
+		elif class_produced_name == "archer":
+			self.class_produced = Archer
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Archer.creation_time
+			self.unit_cost = Archer.creation_cost
+		elif class_produced_name == "skirmisher":
+			self.class_produced = Skirmisher
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Skirmisher.creation_time
+			self.unit_cost = Skirmisher.creation_cost
+		elif class_produced_name == "scoutcavalry":
+			self.class_produced = ScoutCavalry
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else ScoutCavalry.creation_time
+			self.unit_cost = ScoutCavalry.creation_cost
+		elif class_produced_name == "knight":
+			self.class_produced = Knight
+			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Knight.creation_time
+			self.unit_cost = Knight.creation_cost
 
 	@staticmethod
 	def Barracks_1():
-		House.cost=(Res.WOOD,100)
+		Barracks.cost=(Res.WOOD,100)
 
 class StoragePit(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)

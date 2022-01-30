@@ -140,20 +140,22 @@ class Controller():
 
 	def human_order_towards_sprites(self, action, faction, sprites_at_point):
 		for entity in self.selection[faction]:
-			if isinstance(entity, Villager):
-				if action == "harvest":
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
-					if zone_found:
-						self.order_harvest(entity, zone_found)
-				elif action == "stock/attack":
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
-					if zone_found:
-						self.order_stock_resources(entity, zone_found)
-					else:
+			if action == "harvest/stock/attack/repair" : # click on batiment
+				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
+				if isinstance(entity, Villager) and zone_found: # harvest ressources
+					self.order_harvest(entity, zone_found)
+				else :
+					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
+					stock_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
+					if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0 : #stock zone found and resources to stock
+						self.order_stock_resources(entity, stock_found)
+					elif isinstance(entity, Villager) and zone_found : # zone of faction found, ask repairation
+						self.order_repairation(entity, zone_found)
+					else :
 						other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
-						if other_zone_found:
+						if other_zone_found: # no ally zone
 							self.order_attack(entity, other_zone_found)
-			if action == "attack":
+			if action == "attack" : # click on unit
 				unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
 				if unit_found:
 					self.order_attack(entity, unit_found)
@@ -251,6 +253,9 @@ class Controller():
 		# Step 1: Create a worksite with the building_name
 		worksite = WorkSite(map_position, entity.faction, building_name)
 		if self.game.players[entity.faction].get_resource(worksite.zone_to_build.cost[0]) >= worksite.zone_to_build.cost[1]:
+			#Pour le gui, on baisse le flag si on peut finalement construire
+			if entity.faction == "player":
+				self.game.game_view.errorMessage = ""
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
@@ -277,26 +282,38 @@ class Controller():
 				print("Not a Villager!")
 		else:
 			print("not enough resources to order a build!")
+			#Pour le GUI, on leve un flag pour le message d erreur
+			if entity.faction == "player":
+				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
 	def order_zone_units(self, producing_zone, entity_produced = ""):
 
-		current_player = self.game.players[producing_zone.faction]
-		if isinstance(producing_zone, Barracks):
-			producing_zone.set_class_produced(entity_produced)
-
-		if producing_zone.is_producing or current_player.nb_unit >= current_player.max_unit:
+		if producing_zone.is_producing :
 			return
 
-		for key, value in producing_zone.unit_cost.items():
-			if current_player.get_resource(key) < value:
-				return
+		current_player = self.game.players[producing_zone.faction]
+		if current_player.nb_unit < current_player.max_unit :
+			if isinstance(producing_zone, Barracks) :
+				producing_zone.set_class_produced(entity_produced)
 
-		producing_zone.is_producing = True
-		for key, value in producing_zone.unit_cost.items():
-			current_player.sub_resource(key, value)
-		if producing_zone.faction == "player" : # Shouldn't be used with AI
-			self.game.game_view.update_resources_gui()
+			if current_player.can_create(producing_zone.class_produced) :
 
+				for key, value in producing_zone.unit_cost.items():
+					if current_player.get_resource(key) < value:
+						return
+
+				producing_zone.is_producing = True
+				for key, value in producing_zone.unit_cost.items():
+					current_player.sub_resource(key, value)
+
+				if producing_zone.faction == "player" : # Shouldn't be used with AI
+					self.game.game_view.update_resources_gui()
+			else :
+				if producing_zone.faction == "player":
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+		else :
+			if producing_zone.faction == "player":
+				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
 		# print(f"{entity} ---> VS {aimed_unit}")
@@ -317,6 +334,22 @@ class Controller():
 					entity.is_interacting = True
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
+
+	def order_repairation(self, entity, aimed_entity) :
+		entity.set_goal("repair")
+		entity.set_aimed_entity(aimed_entity)
+
+		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
+		# Step 1: Search the closest tile near the zone_found to harvest it.
+		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
+		print(f"aimed_tile : {aimed_tile}")
+		# Step 2: Start moving toward the aimed entity
+		if aimed_tile :
+			print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
+			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
+				entity.is_interacting = True
+			else:
+				self.move_entity(entity, aimed_tile.grid_position)
 
 	def end_game(self):
 		print("youpiiii !!!")
@@ -374,7 +407,7 @@ class Controller():
 					entity.next_aim()
 				else: # ça veut dire qu'il est arrivé
 					entity.is_moving = False
-					if entity.goal in ("harvest", "stock", "build"):
+					if entity.goal in ("harvest", "stock", "build", "repair"):
 						entity.is_interacting = True
 					elif entity.goal == "attack":
 						if isinstance(entity.aimed_entity, Unit):
@@ -400,12 +433,14 @@ class Controller():
 						self.attack_entity(entity, delta_time)
 				else:
 					self.attack_entity(entity, delta_time)
-			elif isinstance(entity.aimed_entity, Resources):
+			elif entity.goal == "harvest" and isinstance(entity.aimed_entity, Resources):
 				self.harvest_zone(entity, delta_time)
-			elif isinstance(entity.aimed_entity, WorkSite):
+			elif entity.goal == "build" and isinstance(entity.aimed_entity, WorkSite):
 				self.build_zone(entity, delta_time)
-			elif isinstance(entity.aimed_entity, (TownCenter, StoragePit, Granary)):
+			elif entity.goal == "stock" and  isinstance(entity.aimed_entity, (TownCenter, StoragePit, Granary)):
 				self.stock_resources(entity, entity.aimed_entity.get_name())
+			elif entity.goal == "repair" and isinstance(entity.aimed_entity, Buildable) :
+				self.repair_zone(entity, delta_time)
 
 		for entity in producing_entities:
 			if isinstance(entity, (TownCenter, Barracks)):
@@ -424,20 +459,32 @@ class Controller():
 
 # --- Updating interaction (Called every frame) ---
 
+	def repair_zone(self, entity, delta_time) :
+		entity.action_timer += delta_time
+		if entity.action_timer > 1 : # commence à réparer ou continue
+			if entity.aimed_entity.health < entity.aimed_entity.max_health :
+				entity.aimed_entity.health += 1 # repare 1 point de vie
+
+				if entity.faction == "player" :
+					self.game.game_view.update_resources_gui()
+			else : # fin de la réparation
+				entity.end_goal()
+
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
 		if entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
-
 			current_player = self.game.players[entity.faction]
-			cost = entity.aimed_entity.zone_to_build.cost
-			current_player.sub_resource(*cost)
-			if entity.faction == "player" :
-				self.game.game_view.update_resources_gui()
+			if current_player.can_create(entity.aimed_entity.zone_to_build) :
+				cost = entity.aimed_entity.zone_to_build.cost
+				current_player.sub_resource(*cost)
+				if entity.faction == "player" :
+					self.game.game_view.update_resources_gui()
 
-			self.add_entity_to_game(entity.aimed_entity.create_zone())
-
+				self.add_entity_to_game(entity.aimed_entity.create_zone())
+			elif entiity.faction == "player" :
+				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 			entity.end_goal()
 
 	# Called every frame when an action is done on a zone (harvesting).
@@ -449,13 +496,12 @@ class Controller():
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
 				harvested = aimed_entity.harvest(entity.damage)
+				if entity.faction == "player" :
+					self.game.game_view.update_villager_resources_gui()
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
 					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
 					print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
-					if entity.faction == "player" :
-						self.game.game_view.update_villager_resources_gui()
-
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
@@ -492,10 +538,17 @@ class Controller():
 		if producing_zone.action_timer > producing_zone.unit_cooldown:
 			producing_zone.action_timer = 0
 			producing_zone.is_producing = False
-			grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
-			Class_produced = producing_zone.class_produced
-			random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
-			self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
+			current_player = self.game.players[producing_zone.faction]
+			if current_player.nb_unit < current_player.max_unit :
+				if current_player.can_create(producing_zone.class_produced) :
+					grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
+					Class_produced = producing_zone.class_produced
+          random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
+					self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
+				elif producing_zone.faction == "player" :
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+			elif producing_zone.faction == "player":
+				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def attack_entity(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time
@@ -503,6 +556,9 @@ class Controller():
 			unit.action_timer = 0
 			print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
+
+			if unit.faction == "player" : # Shouldn't be used with AI
+				self.game.game_view.trigger_Villager_GUI(self.selection)
 
 			if isinstance(unit.aimed_entity, Unit) and unit.aimed_entity.aimed_entity != unit:
 				self.order_attack(unit.aimed_entity, unit)

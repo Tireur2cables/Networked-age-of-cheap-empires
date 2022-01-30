@@ -1,6 +1,6 @@
 # --- Imports ---
 ## -- arcade --
-from turtle import window_height, window_width
+from turtle import width, window_height, window_width
 import arcade
 from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
@@ -63,6 +63,9 @@ class View():
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
 		self.reset_construct_flags()
 
+		#GUI, les flags indiquant
+		self.message_error_flags()
+
 		# a UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
@@ -87,6 +90,9 @@ class View():
 
 	def reset_construct_flags(self) :
 		self.build_request = ""
+
+	def message_error_flags(self):
+		self.errorMessage = ""
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
@@ -193,6 +199,7 @@ class View():
 			pos = grid_pos_to_iso(iso_to_grid_pos(Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)) + Vector(1, 1))
 			build_sprite = arcade.Sprite(path, scale=0.7, center_x=pos.x, center_y=pos.y)
 			build_sprite.draw(pixelated=True)
+			self.count_time = 0
 
 
 		# for s in self.tile_sprite_list:
@@ -271,6 +278,9 @@ class View():
 		self.camera.use()
 		self.camera_move()
 		self.camera.move_to([self.camera_x, self.camera_y], 0.5)
+
+		#GUI dynamic error message
+		self.trigger_attention_message()
 
 	def get_tile_outline(self, map_position):
 		left_vertex = tuple(map_position - Vector(TILE_WIDTH//2, 0))
@@ -369,14 +379,11 @@ class View():
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 			if zones_at_point:
-				self.game.game_controller.human_order_towards_sprites("stock/attack", "player", zones_at_point)
+				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
 			elif units_at_point:
 				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
-				# TODO ici, reparer le batiment s'il est abimé et que on a pas de ressources a deposer et batiment a nous
-
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
-			# TODO ici attquer si batiment ou unité pas a nous
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -387,39 +394,11 @@ class View():
 			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
-
 		if symbol == arcade.key.ENTER:
 			self.cheatsinput.on_enter_pressed()
 
 		if symbol == arcade.key.F: # cheat window
 			self.triggerCheatInput()
-		else:
-			mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
-			if self.game.game_controller.unit_in_selection("player"):
-				if self.mode == "move":
-					if symbol == arcade.key.C or symbol == arcade.key.H:  # Couper arbre / Harvest resource
-						self.game.game_controller.human_order_towards_sprites("harvest", "player", self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone))
-					elif symbol == arcade.key.B:
-						self.mode = "build"
-						print("build mode!")
-				elif self.mode == "build":
-					if symbol == arcade.key.H: # Build something
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "House")
-					elif symbol == arcade.key.S:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "StoragePit")
-					elif symbol == arcade.key.G:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Granary")
-					elif symbol == arcade.key.B:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Barracks")
-					elif symbol == arcade.key.D:
-						self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, "Dock")
-					self.mode = "move"
-					print("move mode!")
-			else:
-				if symbol == arcade.key.V:
-					self.game.game_controller.human_order_with_zone("populate", "player")
-				elif symbol == arcade.key.C:
-					self.game.game_controller.human_order_with_zone("train militia", "player")
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
 		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))
@@ -447,6 +426,9 @@ class View():
 				arcade.draw_rectangle_filled(pos.x - (32//2)*(1 - health/max_health), pos.y - nbr_health_bar*y_offset, (health*32)/max_health, 8, color)
 
 	def init_dynamic_gui(self) :
+		#Compteur de "temps" pour l affichage des messages d erreurs, pour qu ils restent un petit temps a l ecran
+		self.count_time = 0
+
 		# Create a box group to align the 'open' button in the center
 		# Box pour le UITextArea qui contiens les stats du personnage
 		self.v_box4 = arcade.gui.UIBoxLayout()
@@ -555,6 +537,17 @@ class View():
 				child=self.v_box12
 			)
 		)
+
+		# Create a box for the military buildable by barracks
+		self.v_box13 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="center",
+				anchor_y="center",
+				child=self.v_box13
+			)
+		)
+
 
 	def addButton(self):
 		# def button size
@@ -703,3 +696,15 @@ class View():
 
 
 				break # ce break sera a enlever si on gere la selection multiple
+
+	def trigger_attention_message(self):
+		self.v_box13.clear()
+		if self.errorMessage != "" :
+			width = self.game.window.width /2
+			height = self.game.window.height / 2
+			self.count_time = self.count_time + 1
+			errorTextArea = arcade.gui.UITextArea(text=self.errorMessage, width=width, height=height, font_size=24, text_color=arcade.color.RED)
+			self.v_box13.add(errorTextArea)
+			if self.count_time > 40:
+				self.errorMessage = ""
+				self.count_time = 0

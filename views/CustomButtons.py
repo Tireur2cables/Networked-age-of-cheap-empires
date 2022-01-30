@@ -61,7 +61,7 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 			ia[name] = diff
 
 		ressources = {}
-		tab = [Res.GOLD, Res.WOOD, Res.FOOD, Res.STONE]
+		tab = [Res.FOOD, Res.WOOD, Res.STONE, Res.GOLD]
 		indice = 0
 		for texture_pane in self.pregameview.name_input_ressources :
 			ressources[tab[indice]] = int(texture_pane.child.text)
@@ -155,6 +155,7 @@ class ConstructButton(arcade.gui.UITextureButton) :
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
 		#On initialise à zero au cas ou le player changerai d avis sur ce qu il veut construire
 		self.game.game_view.reset_construct_flags()
+		self.game.game_view.count_time = 0
 
 		if self.text in ("StoragePit", "House", "Granary", "Barracks", "TownCenter"):
 			self.game.game_view.build_request = self.text.lower()

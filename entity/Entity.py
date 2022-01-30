@@ -16,7 +16,7 @@ SPRITE_SCALING_COIN = 0.2
 class Entity:
 	# https://ageofempires.fandom.com/wiki/Units_(Age_of_Empires)
 	# https://ageofempires.fandom.com/wiki/Buildings_(Age_of_Empires)
-  
+
   #static attributs which must be redefined in leaf classes
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 0
@@ -56,6 +56,7 @@ class Entity:
 
 	def __getstate__(self):
 		return [self.iso_position, self.sprite_data, self.faction, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
+
 	def __setstate__(self, data):
 		# Position
 		self.iso_position = data[0]
