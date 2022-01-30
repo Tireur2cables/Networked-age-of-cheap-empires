@@ -245,8 +245,9 @@ class Map():
 	def free_tile_at(self, map_position, tile_size):
 		for x in range(map_position.x, map_position.x + tile_size[0]):
 			for y in range(map_position.y, map_position.y + tile_size[1]):
-				if self.objects_array[x][y] is not None or self.tile_array[x][y].pointer_to_entity is not None:
+				if self.objects_array[x][y] is not None:
 					self.objects_array[x][y] = None
+				if self.tile_array[x][y].pointer_to_entity is not None:
 					self.tile_array[x][y].pointer_to_entity = None
 				self.tile_array[x][y].is_free = 1
 

@@ -278,6 +278,11 @@ class Controller():
 					print("area not empty!")
 					return
 
+				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_empty(map_position - Vector(1, 1), (1, 1)):
+					print("no space to produce units!")
+					return
+
+
 				# Step 4: if possible (no return), move one tile below the first tile of the building and create the worksite
 				worksite = WorkSite(map_position, entity.faction, building_name, entity)
 				entity.set_goal("build")

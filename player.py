@@ -245,7 +245,7 @@ class AI(Player):
 					elif (action := ("build", "house")) not in (ongoing_actions | impossible_actions) and self.max_unit - self.nb_unit < 2 and self.resources[Res.WOOD] > 30:
 						map_position = self.search_pos_to_build(self.town_center.grid_position, House.tile_size)
 						if map_position is not None:
-							self.game.game_controller.order_build(unit, map_position, "House")
+							self.game.game_controller.order_build(unit, map_position, "house")
 							action_found = True
 						else:
 							impossible_actions.add(action)
