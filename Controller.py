@@ -476,7 +476,7 @@ class Controller():
 		if entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
-			if current_player.can_create(entity.aimed_entity.zone_to_build) :
+			if current_player.can_create(entity.aimed_entity.zone_to_build):
 				cost = entity.aimed_entity.zone_to_build.cost
 				current_player.sub_resource(*cost)
 				if entity.faction == "player":
@@ -496,8 +496,6 @@ class Controller():
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
 				harvested = aimed_entity.harvest(entity.damage)
-				if entity.faction == "player" :
-					self.game.game_view.update_villager_resources_gui()
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
 					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
@@ -505,6 +503,8 @@ class Controller():
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
+				if entity.faction == "player" :
+					self.game.game_view.update_villager_resources_gui()
 			else: # the entity is full and needs to go back to the town center.
 				entity.set_goal("stock")
 				self.order_search_stock_resources(entity, aimed_entity.get_resource_nbr())
@@ -522,11 +522,10 @@ class Controller():
 		for resource in items_to_store:
 			self.game.players[entity.faction].add_resource(resource, entity.resources[resource])
 			entity.resources[resource] = 0
-			if entity.faction == "player" :
-				self.game.game_view.update_resources_gui()
 
 		if entity.faction == "player" :
 			self.game.game_view.trigger_Villager_GUI(self.selection)
+			self.game.game_view.update_resources_gui()
 
 		can_harvest = entity.go_back_to_harvest()
 		if can_harvest:
