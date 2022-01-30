@@ -386,20 +386,30 @@ class Controller():
 	def order_upgradebuilding(self, upgradeIt:Buildable):
 		if (upgradeIt.upgrade_cost[upgradeIt.upgrade_level] != None):
 			current_player = self.game.players[upgradeIt.faction]
-			current_player.sub_resource(upgradeIt.upgrade_cost[upgradeIt.upgrade_level])
-			if isinstance(upgradeIt,Barracks):
-				upgradeIt.Barracks_upgrade()
-			elif isinstance(upgradeIt,House):
-				upgradeIt.House_upgrade()
-			elif isinstance(upgradeIt,Dock):
-				#upgradeIt.Dock_upgrade()
-				pass
-			elif isinstance(upgradeIt,Granary):
-				upgradeIt.Granary_upgrade()
-			elif isinstance(upgradeIt,StoragePit):
-				upgradeIt.StoragePit_upgrade()
-			elif isinstance(upgradeIt,TownCenter):
-				upgradeIt.TownCenter_upgrade()
+			if all(current_player.resources[k] >= upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k] for k in Res) :
+				for k in Res :
+					current_player.sub_resource(k, upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k])
+				if upgradeIt.faction == "player" : # Shouldn't be used with AI
+					self.game.game_view.update_resources_gui()
+				if isinstance(upgradeIt,Barracks):
+					upgradeIt.Barracks_upgrade()
+				elif isinstance(upgradeIt,House):
+					upgradeIt.House_upgrade()
+				elif isinstance(upgradeIt,Dock):
+					#upgradeIt.Dock_upgrade()
+					pass
+				elif isinstance(upgradeIt,Granary):
+					upgradeIt.Granary_upgrade()
+				elif isinstance(upgradeIt,StoragePit):
+					upgradeIt.StoragePit_upgrade()
+				elif isinstance(upgradeIt,TownCenter):
+					upgradeIt.TownCenter_upgrade()
+			else :
+				if upgradeIt.faction == "player":
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
+		else :
+			if upgradeIt.faction == "player":
+				self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
 
 	def end_game(self):
 		# print("youpiiii !!!")

@@ -181,3 +181,5 @@ class ActionButton(arcade.gui.UITextureButton) :
 			self.aoce_game.game_controller.order_zone_units(self.batiment, ScoutCavalry.get_name())
 		elif self.text == "Chevalier" :
 			self.aoce_game.game_controller.order_zone_units(self.batiment, Knight.get_name())
+		elif self.text == "Amélioration" :
+			self.aoce_game.game_controller.order_upgradebuilding(self.batiment)
