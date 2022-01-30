@@ -186,7 +186,7 @@ class Militia(Military):
 		faction=faction,
 		speed=Militia.speed,
 		health=health,
-		max_health=Militia.health,
+		max_health=Militia.max_health,
 		damage=Militia.damage,
 		rate_fire=Militia.rate_fire,
 		pierce_armor=Militia.pierce_armor,
