@@ -624,8 +624,8 @@ class View():
 			height = self.minimap.size[1] # same as minimap
 
 			for s in selected_list["player"] :
-				if isinstance(s, Entity) : # add entiity info
-					titre = s.name if s.faction == "None" else s.name + " [" + s.faction + "] "
+				if isinstance(s, Entity) : # add entity info
+					titre = s.get_name().capitalize() + ("" if s.faction == "None" else " [" + s.faction + "] ")
 					entity_box_stat = arcade.gui.UITextArea(text=titre, width=width / 3, height=height)
 					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
 

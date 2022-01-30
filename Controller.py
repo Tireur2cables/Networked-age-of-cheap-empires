@@ -479,11 +479,11 @@ class Controller():
 			if current_player.can_create(entity.aimed_entity.zone_to_build) :
 				cost = entity.aimed_entity.zone_to_build.cost
 				current_player.sub_resource(*cost)
-				if entity.faction == "player" :
+				if entity.faction == "player":
 					self.game.game_view.update_resources_gui()
 
 				self.add_entity_to_game(entity.aimed_entity.create_zone())
-			elif entiity.faction == "player" :
+			elif entity.faction == "player" :
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 			entity.end_goal()
 
@@ -543,7 +543,7 @@ class Controller():
 				if current_player.can_create(producing_zone.class_produced) :
 					grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
 					Class_produced = producing_zone.class_produced
-          random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
+					random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
 					self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
 				elif producing_zone.faction == "player" :
 					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"

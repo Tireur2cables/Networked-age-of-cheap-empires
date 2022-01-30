@@ -100,17 +100,24 @@ class Unit(Entity):
 class Villager(Unit):#un Villageois est une Unit particuliere
 	creation_cost = {Res.FOOD : 50, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 25
+	sprite_data = SpriteData("Ressources/img/units/villager_stand.png", y_offset=46//2, x_offset=-3)
+	speed = 0.8
+	max_health = 25
+	damage = 3
+	rate_fire = 2
+	line_sight = 4
+	name = "Villager"
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
-		sprite_data=SpriteData("Ressources/img/units/villager_stand.png", y_offset=46//2, x_offset=-3),
+		sprite_data=Villager.sprite_data,
 		faction=faction,
-		speed=0.8,
+		speed=Villager.speed,
 		health=health,
-		max_health=25,
-		damage=3,
-		rate_fire=2,
-		line_sight=4,
-		name="Villager")
+		max_health=Villager.max_health,
+		damage=Villager.damage,
+		rate_fire=Villager.rate_fire,
+		line_sight=Villager.line_sight,
+		name=Villager.name)
 
 		self.resources = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0} # utilisation de l'enumeration Resource
 		self.max_resource = 3 if LAUNCH_FAST_ACTIONS else 10
@@ -166,115 +173,176 @@ class Military(Unit):#un Militaire est une Unit particuliere
 class Militia(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 20, Res.STONE : 0}
 	creation_time = 21
+	SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2)
+	speed=0.9
+	max_health = 40
+	damage = 4
+	rate_fire = 2
+	pierce_armor = 1
+	line_sight = 4
+	name = "Militia"
+
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
-		sprite_data=SpriteData("Ressources/img/units/militia_stand.png", y_offset=50//2),
+		sprite_data=Militia.sprite_data,
 		faction=faction,
-		speed=0.9,
+		speed=Militia.speed,
 		health=health,
-		max_health=40,
-		damage=4,
-		rate_fire=2,
-		pierce_armor=1,
-		line_sight=4,
-		name="Militia")
+		max_health=Militia.health,
+		damage=Militia.damage,
+		rate_fire=Militia.rate_fire,
+		pierce_armor=Militia.pierce_armor,
+		line_sight=Militia.line_sight,
+		name=Militia.name)
 
 class Spearman(Military):
 	creation_cost = {Res.FOOD : 35, Res.WOOD : 25, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 22
+	sprite_data=SpriteData("Ressources/img/units/spearman_stand.png", y_offset=67//2)
+	speed=1
+	max_health=45
+	damage=3
+	rate_fire=3
+	line_sight=4
+	name="Spearman"
+
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		sprite_data=SpriteData("Ressources/img/units/spearman_stand.png", y_offset=67//2),
 		faction=faction,
-		speed=1,
+		speed=Spearman.speed,
 		health=health,
-		max_health=45,
-		damage=3,
-		rate_fire=3,
-		line_sight=4,
-		name="Spearman")
+		max_health=Spearman.max_health,
+		damage=Spearman.damage,
+		rate_fire=Spearman.rate_fire,
+		line_sight=Spearman.line_sight,
+		name=Spearman.name)
 
 #Archery (Trained at Archery Range)
 #For the moment, all archery units deal instant damage (there is no projectile) and they aim parfectly well.
 class Archer(Military):
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 25, Res.GOLD : 45, Res.STONE : 0}
 	creation_time = 35
+	sprite_data=SpriteData("Ressources/img/units/archer_stand.png", y_offset=51//2)
+	speed=0.96
+	max_health=30
+	damage=4
+	rate_fire=2
+	range=4
+	line_sight=6
+	name="Archer"
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
-		sprite_data=SpriteData("Ressources/img/units/archer_stand.png", y_offset=51//2),
+		sprite_data=Archer.sprite_data,
 		faction=faction,
-		speed=0.96,
+		speed=Archer.speed,
 		health=health,
-		max_health=30,
-		damage=4,
-		rate_fire=2,
-		range=4,
-		line_sight=6,
-		name="Archer")
+		max_health=Archer.max_health,
+		damage=Archer.damage,
+		rate_fire=Archer.rate_fire,
+		range=Archer.range,
+		line_sight=Archer.line_sight,
+		name=Archer.name)
 
 class Skirmisher(Military):
 	creation_cost = {Res.FOOD : 25, Res.WOOD : 35, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 22
+	sprite_data=SpriteData("Ressources/img/units/skirmisher_stand.png", y_offset=71//2)
+	speed=0.96
+	max_health=30
+	damage=2
+	rate_fire=3
+	range=4
+	pierce_armor=3
+	line_sight=6
+	name="Skirmisher"
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		faction=faction,
-		sprite_data=SpriteData("Ressources/img/units/skirmisher_stand.png", y_offset=71//2),
-		speed=0.96,
+		sprite_data=Skirmisher.sprite_data,
+		speed=Skirmisher.speed,
 		health=health,
-		max_health=30,
-		damage=2,
-		rate_fire=3,
-		range=4,
-		pierce_armor=3,
-		line_sight=6,
-		name="Skirmisher")
+		max_health=Skirmisher.max_health,
+		damage=Skirmisher.damage,
+		rate_fire=Skirmisher.rate_fire,
+		range=Skirmisher.range,
+		pierce_armor=Skirmisher.pierce_armor,
+		line_sight=Skirmisher.line_sight,
+		name=Skirmisher.name)
 
 #Cavalry (Trained at Stable)
 class ScoutCavalry(Military):
 	creation_cost = {Res.FOOD : 80, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 30
+	sprite_data = SpriteData("Ressources/img/units/scoutcavalry_stand.png", y_offset=90//2)
+	speed=1.2
+	max_health=45
+	damage=3
+	rate_fire=2
+	pierce_armor=2
+	line_sight=4
+	name="ScoutCavalry"
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		faction=faction,
-		sprite_data=SpriteData("Ressources/img/units/scoutcavalry_stand.png", y_offset=90//2),
-		speed=1.2,
+		sprite_data=ScoutCavalry.sprite_data,
+		speed=ScoutCavalry.speed,
 		health=health,
-		max_health=45,
-		damage=3,
-		rate_fire=2,
-		pierce_armor=2,
-		line_sight=4,
-		name="ScoutCavalry")
+		max_health=ScoutCavalry.max_health,
+		damage=ScoutCavalry.damage,
+		rate_fire=ScoutCavalry.rate_fire,
+		pierce_armor=ScoutCavalry.pierce_armor,
+		line_sight=ScoutCavalry.line_sight,
+		name=ScoutCavalry.name)
 
 class Knight(Military):
 	creation_cost = {Res.FOOD : 60, Res.WOOD : 0, Res.GOLD : 75, Res.STONE : 0}
 	creation_time = 30
+	sprite_data=SpriteData("Ressources/img/units/knight_stand.png", y_offset=90//2)
+	speed=1.35
+	max_health=100
+	damage=10
+	rate_fire=1.8
+	melee_armor=2
+	pierce_armor=2
+	line_sight=4
+	name="Knight"
 
 	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
 		faction=faction,
-		sprite_data=SpriteData("Ressources/img/units/knight_stand.png", y_offset=90//2),
-		speed=1.35,
+		sprite_data=Knight.sprite_data,
+		speed=Knight.speed,
 		health=health,
-		max_health=100,
-		damage=10,
-		rate_fire=1.8,
-		melee_armor=2,
-		pierce_armor=2,
-		line_sight=4,
-		name="Knight")
+		max_health=Knight.max_health,
+		damage=Knight.damage,
+		rate_fire=Knight.rate_fire,
+		melee_armor=Knight.melee_armor,
+		pierce_armor=Knight.pierce_armor,
+		line_sight=Knight.line_sight,
+		name=Knight.name)
 
 #BigDaddy (CheatCode)
 class BigDaddy(Military):
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 0
+	sprite_data=SpriteData("Ressources/img/units/bigdaddy.png", y_offset=90//2)
+	speed=1.6
+	max_health=500
+	damage=200
+	rate_fire=3
+	pierce_armor=10
+	line_sight=17
+	name="BigDaddy"
+
 	def __init__(self, iso_position, health=-1):
 		super().__init__(iso_position,
-		sprite_data=SpriteData("Ressources/img/units/bigdaddy.png", y_offset=90//2),
-		speed=1.6,
+		sprite_data=BigDaddy.sprite_data,
+		speed=BigDaddy.speed,
 		health=health,
-		max_health=500,
-		damage=600,
-		rate_fire=3,
-		pierce_armor=10,
-		line_sight=17)
+		max_health=BigDaddy.max_health,
+		damage=BigDaddy.damage,
+		rate_fire=BigDaddy.rate_fire,
+		pierce_armor=BigDaddy.pierce_armor,
+		line_sight=BigDaddy.line_sight,
+		name=BigDaddy.name)
