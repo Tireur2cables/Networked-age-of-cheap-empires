@@ -53,6 +53,7 @@ class MainView(arcade.View) :
 		settings_button = NextViewButton(self.window, SettingsView(self), text="Settings", width=buttonsize)
 		self.v_box.add(settings_button.with_space_around(bottom=20))
 
+		self.game_view.reset_game()
 		quit_button = QuitButton(self.window, text="Quit", width=buttonsize)
 		self.v_box.add(quit_button)
 

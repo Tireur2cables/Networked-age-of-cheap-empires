@@ -28,12 +28,16 @@
 
 ###############################################
 import pickle, json
-def pickleSaving(save_name, unit_list, tile_list, zone_list):
+def pickleSaving(save_name, save_list):
 	save_file=save_name+'.pkl'
-	data = [unit_list, tile_list, zone_list]
-	print(f"[Saving]: {type(data)} - {type(unit_list)} {type(unit_list[0])}")
+	data = save_list
+	print(f"[Saving]: {type(data)}")
 	with open(save_file,'wb') as fileDescriptor:
-		pickle.dump(unit_list[0], fileDescriptor)
+		pickle.dump(data, fileDescriptor)
+		# for i in data:
+		# 	for i_i in i:
+		# 		print(i_i)
+		# 		pickle.dump(i_i, fileDescriptor)
 	print(f"[Saving]: Done!")
 	pickleLoading(save_name) # A SUPPRIME !!! C'est juste pour teste le loading
 

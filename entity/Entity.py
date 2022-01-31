@@ -63,6 +63,9 @@ class Entity:
 		self.sprite_data = data[1]
 		self.sprite = EntitySprite(self, self.sprite_data, hit_box_algorithm="Simple")
 
+		# Faction
+		self.faction = data[2]
+
 		# Backend
 		self.action_timer = 0
 		self.selected = False
@@ -70,16 +73,17 @@ class Entity:
 		#
 		## Life
 		#
-		self.health = data[2]
-		self.max_health = data[3]
-		self.damage = data[4]
+		self.health = data[3]
+		self.max_health = data[4]
+		self.damage = data[5]
+		self.is_dead = False
 
 		# Battle
-		self.rate_fire = data[5]
-		self.range = data[6]
-		self.melee_armor = data[7]
-		self.pierce_armor = data[8]
-		self.line_sight = data[9]
+		self.rate_fire = data[6]
+		self.range = data[7]
+		self.melee_armor = data[8]
+		self.pierce_armor = data[9]
+		self.line_sight = data[10]
 
 	@classmethod
 	def get_name(cls):

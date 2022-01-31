@@ -26,11 +26,22 @@ class Model():
 		self.tile_list = []
 		self.zone_list = []
 
-	def setup(self, ressources, players, map_seed):
+	def __getstate__(self):
+		return [self.unit_list, self.tile_list, self.zone_list]
+
+	def __setstate__(self, data):
+		self.unit_list = data[0]
+		self.tile_list = data[1]
+		self.zone_list = data[2]
+
+	def reset(self):
 		# clear old lists
 		self.unit_list.clear()
 		self.tile_list.clear()
 		self.zone_list.clear()
+
+	def setup(self, ressources, players, map_seed):
+		self.reset()
 
 		# pre game view infos
 		self.players = players

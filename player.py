@@ -38,6 +38,14 @@ class Player:
 		self.food_storage = set()
 		self.other_storage = set()
 
+	def reset(self):
+		self.resources.clear()
+		self.my_units.clear()
+		self.my_military.clear()
+		self.my_zones.clear()
+		self.food_storage.clear()
+		self.other_storage.clear()
+
 	# my_entities
 	def add_entity(self, new_entity):
 		# Abstract/General class

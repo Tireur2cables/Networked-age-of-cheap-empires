@@ -56,9 +56,12 @@ class View():
 
 		self.resource_label_list = []
 
-	def setup(self) :
+	def reset(self):
 		#clear old lists
 		self.tile_sprite_list = arcade.SpriteList()
+		self.sorted_sprite_list = arcade.SpriteList()
+		self.mode = "move"
+		self.resource_label_list.clear()
 
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
 		self.reset_construct_flags()
@@ -72,6 +75,8 @@ class View():
 		#Boolean qui indique si le gui dynamic est active ou non
 		self.boolean_dynamic_gui = False
 
+	def setup(self):
+		self.reset()
 		self.init_dynamic_gui()
 		self.init_cheats()
 
@@ -559,7 +564,7 @@ class View():
 		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
 		# Create the save button
-		save_button = SaveButton(self.game.game_model.unit_list, self.game.game_model.tile_list ,self.game.game_model.zone_list, text="Save Game", width=buttonsize)
+		save_button = SaveButton(self.game.game_model, text="Save Game", width=buttonsize)
 
 		# Create the option button
 		option_button = ListButton(self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)

@@ -30,7 +30,15 @@ class Controller():
 		self.players = set()
 		self.working_sites = set()
 
+	def reset(self):
+		self.selection.clear()
+		self.dead_entities.clear()
+		self.ai.clear()
+		self.players.clear()
+		self.working_sites.clear()
+
 	def setup(self, players_dict: dict):
+		self.reset()
 		self.selection["player"] = set()
 		for key, value in players_dict.items():
 			self.players.add(value)
@@ -251,6 +259,7 @@ class Controller():
 
 
 	def order_stock_resources(self, entity, stock_zone):
+		entity.set_goal("stock")
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 
 		# Step 1: Search the closest tile near the zone_found to harvest it.
