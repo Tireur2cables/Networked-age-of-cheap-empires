@@ -8,6 +8,7 @@ from entity.Zone import *
 # from game import GameView
 from player import AI, Player
 from views.VictoryView import VictoryView
+from views.DefeatView import DefeatView
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -415,8 +416,13 @@ class Controller():
 	def end_game(self):
 		# print("youpiiii !!!")
 		#Le call est en construction
-		VictoryView(self.game).setup()
-		self.game.window.show_view(VictoryView(self.game))
+		for player in self.game.players:
+			if player == "player":
+				VictoryView(self.game).setup()
+				self.game.window.show_view(VictoryView(self.game))
+			else:
+				DefeatView(self.game).setup()
+				self.game.window.show_view(DefeatView(self.game))
 		#pass
 
 # --- On_update (Called every frame) ---
