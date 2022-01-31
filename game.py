@@ -43,15 +43,15 @@ class AoCE(arcade.Window):
 		if not LAUNCH_MUSIC:
 			self.media_player.pause()
 
-		self.game_view = GameView()
+		self.GameView = GameView()
 		# # Variables for communications between model, view and controller.
 		# self.toDraw = []
 
 	def on_show(self):
 		# Affiche le main menu
-		start_view = MainView(self.game_view)
+		start_view = MainView(self.GameView)
 		print("test")
-		self.game_view.setMenuView(start_view)
+		self.GameView.setMenuView(start_view)
 		start_view.setup() # useless : mainview.setup is empty
 		self.show_view(start_view)
 
