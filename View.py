@@ -106,7 +106,7 @@ class View():
 		self.cheatsinput = CheatsInput( #test
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
-				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG", width=width, height=height,
+				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS", width=width, height=height,
 				text_color=(255, 255, 255, 255),
 				game = self.game
 			)

@@ -2,6 +2,7 @@
 import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
+from cheats.fonctions import CheatsInput
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
@@ -509,7 +510,7 @@ class Controller():
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.aimed_entity.action_timer += delta_time
-		if entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
+		if CheatsInput.STEROIDS or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
 
@@ -533,7 +534,7 @@ class Controller():
 	# Récupère les resources présentes à chaque seconde, jusqu'à ce que ce soit full. Dans ce cas, il doit retourner au Town Center
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
-		if entity.action_timer > 1:
+		if CheatsInput.STEROIDS or entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
@@ -576,7 +577,7 @@ class Controller():
 	# Produit une unité et s'arrête
 	def produce_units(self, producing_zone, delta_time):
 		producing_zone.action_timer += delta_time
-		if producing_zone.action_timer > producing_zone.unit_cooldown:
+		if CheatsInput.STEROIDS or producing_zone.action_timer > producing_zone.unit_cooldown:
 			producing_zone.action_timer = 0
 			producing_zone.is_producing = False
 			current_player = self.game.players[producing_zone.faction]

@@ -2,6 +2,7 @@ from asyncio import sleep
 from multiprocessing.connection import wait
 import arcade
 import arcade.gui
+import CONSTANTS
 
 from entity.Unit import BigDaddy
 from utils.isometric import grid_pos_to_iso
@@ -28,7 +29,9 @@ else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
 cheat codes available ;
 """
 
+
 class CheatsInput(arcade.gui.UIInputText):
+    STEROIDS = False
     def __init__(self, x, y, text, width, height, text_color, game) : #player : Player
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
@@ -45,7 +48,8 @@ class CheatsInput(arcade.gui.UIInputText):
         self.game.game_controller.add_entity_to_game(bigdaddz)
 
     def Steroids(self):
-        print("debug steroidz")
+        print("ON STEROIDS!!!")
+        CheatsInput.STEROIDS = not CheatsInput.STEROIDS
 
     def reset_text(self):
         self.text = "Enter a cheat code"
