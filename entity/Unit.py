@@ -316,16 +316,17 @@ class Knight(Military):
 class BigDaddy(Military):
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 0
-	sprite_data=SpriteData("Ressources/img/units/bigdaddy.png", y_offset=90//2)
-	speed=1.6
+	sprite_data=SpriteData("Ressources/img/units/bigdaddy.png", y_offset=90//2 - TILE_HEIGHT, scale=0.3)
+	speed=4
 	max_health=500
 	damage=200
-	rate_fire=3
+	rate_fire=10
 	pierce_armor=10
 	line_sight=17
 
-	def __init__(self, iso_position, health=-1):
+	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
+		faction=faction,
 		sprite_data=BigDaddy.sprite_data,
 		speed=BigDaddy.speed,
 		health=health,
