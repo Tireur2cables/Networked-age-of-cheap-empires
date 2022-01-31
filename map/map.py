@@ -16,22 +16,26 @@ from pathfinding.finder.a_star import AStarFinder
 CHARACTER_SCALING = 1
 
 class Map():
-	def __init__(self, tiles, objects, map_size, tile_array = None):
+	def __init__(self, tiles, objects, map_size):
 		self.tiles = tiles
 		self.objects = objects
 
 		self.map_size = map_size
-		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
-		if tile_array is None:
-			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], Vector(grid_x, grid_y)) for grid_y in range(map_size)] for grid_x in range(map_size)]
-		else:
-			self.tile_array = tile_array
-
+		self.tile_array = []
+		self.objects_array = []
 		self.spawn_array = []
 
-		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
-		for x in range(map_size):
-			for y in range(map_size):
+
+	def setup(self, tile_array):
+		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
+		if tile_array is None:
+			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], Vector(grid_x, grid_y)) for grid_y in range(self.map_size)] for grid_x in range(self.map_size)]
+		else:
+			self.tile_array = [[Tile(tile_array[x][y]["tile"], Vector(x,y), tile_array[x][y]["obj"]) for y in range(self.map_size)] for x in range(self.map_size)]
+
+		self.objects_array = [[None for y in range(self.map_size)] for x in range(self.map_size)]
+		for x in range(self.map_size):
+			for y in range(self.map_size):
 				object = default_map_objects_2d[x][y] if tile_array is None else self.tile_array[x][y].pointer_to_entity
 				if tile_array is None:
 					self.tile_array[x][y].pointer_to_entity = object
@@ -162,13 +166,15 @@ class Map():
 		# path_len > 0 : means there is a path between start and end.
 		return path, path_len
 
-	def is_area_empty(self, map_position, tile_size):
+	def is_area_buildable(self, map_position, tile_size):
 		for i in range(tile_size[0]):
 			for j in range(tile_size[1]):
 				new_position = map_position + Vector(i, j)
 				if self.is_on_map(new_position):
 					tile = self.get_tile_at(new_position)
 					if not tile.is_empty():
+						return False
+					if tile.build_guard:
 						return False
 		return True
 
@@ -258,6 +264,12 @@ class Map():
 		for x in range(map_position.x, map_position.x + tile_size[0]):
 			for y in range(map_position.y, map_position.y + tile_size[1]):
 				self.tile_array[x][y].is_free = 0
+
+	def set_build_guard(self, map_position):
+		self.tile_array[map_position.x][map_position.y].build_guard = True
+
+	def remove_build_guard(self, map_position):
+		self.tile_array[map_position.x][map_position.y].build_guard = False
 
 ####################################################################
 #

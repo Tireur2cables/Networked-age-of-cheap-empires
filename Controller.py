@@ -2,6 +2,7 @@
 import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
+from cheats.fonctions import CheatsInput
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
@@ -32,7 +33,21 @@ class Controller():
 		self.players = set()
 		self.working_sites = set()
 
+	def __getstate__(self):
+		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites]
+
+	def __setstate__(self, data):
+		self.selection, self.dead_entities, self.ai, self.players, self.working_sites = data
+
+	def reset(self):
+		self.selection.clear()
+		self.dead_entities.clear()
+		self.ai.clear()
+		self.players.clear()
+		self.working_sites.clear()
+
 	def setup(self, players_dict: dict):
+		self.reset()
 		self.selection["player"] = set()
 		for key, value in players_dict.items():
 			self.players.add(value)
@@ -92,9 +107,12 @@ class Controller():
 			selection_set.discard(dead_entity)
 		self.game.game_view.update_resources_gui()
 
-		player = self.game.players.get(dead_entity.faction)
-		if player is not None:
-			player.discard_entity(dead_entity)
+		for player in self.game.players.values():
+			player.discard_from_selection(dead_entity)
+
+		owner = self.game.players.get(dead_entity.faction)
+		if owner is not None:
+			owner.discard_entity(dead_entity)
 		self.game.game_view.discard_sprite(dead_entity.sprite)
 		self.game.game_model.discard_entity(dead_entity)
 
@@ -250,6 +268,7 @@ class Controller():
 
 
 	def order_stock_resources(self, entity, stock_zone):
+		entity.set_goal("stock")
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 
 		# Step 1: Search the closest tile near the zone_found to harvest it.
@@ -276,11 +295,11 @@ class Controller():
 					print("out of bound!")
 					return
 
-				if not self.game.game_model.map.is_area_empty(map_position, zone_to_build_class.tile_size):
-					print("area not empty!")
+				if not self.game.game_model.map.is_area_buildable(map_position, zone_to_build_class.tile_size):
+					print("area not available!")
 					return
 
-				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_empty(map_position - Vector(1, 1), (1, 1)):
+				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1)):
 					print("no space to produce units!")
 					return
 
@@ -544,30 +563,31 @@ class Controller():
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.aimed_entity.action_timer += delta_time
-		if entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
+		if CheatsInput.STEROIDS or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
 
+			worksite = entity.aimed_entity
 			self.discard_entity_from_game(entity.aimed_entity)
+			entity.aimed_entity = None
 
-			if current_player.can_create(entity.aimed_entity.zone_to_build):
-				cost = entity.aimed_entity.zone_to_build.cost
+			if current_player.can_create(worksite.zone_to_build):
+				cost = worksite.zone_to_build.cost
 				current_player.sub_resource(*cost)
 				if entity.faction == "player":
 					self.game.game_view.update_resources_gui()
 
-				self.add_entity_to_game(entity.aimed_entity.create_zone())
+				self.add_entity_to_game(worksite.create_zone())
 			elif entity.faction == "player" :
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
-			entity.aimed_entity = None
 			entity.end_goal()
 
 	# Called every frame when an action is done on a zone (harvesting).
 	# Récupère les resources présentes à chaque seconde, jusqu'à ce que ce soit full. Dans ce cas, il doit retourner au Town Center
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
-		if entity.action_timer > 1:
+		if CheatsInput.STEROIDS or entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
@@ -592,7 +612,7 @@ class Controller():
 			items_to_store = (Res.FOOD, Res.GOLD, Res.STONE, Res.WOOD)
 		elif storage_type == "granary":
 			items_to_store = (Res.FOOD,)
-		elif storage_type == "storage_pit":
+		elif storage_type == "storagepit":
 			items_to_store = (Res.GOLD, Res.STONE, Res.WOOD)
 
 		for resource in items_to_store:
@@ -610,7 +630,7 @@ class Controller():
 	# Produit une unité et s'arrête
 	def produce_units(self, producing_zone, delta_time):
 		producing_zone.action_timer += delta_time
-		if producing_zone.action_timer > producing_zone.unit_cooldown:
+		if CheatsInput.STEROIDS or producing_zone.action_timer > producing_zone.unit_cooldown:
 			producing_zone.action_timer = 0
 			producing_zone.is_producing = False
 			current_player = self.game.players[producing_zone.faction]

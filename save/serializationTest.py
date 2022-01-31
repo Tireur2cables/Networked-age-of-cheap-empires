@@ -28,19 +28,20 @@
 
 ###############################################
 import pickle, json
-def pickleSaving(save_name, unit_list, tile_list, zone_list):
+def pickleSaving(save_name, game):
 	save_file=save_name+'.pkl'
-	data = [unit_list, tile_list, zone_list]
-	print(f"[Saving]: {type(data)} - {type(unit_list)} {type(unit_list[0])}")
+	data = {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
+	print(f"[Saving]: {data}")
 	with open(save_file,'wb') as fileDescriptor:
-		pickle.dump(unit_list[0], fileDescriptor)
+		pickle.dump(data, fileDescriptor)
 	print(f"[Saving]: Done!")
-	pickleLoading(save_name) # A SUPPRIME !!! C'est juste pour teste le loading
+	pickleLoading(save_name)
 
 def pickleLoading(save_name):
 	save_file=save_name+'.pkl'
 	print(f"[Loading]: Loading...")
 	with open(save_file,'rb') as fileDescriptor:
-		test = pickle.load(fileDescriptor)
-		print(f"[Loaded]: Loaded {test}")
+		data = pickle.load(fileDescriptor)
+		print(f"[Loaded]: Loaded")
 	print(f"[Loading]: Done!")
+	return data

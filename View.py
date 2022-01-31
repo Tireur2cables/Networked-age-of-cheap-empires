@@ -54,12 +54,13 @@ class View():
 
 		self.resource_label_list = []
 
-	def setup(self) :
+	def reset(self):
 		#clear old lists
 		self.tile_sprite_list = arcade.SpriteList()
 		self.sorted_sprite_list = arcade.SpriteList()
 
-		self.resource_label_list = []
+		self.mode = "move"
+		self.resource_label_list.clear()
 
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
 		self.reset_construct_flags()
@@ -73,6 +74,8 @@ class View():
 		#Boolean qui indique si le gui dynamic est active ou non
 		self.boolean_dynamic_gui = False
 
+	def setup(self):
+		self.reset()
 		self.init_dynamic_gui()
 		self.init_cheats()
 
@@ -97,9 +100,6 @@ class View():
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
-
-		#cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
-
 		width = self.game.window.width  # arbitrary
 		height = self.game.window.height / 22 # arbitrary
 		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
@@ -107,13 +107,12 @@ class View():
 		self.cheatsinput = CheatsInput( #test
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
-				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS, REVEAL MAP, NO FOG", width=width, height=height,
+				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS", width=width, height=height,
 				text_color=(255, 255, 255, 255),
 				game = self.game
 			)
-
 		self.cheat_pane = arcade.gui.UITexturePane(self.cheatsinput, tex=bg_text)
-
+	
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
 
@@ -395,8 +394,8 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		if symbol == arcade.key.ENTER:
 			self.cheatsinput.on_enter_pressed()
-
-		if symbol == arcade.key.F: # cheat window
+			self.triggerCheatInput()
+		if symbol == arcade.key.F1: # cheat window
 			self.triggerCheatInput()
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
@@ -415,7 +414,7 @@ class View():
 		else :
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
-		self.cheatsinput.triggered = not self.cheatsinput.triggered
+		
 
 	def draw_bar(self, pos, health, max_health, color, nbr_health_bar=1):
 		if max_health:
@@ -570,8 +569,8 @@ class View():
 		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
 		# Create the save button
-		save_button = SaveButton(self.game.game_model.unit_list, self.game.game_model.tile_list ,self.game.game_model.zone_list, text="Save Game", width=buttonsize)
-
+		save_button = SaveButton(self.game, text="Save Game", width=buttonsize)
+		# {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
 		# Create the option button
 		option_button = ListButton(self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
 		self.v_box3.add(option_button)

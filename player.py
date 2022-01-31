@@ -38,6 +38,32 @@ class Player:
 		self.food_storage = set()
 		self.other_storage = set()
 
+	def reset(self):
+		self.resources.clear()
+		self.my_units.clear()
+		self.my_military.clear()
+		self.my_zones.clear()
+		self.food_storage.clear()
+		self.other_storage.clear()
+
+
+	def __getstate__(self):
+		return [self.player_type,
+		self.is_alive,
+		self.resources,
+		self.nb_unit,
+		self.max_unit,
+		self.town_center,
+		self.my_units,
+		self.my_military,
+		self.my_zones,
+		self.food_storage,
+		self.other_storage]
+
+
+	def __setstate__(self, data):
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage = data
+
 	# my_entities
 	def add_entity(self, new_entity):
 		# Abstract/General class
@@ -63,6 +89,13 @@ class Player:
 				self.food_storage.add(new_entity)
 			elif isinstance(new_entity, StoragePit):
 				self.other_storage.add(new_entity)
+
+
+	def discard_from_selection(self, dead_entity):
+		for unit in self.my_units:
+			if unit.aimed_entity == dead_entity:
+				unit.aimed_entity = None
+				unit.end_goal()
 
 
 	def discard_entity(self, dead_entity):
@@ -147,6 +180,27 @@ class AI(Player):
 		self.goal = "dev"
 		self.aimed_enemy = None
 
+	def __getstate__(self):
+		return [self.player_type,
+		self.is_alive,
+		self.resources,
+		self.nb_unit,
+		self.max_unit,
+		self.town_center,
+		self.my_units,
+		self.my_military,
+		self.my_zones,
+		self.food_storage,
+		self.other_storage,
+		self.delta_time,
+		self.goal,
+		self.aimed_enemy]
+
+
+	def __setstate__(self, data):
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.goal, self.aimed_enemy = data
+
+
 	def search_enemy_to_attack(self):
 		self.aimed_enemy = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
 		print(self.aimed_enemy)
@@ -175,7 +229,7 @@ class AI(Player):
 			rand_y = random.choice((random.randint(-10, -3), random.randint(3, 10)))
 			map_position = start_position + Vector(rand_x, rand_y)
 			if self.game.game_model.map.is_area_on_map(map_position, tile_size):
-				area_found = self.game.game_model.map.is_area_empty(map_position, tile_size)
+				area_found = self.game.game_model.map.is_area_buildable(map_position, tile_size)
 			current_iter += 1
 		if current_iter == 1000:
 			map_position = None
