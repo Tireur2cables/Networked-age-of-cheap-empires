@@ -16,22 +16,26 @@ from pathfinding.finder.a_star import AStarFinder
 CHARACTER_SCALING = 1
 
 class Map():
-	def __init__(self, tiles, objects, map_size, tile_array = None):
+	def __init__(self, tiles, objects, map_size):
 		self.tiles = tiles
 		self.objects = objects
 
 		self.map_size = map_size
-		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
-		if tile_array is None:
-			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], Vector(grid_x, grid_y)) for grid_y in range(map_size)] for grid_x in range(map_size)]
-		else:
-			self.tile_array = [[Tile(tile_array[x][y]["tile"], Vector(x,y), tile_array[x][y]["obj"]) for y in range(map_size)] for x in range(map_size)]
-
+		self.tile_array = []
+		self.objects_array = []
 		self.spawn_array = []
 
-		self.objects_array = [[None for y in range(map_size)] for x in range(map_size)]
-		for x in range(map_size):
-			for y in range(map_size):
+
+	def setup(self, tile_array):
+		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
+		if tile_array is None:
+			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], Vector(grid_x, grid_y)) for grid_y in range(self.map_size)] for grid_x in range(self.map_size)]
+		else:
+			self.tile_array = [[Tile(tile_array[x][y]["tile"], Vector(x,y), tile_array[x][y]["obj"]) for y in range(self.map_size)] for x in range(self.map_size)]
+
+		self.objects_array = [[None for y in range(self.map_size)] for x in range(self.map_size)]
+		for x in range(self.map_size):
+			for y in range(self.map_size):
 				object = default_map_objects_2d[x][y] if tile_array is None else self.tile_array[x][y].pointer_to_entity
 				if tile_array is None:
 					self.tile_array[x][y].pointer_to_entity = object

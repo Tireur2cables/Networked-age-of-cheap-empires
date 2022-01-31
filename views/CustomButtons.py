@@ -26,12 +26,26 @@ class QuitButton(arcade.gui.UITextureButton) :
 
 
 class SaveButton(arcade.gui.UITextureButton) :
-	def __init__(self, save_list, text, width) :
+	def __init__(self, data, text, width) :
 		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
-		self.save_list = save_list
+		self.data = data
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		pickleSaving("savetest",self.save_list)
+		pickleSaving("savetest", self.data)
+
+class LoadButton(arcade.gui.UITextureButton):
+	def __init__(self, window, main_view, save_list, text, width):
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
+		self.window = window
+		self.main_view = main_view
+		self.save_list = save_list
+		self.nextView = main_view.game_view
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		data = pickleLoading("savetest")
+		print("Data LOADED!!!")
+		self.nextView.load_save(data)
+		self.window.show_view(self.nextView)
 
 # Button to return to the main menu
 class NextViewButton(arcade.gui.UITextureButton) :

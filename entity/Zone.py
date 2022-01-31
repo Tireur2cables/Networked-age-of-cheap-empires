@@ -335,7 +335,7 @@ class Wood(Resources):
 		super().__init__(grid_position,
 		sprite_data=Wood.sprite_data,
 		health=25,
-		amount=10)
+		amount=40)
 
 class Stone(Resources):
 	sprite_data = SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2)

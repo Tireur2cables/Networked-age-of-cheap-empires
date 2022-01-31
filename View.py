@@ -564,8 +564,8 @@ class View():
 		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
 		# Create the save button
-		save_button = SaveButton(self.game.game_model, text="Save Game", width=buttonsize)
-
+		save_button = SaveButton({'players': self.game.players, 'model': self.game.game_model, 'controller': self.game.game_controller}, text="Save Game", width=buttonsize)
+		# {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
 		# Create the option button
 		option_button = ListButton(self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
 		self.v_box3.add(option_button)

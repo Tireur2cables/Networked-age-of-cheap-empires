@@ -46,6 +46,24 @@ class Player:
 		self.food_storage.clear()
 		self.other_storage.clear()
 
+
+	def __getstate__(self):
+		return [self.player_type,
+		self.is_alive,
+		self.resources,
+		self.nb_unit,
+		self.max_unit,
+		self.town_center,
+		self.my_units,
+		self.my_military,
+		self.my_zones,
+		self.food_storage,
+		self.other_storage]
+
+
+	def __setstate__(self, data):
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage = data
+
 	# my_entities
 	def add_entity(self, new_entity):
 		# Abstract/General class

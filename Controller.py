@@ -30,6 +30,12 @@ class Controller():
 		self.players = set()
 		self.working_sites = set()
 
+	def __getstate__(self):
+		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites]
+
+	def __setstate__(self, data):
+		self.selection, self.dead_entities, self.ai, self.players, self.working_sites = data
+
 	def reset(self):
 		self.selection.clear()
 		self.dead_entities.clear()
@@ -567,7 +573,7 @@ class Controller():
 			items_to_store = (Res.FOOD, Res.GOLD, Res.STONE, Res.WOOD)
 		elif storage_type == "granary":
 			items_to_store = (Res.FOOD,)
-		elif storage_type == "storage_pit":
+		elif storage_type == "storagepit":
 			items_to_store = (Res.GOLD, Res.STONE, Res.WOOD)
 
 		for resource in items_to_store:
