@@ -1,6 +1,6 @@
 # --- Imports ---
 from map.map import Map
-from map.map_tests.abstract_perlin_matrix import process_array2
+from map.procedural_map import process_array2
 from utils.vector import Vector
 from entity.Unit import *
 from entity.Zone import *

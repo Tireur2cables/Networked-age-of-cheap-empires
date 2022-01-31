@@ -221,7 +221,7 @@ class StoragePit(Buildable):
 	sprite_data = SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - TILE_HEIGHT//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
-	
+
 	upgrade_level=0
 	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
 
@@ -248,7 +248,7 @@ class Granary(Buildable):
 	sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
-	
+
 	upgrade_level=0
 	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
 
@@ -276,7 +276,7 @@ class Dock(Buildable):
 	sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 35
-	
+
 	upgrade_level=0
 	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
 
@@ -297,7 +297,7 @@ class House(Buildable):
 	sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 30, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 25
-	
+
 	upgrade_level=0
 	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
 

@@ -2,7 +2,7 @@
 import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
-from cheats.fonctions import CheatsInput
+from cheats import CheatsInput
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *

@@ -8,7 +8,7 @@ import arcade.gui
 from views.CustomButtons import ActionButton, ConstructButton, NextViewButton, ListButton, SaveButton
 from map.tileSprite import TileSprite
 from map.Minimap import Minimap
-from cheats.fonctions import CheatsInput
+from cheats import CheatsInput
 from utils.vector import Vector
 from save.serializationTest import *
 from entity.Unit import *
@@ -112,7 +112,7 @@ class View():
 				game = self.game
 			)
 		self.cheat_pane = arcade.gui.UITexturePane(self.cheatsinput, tex=bg_text)
-	
+
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
 
@@ -414,7 +414,7 @@ class View():
 		else :
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
-		
+
 
 	def draw_bar(self, pos, health, max_health, color, nbr_health_bar=1):
 		if max_health:
