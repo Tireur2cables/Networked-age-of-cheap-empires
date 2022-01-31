@@ -3,6 +3,10 @@ from multiprocessing.connection import wait
 import arcade
 import arcade.gui
 
+from entity.Unit import BigDaddy
+from utils.isometric import grid_pos_to_iso
+from utils.vector import Vector
+
 """
 NINJALUI: get 10000 of each resource.
 \
@@ -35,8 +39,10 @@ class CheatsInput(arcade.gui.UIInputText):
         self.game.players["player"].add_all(10000)
         self.game.game_view.update_resources_gui()
 
-    def Bigdaddy(self): #if bool_BigDaddz is True then when we call "BIGDADDY" and unit spawns
-        bool_BigDaddz = False
+    def Bigdaddy(self):
+        print("Bigdaddy")
+        bigdaddz = BigDaddy(grid_pos_to_iso(self.game.players["player"].town_center.grid_position - Vector(1, 1)), "player")
+        self.game.game_controller.add_entity_to_game(bigdaddz)
 
     def Steroids(self):
         print("debug steroidz")

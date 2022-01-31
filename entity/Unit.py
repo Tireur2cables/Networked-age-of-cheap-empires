@@ -324,8 +324,9 @@ class BigDaddy(Military):
 	pierce_armor=10
 	line_sight=17
 
-	def __init__(self, iso_position, health=-1):
+	def __init__(self, iso_position, faction, health=-1):
 		super().__init__(iso_position,
+		faction=faction,
 		sprite_data=BigDaddy.sprite_data,
 		speed=BigDaddy.speed,
 		health=health,
