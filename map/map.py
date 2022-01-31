@@ -25,7 +25,7 @@ class Map():
 		if tile_array is None:
 			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], Vector(grid_x, grid_y)) for grid_y in range(map_size)] for grid_x in range(map_size)]
 		else:
-			self.tile_array = tile_array
+			self.tile_array = [[Tile(tile_array[x][y]["tile"], Vector(x,y), tile_array[x][y]["obj"]) for y in range(map_size)] for x in range(map_size)]
 
 		self.spawn_array = []
 

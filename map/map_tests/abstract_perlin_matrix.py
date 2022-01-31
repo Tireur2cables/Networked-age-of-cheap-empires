@@ -1,8 +1,5 @@
 #from map.map import Map
 from LAUNCH_SETUP import LAUNCH_SAFEWAY_SAND
-from map.tile import Tile#, TileSprite
-
-from entity.Zone import Gold, Stone, Wood #, Zone,Resources
 #from map.defaultmap import default_map_2d
 import noise
 import numpy as np
@@ -230,8 +227,7 @@ def process_array2(size = (50,50), seed=None, nbr_players=1):
 	if nbr_players > 3:
 		reserve_towncenter(out, Vector(size[0] - 10, 10), zoneSize, 3, text_pos="right")
 
-	tile_map = [[Tile(out[x][y]["tile"], Vector(x,y), out[x][y]["obj"]) for y in range(size[1])] for x in range(size[0])]
-	return tile_map
+	return out
 
 
 #a = process_array(perlin_array())
