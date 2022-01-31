@@ -2,7 +2,7 @@ from asyncio import sleep
 from multiprocessing.connection import wait
 import arcade
 import arcade.gui
-import CONSTANTS
+import cheats_vars
 
 from entity.Unit import BigDaddy
 from utils.isometric import grid_pos_to_iso
@@ -16,8 +16,6 @@ The idea is that you should have commands that enable you to debug and show off
 your AI. What commands those are will depend on your AI.
 """
 class CheatsInput(arcade.gui.UIInputText):
-    STEROIDS = False
-    save_suffix = "0"
 
     def __init__(self, x, y, text, width, height, text_color, game) :
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
@@ -36,10 +34,13 @@ class CheatsInput(arcade.gui.UIInputText):
 
     def Steroids(self):
         print("ON STEROIDS!!!")
-        CheatsInput.STEROIDS = not CheatsInput.STEROIDS
+        cheats_vars.cheat_steroids = not cheats_vars.cheat_steroids
+
+    def Lightspeed(self):
+        cheats_vars.cheat_lightspeed = not cheats_vars.cheat_lightspeed
 
     def set_save(self, save_suffix):
-        CheatsInput.save_suffix = save_suffix
+        cheats_vars.global_save_suffix = save_suffix
 
     def reset_text(self):
         self.text = "Enter a cheat code"
@@ -53,6 +54,11 @@ class CheatsInput(arcade.gui.UIInputText):
             self.Bigdaddy()
         elif self.text == "STEROIDS":
             self.Steroids()
-        elif "/save" in self.text and len(self.text) >= 7:
-            self.set_save(self.text[6:])
+        elif self.text == "LIGHTSPEED":
+            self.Lightspeed()
+        elif "/save" in self.text:
+            if len(self.text) >= 7:
+                self.set_save(self.text[6:])
+            else:
+                self.set_save("0")
         self.reset_text()

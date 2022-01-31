@@ -141,9 +141,6 @@ class GameView(arcade.View):
 		self.game_view.reset()
 		self.game_controller.reset()
 
-	def load_game(self, save_file):
-		pickleLoading(save_file)
-
 	def on_update(self, *args):  # Redirecting on_update to the Controller
 		self.game_controller.on_update(*args)
 

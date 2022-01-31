@@ -2,7 +2,7 @@
 import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
-from cheats import CheatsInput
+import cheats_vars
 from utils.isometric import *
 from entity.Unit import *
 from entity.Zone import *
@@ -492,7 +492,7 @@ class Controller():
 			# Check if the next position is on the map
 			if not self.is_on_map(iso_to_grid_pos(entity.iso_position+entity.change)):
 				entity.is_moving = False
-			elif entity.iso_position.isalmost(entity.aim, entity.speed):
+			elif entity.iso_position.isalmost(entity.aim, SPEED_UNITS * 5 if cheats_vars.cheat_lightspeed else entity.speed):
 				if entity.path:
 					entity.next_aim()
 				else: # ça veut dire qu'il est arrivé
@@ -563,7 +563,7 @@ class Controller():
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.aimed_entity.action_timer += delta_time
-		if CheatsInput.STEROIDS or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
+		if cheats_vars.cheat_steroids or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
 
@@ -587,7 +587,7 @@ class Controller():
 	# Récupère les resources présentes à chaque seconde, jusqu'à ce que ce soit full. Dans ce cas, il doit retourner au Town Center
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
-		if CheatsInput.STEROIDS or entity.action_timer > 1:
+		if cheats_vars.cheat_steroids or entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
@@ -630,7 +630,7 @@ class Controller():
 	# Produit une unité et s'arrête
 	def produce_units(self, producing_zone, delta_time):
 		producing_zone.action_timer += delta_time
-		if CheatsInput.STEROIDS or producing_zone.action_timer > producing_zone.unit_cooldown:
+		if cheats_vars.cheat_steroids or producing_zone.action_timer > producing_zone.unit_cooldown:
 			producing_zone.action_timer = 0
 			producing_zone.is_producing = False
 			current_player = self.game.players[producing_zone.faction]

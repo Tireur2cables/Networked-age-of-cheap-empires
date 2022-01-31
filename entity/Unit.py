@@ -1,5 +1,6 @@
 import random
 from LAUNCH_SETUP import LAUNCH_DISABLE_RANDOM_PLACEMENT, LAUNCH_FAST_ACTIONS, LAUNCH_LIGHTSPEED_MOVES
+import cheats_vars
 from entity.Entity import Entity
 from utils.SpriteData import SpriteData
 from CONSTANTS import Resource as Res
@@ -80,7 +81,7 @@ class Unit(Entity):
 			self.aim += Vector(random.randint(-8, 8), random.randint(-8, 8))
 
 		# The following calculation is necessary to have uniform speeds :
-		self.change = self.speed * ((self.aim - self.iso_position).normalized())
+		self.change = SPEED_UNITS * 5 * ((self.aim - self.iso_position).normalized()) if cheats_vars.cheat_lightspeed else self.speed * ((self.aim - self.iso_position).normalized())
 		# We want the same speed no matter what the distance between the villager and where he needs to go is.
 
 
