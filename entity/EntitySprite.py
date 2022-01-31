@@ -21,10 +21,10 @@ class EntitySprite(Sprite):
 		self.hit_box_algorithm = hit_box_algorithm
 
 	def __getstate__(self):
-		return self.sprite_data, self.entity, self.hit_box_algorithm
+		return self.sprite_data, self.entity, self.hit_box_algorithm, self.entity.iso_position
 
 	def __setstate__(self, data):
-		self.sprite_data, self.entity, self.hit_box_algorithm = data
+		self.sprite_data, self.entity, self.hit_box_algorithm, self.entity.iso_position = data
 		super().__init__(filename=self.sprite_data.file, scale=self.sprite_data.scale, center_x=self.entity.iso_position.x + self.sprite_data.x_offset, center_y=self.entity.iso_position.y + self.sprite_data.y_offset, hit_box_algorithm=self.hit_box_algorithm)
 
 	def update(self):

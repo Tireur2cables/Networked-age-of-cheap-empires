@@ -121,15 +121,14 @@ class GameView(arcade.View):
 
 	def load_save(self, data):
 		# in data : {'model': game.game_model, 'controller': game.game_controller, 'players': game.players}
-		print('1')
 		self.players = data['players']
-		print('2')
 		self.game_model = data['model']
-		print('3')
 		self.game_view.setup()
-		print('4')
 		self.game_controller = data['controller']
 
+
+		for player in self.players.values():
+			player.game = self
 		self.game_model.game = self
 		self.game_view.game = self
 		self.game_controller.game = self

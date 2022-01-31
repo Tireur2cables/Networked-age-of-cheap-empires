@@ -180,6 +180,27 @@ class AI(Player):
 		self.goal = "dev"
 		self.aimed_enemy = None
 
+	def __getstate__(self):
+		return [self.player_type,
+		self.is_alive,
+		self.resources,
+		self.nb_unit,
+		self.max_unit,
+		self.town_center,
+		self.my_units,
+		self.my_military,
+		self.my_zones,
+		self.food_storage,
+		self.other_storage,
+		self.delta_time,
+		self.goal,
+		self.aimed_enemy]
+
+
+	def __setstate__(self, data):
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.goal, self.aimed_enemy = data
+
+
 	def search_enemy_to_attack(self):
 		self.aimed_enemy = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
 		print(self.aimed_enemy)
