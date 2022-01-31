@@ -9,27 +9,12 @@ from utils.isometric import grid_pos_to_iso
 from utils.vector import Vector
 
 """
-NINJALUI: get 10000 of each resource.
-\
-BIGDADDY: spawn very powerful unit at town center.
-\
-STEROIDS: training, building, research, foraging, farming, and mining times are
-instantaneous. . . for all players, not just you.
-\
 Additionally, you should have a few commands to influence the AI, force it to launch
 an immediate attack, check its state of mind, put your civilisation on autopilot, or
 simply exchange the civilisations you and the enemy AI control.
 The idea is that you should have commands that enable you to debug and show off
 your AI. What commands those are will depend on your AI.
 """
-"""
-idées : key pour toggle une ligne pour rentrer les cheats code : F10
-if un cheat code est rentré : execute cheatcode pour un player en particulier
-else : renvoie sur l'écran : "ce cheat code n'est pas implémenté ; liste les
-cheat codes available ;
-"""
-
-
 class CheatsInput(arcade.gui.UIInputText):
     STEROIDS = False
     def __init__(self, x, y, text, width, height, text_color, game) : 
