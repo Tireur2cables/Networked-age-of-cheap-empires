@@ -55,7 +55,6 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.sorted_sprite_list = arcade.SpriteList()
 
-		self.mode = "move"
 		self.resource_label_list.clear()
 
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
@@ -100,7 +99,7 @@ class View():
 		height = self.game.window.height / 22 # arbitrary
 		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
 
-		self.cheatsinput = CheatsInput( #test
+		self.cheatsinput = CheatsInput(
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
 				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS", width=width, height=height,
@@ -602,7 +601,7 @@ class View():
 		player = self.game.players.get("player")
 		if player is not None:
 			player_resources = player.resources
-			print(player_resources)
+			#print(player_resources)
 			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 			for label, resource_text in zip(self.resource_label_list, resources_tab):
 				label.text = resource_text

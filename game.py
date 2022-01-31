@@ -49,7 +49,7 @@ class AoCE(arcade.Window):
 	def on_show(self):
 		# Affiche le main menu
 		start_view = MainView(self.GameView)
-		print("test")
+		#print("test")
 		self.GameView.setMenuView(start_view)
 		start_view.setup() # useless : mainview.setup is empty
 		self.show_view(start_view)
@@ -115,8 +115,8 @@ class GameView(arcade.View):
 		self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
-		self.game_view.setup()
 		self.game_controller.setup(self.players)
+		self.game_view.setup()
 
 	def load_save(self, data):
 		# in data : {'model': game.game_model, 'controller': game.game_controller, 'players': game.players}

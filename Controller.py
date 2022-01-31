@@ -201,7 +201,7 @@ class Controller():
 						for entity in self.selection[faction]:
 							self.move_entity(entity, grid_position, False)
 					else:
-						print("out of bound!")
+						#print("out of bound!")
 						return
 				elif action == "build":
 					self.order_build(entity, grid_position, *args)
@@ -292,15 +292,15 @@ class Controller():
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
 				if not self.game.game_model.map.is_area_on_map(map_position, zone_to_build_class.tile_size):
-					print("out of bound!")
+					#print("out of bound!")
 					return
 
 				if not self.game.game_model.map.is_area_buildable(map_position, zone_to_build_class.tile_size):
-					print("area not available!")
+					#print("area not available!")
 					return
 
 				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1)):
-					print("no space to produce units!")
+					#print("no space to produce units!")
 					return
 
 
@@ -316,9 +316,10 @@ class Controller():
 				else:
 					self.move_entity(entity, map_position - Vector(1, 1))
 			else:
-				print("Not a Villager!")
+				pass
+				#print("Not a Villager!")
 		else:
-			print("not enough resources to order a build!")
+			#print("not enough resources to order a build!")
 			#Pour le GUI, on leve un flag pour le message d erreur
 			if entity.faction == "player":
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
@@ -379,10 +380,10 @@ class Controller():
 			entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
 			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
-			print(f"aimed_tile : {aimed_tile}")
+			#print(f"aimed_tile : {aimed_tile}")
 			# Step 2: Start moving toward the aimed entity
 			if aimed_tile is not None:
-				print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
+				#print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
 				if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 					entity.is_interacting = True
 				else:
@@ -395,10 +396,10 @@ class Controller():
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 		# Step 1: Search the closest tile near the zone_found to harvest it.
 		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
-		print(f"aimed_tile : {aimed_tile}")
+		#print(f"aimed_tile : {aimed_tile}")
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile :
-			print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
+			#print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
@@ -538,7 +539,7 @@ class Controller():
 
 		# --- Deleting dead entities ---
 		for dead_entity in self.dead_entities:
-			print("DEAD ENTITY DETECTED")
+			#print("DEAD ENTITY DETECTED")
 			self.discard_entity_from_game(dead_entity)
 		self.dead_entities.clear()
 
@@ -594,8 +595,8 @@ class Controller():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
-					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
+					#print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					#print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
@@ -649,7 +650,7 @@ class Controller():
 		unit.action_timer += delta_time
 		if unit.action_timer > 1/unit.rate_fire:
 			unit.action_timer = 0
-			print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
+			#print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
 
 			if unit.faction == "player" : # Shouldn't be used with AI
@@ -659,7 +660,7 @@ class Controller():
 				self.order_attack(unit.aimed_entity, unit)
 				unit.aimed_entity.is_interacting = True
 
-			print(alive)
+			#print(alive)
 			if not alive:
 				unit.end_goal()
 				self.dead_entities.add(unit.aimed_entity)
