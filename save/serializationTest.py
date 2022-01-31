@@ -28,8 +28,9 @@
 
 ###############################################
 import pickle, json
-def pickleSaving(save_name, data):
+def pickleSaving(save_name, game):
 	save_file=save_name+'.pkl'
+	data = {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
 	print(f"[Saving]: {data}")
 	with open(save_file,'wb') as fileDescriptor:
 		pickle.dump(data, fileDescriptor)

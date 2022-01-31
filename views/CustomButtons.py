@@ -26,19 +26,18 @@ class QuitButton(arcade.gui.UITextureButton) :
 
 
 class SaveButton(arcade.gui.UITextureButton) :
-	def __init__(self, data, text, width) :
+	def __init__(self, game, text, width) :
 		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
-		self.data = data
+		self.game = game
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		pickleSaving("savetest", self.data)
+		pickleSaving("savetest", self.game)
 
 class LoadButton(arcade.gui.UITextureButton):
-	def __init__(self, window, main_view, save_list, text, width):
+	def __init__(self, window, main_view, text, width):
 		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
 		self.window = window
 		self.main_view = main_view
-		self.save_list = save_list
 		self.nextView = main_view.game_view
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :

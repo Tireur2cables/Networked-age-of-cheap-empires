@@ -47,7 +47,7 @@ class MainView(arcade.View) :
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
 		# TODO : charger une sauvegarde
-		load_button = LoadButton(self.window, self, "", text="Charger une sauvegarde", width=buttonsize)
+		load_button = LoadButton(self.window, self, text="Charger une sauvegarde", width=buttonsize)
 		self.v_box.add(load_button.with_space_around(bottom=20))
 
 		settings_button = NextViewButton(self.window, SettingsView(self), text="Settings", width=buttonsize)
