@@ -2,6 +2,7 @@
 # -- arcade --
 import arcade
 from player import AI, Player
+from save.serializationTest import pickleLoading
 # -- others --
 from views.MainView import MainView
 # -- mvc --
@@ -94,12 +95,12 @@ class GameView(arcade.View):
 		self.game_model = Model(self)
 		self.game_view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
 		self.game_controller = Controller(self)
+		self.players = dict()
 
-	def setMenuView(self, menu_view) :
+	def setMenuView(self, menu_view):
 		self.menu_view = menu_view
 
 	def create_players(self, players, resources):
-		self.players = dict()
 		i = 1
 		for player in players:
 			if "Vous" in player:
@@ -117,6 +118,31 @@ class GameView(arcade.View):
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup()
 		self.game_controller.setup(self.players)
+
+	def load_save(self, data):
+		# in data : {'model': game.game_model, 'controller': game.game_controller, 'players': game.players}
+		self.players = data['players']
+		self.game_model = data['model']
+		self.game_view.setup()
+		self.game_controller = data['controller']
+
+
+		for player in self.players.values():
+			player.game = self
+		self.game_model.game = self
+		self.game_view.game = self
+		self.game_controller.game = self
+
+	def reset_game(self):
+		for player in self.players.values():
+			player.reset()
+		self.players.clear()
+		self.game_model.reset()
+		self.game_view.reset()
+		self.game_controller.reset()
+
+	def load_game(self, save_file):
+		pickleLoading(save_file)
 
 	def on_update(self, *args):  # Redirecting on_update to the Controller
 		self.game_controller.on_update(*args)

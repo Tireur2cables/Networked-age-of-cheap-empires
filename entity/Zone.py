@@ -297,15 +297,15 @@ class Resources(Zone):
 		self.amount = amount
 		self.max_amount = self.amount
 
-	def __getstate__(self):
-		return [self.get_grid_position(), self.is_locking, self.sprite_data, self.health, self.amount, self.max_amount]
-	def __setstate__(self, data):
-		super().__init__(data[0])
-		self.is_locking=data[1]
-		self.sprite_data=data[2]
-		self.health = data[3]
-		self.amount=data[4]
-		self.max_amount=data[5]
+	# def __getstate__(self):
+	# 	return [self.get_grid_position(), self.is_locking, self.sprite_data, self.health, self.amount, self.max_amount]
+	# def __setstate__(self, data):
+	# 	super().__init__(data[0])
+	# 	self.is_locking=data[1]
+	# 	self.sprite_data=data[2]
+	# 	self.health = data[3]
+	# 	self.amount=data[4]
+	# 	self.max_amount=data[5]
 
 	def get_resource_nbr(self):
 		name = type(self).__name__.upper()
@@ -335,7 +335,7 @@ class Wood(Resources):
 		super().__init__(grid_position,
 		sprite_data=Wood.sprite_data,
 		health=25,
-		amount=10)
+		amount=40)
 
 class Stone(Resources):
 	sprite_data = SpriteData("Ressources/img/zones/resources/stonemine.png", scale=1, y_offset=50//2 - TILE_HEIGHT//2)

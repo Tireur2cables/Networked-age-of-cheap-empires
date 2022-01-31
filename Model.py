@@ -26,11 +26,25 @@ class Model():
 		self.tile_list = []
 		self.zone_list = []
 
-	def setup(self, ressources, players, map_seed):
+		self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
+
+	def __getstate__(self):
+		return [self.unit_list, self.tile_list, self.zone_list, self.map]
+
+	def __setstate__(self, data):
+		self.unit_list = data[0]
+		self.tile_list = data[1]
+		self.zone_list = data[2]
+		self.map = data[3]
+
+	def reset(self):
 		# clear old lists
 		self.unit_list.clear()
 		self.tile_list.clear()
 		self.zone_list.clear()
+
+	def setup(self, ressources, players, map_seed):
+		self.reset()
 
 		# pre game view infos
 		self.players = players
@@ -43,9 +57,9 @@ class Model():
 		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		use_default = LAUNCH_DEFAULT_MAP
 		if use_default:
-			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
+			self.map.setup()
 		else:
-			self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE, process_array2(seed=self.map_seed, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE), nbr_players=len(self.players)))
+			self.map.setup(process_array2(seed=self.map_seed, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE), nbr_players=len(self.players)))
 
 		for pos_spawn in self.map.spawn_array:
 			if "player" in self.players:

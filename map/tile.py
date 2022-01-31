@@ -7,7 +7,7 @@ class Tile():
 		self.blockID = blockID
 
 		self.grid_position=grid_position
-		self.pointer_to_entity = pointer_to_entity  # For now, pointer_to_entity is never used.
+		self.pointer_to_entity = pointer_to_entity
 
 		self.is_free = 1
 		self.build_guard = False  # If is_free == 0, this doesn't change anything. If is_free == 1 but build_guard = True, you cannot build.
@@ -19,13 +19,14 @@ class Tile():
 		self.init_sprite()
 
 	def __getstate__(self):
-		return [self.blockID, self.grid_position, self.is_free]
+		return [self.blockID, self.grid_position, self.is_free, self.pointer_to_entity, self.build_guard]
 
 	def __setstate__(self, data):
 		self.blockID = data[0]
 		self.grid_position = data[1]
 		self.is_free = data[2]
-		#self.pointer_to_entity = data[3]
+		self.pointer_to_entity = data[3]
+		self.build_guard = data[4]
 		self.init_sprite()
 
 	def init_sprite(self):

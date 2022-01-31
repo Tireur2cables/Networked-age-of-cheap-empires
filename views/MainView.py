@@ -1,7 +1,7 @@
 # --- Imports ---
 import arcade
 from arcade.arcade_types import Color
-from views.CustomButtons import QuitButton, NextViewButton
+from views.CustomButtons import LoadButton, QuitButton, NextViewButton
 from views.SettingsView import SettingsView
 from views.PreGameView import PreGameView
 from views.IAvsIAView import IAPreGameView
@@ -46,13 +46,14 @@ class MainView(arcade.View) :
 		ia_match_button = NextViewButton(self.window,IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
-		# TODO : charger une sauvegarde				# should not be self here
-		charger_button = NextViewButton(self.window, self, text="Charger une sauvegarde", width=buttonsize)
-		self.v_box.add(charger_button.with_space_around(bottom=20))
+		# TODO : charger une sauvegarde
+		load_button = LoadButton(self.window, self, text="Charger une sauvegarde", width=buttonsize)
+		self.v_box.add(load_button.with_space_around(bottom=20))
 
 		settings_button = NextViewButton(self.window, SettingsView(self), text="Settings", width=buttonsize)
 		self.v_box.add(settings_button.with_space_around(bottom=20))
 
+		self.game_view.reset_game()
 		quit_button = QuitButton(self.window, text="Quit", width=buttonsize)
 		self.v_box.add(quit_button)
 
