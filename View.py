@@ -52,14 +52,13 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.sorted_sprite_list = arcade.SpriteList()
 
-		self.mode = "move"
-
 		self.resource_label_list = []
 
 	def reset(self):
 		#clear old lists
 		self.tile_sprite_list = arcade.SpriteList()
 		self.sorted_sprite_list = arcade.SpriteList()
+
 		self.mode = "move"
 		self.resource_label_list.clear()
 
@@ -117,18 +116,16 @@ class View():
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
 
+		self.HEIGHT_LABEL = self.minimap.size[1] / 5 # in order to have same height as minimap at the end
+		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 		player = self.game.players.get("player")
 		if player is not None:
 			# Create a vertical BoxGroup to align buttons
 			self.v_box1 = arcade.gui.UIBoxLayout()
 
-
 			player_resources = player.resources
 			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
-
-			self.HEIGHT_LABEL = self.minimap.size[1] / len(resources_tab) # in order to have same height as minimap at the end
-			self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
 			# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 			for val in resources_tab :
@@ -515,6 +512,18 @@ class View():
 			)
 		)
 
+		# Create a box for upgrades
+		self.v_box14 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 12) / 2,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height / 12) / 2,
+				child=self.v_box14
+			)
+		)
+
 		# Create a box for the military buildable by barracks
 		self.v_box11 = arcade.gui.UIBoxLayout()
 		self.manager.add(
@@ -597,6 +606,7 @@ class View():
 		player = self.game.players.get("player")
 		if player is not None:
 			player_resources = player.resources
+			print(player_resources)
 			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 			for label, resource_text in zip(self.resource_label_list, resources_tab):
 				label.text = resource_text
@@ -616,6 +626,7 @@ class View():
 		self.v_box10.clear()
 		self.v_box11.clear()
 		self.v_box12.clear()
+		self.v_box14.clear()
 
 		self.boolean_dynamic_gui = False
 		if selected_list["player"] : # someting is selected
@@ -667,9 +678,11 @@ class View():
 
 
 					elif isinstance(s, Zone) : # batiment du joueur
-						if not isinstance(s, House) : # ne pas l'afficher sur les batiments qui ne possèdent aucune action
-							villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
-							self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
+						self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+						if isinstance(s, House) :
+							upgrade_button = ActionButton(text="Amélioration", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/upgrade.png", aoce_game=self.game)
+							self.v_box14.add(upgrade_button.with_background(arcade.load_texture(button_texture)))
 
 						if isinstance(s, TownCenter) :
 							villager_button = ActionButton(text="Villageois", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/villager_stand.png", aoce_game=self.game)

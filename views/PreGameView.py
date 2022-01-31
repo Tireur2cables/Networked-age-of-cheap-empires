@@ -67,7 +67,7 @@ class PreGameView(arcade.View) :
 		you_civil_button = PlayerButton(text="Vous", width=buttonsize * 2, height=buttonsize / 4)
 		self.ia_box.add(you_civil_button.with_space_around(bottom=20))
 
-		name = ["Hugot", "Nico", "GuiLeDav", "Maxence", "Thomas", "Kenzo", "Nicolas"]
+		name = ["IA1", "IA2", "IA3", "IA4", "IA5", "IA6", "IA7"]
 
 		for i in range(self.nbAdv) :
 			adv_civil_button = SelctDifButton(text=name[i],size=buttonsize, name=name[i])

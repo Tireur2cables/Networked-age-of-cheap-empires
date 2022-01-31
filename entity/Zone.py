@@ -123,6 +123,7 @@ class TownCenter(Buildable):
 	tile_size=(4, 4) # (3, 3) sur AOE
 	villager_cooldown_upgr = 3 if LAUNCH_FAST_ACTIONS else 20 # in seconds
 	villager_cost_upgr = (Res.FOOD, 50)
+	# Problème : Le unit_cooldown et cost sont des variables d'instance, et devraient être des variables de classe...
 
 	def __init__(self, grid_position, faction):
 		super().__init__(grid_position,
@@ -137,8 +138,9 @@ class TownCenter(Buildable):
 		self.unit_cost = Villager.creation_cost
 
 	@staticmethod
-	def TownCenter_1():
-		TownCenter.villager_cooldown_upgr=(Res.WOOD,30)
+	def TownCenter_upgrade():
+		TownCenter.upgrade_level=TownCenter.upgrade_level+1
+		TownCenter.villager_cost_upgr=(Res.WOOD,30)
 
 class Barracks(Buildable):
 	#WhoAmI : Cost : 125Wood and 30sec buildtime; Train & Upgrade infantry (Clubman)
@@ -146,6 +148,10 @@ class Barracks(Buildable):
 	#Il y a des doublons dans les attributs static, mais cela évite de tout casser
 	sprite_data = SpriteData("Ressources/img/zones/buildables/barracks.png", scale=0.7, y_offset=255//2 - TILE_HEIGHT - 20)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 125, Res.GOLD : 0, Res.STONE : 0}
+
+	upgrade_level=0
+	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
+
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
 	cost=(Res.WOOD, 125)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
@@ -192,8 +198,19 @@ class Barracks(Buildable):
 			self.unit_cost = Knight.creation_cost
 
 	@staticmethod
-	def Barracks_1():
-		Barracks.cost=(Res.WOOD,100)
+	def Barracks_upgrade(self):
+		Barracks.upgrade_level=Barracks.upgrade_level+1
+
+		Militia.creation_time=Militia.creation_time-5
+		Spearman.creation_time=Spearman.creation_time-5
+		Archer.creation_time=Archer.creation_time-5
+		Skirmisher.creation_time=Skirmisher.creation_time-5
+		ScoutCavalry.creation_time=ScoutCavalry.creation_time-5
+		Knight.creation_time=Knight.creation_time-5
+
+
+
+
 
 class StoragePit(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30sec Build time; Use : Drop off wood, stone,gold (& food from hunt & fishing ONLY)
@@ -204,6 +221,10 @@ class StoragePit(Buildable):
 	sprite_data = SpriteData("Ressources/img/zones/buildables/storagepit.png", scale=0.7, y_offset=101//2 - TILE_HEIGHT//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
+	
+	upgrade_level=0
+	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
+
 	cost=(Res.WOOD, 120)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2) # (3, 3) sur AOE, (2, 2) sur AOE2
@@ -215,8 +236,10 @@ class StoragePit(Buildable):
 		health=350)
 
 	@staticmethod
-	def StoragePit_1():
+	def StoragePit_upgrade():
+		StoragePit.upgrade_level=StoragePit.upgrade_level+1
 		StoragePit.cost=(Res.WOOD,100)
+		StoragePit.creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
 
 class Granary(Buildable):
 	#WhoAmI : Cost : 120 Wood, 30 sec build time; Use : Drop off Food from Gatherers, Foragers & Farmers (subclass Villager)
@@ -225,6 +248,10 @@ class Granary(Buildable):
 	sprite_data=SpriteData("Ressources/img/zones/buildables/granary.png", scale=0.7, y_offset=208//2 - TILE_HEIGHT - 15)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 30
+	
+	upgrade_level=0
+	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
+
 	cost=(Res.WOOD, 120)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 30
 	tile_size=(2, 2)
@@ -236,8 +263,10 @@ class Granary(Buildable):
 		health=350)
 
 	@staticmethod
-	def Granary_1():
+	def Granary_upgrade():
+		Granary.upgrade_level=Granary.upgrade_level+1
 		Granary.cost=(Res.WOOD,90)
+		Granary.creation_cost = {Res.FOOD : 0, Res.WOOD : 90, Res.GOLD : 0, Res.STONE : 0}
 
 
 class Dock(Buildable):
@@ -247,6 +276,10 @@ class Dock(Buildable):
 	sprite_data=SpriteData("Ressources/img/zones/buildables/dock.png", scale=0.7, y_offset=177//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 35
+	
+	upgrade_level=0
+	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
+
 	cost=(Res.WOOD, 100)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 35
 	tile_size=(3, 3)
@@ -264,6 +297,10 @@ class House(Buildable):
 	sprite_data=SpriteData("Ressources/img/zones/buildables/house.png", scale=0.7, y_offset=126//2 - 10)
 	creation_cost = {Res.FOOD : 0, Res.WOOD : 30, Res.GOLD : 0, Res.STONE : 0}
 	creation_time = 2 if LAUNCH_FAST_ACTIONS else 25
+	
+	upgrade_level=0
+	upgrade_cost = [{Res.FOOD : 150, Res.WOOD : 75, Res.GOLD : 0, Res.STONE : 0},None]
+
 	cost=(Res.WOOD, 30)
 	build_time=2 if LAUNCH_FAST_ACTIONS else 25
 	tile_size=(2, 2)
@@ -275,8 +312,10 @@ class House(Buildable):
 		health=75)
 
 	@staticmethod
-	def House_1():
+	def House_upgrade():
+		House.upgrade_level=House.upgrade_level+1
 		House.cost=(Res.WOOD,20)
+		House.creation_cost = {Res.FOOD : 0, Res.WOOD : 20, Res.GOLD : 0, Res.STONE : 0}
 
 
 

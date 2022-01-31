@@ -8,6 +8,8 @@ from entity.Unit import *
 from entity.Zone import *
 # from game import GameView
 from player import AI, Player
+from views.VictoryView import VictoryView
+from views.DefeatView import DefeatView
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -402,9 +404,45 @@ class Controller():
 			else:
 				self.move_entity(entity, aimed_tile.grid_position)
 
+	def order_upgradebuilding(self, upgradeIt:Buildable):
+		if (upgradeIt.upgrade_cost[upgradeIt.upgrade_level] != None):
+			current_player = self.game.players[upgradeIt.faction]
+			if all(current_player.resources[k] >= upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k] for k in Res) :
+				for k in Res :
+					current_player.sub_resource(k, upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k])
+				if upgradeIt.faction == "player" : # Shouldn't be used with AI
+					self.game.game_view.update_resources_gui()
+				if isinstance(upgradeIt,Barracks):
+					upgradeIt.Barracks_upgrade()
+				elif isinstance(upgradeIt,House):
+					upgradeIt.House_upgrade()
+				elif isinstance(upgradeIt,Dock):
+					#upgradeIt.Dock_upgrade()
+					pass
+				elif isinstance(upgradeIt,Granary):
+					upgradeIt.Granary_upgrade()
+				elif isinstance(upgradeIt,StoragePit):
+					upgradeIt.StoragePit_upgrade()
+				elif isinstance(upgradeIt,TownCenter):
+					upgradeIt.TownCenter_upgrade()
+			else :
+				if upgradeIt.faction == "player":
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
+		else :
+			if upgradeIt.faction == "player":
+				self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
+
 	def end_game(self):
 		# print("youpiiii !!!")
-		pass
+		#Le call est en construction
+		for player in self.game.players:
+			if player == "player":
+				VictoryView(self.game).setup()
+				self.game.window.show_view(VictoryView(self.game))
+			else:
+				DefeatView(self.game).setup()
+				self.game.window.show_view(DefeatView(self.game))
+		#pass
 
 # --- On_update (Called every frame) ---
 
@@ -423,7 +461,7 @@ class Controller():
 			self.players.remove(dead_player)
 			del self.game.players[dead_player.player_type]
 
-		if len(self.game.players) == 1:
+		if len(self.game.players) == 1: #If there is only one player in the game it will call end_game which will call Victory Screen.
 			self.end_game()
 
 		# --- Update AI ---
