@@ -96,9 +96,6 @@ class View():
 
 	def init_cheats(self) :
 		self.display_cheat_input = False
-
-		#cheat_list_display = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
-
 		width = self.game.window.width  # arbitrary
 		height = self.game.window.height / 22 # arbitrary
 		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
@@ -110,9 +107,8 @@ class View():
 				text_color=(255, 255, 255, 255),
 				game = self.game
 			)
-
 		self.cheat_pane = arcade.gui.UITexturePane(self.cheatsinput, tex=bg_text)
-
+	
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
 
@@ -396,8 +392,8 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		if symbol == arcade.key.ENTER:
 			self.cheatsinput.on_enter_pressed()
-
-		if symbol == arcade.key.F: # cheat window
+			self.triggerCheatInput()
+		if symbol == arcade.key.F1: # cheat window
 			self.triggerCheatInput()
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
@@ -416,7 +412,7 @@ class View():
 		else :
 			self.manager.add(self.cheat_pane)
 		self.display_cheat_input = not self.display_cheat_input
-		self.cheatsinput.triggered = not self.cheatsinput.triggered
+		
 
 	def draw_bar(self, pos, health, max_health, color, nbr_health_bar=1):
 		if max_health:

@@ -32,11 +32,11 @@ cheat codes available ;
 
 class CheatsInput(arcade.gui.UIInputText):
     STEROIDS = False
-    def __init__(self, x, y, text, width, height, text_color, game) : #player : Player
+    def __init__(self, x, y, text, width, height, text_color, game) : 
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
         self.game = game
-        self.triggered = False #permet de pouvoir taper des keys quand on tape un cheat code sans faire spawn n'importe quoi
+        self.triggered = False 
 
     def Ninjalui(self):
         self.game.players["player"].add_all(10000)
@@ -56,7 +56,7 @@ class CheatsInput(arcade.gui.UIInputText):
 
 
     def on_enter_pressed(self) :
-        print(self.text)
+        print(f"Cheatcode entered : {self.text}")
         if self.text == "NINJALUI":
             self.Ninjalui()
         elif self.text == "BIGDADDY":
