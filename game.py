@@ -2,7 +2,6 @@
 # -- arcade --
 import arcade
 from player import AI, Player
-from save.serializationTest import pickleLoading
 # -- others --
 from views.MainView import MainView
 # -- mvc --

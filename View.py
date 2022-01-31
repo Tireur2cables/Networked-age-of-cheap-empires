@@ -1,16 +1,12 @@
 # --- Imports ---
 ## -- arcade --
-from turtle import width, window_height, window_width
 import arcade
-from arcade.color import BLACK, BROWN_NOSE
 import arcade.gui
 ## -- Others --
 from views.CustomButtons import ActionButton, ConstructButton, NextViewButton, ListButton, SaveButton
-from map.tileSprite import TileSprite
 from map.Minimap import Minimap
 from cheats import CheatsInput
 from utils.vector import Vector
-from save.serializationTest import *
 from entity.Unit import *
 from entity.Zone import *
 from utils.isometric import *

@@ -2,7 +2,7 @@
 from ctypes import string_at
 from arcade.arcade_types import Color
 import arcade.gui
-from save.serializationTest import *
+from save import pickleLoading, pickleSaving
 from entity.Unit import *
 
 # Constants
