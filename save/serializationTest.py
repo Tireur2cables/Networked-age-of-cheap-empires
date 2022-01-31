@@ -28,17 +28,18 @@
 
 ###############################################
 import pickle, json
-def pickleSaving(save_name, game):
-	save_file=save_name+'.pkl'
+
+from cheats import CheatsInput
+def pickleSaving(game):
+	save_file = "aocesave" + CheatsInput.save_suffix +'.pkl'
 	data = {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
 	print(f"[Saving]: {data}")
 	with open(save_file,'wb') as fileDescriptor:
 		pickle.dump(data, fileDescriptor)
 	print(f"[Saving]: Done!")
-	pickleLoading(save_name)
 
 def pickleLoading(save_name):
-	save_file=save_name+'.pkl'
+	save_file = "aocesave" + CheatsInput.save_suffix +'.pkl'
 	print(f"[Loading]: Loading...")
 	with open(save_file,'rb') as fileDescriptor:
 		data = pickle.load(fileDescriptor)

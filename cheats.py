@@ -17,11 +17,13 @@ your AI. What commands those are will depend on your AI.
 """
 class CheatsInput(arcade.gui.UIInputText):
     STEROIDS = False
-    def __init__(self, x, y, text, width, height, text_color, game) : 
+    save_suffix = "0"
+
+    def __init__(self, x, y, text, width, height, text_color, game) :
         super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
         self.game = game
-        self.triggered = False 
+        self.triggered = False
 
     def Ninjalui(self):
         self.game.players["player"].add_all(10000)
@@ -36,6 +38,9 @@ class CheatsInput(arcade.gui.UIInputText):
         print("ON STEROIDS!!!")
         CheatsInput.STEROIDS = not CheatsInput.STEROIDS
 
+    def set_save(self, save_suffix):
+        CheatsInput.save_suffix = save_suffix
+
     def reset_text(self):
         self.text = "Enter a cheat code"
 
@@ -48,4 +53,6 @@ class CheatsInput(arcade.gui.UIInputText):
             self.Bigdaddy()
         elif self.text == "STEROIDS":
             self.Steroids()
+        elif "/save" in self.text and len(self.text) >= 7:
+            self.set_save(self.text[6:])
         self.reset_text()

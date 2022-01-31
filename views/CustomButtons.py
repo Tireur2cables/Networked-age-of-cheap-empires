@@ -31,7 +31,7 @@ class SaveButton(arcade.gui.UITextureButton) :
 		self.game = game
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		pickleSaving("savetest", self.game)
+		pickleSaving(self.game)
 
 class LoadButton(arcade.gui.UITextureButton):
 	def __init__(self, window, main_view, text, width):

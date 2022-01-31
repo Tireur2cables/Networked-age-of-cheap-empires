@@ -407,4 +407,4 @@ class BerryBush(Resources):
 		is_locking=True,
 		sprite_data=BerryBush.sprite_data,
 		health=0,
-		amount=150)
+		amount=1000)  # 150 in reality, we don't have farms and animals so this is necessary.
