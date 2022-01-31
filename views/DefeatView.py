@@ -11,7 +11,7 @@ class DefeatView(arcade.View) :
     def __init__(self,game):
         super().__init__()
         self.game =game
-    
+
     def setup(self):
         pass
 
@@ -26,7 +26,7 @@ class DefeatView(arcade.View) :
         self.manager.enable()
 
         self.setupButtons()
-    
+
     def setupButtons(self):
         # def button size
         buttonsize = self.window.width / 3 # arbitrary
@@ -34,7 +34,7 @@ class DefeatView(arcade.View) :
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
 
-        retour_menu = NextViewButton(self.window,MainView(self.game.game_view),text="Menu Principal",width=buttonsize)
+        retour_menu = NextViewButton(self.window,MainView(self.game),text="Menu Principal",width=buttonsize)
         self.v_box.add(retour_menu.with_space_around(bottom=buttonsize/6))
 
         exit_game = QuitButton(self.window,text="Quit",width = buttonsize)
@@ -60,4 +60,3 @@ class DefeatView(arcade.View) :
 
     def on_hide_view(self) :
         self.manager.disable()
-
