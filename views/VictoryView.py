@@ -2,15 +2,16 @@
 import arcade
 from arcade.arcade_types import Color
 from views.CustomButtons import QuitButton, NextViewButton
+from views.MainView import MainView
 
 # --- Constants ---
 BACKGROUND = "./Ressources/img/Victory3.jpg"
 
 # View de victoire : on l'affiche quand le joueur remporte la partie
 class VictoryView(arcade.View) :
-    def __init__(self, main_view):
+    def __init__(self,game):
         super().__init__()
-        self.main_view = main_view
+        self.game =game
     
     def setup(self):
         pass
@@ -34,7 +35,7 @@ class VictoryView(arcade.View) :
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
 
-        retour_menu = NextViewButton(self.window,self.main_view,text="Menu Principal",width=buttonsize)
+        retour_menu = NextViewButton(self.window,MainView(self.game.game_view),text="Menu Principal",width=buttonsize)
         self.v_box.add(retour_menu.with_space_around(bottom=buttonsize/6))
 
         exit_game = QuitButton(self.window,text="Quit",width = buttonsize)

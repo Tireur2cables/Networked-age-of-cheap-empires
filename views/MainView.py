@@ -5,7 +5,6 @@ from views.CustomButtons import QuitButton, NextViewButton
 from views.SettingsView import SettingsView
 from views.PreGameView import PreGameView
 from views.IAvsIAView import IAPreGameView
-from views.VictoryView import VictoryView
 
 # --- Constants ---
 BACKGROUND = "./Ressources/img/background.png"
@@ -56,9 +55,6 @@ class MainView(arcade.View) :
 
 		quit_button = QuitButton(self.window, text="Quit", width=buttonsize)
 		self.v_box.add(quit_button)
-
-		tempo_test = NextViewButton(self.window,VictoryView(self),text="Testing Victory",width = buttonsize)
-		self.v_box.add(tempo_test.with_space_around(top=20))
 
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(

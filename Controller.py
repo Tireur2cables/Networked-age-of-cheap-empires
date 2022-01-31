@@ -415,9 +415,9 @@ class Controller():
 	def end_game(self):
 		# print("youpiiii !!!")
 		#Le call est en construction
-		#self.VictoryView(self).setup()
-		#self.window.show_view(VictoryView(self))
-		pass
+		VictoryView(self.game).setup()
+		self.game.window.show_view(VictoryView(self.game))
+		#pass
 
 # --- On_update (Called every frame) ---
 
@@ -436,7 +436,7 @@ class Controller():
 			self.players.remove(dead_player)
 			del self.game.players[dead_player.player_type]
 
-		if len(self.game.players) == 1:
+		if len(self.game.players) == 1: #If there is only one player in the game it will call end_game which will call Victory Screen.
 			self.end_game()
 
 		# --- Update AI ---
