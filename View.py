@@ -29,6 +29,7 @@ PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
 PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
 PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
 button_texture = "Ressources/img/button_background.png"
+button_texture2 = "Ressources/img/bouton_black_age.png"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
@@ -111,6 +112,7 @@ class View():
 	def static_menu(self) :
 		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
 
+
 		self.HEIGHT_LABEL = self.minimap.size[1] / 5 # in order to have same height as minimap at the end
 		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
@@ -124,9 +126,9 @@ class View():
 
 			# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 			for val in resources_tab :
-				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
+				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(255, 255, 255, 255), font_name=('Impact',))
 				self.resource_label_list.append(label)
-				self.v_box1.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
+				self.v_box1.add(label.with_background(arcade.load_texture(button_texture2)))
 
 			# Create a widget to hold the v_box widget, that will center the buttons
 			self.manager.add(
@@ -632,9 +634,9 @@ class View():
 
 			for s in selected_list["player"] :
 				if isinstance(s, Entity) : # add entity info
-					titre = s.get_name().capitalize() + ("" if s.faction == "None" else " [" + s.faction + "] ") # There is a weird graphic bug. Replacing this line by : title = "Wood" also produces the bug so it's likely not due to our code...
+					titre ="  " + s.get_name().capitalize() + ("" if s.faction == "None" else " [" + s.faction + "] ") # There is a weird graphic bug. Replacing this line by : title = "Wood" also produces the bug so it's likely not due to our code...
 					entity_box_stat = arcade.gui.UITextArea(text=titre, width=width / 3, height=height)
-					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
+					self.v_box4.add(entity_box_stat.with_background(arcade.load_texture(button_texture2)))
 
 					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
 					self.v_box8.add(entity_life.with_border())
@@ -652,8 +654,8 @@ class View():
 						villager_ressources = arcade.gui.UITextArea(text="Ressources : " + str(s.nb_resources()), text_color=arcade.color.PINK, width=width / 8)
 						self.v_box8.add(villager_ressources.with_border())
 
-						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
-						self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+						villager_box_action = arcade.gui.UITextArea(text="    Actions", width=width * 2 / 3, height=height)
+						self.v_box7.add(villager_box_action.with_background(arcade.load_texture(button_texture2)))
 
 						storagepit_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/storagepit.png", text="StoragePit", width=width / 6, height=self.game.window.height / 12)
 						self.v_box5.add(storagepit_villager.with_background(arcade.load_texture(button_texture)))
@@ -673,8 +675,8 @@ class View():
 
 
 					elif isinstance(s, Zone) : # batiment du joueur
-						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
-						self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+						villager_box_action = arcade.gui.UITextArea(text="    Actions", width=width * 2 / 3, height=height)
+						self.v_box7.add(villager_box_action.with_background(arcade.load_texture(button_texture2)))
 						if isinstance(s, House) :
 							upgrade_button = ActionButton(text="Amélioration", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/upgrade.png", aoce_game=self.game)
 							self.v_box14.add(upgrade_button.with_background(arcade.load_texture(button_texture)))
