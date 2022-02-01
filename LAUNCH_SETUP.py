@@ -6,14 +6,14 @@
 # Note: If you add lines, remember to put the default values back before commiting.
 
 # Defaults, in this order: True, True, False, False, False, True, False, False, False, False, False
-LAUNCH_FULLSCREEN = False
-LAUNCH_MUSIC = False
+LAUNCH_FULLSCREEN = True
+LAUNCH_MUSIC = True
 LAUNCH_DEFAULT_MAP = False
 LAUNCH_DEBUG_DISPLAY = False
-LAUNCH_FAST_ACTIONS = True
+LAUNCH_FAST_ACTIONS = False
 LAUNCH_ENABLE_IA = True
-LAUNCH_LIGHTSPEED_MOVES = True
-LAUNCH_NINJALUI = True
+LAUNCH_LIGHTSPEED_MOVES = False
+LAUNCH_NINJALUI = False
 LAUNCH_SAFEWAY_SAND = False
 LAUNCH_PAPER_TOWNCENTER = False
 LAUNCH_DISABLE_RANDOM_PLACEMENT = False
