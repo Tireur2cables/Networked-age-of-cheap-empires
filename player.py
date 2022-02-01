@@ -174,12 +174,14 @@ class AI(Player):
 	def __init__(self,
 			game,
 			player_type: str,
+			difficulty,
 			resources: dict) -> None:
 		super().__init__(game, player_type, resources)
 		self.delta_time = 0
-		self.goal = "dev"
-		self.aimed_player = None
-		self.aimed_entity = None
+		self.difficulty = difficulty
+		self.mind = {}
+
+		print(self.difficulty)
 
 	def __getstate__(self):
 		return [self.player_type,
@@ -194,33 +196,32 @@ class AI(Player):
 		self.food_storage,
 		self.other_storage,
 		self.delta_time,
-		self.goal,
-		self.aimed_player,
-		self.aimed_entity]
+		self.difficulty,
+		self.mind]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.goal, self.aimed_player, self.aimed_entity = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.difficulty, self.mind = data
 
 
 	def search_enemy_to_attack(self):
-		if self.aimed_player is None:
-			self.aimed_player = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
-			print(self.aimed_player)
+		if self.mind.get("aimed_player", None) is None:
+			self.mind["aimed_player"] = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
+			print(self.mind)
 
 		if random.randint(0, 1) == 0: # 0 : I attack a zone / 1 : I attack a unit
-			for zone in self.aimed_player.my_zones:
+			for zone in self.mind["aimed_player"].my_zones:
 				return zone
 			# aimed_tile, harvest_zone = self.game.game_model.map.get_closest_tile_nearby_fast(iso_to_grid_pos(self.town_center.iso_position), attacked_zone)
 
-		for unit in self.aimed_player.my_units:
+		for unit in self.mind["aimed_player"].my_units:
 			return unit
 
 	def send_army(self):
-		self.aimed_entity = self.search_enemy_to_attack()
+		self.mind["aimed_entity"] = self.search_enemy_to_attack()
 		for military in self.my_military:
 			DEBUG_start = time.time()
-			self.game.game_controller.order_attack(military, self.aimed_entity)
+			self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
 			print(f"time: {time.time() - DEBUG_start}")
 
 	def search_pos_to_build(self, start_position, tile_size):
@@ -332,7 +333,7 @@ class AI(Player):
 						else:
 							impossible_actions.add(action)
 
-					elif (action := ("build", "barracks")) not in (ongoing_actions | impossible_actions) and not self.my_zones_contains(Barracks):
+					elif self.difficulty != "Pacifique" and (action := ("build", "barracks")) not in (ongoing_actions | impossible_actions) and not self.my_zones_contains(Barracks):
 						map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
 						if map_position is not None:
 							self.game.game_controller.order_build(unit, map_position, "barracks")
@@ -352,8 +353,9 @@ class AI(Player):
 						if harvest_zone is not None:
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
-		if self.get_nb_class_in_unit(Military) > 5 and self.aimed_entity is None:
-			self.send_army()
+		if self.difficulty != "Pacifique":
+			if self.get_nb_class_in_unit(Military) > 5 and self.mind.get("aimed_entity", None) is None:
+				self.send_army()
 
 		for zone in self.my_zones:
 			if isinstance(zone, (TownCenter, Barracks)):

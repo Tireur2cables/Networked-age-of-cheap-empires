@@ -666,8 +666,8 @@ class Controller():
 				player_controlling = self.game.players[unit.faction]
 				opponent_controlling = self.game.players[unit.aimed_entity.faction]
 				if isinstance(player_controlling, AI):
-					player_controlling.aimed_entity = None
+					player_controlling.mind["aimed_entity"] = None
 					if isinstance(unit.aimed_entity, TownCenter) or not opponent_controlling.is_alive:
-						player_controlling.aimed_player = None
+						player_controlling.mind["aimed_player"] = None
 				unit.end_goal()
 				self.dead_entities.add(unit.aimed_entity)

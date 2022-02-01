@@ -123,10 +123,10 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 # Selection de sa difficulté
 class SelctDifButton(arcade.gui.UITextureButton):
 	def __init__(self, text, size, name):
-		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Facile ", width=size * 2, height=size / 4)
-		self.count = 0
+		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Facile", width=size * 2, height=size / 4)
+		self.count = 2
 		self.name = name
-		self.list = ["Facile", "Moyen", "Difficile"]
+		self.list = ["Stupide", "Pacifique", "Facile", "Moyen", "Difficile"]
 		self.sep = " : "
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
