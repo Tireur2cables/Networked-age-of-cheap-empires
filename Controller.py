@@ -1,4 +1,5 @@
 # --- Imports ---
+from copy import deepcopy
 import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
@@ -221,11 +222,11 @@ class Controller():
 
 
 # --- Orders (Called once) ----
-	def move_entity(self, entity, grid_position, fast=True):
+	def move_entity(self, entity, end_grid_position, fast=True):
 		if fast:
-			path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+			path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		else:
-			path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+			path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		if path_len > 0:
 			entity.set_move_action()
@@ -233,6 +234,31 @@ class Controller():
 			entity.next_aim()
 		else:
 			return
+
+	def move_grouped_entities(self, entity_list, end_grid_position, fast=True):
+		position_dict = {}
+		for entity in entity_list:
+			start_position = iso_to_grid_pos(entity.iso_position)
+			if position_dict.get(tuple(start_position), None) is None:
+				if fast:
+					path, path_len = self.game.game_model.map.get_path_fast(start=start_position, end=end_grid_position)
+				else:
+					path, path_len = self.game.game_model.map.get_path(start=start_position, end=end_grid_position)
+				# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
+				if path_len > 0:
+					position_dict[tuple(start_position)] = path
+					entity.set_move_action()
+					entity.set_path(path)
+					entity.next_aim()
+				else:
+					position_dict[tuple(start_position)] = ()
+			else:
+				path = position_dict[tuple(start_position)]
+
+				if len(path) > 0:
+					entity.set_move_action()
+					entity.set_path(deepcopy(path))
+					entity.next_aim()
 
 	# Called once when you order an action on a zone
 	def order_harvest(self, entity, zone_to_harvest):
@@ -375,8 +401,6 @@ class Controller():
 
 		if isinstance(aimed_entity, Unit):
 			self.move_entity(entity, iso_to_grid_pos(aimed_entity.iso_position), False)
-			if isinstance(aimed_entity, Military) and entity.faction != "player":
-				return #TODO: Temporary fix to prevent circular/infinite loop of military chasing military...
 		else:
 			entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
@@ -389,6 +413,23 @@ class Controller():
 					entity.is_interacting = True
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
+
+	def order_army_attack(self, entity_list, aimed_entity):
+		for entity in entity_list:
+			entity.set_goal("attack")
+			entity.set_aimed_entity(aimed_entity)
+
+		if isinstance(aimed_entity, Unit):
+			self.move_grouped_entities(entity_list, iso_to_grid_pos(aimed_entity.iso_position), False)
+		else:
+			first_entity_grid_pos = iso_to_grid_pos(entity.iso_position)
+			# Step 1: Search the closest tile near the zone_found to harvest it.
+			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(first_entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
+			print(f"aimed_tile : {aimed_tile}")
+			# Step 2: Start moving toward the aimed entity
+			if aimed_tile is not None:
+				print(f"src and dest : {first_entity_grid_pos} -> {aimed_tile.grid_position}")
+				self.move_grouped_entities(entity_list, aimed_tile.grid_position)
 
 	def order_repairation(self, entity, aimed_entity) :
 		entity.set_goal("repair")

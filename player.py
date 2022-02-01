@@ -219,10 +219,11 @@ class AI(Player):
 
 	def send_army_towards(self, entity):
 		self.mind["aimed_entity"] = entity
-		for military in self.my_military:
-			# DEBUG_start = time.time()
-			self.game.game_controller.order_attack(military, entity)
-			# print(f"time: {time.time() - DEBUG_start}")
+		# for military in self.my_military:
+		# 	# DEBUG_start = time.time()
+		# 	self.game.game_controller.order_attack(military, entity)
+		# 	# print(f"time: {time.time() - DEBUG_start}")
+		self.game.game_controller.order_army_attack(self.my_military, entity)
 
 	def send_army(self):
 		entity_to_attack = self.search_enemy_to_attack()
