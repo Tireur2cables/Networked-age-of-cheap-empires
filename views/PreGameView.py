@@ -117,7 +117,7 @@ class PreGameView(arcade.View) :
 				y=self.window.height - buttonsize * (0.75),
 				text="70", width=buttonsize/(2.5), height=buttonsize/10,
 				text_color=(255, 255, 255, 255),
-				limit=101 # 100 + default on 100
+				limit=100
 			),
 			tex=bg_text,
 			padding=(10, 10, 10, 10)

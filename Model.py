@@ -79,7 +79,7 @@ class Model():
 		# Set up the villager and add it to the unit_list.
 		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		use_default = LAUNCH_DEFAULT_MAP
-		if use_default or self.map_seed == 100 :
+		if use_default :
 			self.map.setup(None)
 		else:
 			self.map.setup(process_array2(seed=self.map_seed, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE), nbr_players=len(self.players)))
