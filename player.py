@@ -204,6 +204,11 @@ class AI(Player):
 		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.difficulty, self.mind = data
 
 
+	def reset(self):
+		self.delta_time = 0
+		self.mind.clear()
+		super().reset()
+
 	def search_enemy_to_attack(self):
 		if self.mind.get("aimed_player", None) is None:
 			self.mind["aimed_player"] = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
