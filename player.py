@@ -230,11 +230,12 @@ class AI(Player):
 		self.send_army_towards(self.mind[entity_to_attack])
 
 	def send_army_aggressive(self):
+		print("ALATTAQUE")
 		if self.mind.get("aimed_player", None) is None:
 			aimed_player = None
 			for player_key, player in self.game.players.items():
 				if player_key != self.player_type:
-					if len(self.my_military) >= 5 + len(player.my_military):
+					if len(self.my_military) >= 5 + len(player.my_military) or random.randint(0, 30) == 0:
 						aimed_player = player
 			self.mind["aimed_player"] = aimed_player
 
@@ -371,16 +372,17 @@ class AI(Player):
 						if harvest_zone is not None:
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
-		if self.mind.get("aimed_entity") is None:
-			if self.difficulty == "Moyen":
-				if self.get_nb_class_in_unit(Military) > 15:
-					self.send_army()
-			elif self.difficulty == "Aggressive":
-				self.send_army_aggressive()
-		else:
-			idle_military = set(military for military in self.my_military if military.goal != "attack")
-			for military in idle_military:
-				self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
+		if len(self.my_military) > 0:
+			if self.mind.get("aimed_entity") is None:
+				if self.difficulty == "Moyen":
+					if self.get_nb_class_in_unit(Military) > 15:
+						self.send_army()
+				elif self.difficulty == "Aggressive":
+					self.send_army_aggressive()
+			else:
+				idle_military = set(military for military in self.my_military if military.goal != "attack")
+				for military in idle_military:
+					self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
 
 		for zone in self.my_zones:
 			if isinstance(zone, (TownCenter, Barracks)):

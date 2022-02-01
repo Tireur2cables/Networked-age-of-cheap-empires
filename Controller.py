@@ -415,14 +415,16 @@ class Controller():
 					self.move_entity(entity, aimed_tile.grid_position)
 
 	def order_army_attack(self, entity_list, aimed_entity):
+		last_entity = None
 		for entity in entity_list:
+			last_entity = entity
 			entity.set_goal("attack")
 			entity.set_aimed_entity(aimed_entity)
 
 		if isinstance(aimed_entity, Unit):
 			self.move_grouped_entities(entity_list, iso_to_grid_pos(aimed_entity.iso_position), False)
 		else:
-			first_entity_grid_pos = iso_to_grid_pos(entity.iso_position)
+			first_entity_grid_pos = iso_to_grid_pos(last_entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
 			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(first_entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
 			print(f"aimed_tile : {aimed_tile}")
