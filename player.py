@@ -217,12 +217,29 @@ class AI(Player):
 		for unit in self.mind["aimed_player"].my_units:
 			return unit
 
-	def send_army(self):
-		self.mind["aimed_entity"] = self.search_enemy_to_attack()
+	def send_army_towards(self, entity):
+		self.mind["aimed_entity"] = entity
 		for military in self.my_military:
-			DEBUG_start = time.time()
-			self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
-			print(f"time: {time.time() - DEBUG_start}")
+			# DEBUG_start = time.time()
+			self.game.game_controller.order_attack(military, entity)
+			# print(f"time: {time.time() - DEBUG_start}")
+
+	def send_army(self):
+		entity_to_attack = self.search_enemy_to_attack()
+		self.send_army_towards(self.mind[entity_to_attack])
+
+	def send_army_aggressive(self):
+		if self.mind.get("aimed_player", None) is None:
+			aimed_player = None
+			for player_key, player in self.game.players.items():
+				if player_key != self.player_type:
+					if len(self.my_military) >= 5 + len(player.my_military):
+						aimed_player = player
+			self.mind["aimed_player"] = aimed_player
+
+		if self.mind.get("aimed_player", None) is not None:
+			self.send_army_towards(self.mind["aimed_player"].town_center)
+
 
 	def search_pos_to_build(self, start_position, tile_size):
 		area_found = False
@@ -353,9 +370,16 @@ class AI(Player):
 						if harvest_zone is not None:
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
-		if self.difficulty != "Pacifique":
-			if self.get_nb_class_in_unit(Military) > 5 and self.mind.get("aimed_entity", None) is None:
-				self.send_army()
+		if self.mind.get("aimed_entity") is None:
+			if self.difficulty == "Moyen":
+				if self.get_nb_class_in_unit(Military) > 15:
+					self.send_army()
+			elif self.difficulty == "Aggressive":
+				self.send_army_aggressive()
+		else:
+			idle_military = set(military for military in self.my_military if military.goal != "attack")
+			for military in idle_military:
+				self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
 
 		for zone in self.my_zones:
 			if isinstance(zone, (TownCenter, Barracks)):
