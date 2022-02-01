@@ -110,7 +110,7 @@ class View():
 		self.cheat_pane = arcade.gui.UITexturePane(self.cheatsinput, tex=bg_text)
 
 	def static_menu(self) :
-		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
+		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT , COLOR_STATIC_RESSOURCES) #-15 sur Tile_Height pour minimap carré qui suit le deplacement cliqué en vertical (perte horizontale)
 
 
 		self.HEIGHT_LABEL = self.minimap.size[1] / 5 # in order to have same height as minimap at the end
@@ -345,7 +345,7 @@ class View():
 		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
 		if self.minimap.is_on_minimap_sprite(x, y) :
 			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
-			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
+			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / (self.minimap.size[1] -self.game.window.height*(9/400))) - self.camera.viewport_height / 2 # -self.game.window.height*(9/400) pour ajuster le deplacement de la caméra
 			self.camera.move_to([self.camera_x, self.camera_y], 1)
 		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :

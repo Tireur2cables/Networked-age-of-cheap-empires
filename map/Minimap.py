@@ -14,21 +14,21 @@ class Minimap() :
 	def __init__(self, view, default_map_size, tile_width, tile_height,	bakcground_color):
 		self.view = view
 		self.map_width = default_map_size * tile_width
-		self.map_height = default_map_size * tile_height
+		self.map_height =default_map_size * tile_height 
 		self.background_color = bakcground_color
 
 
 		MINIMAP_WIDTH = int(self.view.game.window.width * 3 / 10) # arbitrary
 		MINIMAP_HEIGHT = int(self.view.game.window.height * 1 / 4) # arbitrary
 
-		self.size = (MINIMAP_WIDTH, MINIMAP_HEIGHT)
+		self.size = (MINIMAP_WIDTH, MINIMAP_HEIGHT )
 
 		# Texture and associated sprite to render our minimap to
 		self.texture = arcade.Texture.create_empty("minimap_texture", self.size)
 		self.sprite = arcade.Sprite(
 			center_x=MINIMAP_WIDTH / 2,
-			center_y=MINIMAP_HEIGHT / 2,
-			texture=self.texture
+			center_y=(MINIMAP_HEIGHT / 2) + (MINIMAP_HEIGHT*(9/100)), #Decalage + (MINIMAP_HEIGHT*(9/100) pour centrer la minimap dans le carré
+			texture=self.texture,
 		)
 
 		# List of all our minimaps (there's just one)
@@ -47,7 +47,7 @@ class Minimap() :
 			top_left_x = self.view.camera_x + self.view.camera.viewport_width / 2
 			top_left_y = self.view.camera_y + self.view.camera.viewport_height / 2
 			arcade.draw_rectangle_outline(top_left_x, top_left_y, self.view.camera.viewport_width, self.view.camera.viewport_height, WHITE, BORDER_MINI_RECTANGLE)
-		minimap_texture = arcade.draw_texture_rectangle(center_x=self.size[0] / 2, center_y=self.size[1] / 2, width=self.size[0], height=self.size[1], texture=arcade.load_texture(button_texture2))
+		minimap_texture = arcade.draw_texture_rectangle(center_x=self.size[0] / 2, center_y=self.size[1] / 2, width=self.size[0] , height=self.size[1] , texture=arcade.load_texture(button_texture2))
 
 		
 	def draw(self) :
