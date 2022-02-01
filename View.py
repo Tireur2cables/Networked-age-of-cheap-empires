@@ -498,11 +498,11 @@ class View():
 		)
 
 		# Create a box for the villagers buildable by towncenters
-		self.v_box10 = arcade.gui.UIBoxLayout()
+		self.v_box10 = arcade.gui.UIBoxLayout(vertical=False)
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="right",
-				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 12) / 2,
+				align_x=-self.game.window.width / 3 + self.game.window.width / 6 + (self.game.window.width / 3 - self.game.window.width / 6) / 2,
 				anchor_y="bottom",
 				align_y=(self.game.window.height / 4 - self.game.window.height / 12) / 2,
 				child=self.v_box10
@@ -677,15 +677,20 @@ class View():
 					elif isinstance(s, Zone) : # batiment du joueur
 						villager_box_action = arcade.gui.UITextArea(text="    Actions", width=width * 2 / 3, height=height)
 						self.v_box7.add(villager_box_action.with_background(arcade.load_texture(button_texture2)))
-						if isinstance(s, House) :
+
+						if isinstance(s, House) or isinstance(s, StoragePit) or isinstance(s, Granary) :
 							upgrade_button = ActionButton(text="Amélioration", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/upgrade.png", aoce_game=self.game)
 							self.v_box14.add(upgrade_button.with_background(arcade.load_texture(button_texture)))
 
-						if isinstance(s, TownCenter) :
+						elif isinstance(s, TownCenter) :
 							villager_button = ActionButton(text="Villageois", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/villager_stand.png", aoce_game=self.game)
 							self.v_box10.add(villager_button.with_background(arcade.load_texture(button_texture)))
 
+							upgrade_button = ActionButton(text="Amélioration", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/upgrade.png", aoce_game=self.game)
+							self.v_box10.add(upgrade_button.with_background(arcade.load_texture(button_texture)))
+
 						elif isinstance(s, Barracks) :
+							# ajouter quelque part ou ya la place le bouton amelioration
 							militia_button = ActionButton(text="Milice", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/militia_stand.png", aoce_game=self.game)
 							self.v_box11.add(militia_button.with_background(arcade.load_texture(button_texture)))
 

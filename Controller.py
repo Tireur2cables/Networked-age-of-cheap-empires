@@ -284,7 +284,7 @@ class Controller():
 	def order_build(self, entity, map_position, building_name):
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
-		if self.game.players[entity.faction].get_resource(zone_to_build_class.cost[0]) >= zone_to_build_class.cost[1]:
+		if self.game.players[entity.faction].can_create(zone_to_build_class) :
 			#Pour le gui, on baisse le flag si on peut finalement construire
 			if entity.faction == "player":
 				self.game.game_view.errorMessage = ""
@@ -352,12 +352,8 @@ class Controller():
 
 			if current_player.can_create(producing_zone.class_produced) :
 
-				for key, value in producing_zone.unit_cost.items():
-					if current_player.get_resource(key) < value:
-						return
-
 				producing_zone.is_producing = True
-				for key, value in producing_zone.unit_cost.items():
+				for key, value in producing_zone.class_produced.creation_cost.items():
 					current_player.sub_resource(key, value)
 
 				if producing_zone.faction == "player" : # Shouldn't be used with AI
@@ -573,8 +569,8 @@ class Controller():
 			entity.aimed_entity = None
 
 			if current_player.can_create(worksite.zone_to_build):
-				cost = worksite.zone_to_build.cost
-				current_player.sub_resource(*cost)
+				for res, cost in worksite.zone_to_build.creation_cost.items() :
+					current_player.sub_resource(res, cost)
 				if entity.faction == "player":
 					self.game.game_view.update_resources_gui()
 
