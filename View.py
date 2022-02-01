@@ -602,7 +602,7 @@ class View():
 		player = self.game.players.get("player")
 		if player is not None:
 			player_resources = player.resources
-			print(player_resources)
+			# print(player_resources)
 			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
 			for label, resource_text in zip(self.resource_label_list, resources_tab):
 				label.text = resource_text

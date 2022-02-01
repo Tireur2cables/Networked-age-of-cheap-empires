@@ -178,7 +178,8 @@ class AI(Player):
 		super().__init__(game, player_type, resources)
 		self.delta_time = 0
 		self.goal = "dev"
-		self.aimed_enemy = None
+		self.aimed_player = None
+		self.aimed_entity = None
 
 	def __getstate__(self):
 		return [self.player_type,
@@ -194,29 +195,32 @@ class AI(Player):
 		self.other_storage,
 		self.delta_time,
 		self.goal,
-		self.aimed_enemy]
+		self.aimed_player,
+		self.aimed_entity]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.goal, self.aimed_enemy = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.goal, self.aimed_player, self.aimed_entity = data
 
 
 	def search_enemy_to_attack(self):
-		self.aimed_enemy = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
-		print(self.aimed_enemy)
+		if self.aimed_player is None:
+			self.aimed_player = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
+			print(self.aimed_player)
+
 		if random.randint(0, 1) == 0: # 0 : I attack a zone / 1 : I attack a unit
-			for zone in self.aimed_enemy.my_zones:
+			for zone in self.aimed_player.my_zones:
 				return zone
 			# aimed_tile, harvest_zone = self.game.game_model.map.get_closest_tile_nearby_fast(iso_to_grid_pos(self.town_center.iso_position), attacked_zone)
 
-		for unit in self.aimed_enemy.my_units:
+		for unit in self.aimed_player.my_units:
 			return unit
 
 	def send_army(self):
-		entity_to_attack = self.search_enemy_to_attack()
+		self.aimed_entity = self.search_enemy_to_attack()
 		for military in self.my_military:
 			DEBUG_start = time.time()
-			self.game.game_controller.order_attack(military, entity_to_attack)
+			self.game.game_controller.order_attack(military, self.aimed_entity)
 			print(f"time: {time.time() - DEBUG_start}")
 
 	def search_pos_to_build(self, start_position, tile_size):
@@ -348,7 +352,7 @@ class AI(Player):
 						if harvest_zone is not None:
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
-		if self.get_nb_class_in_unit(Military) > 30 and self.aimed_enemy is None:
+		if self.get_nb_class_in_unit(Military) > 5 and self.aimed_entity is None:
 			self.send_army()
 
 		for zone in self.my_zones:

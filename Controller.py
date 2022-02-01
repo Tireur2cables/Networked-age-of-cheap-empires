@@ -375,6 +375,8 @@ class Controller():
 
 		if isinstance(aimed_entity, Unit):
 			self.move_entity(entity, iso_to_grid_pos(aimed_entity.iso_position), False)
+			if isinstance(aimed_entity, Military) and entity.faction != "player":
+				return #TODO: Temporary fix to prevent circular/infinite loop of military chasing military...
 		else:
 			entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
@@ -594,8 +596,8 @@ class Controller():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
-					print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
+					# print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					# print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
@@ -661,8 +663,11 @@ class Controller():
 
 			print(alive)
 			if not alive:
+				player_controlling = self.game.players[unit.faction]
+				opponent_controlling = self.game.players[unit.aimed_entity.faction]
+				if isinstance(player_controlling, AI):
+					player_controlling.aimed_entity = None
+					if isinstance(unit.aimed_entity, TownCenter) or not opponent_controlling.is_alive:
+						player_controlling.aimed_player = None
 				unit.end_goal()
 				self.dead_entities.add(unit.aimed_entity)
-				player_controlling = self.game.players[unit.faction]
-				if isinstance(player_controlling, AI):
-					player_controlling.aimed_enemy = None
