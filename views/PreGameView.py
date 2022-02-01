@@ -18,7 +18,7 @@ class PreGameView(arcade.View) :
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
-		if self.nbAdv == 8 :
+		if self.nbAdv == 4 :
 			self.nbAdv = 0
 
 	def on_show(self):
@@ -36,7 +36,7 @@ class PreGameView(arcade.View) :
 
 	# Boutton retour
 	def retourButton(self):
-		buttonsize = self.window.width / 6 # arbitrary
+		buttonsize = self.window.width / 10 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
 		self.retour_box = arcade.gui.UIBoxLayout()
