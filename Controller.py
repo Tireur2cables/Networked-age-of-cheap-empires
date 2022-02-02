@@ -500,7 +500,7 @@ class Controller():
 		# --- Check End Conditions ---
 		dead_players = set()
 		for player in self.players:
-			if player.town_center.is_dead == True:
+			if player.town_center.is_dead:
 				self.discard_player_from_game(player)
 				player.is_alive = False
 				dead_players.add(player)
