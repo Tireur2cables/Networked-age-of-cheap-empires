@@ -1,16 +1,19 @@
 # --- Imports ---
 import arcade
+import arcade.gui
 from views.CustomButtons import QuitButton, NextViewButton
 from views.MainView import MainView
 
 # --- Constants ---
 BACKGROUND = "./Ressources/img/Defeat2.jpg"
+IMAGE_VICTORY = "./Ressources/img/bouton_rouge_age.png"
 
 # View de victoire : on l'affiche quand le joueur remporte la partie
 class DefeatView(arcade.View) :
-    def __init__(self,game):
+    def __init__(self,game,winner):
         super().__init__()
         self.game =game
+        self.winner = winner
 
     def setup(self):
         pass
@@ -33,6 +36,10 @@ class DefeatView(arcade.View) :
 
         # Create a vertical BoxGroup to align buttons
         self.v_box = arcade.gui.UIBoxLayout()
+        self.v_box1 = arcade.gui.UIBoxLayout()
+
+        winner_text = arcade.gui.UITextArea(text="      " + self.winner + " est victorieux",width=buttonsize,font_size = 28,text_color= arcade.color.WHITE)
+        self.v_box1.add(winner_text.with_background(texture=arcade.load_texture(IMAGE_VICTORY),top=buttonsize/12,bottom=buttonsize/12))
 
         retour_menu = NextViewButton(self.window,MainView(self.game),text="Menu Principal",width=buttonsize)
         self.v_box.add(retour_menu.with_space_around(bottom=buttonsize/6))
@@ -47,6 +54,16 @@ class DefeatView(arcade.View) :
                 align_x = buttonsize/2,
 				anchor_y = "center_y",
 				child = self.v_box
+			)
+		)
+
+        # Create a widget to hold the v_box widget, that will center the buttons
+        self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x = "center_x",
+				anchor_y = "bottom",
+                align_y=buttonsize/10,
+				child = self.v_box1
 			)
 		)
 

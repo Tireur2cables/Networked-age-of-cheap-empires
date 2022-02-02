@@ -437,8 +437,8 @@ class Controller():
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
 			else:
-				DefeatView(self.game).setup()
-				self.game.window.show_view(DefeatView(self.game))
+				DefeatView(self.game,player).setup()
+				self.game.window.show_view(DefeatView(self.game, player))
 		#pass
 
 # --- On_update (Called every frame) ---
