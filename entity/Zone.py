@@ -82,6 +82,7 @@ class WorkSite(Zone):
 		super().__init__(grid_position,
 		sprite_data=sprite_data,
 		faction=faction,
+		max_health=100,
 		**kwargs)
 
 	@staticmethod
