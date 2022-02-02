@@ -126,7 +126,7 @@ class SelctDifButton(arcade.gui.UITextureButton):
 		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Moyen", width=size * 2, height=size / 4)
 		self.count = 2
 		self.name = name
-		self.list = ["Stupide", "Pacifique", "Facile", "Moyen", "Difficile", "Agressive"]
+		self.list = ["Pacifique", "Facile", "Moyen", "Difficile", "Agressive"]
 		self.sep = " : "
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent):
