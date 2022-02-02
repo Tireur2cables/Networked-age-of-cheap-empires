@@ -1,4 +1,5 @@
 # --- Imports ---
+from pickle import TRUE
 import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
@@ -8,6 +9,7 @@ from entity.Unit import *
 from entity.Zone import *
 # from game import GameView
 from player import AI, Player
+from views.IAVictoryView import IAVictoryView
 from views.VictoryView import VictoryView
 from views.DefeatView import DefeatView
 
@@ -436,25 +438,33 @@ class Controller():
 			if player == "player":
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
-			else:
+			elif self.partie_player():
 				DefeatView(self.game,player).setup()
 				self.game.window.show_view(DefeatView(self.game, player))
+			else:
+				IAVictoryView(self.game,player).setup()
+				self.game.window.show_view(IAVictoryView(self.game,player))
 		#pass
 
+	def partie_player(self):
+		for player in self.dead_players:
+			if player == "player":
+				return True
+		return False
 # --- On_update (Called every frame) ---
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 
 		# --- Check End Conditions ---
-		dead_players = set()
+		self.dead_players = set()
 		for player in self.players:
 			if player.town_center.is_dead == True:
 				self.discard_player_from_game(player)
 				player.is_alive = False
-				dead_players.add(player)
+				self.dead_players.add(player)
 
-		for dead_player in dead_players:
+		for dead_player in self.dead_players:
 			self.players.remove(dead_player)
 			del self.game.players[dead_player.player_type]
 
