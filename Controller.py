@@ -696,6 +696,8 @@ class Controller():
 	def attack_entity(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time
 		if unit.action_timer > 1/unit.rate_fire:
+			player_controlling = self.game.players[unit.faction]
+			opponent_controlling = self.game.players[unit.aimed_entity.faction]
 			unit.action_timer = 0
 			print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
@@ -707,13 +709,16 @@ class Controller():
 				self.order_attack(unit.aimed_entity, unit)
 				unit.aimed_entity.is_interacting = True
 
-			print(alive)
+			if isinstance(opponent_controlling, AI):
+				opponent_controlling.mind["is_attacked_by"] = unit
+
 			if not alive:
-				player_controlling = self.game.players[unit.faction]
-				opponent_controlling = self.game.players[unit.aimed_entity.faction]
-				if isinstance(player_controlling, AI):
-					player_controlling.mind["aimed_entity"] = None
-					if isinstance(unit.aimed_entity, TownCenter) or not opponent_controlling.is_alive:
-						player_controlling.mind["aimed_player"] = None
+				# if isinstance(player_controlling, AI):
+				# 	player_controlling.mind["is_attacked_by"] = None
+				# 	player_controlling.mind["aimed_entity"] = None
+				# 	player_controlling.mind["counter_entity"] = None
+				# 	if isinstance(unit.aimed_entity, TownCenter) or not opponent_controlling.is_alive:
+				# 		player_controlling.mind["aimed_player"] = None
+				# Used to reset the mind of the IA, now it is in the AI on_update function but I left it here just in case
 				unit.end_goal()
 				self.dead_entities.add(unit.aimed_entity)

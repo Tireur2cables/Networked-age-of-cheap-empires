@@ -286,6 +286,14 @@ class AI(Player):
 				return True
 		return False
 
+	def correct_mind(self): # Just in case...
+		if (aimed_entity := self.mind.get("aimed_entity", None)) is not None and (aimed_entity.is_dead or not aimed_entity.is_alive()):
+			self.mind["is_attacked_by"] = None
+			self.mind["aimed_entity"] = None
+			self.mind["counter_entity"] = None
+			if isinstance(aimed_entity, TownCenter) or ((aimed_player := self.mind.get("aimed_player", None)) is not None and aimed_player.is_alive):
+				self.mind["aimed_player"] = None
+
 	def on_update(self, delta_time):
 
 		if not self.is_alive:
@@ -297,6 +305,8 @@ class AI(Player):
 			return
 		else:
 			self.delta_time = 0
+
+		self.correct_mind()
 
 		idle_unit = None
 		ongoing_actions = set()
@@ -378,7 +388,14 @@ class AI(Player):
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
 		if len(self.my_military) > 0:
-			if self.mind.get("aimed_entity") is None:
+			print(self.mind.get("aimed_entity", None))
+			if self.difficulty != "Pacifique" and self.mind.get("is_attacked_by", None) is not None and self.mind.get("counter_entity", None) is None:
+				print("I'M ATTACKED!!!")
+				entity_attacking = self.mind["is_attacked_by"]
+				self.mind["counter_entity"] = entity_attacking
+				self.send_army_towards(entity_attacking)
+			elif self.mind.get("aimed_entity", None) is None:
+				print("OK I AIM")
 				if self.difficulty == "Moyen":
 					if self.get_nb_class_in_unit(Military) > 15:
 						self.send_army()
