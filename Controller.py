@@ -167,30 +167,37 @@ class Controller():
 # --- Human Orders (Called once) ----
 
 	def human_order_towards_sprites(self, action, faction, sprites_at_point):
-		for entity in self.selection[faction]:
-			if action == "harvest/stock/attack/repair" : # click on batiment
-				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
-				if isinstance(entity, Villager) and zone_found: # harvest ressources
-					self.order_harvest(entity, zone_found)
-				else :
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
-					worksite_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(WorkSite,faction))
-					stock_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
-					if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0: #stock zone found and resources to stock
-						self.order_stock_resources(entity, stock_found)
 
-					elif isinstance(entity, Villager) and worksite_found:
-						self.order_resume_build(entity, worksite_found)
-					elif isinstance(entity, Villager) and zone_found: # zone of faction found, ask repairation
-						self.order_repairation(entity, zone_found)
-					else:
-						other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
-						if other_zone_found: # no ally zone
-							self.order_attack(entity, other_zone_found)
-			if action == "attack" : # click on unit
-				unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
-				if unit_found:
-					self.order_attack(entity, unit_found)
+		if action == "army" : # keyboard shortcut to send the whole army
+			entity_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
+			if entity_found:
+				self.order_army_attack(self.game.players["player"].my_military, entity_found)
+		else:
+			for entity in self.selection[faction]:
+				if action == "harvest/stock/attack/repair" : # click on batiment
+					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
+					if isinstance(entity, Villager) and zone_found: # harvest ressources
+						self.order_harvest(entity, zone_found)
+					else :
+						zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
+						worksite_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(WorkSite,faction))
+						stock_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
+						if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0: #stock zone found and resources to stock
+							self.order_stock_resources(entity, stock_found)
+
+						elif isinstance(entity, Villager) and worksite_found:
+							self.order_resume_build(entity, worksite_found)
+						elif isinstance(entity, Villager) and zone_found: # zone of faction found, ask repairation
+							self.order_repairation(entity, zone_found)
+						else:
+							other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
+							if other_zone_found: # no ally zone
+								self.order_attack(entity, other_zone_found)
+				if action == "attack" : # click on unit
+					unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
+					if unit_found:
+						self.order_attack(entity, unit_found)
+
 
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)

@@ -388,11 +388,19 @@ class View():
 			print(f"position sur la grille sans arrondi : {Vector(grid_x, grid_y)}")
 
 	def on_key_press(self, symbol, modifier):
+		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		if symbol == arcade.key.ENTER:
 			self.cheatsinput.on_enter_pressed()
 			self.triggerCheatInput()
 		if symbol == arcade.key.F1: # cheat window
 			self.triggerCheatInput()
+		if symbol == arcade.key.A and (modifier & arcade.key.MOD_CTRL):
+			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
+			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+			if zones_at_point:
+				self.game.game_controller.human_order_towards_sprites("army", "player", zones_at_point)
+			elif units_at_point:
+				self.game.game_controller.human_order_towards_sprites("army", "player", units_at_point)
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
 		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))

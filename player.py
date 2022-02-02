@@ -232,7 +232,7 @@ class AI(Player):
 
 	def send_army(self):
 		entity_to_attack = self.search_enemy_to_attack()
-		self.send_army_towards(self.mind[entity_to_attack])
+		self.send_army_towards(entity_to_attack)
 
 	def send_army_aggressive(self):
 		print("ALATTAQUE")
