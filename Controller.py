@@ -223,11 +223,9 @@ class Controller():
 
 # --- Orders (Called once) ----
 	def move_entity(self, entity, end_grid_position, fast=True):
-		if fast:
-			path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
-		else:
-			path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
+		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
+		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -240,11 +238,9 @@ class Controller():
 		for entity in entity_list:
 			start_position = iso_to_grid_pos(entity.iso_position)
 			if position_dict.get(tuple(start_position), None) is None:
-				if fast:
-					path, path_len = self.game.game_model.map.get_path_fast(start=start_position, end=end_grid_position)
-				else:
-					path, path_len = self.game.game_model.map.get_path(start=start_position, end=end_grid_position)
+				path, path_len = self.game.game_model.map.get_path(start=start_position, end=end_grid_position)
 				# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
+				# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 				if path_len > 0:
 					position_dict[tuple(start_position)] = path
 					entity.set_move_action()
