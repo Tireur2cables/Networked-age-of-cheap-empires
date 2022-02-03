@@ -258,8 +258,16 @@ class AI(Player):
 			aimed_player = None
 			for player_key, player in self.game.players.items():
 				if player_key != self.player_type:
-					if len(self.my_military) >= 5 + len(player.my_military) or (len(self.my_military) >= 5 and random.randint(0, 30) == 0):
+					if len(self.my_military) >= 5 + len(player.my_military):
 						aimed_player = player
+						break
+
+			if aimed_player is None and len(self.my_military) >= 5 and random.randint(0, 4) == 0:
+				for player_key, player in self.game.players.items():
+					if player_key != self.player_type:
+						aimed_player = player
+						break
+
 			self.mind["aimed_player"] = aimed_player
 
 		if self.mind.get("aimed_player", None) is not None:
