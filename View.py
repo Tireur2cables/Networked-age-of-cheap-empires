@@ -3,7 +3,7 @@
 import arcade
 import arcade.gui
 ## -- Others --
-from views.CustomButtons import ActionButton, ConstructButton, NextViewButton, ListButton, SaveButton
+from views.CustomButtons import ActionButton, ConstructButton, NextViewButton, ListButton, SaveButton, TactilButton
 from map.Minimap import Minimap
 from cheats import CheatsInput
 from utils.vector import Vector
@@ -50,6 +50,7 @@ class View():
 		self.sorted_sprite_list = arcade.SpriteList()
 
 		self.resource_label_list = []
+		self.right_click_mode = False
 
 	def reset(self):
 		#clear old lists
@@ -69,11 +70,13 @@ class View():
 
 		#Boolean qui indique si le gui dynamic est active ou non
 		self.boolean_dynamic_gui = False
+		self.right_click_mode = False
 
-	def setup(self):
+	def setup(self, tactilmod):
 		self.reset()
 		self.init_dynamic_gui()
 		self.init_cheats()
+		self.tactilmod = tactilmod
 
 		# Sync self.game_model.tile_list with tile_sprite_list
 		for t in self.game.game_model.tile_list:
@@ -352,7 +355,11 @@ class View():
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :
 			pass
 
-		elif button == arcade.MOUSE_BUTTON_LEFT :
+		#clique sur bouton rightclick
+		elif self.tactilmod and x >= self.game.window.width - self.game.window.width * 2 / 6 and x <= self.game.window.width - self.game.window.width / 6 and y >= self.game.window.height - self.game.window.height / 11 :
+			pass
+
+		elif button == arcade.MOUSE_BUTTON_LEFT and not self.right_click_mode :
 			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
 			if self.build_request:
 				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, self.build_request)
@@ -370,7 +377,7 @@ class View():
 				# draw interactive ui of selected
 				self.trigger_Villager_GUI(self.game.game_controller.selection)
 
-		elif button == arcade.MOUSE_BUTTON_RIGHT :
+		elif button == arcade.MOUSE_BUTTON_RIGHT or self.right_click_mode :
 			self.reset_construct_flags() # permet d'annuler une construction
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
@@ -380,6 +387,9 @@ class View():
 				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
+
+			if self.right_click_mode :
+				self.tactile_button.reset()
 
 		elif button == arcade.MOUSE_BUTTON_MIDDLE:
 			print(f"position de la souris : {mouse_position_in_game}")
@@ -580,7 +590,7 @@ class View():
 	def addButton(self):
 		# def button size
 		buttonsize = self.game.window.width / 6 # arbitrary
-
+		buttonheight = self.game.window.height / 11 # arbitrary
 		# Create a vertical BoxGroup to align buttons
 		self.v_box3 = arcade.gui.UIBoxLayout()
 
@@ -601,6 +611,21 @@ class View():
 				child = self.v_box3
 			)
 		)
+
+		if self.tactilmod :
+			# Create a vertical BoxGroup to align buttons
+			self.tactile_box = arcade.gui.UIBoxLayout()
+			self.tactile_button = TactilButton(self, text="Mode Clique droit", width=buttonsize, height=buttonheight)
+			self.tactile_box.add(self.tactile_button)
+			# Create a widget to hold the v_box widget, that will center the buttons
+			self.manager.add(
+				arcade.gui.UIAnchorWidget(
+					anchor_x = "right",
+					anchor_y = "top",
+					align_x = -buttonsize,
+					child = self.tactile_box
+				)
+			)
 
 	def addCoordLabel(self): # just for debug (should disappear for the final render)
 		coordsize = self.game.window.width / 5 # arbitrary?

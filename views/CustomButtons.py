@@ -57,6 +57,26 @@ class NextViewButton(arcade.gui.UITextureButton) :
 		self.nextView.setup()
 		self.window.show_view(self.nextView)
 
+# Button to tactile mode
+class TactilButton(arcade.gui.UITextureButton) :
+	def __init__(self, view, text, width, height) :
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width, height=height)
+		self.view = view
+		self.bool = True
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		if self.bool :
+			self.view.right_click_mode = True
+			self.text = "Mode Clique Gauche"
+			self.bool = False
+		else :
+			self.reset()
+
+	def reset(self) :
+		self.view.right_click_mode = False
+		self.text = "Mode Clique Droit"
+		self.bool = True
+
 # Button to return to the main menu
 class LaunchGameButton(arcade.gui.UITextureButton) :
 	def __init__(self, window, nextView, pregameview, text, width) :
@@ -100,13 +120,14 @@ class ListButton(arcade.gui.UITextureButton) :
 
 # CheckboxButton
 class CheckboxButton(arcade.gui.UITextureButton) :
-	def __init__(self, window, text, size, ticked=True, music=False, fullscreen=False, vsync=False) :
+	def __init__(self, window, text, size, ticked=True, music=False, fullscreen=False, vsync=False, tactil=False) :
 		super().__init__(texture=arcade.load_texture(textureTicked if ticked else textureEmpty), text=text, width=size, height=size)
 		self.window = window
 		self.ticked = ticked
 		self.music = music
 		self.fullscreen = fullscreen
 		self.vsync = vsync
+		self.tactil = tactil
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		self.texture = arcade.load_texture(textureEmpty if self.ticked else textureTicked)
@@ -119,6 +140,8 @@ class CheckboxButton(arcade.gui.UITextureButton) :
 			self.window.triggerFullscreen()
 		elif self.vsync :
 			self.window.triggerVsync()
+		elif self.tactil :
+			self.window.triggerTactil()
 
 # Selection de sa difficulté
 class SelctDifButton(arcade.gui.UITextureButton):
