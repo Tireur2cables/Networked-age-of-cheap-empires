@@ -381,17 +381,19 @@ class Controller():
 			if isinstance(producing_zone, Barracks) :
 				producing_zone.set_class_produced(entity_produced)
 
-			if current_player.can_create(producing_zone.class_produced) :
-
+			if current_player.can_create(producing_zone.class_produced, producing_zone.get_name()) :
 				producing_zone.is_producing = True
 				for key, value in producing_zone.class_produced.creation_cost.items():
-					current_player.sub_resource(key, value)
+					if isinstance(producing_zone, TownCenter) and key == Res.FOOD and current_player.upgrades.get(producing_zone.get_name(), 0) == 1:
+						current_player.sub_resource(key, value - 20)
+					else:
+						current_player.sub_resource(key, value)
 
 				if producing_zone.faction == "player" : # Shouldn't be used with AI
 					self.game.game_view.update_resources_gui()
 			else :
 				if producing_zone.faction == "player":
-					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour produire des unités"
 		else :
 			if producing_zone.faction == "player":
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
@@ -618,9 +620,16 @@ class Controller():
 			self.discard_entity_from_game(entity.aimed_entity)
 			entity.aimed_entity = None
 
+			# print(current_player.upgrades, current_player.upgrades.get(worksite.zone_to_build.get_name(), 0))
 			if current_player.can_create(worksite.zone_to_build):
-				for res, cost in worksite.zone_to_build.creation_cost.items() :
-					current_player.sub_resource(res, cost)
+				for res, cost in worksite.zone_to_build.creation_cost.items():
+					if worksite.zone_to_build in (Barracks, StoragePit, Granary) and res == Res.WOOD and current_player.upgrades.get(worksite.zone_to_build.get_name(), 0) == 1:
+						current_player.sub_resource(res, cost - 20)
+					elif worksite.zone_to_build == House and res == Res.WOOD and current_player.upgrades.get(worksite.zone_to_build.get_name(), 0) == 1:
+						current_player.sub_resource(res, cost - 10)
+					else:
+						current_player.sub_resource(res, cost)
+
 				if entity.faction == "player":
 					self.game.game_view.update_resources_gui()
 
@@ -682,13 +691,10 @@ class Controller():
 			producing_zone.is_producing = False
 			current_player = self.game.players[producing_zone.faction]
 			if current_player.nb_unit < current_player.max_unit :
-				if current_player.can_create(producing_zone.class_produced) :
-					grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
-					Class_produced = producing_zone.class_produced
-					random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
-					self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
-				elif producing_zone.faction == "player" :
-					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+				grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
+				Class_produced = producing_zone.class_produced
+				random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
+				self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
 			elif producing_zone.faction == "player":
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 

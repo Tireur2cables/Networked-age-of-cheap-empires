@@ -157,8 +157,18 @@ class Player:
 		self.resources[Res.GOLD] += qtyGold
 		self.resources[Res.STONE] += qtyStone
 
-	def can_create(self, type_entity: Entity) -> bool:
-		return all(self.resources[k] >= type_entity.creation_cost[k] for k in Res)
+	def can_create(self, type_entity: Entity, upgrade_type_name=None) -> bool:
+		if upgrade_type_name is None:
+			upgrade_type_name = type_entity.get_name()
+		if type_entity.get_name() == "villager" and self.upgrades.get(upgrade_type_name, 0) == 1:
+			print("hey")
+			return all((self.resources[k] >= type_entity.creation_cost[k] if k != Res.FOOD else self.resources[k] >= type_entity.creation_cost[k] - 20) for k in Res)
+		elif type_entity.get_name() in ("barracks", "storagepit", "granary") and self.upgrades.get(upgrade_type_name, 0) == 1:
+			return all((self.resources[k] >= type_entity.creation_cost[k] if k != Res.WOOD else self.resources[k] >= type_entity.creation_cost[k] - 20) for k in Res)
+		elif type_entity.get_name() == "house" and self.upgrades.get(upgrade_type_name, 0) == 1:
+			return all((self.resources[k] >= type_entity.creation_cost[k] if k != Res.WOOD else self.resources[k] >= type_entity.creation_cost[k] - 10) for k in Res)
+		else:
+			return all(self.resources[k] >= type_entity.creation_cost[k] for k in Res)
 
 	# Resource
 	def get_resource(self, resource):
