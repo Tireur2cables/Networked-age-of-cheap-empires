@@ -678,7 +678,7 @@ class Controller():
 			entity.resources[resource] = 0
 
 		if entity.faction == "player" :
-			self.game.game_view.trigger_Villager_GUI(self.selection)
+			self.game.game_view.update_villager_resources_gui()
 			self.game.game_view.update_resources_gui()
 
 		can_harvest = entity.go_back_to_harvest()
@@ -709,8 +709,8 @@ class Controller():
 			#print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
 
-			if unit.faction == "player" : # Shouldn't be used with AI
-				self.game.game_view.trigger_Villager_GUI(self.selection)
+			if unit.faction == "player" or unit.aimed_entity.faction == "player" : # Shouldn't be used with AI
+				self.game.game_view.update_villager_resources_gui()
 
 			if isinstance(unit.aimed_entity, Unit) and unit.aimed_entity.aimed_entity != unit:
 				self.order_attack(unit.aimed_entity, unit)
