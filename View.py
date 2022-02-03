@@ -374,10 +374,10 @@ class View():
 			self.reset_construct_flags() # permet d'annuler une construction
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
-			if zones_at_point:
-				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
-			elif units_at_point:
+			if units_at_point:
 				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
+			elif zones_at_point:
+				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
 
