@@ -453,14 +453,15 @@ class Controller():
 
 	def order_upgradebuilding(self, upgradeIt:Buildable):
 		if isinstance(upgradeIt, (Barracks, House, Granary, StoragePit, TownCenter)): # Dock not implemented
-			if (upgradeIt.upgrade_cost[upgradeIt.upgrade_level] != None):
-				current_player = self.game.players[upgradeIt.faction]
-				if all(current_player.resources[k] >= upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k] for k in Res) :
+			current_player = self.game.players[upgradeIt.faction]
+			current_level = current_player.upgrades.get(upgradeIt.get_name(), 0)  # If the key doesn't exists, it means we have never upgraded, so level 0 by default
+			if (upgradeIt.upgrade_cost[current_level] != None):
+				if all(current_player.resources[k] >= upgradeIt.upgrade_cost[current_level][k] for k in Res) :
 						for k in Res :
-							current_player.sub_resource(k, upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k])
+							current_player.sub_resource(k, upgradeIt.upgrade_cost[current_level][k])
 						if upgradeIt.faction == "player" : # Shouldn't be used with AI
 							self.game.game_view.update_resources_gui()
-						upgradeIt.upgrade()
+						current_player.upgrade(upgradeIt.get_name())
 				else :
 					if upgradeIt.faction == "player":
 						self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"

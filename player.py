@@ -173,6 +173,12 @@ class Player:
 	def sub_resource(self, resource, qty_resource):
 		self.resources[resource] -= qty_resource
 
+	# Upgrade
+	def upgrade(self, class_name_to_update):
+		if self.upgrades.get(class_name_to_update, None) is None:
+			self.upgrades[class_name_to_update] = 0
+		self.upgrades[class_name_to_update] += 1
+
 class AI(Player):
 	def __init__(self,
 			game,
