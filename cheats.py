@@ -22,6 +22,11 @@ class CheatsInput(arcade.gui.UIInputText):
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
         self.game = game
         self.triggered = False
+        # restetting variables
+        cheats_vars.cheat_steroids = False
+        cheats_vars.cheat_vitamins = False
+        cheats_vars.cheat_lightspeed = False
+        cheats_vars.global_save_suffix = "0"
 
     def Ninjalui(self):
         self.game.players["player"].add_all(10000)
