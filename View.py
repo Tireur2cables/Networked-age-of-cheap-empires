@@ -231,7 +231,7 @@ class View():
 						self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
 					elif isinstance(zone, (Barracks, TownCenter)) and zone.is_producing:
-						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.unit_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+						self.draw_bar(zone.iso_position, int(zone.action_timer), 3 if cheats_vars.cheat_vitamins else int(zone.unit_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(s.entity.iso_position)
