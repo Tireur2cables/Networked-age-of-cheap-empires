@@ -545,9 +545,15 @@ class Controller():
 					elif entity.goal == "attack":
 						if isinstance(entity.aimed_entity, Unit):
 							if iso_to_grid_pos(entity.iso_position) == iso_to_grid_pos(entity.aimed_entity.iso_position):
+								# L'entité est arrivée
 								entity.is_interacting = True
-							else:
+							elif (not entity.aimed_entity.is_moving) or entity.faction == "player" or entity.aimed_entity.faction == "player" :
+								# L'entité n'est pas arrivée et l'autre ne bouge pas OU l'une des deux entités appartient à un joueur
 								self.order_attack(entity, entity.aimed_entity)
+							else:
+								# L'entité n'est pas arrivée et l'autre bouge et les 2 appartiennent à des IA
+								# "Temporary" fix to prevent circular/infinite loop of military chasing military...
+								entity.end_goal()
 						else:
 							entity.is_interacting = True
 
