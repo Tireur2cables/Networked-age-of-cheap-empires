@@ -452,21 +452,21 @@ class Controller():
 				self.move_entity(entity, aimed_tile.grid_position)
 
 	def order_upgradebuilding(self, upgradeIt:Buildable):
-		if (upgradeIt.upgrade_cost[upgradeIt.upgrade_level] != None):
-			current_player = self.game.players[upgradeIt.faction]
-			if all(current_player.resources[k] >= upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k] for k in Res) :
-				for k in Res :
-					current_player.sub_resource(k, upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k])
-				if upgradeIt.faction == "player" : # Shouldn't be used with AI
-					self.game.game_view.update_resources_gui()
-				if isinstance(upgradeIt, (Barracks, House, Granary, StoragePit, TownCenter)): # Dock not implemented
-					upgradeIt.upgrade()
+		if isinstance(upgradeIt, (Barracks, House, Granary, StoragePit, TownCenter)): # Dock not implemented
+			if (upgradeIt.upgrade_cost[upgradeIt.upgrade_level] != None):
+				current_player = self.game.players[upgradeIt.faction]
+				if all(current_player.resources[k] >= upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k] for k in Res) :
+						for k in Res :
+							current_player.sub_resource(k, upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k])
+						if upgradeIt.faction == "player" : # Shouldn't be used with AI
+							self.game.game_view.update_resources_gui()
+						upgradeIt.upgrade()
+				else :
+					if upgradeIt.faction == "player":
+						self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
 			else :
 				if upgradeIt.faction == "player":
-					self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
-		else :
-			if upgradeIt.faction == "player":
-				self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
+					self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
 
 	def end_game(self):
 		# print("youpiiii !!!")

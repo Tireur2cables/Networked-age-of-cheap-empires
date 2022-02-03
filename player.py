@@ -37,6 +37,7 @@ class Player:
 		self.my_zones = set()
 		self.food_storage = set()
 		self.other_storage = set()
+		self.upgrades = {}
 
 	def reset(self):
 		self.resources.clear()
@@ -45,6 +46,7 @@ class Player:
 		self.my_zones.clear()
 		self.food_storage.clear()
 		self.other_storage.clear()
+		self.upgrades.clear()
 
 
 	def __getstate__(self):
@@ -58,11 +60,12 @@ class Player:
 		self.my_military,
 		self.my_zones,
 		self.food_storage,
-		self.other_storage]
+		self.other_storage,
+		self.upgrades]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.upgrades = data
 
 	# my_entities
 	def add_entity(self, new_entity):
@@ -194,12 +197,13 @@ class AI(Player):
 		self.my_zones,
 		self.food_storage,
 		self.other_storage,
+		self.upgrades,
 		self.delta_time,
 		self.difficulty,
 		self.mind]
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.difficulty, self.mind = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.upgrades, self.delta_time, self.difficulty, self.mind = data
 
 
 	def reset(self):
