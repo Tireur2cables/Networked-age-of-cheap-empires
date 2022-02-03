@@ -250,7 +250,7 @@ class View():
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.BLUE)
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.YELLOW, nbr_health_bar=2)
 						elif isinstance(aimed_entity, WorkSite) and aimed_entity.faction == unit.faction:
-							self.draw_bar(unit.iso_position, int(aimed_entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
+							self.draw_bar(unit.iso_position, int(aimed_entity.action_timer), 3 if cheats_vars.cheat_vitamins else aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Unit):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Buildable) and aimed_entity.faction != unit.faction:
