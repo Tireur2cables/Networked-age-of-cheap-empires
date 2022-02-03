@@ -710,7 +710,7 @@ class Controller():
 				self.order_attack(unit.aimed_entity, unit)
 				unit.aimed_entity.is_interacting = True
 
-			if isinstance(opponent_controlling, AI):
+			if isinstance(opponent_controlling, AI) and isinstance(unit.aimed_entity, Zone):
 				opponent_controlling.mind["is_attacked_by"] = unit
 
 			if not alive:
