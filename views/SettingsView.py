@@ -68,6 +68,14 @@ class SettingsView(arcade.View) :
 		self.h_box_vsync.add(vsync_text)
 		self.v_box.add(self.h_box_vsync.with_space_around(top=20))
 
+		self.h_box_tactil = arcade.gui.UIBoxLayout(vertical=False, align='left')
+		tactil_button = CheckboxButton(self.window, text="", size=checkboxsize, ticked=self.window.tactilmod, tactil=True)
+		self.h_box_tactil.add(tactil_button.with_space_around(right=20))
+		tactil_text = UITextArea(text="Tactile", text_color=(0, 0, 0, 255), font_size=20)
+		tactil_text.fit_content()
+		self.h_box_tactil.add(tactil_text)
+		self.v_box.add(self.h_box_tactil.with_space_around(top=20))
+
 		# Create the return menu
 		retour_button = NextViewButton(self.window, self.main_view, text="Retour", width=buttonsize)
 		self.v_box.add(retour_button.with_space_around(top=20))
