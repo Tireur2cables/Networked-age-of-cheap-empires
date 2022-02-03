@@ -219,6 +219,7 @@ class AI(Player):
 		self.my_units,
 		self.my_military,
 		self.my_zones,
+		self.my_worksites,
 		self.food_storage,
 		self.other_storage,
 		self.upgrades,
@@ -227,7 +228,7 @@ class AI(Player):
 		self.mind]
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.upgrades, self.delta_time, self.difficulty, self.mind = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades, self.delta_time, self.difficulty, self.mind = data
 
 
 	def reset(self):
