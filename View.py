@@ -122,11 +122,11 @@ class View():
 			self.v_box1 = arcade.gui.UIBoxLayout()
 
 			player_resources = player.resources
-			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+			resources_tab = [f"    {player.nb_unit}/{player.max_unit} ", f"   {player_resources[Res.FOOD]}", f"   {player_resources[Res.WOOD]}", f"   {player_resources[Res.STONE]}", f"   {player_resources[Res.GOLD]}"]
 
 			# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 			for val in resources_tab :
-				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(255, 255, 255, 255), font_name=('Impact',))
+				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(255, 255, 255, 255), font_name=('Impact',),font_size=24)
 				self.resource_label_list.append(label)
 				self.v_box1.add(label.with_background(arcade.load_texture(button_texture2)))
 
@@ -625,7 +625,7 @@ class View():
 		if player is not None:
 			player_resources = player.resources
 			# print(player_resources)
-			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+			resources_tab = [f"    {player.nb_unit}/{player.max_unit} ", f"   {player_resources[Res.FOOD]}", f"   {player_resources[Res.WOOD]}", f"   {player_resources[Res.STONE]}", f"   {player_resources[Res.GOLD]}"]
 			for label, resource_text in zip(self.resource_label_list, resources_tab):
 				label.text = resource_text
 
