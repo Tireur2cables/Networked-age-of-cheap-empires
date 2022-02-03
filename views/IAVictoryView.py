@@ -5,7 +5,7 @@ from views.CustomButtons import QuitButton, NextViewButton
 from views.MainView import MainView
 
 # --- Constants ---
-BACKGROUND = "./Ressources/img/Ia_Match_Victory2.jpg"
+BACKGROUND = "./Ressources/img/IA_Match_Victory2.jpg"
 IMAGE_VICTORY = "./Ressources/img/bouton_rouge_age.png"
 
 # View de victoire : on l'affiche quand le joueur remporte la partie
