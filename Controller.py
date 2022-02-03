@@ -429,10 +429,10 @@ class Controller():
 			first_entity_grid_pos = iso_to_grid_pos(last_entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
 			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(first_entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
-			print(f"aimed_tile : {aimed_tile}")
+			# print(f"aimed_tile : {aimed_tile}")
 			# Step 2: Start moving toward the aimed entity
 			if aimed_tile is not None:
-				print(f"src and dest : {first_entity_grid_pos} -> {aimed_tile.grid_position}")
+				# print(f"src and dest : {first_entity_grid_pos} -> {aimed_tile.grid_position}")
 				self.move_grouped_entities(entity_list, aimed_tile.grid_position)
 
 	def order_repairation(self, entity, aimed_entity) :
@@ -606,7 +606,8 @@ class Controller():
 
 	def repair_zone(self, entity, delta_time) :
 		entity.action_timer += delta_time
-		if entity.action_timer > 1 : # commence à réparer ou continue
+		if cheats_vars.cheat_steroids or entity.action_timer > 1 : # commence à réparer ou continue
+			print(f"{entity.aimed_entity.health} < {entity.aimed_entity.max_health}")
 			if entity.aimed_entity.health < entity.aimed_entity.max_health :
 				entity.aimed_entity.health += 1 # repare 1 point de vie
 

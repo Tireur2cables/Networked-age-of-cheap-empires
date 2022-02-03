@@ -40,7 +40,7 @@ class Entity:
 		#
 		#by default, initialize the life with max_health
 		#health is when we load a game from a save file
-		self.health = max_health if health == -1 else health
+		self.health = max_health-20 if health == -1 else health-20
 		self.max_health = max_health if health == -1 else health
 		self.damage = damage
 		self.is_dead = False

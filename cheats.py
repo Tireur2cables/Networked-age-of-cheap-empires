@@ -41,6 +41,9 @@ class CheatsInput(arcade.gui.UIInputText):
         #print("ON STEROIDS!!!")
         cheats_vars.cheat_steroids = not cheats_vars.cheat_steroids
 
+    def Vitamins(self):
+        cheats_vars.cheat_vitamins = not cheats_vars.cheat_vitamins
+
     def Lightspeed(self):
         cheats_vars.cheat_lightspeed = not cheats_vars.cheat_lightspeed
 
