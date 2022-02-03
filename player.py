@@ -412,12 +412,13 @@ class AI(Player):
 				for military in idle_military:
 					self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
 
+		who_is_producing = random.randint(0, 1)
 		for zone in self.my_zones:
 			if isinstance(zone, (TownCenter, Barracks)):
 				if zone.is_producing:
 					ongoing_actions.add(("produce", zone.class_produced.get_name()))
 				else:
-					if isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nb_class_in_unit(Villager) < 10 + self.get_nb_class_in_unit(Military):
+					if who_is_producing == 0 and isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nb_class_in_unit(Villager) < 10 + self.get_nb_class_in_unit(Military):
 						self.game.game_controller.order_zone_units(zone)
-					elif isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
+					elif who_is_producing == 1 and isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
 						self.game.game_controller.order_zone_units(zone, "militia")
