@@ -607,7 +607,7 @@ class Controller():
 	def repair_zone(self, entity, delta_time) :
 		entity.action_timer += delta_time
 		if cheats_vars.cheat_steroids or entity.action_timer > 1 : # commence à réparer ou continue
-			print(f"{entity.aimed_entity.health} < {entity.aimed_entity.max_health}")
+			# print(f"{entity.aimed_entity.health} < {entity.aimed_entity.max_health}")
 			if entity.aimed_entity.health < entity.aimed_entity.max_health :
 				entity.aimed_entity.health += 1 # repare 1 point de vie
 
