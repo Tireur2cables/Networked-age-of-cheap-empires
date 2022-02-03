@@ -26,7 +26,7 @@ class CheatsInput(arcade.gui.UIInputText):
         cheats_vars.cheat_steroids = False
         cheats_vars.cheat_vitamins = False
         cheats_vars.cheat_lightspeed = False
-        cheats_vars.global_save_suffix = "0"
+        # cheats_vars.global_save_suffix = "0" --- This shouldn't be resetted as it is used to load a save in the menu
 
     def Ninjalui(self):
         self.game.players["player"].add_all(10000)
