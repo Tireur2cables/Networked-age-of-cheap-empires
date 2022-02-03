@@ -42,7 +42,7 @@ class LoadButton(arcade.gui.UITextureButton):
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		data = pickleLoading()
-		print("Data LOADED!!!")
+		#print("Data LOADED!!!")
 		self.nextView.load_save(data)
 		self.window.show_view(self.nextView)
 

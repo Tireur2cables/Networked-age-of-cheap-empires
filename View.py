@@ -29,6 +29,7 @@ PIC_WOOD = "./Ressources/img/Ressources_Wood_500x500.png"
 PIC_STONE = "./Ressources/img/Ressources_Pierre_500x500.png"
 PIC_FOOD = "./Ressources/img/Ressources_Viandes_500x500.png"
 button_texture = "Ressources/img/button_background.png"
+button_texture2 = "Ressources/img/bouton_black_age.png"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_DEBUG_DISPLAY
@@ -55,7 +56,6 @@ class View():
 		self.tile_sprite_list = arcade.SpriteList()
 		self.sorted_sprite_list = arcade.SpriteList()
 
-		self.mode = "move"
 		self.resource_label_list.clear()
 
 		#Pour le GUI, les flags indiquant si on veut construire un batiment
@@ -100,7 +100,7 @@ class View():
 		height = self.game.window.height / 22 # arbitrary
 		bg_text = arcade.load_texture("Ressources/img/dark_fond.jpg")
 
-		self.cheatsinput = CheatsInput( #test
+		self.cheatsinput = CheatsInput(
 				x=0,
 				y=(self.game.window.height - height) / 2, # middle
 				text="Enter a cheatcode among NINJALUI, BIGDADDY, STEROIDS", width=width, height=height,
@@ -110,7 +110,8 @@ class View():
 		self.cheat_pane = arcade.gui.UITexturePane(self.cheatsinput, tex=bg_text)
 
 	def static_menu(self) :
-		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT, COLOR_STATIC_RESSOURCES)
+		self.minimap = Minimap(self, DEFAULT_MAP_SIZE, TILE_WIDTH, TILE_HEIGHT , COLOR_STATIC_RESSOURCES) #-15 sur Tile_Height pour minimap carré qui suit le deplacement cliqué en vertical (perte horizontale)
+
 
 		self.HEIGHT_LABEL = self.minimap.size[1] / 5 # in order to have same height as minimap at the end
 		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
@@ -125,9 +126,9 @@ class View():
 
 			# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 			for val in resources_tab :
-				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(0, 0, 0, 255), font_name=('Impact',))
+				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(255, 255, 255, 255), font_name=('Impact',))
 				self.resource_label_list.append(label)
-				self.v_box1.add(label.with_space_around(0, 0, 0, 0, COLOR_STATIC_RESSOURCES))
+				self.v_box1.add(label.with_background(arcade.load_texture(button_texture2)))
 
 			# Create a widget to hold the v_box widget, that will center the buttons
 			self.manager.add(
@@ -344,7 +345,7 @@ class View():
 		mouse_position_in_game = Vector(x + self.camera.position.x, y + self.camera.position.y)
 		if self.minimap.is_on_minimap_sprite(x, y) :
 			self.camera_x = (x * DEFAULT_MAP_SIZE * TILE_WIDTH / self.minimap.size[0]) - ((DEFAULT_MAP_SIZE * TILE_WIDTH) / 2) - self.camera.viewport_width / 2
-			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / self.minimap.size[1]) - self.camera.viewport_height / 2
+			self.camera_y = (y * DEFAULT_MAP_SIZE * TILE_HEIGHT / (self.minimap.size[1] -self.game.window.height*(9/400))) - self.camera.viewport_height / 2 # -self.game.window.height*(9/400) pour ajuster le deplacement de la caméra
 			self.camera.move_to([self.camera_x, self.camera_y], 1)
 		#Empeche la deselection des entites quand on clique sur le gui static correspondant OR sur option (les valeurs sont dependantes de la taille du button)
 		elif (self.boolean_dynamic_gui and (x > self.game.window.width/2 and y < 5*self.HEIGHT_LABEL)) or ( x > self.game.window.width*(5/6) and y > (self.game.window.height - self.game.window.height/10)) :
@@ -511,7 +512,7 @@ class View():
 				anchor_x="right",
 				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 12) / 2,
 				anchor_y="bottom",
-				align_y=(self.game.window.height / 4 - self.game.window.height / 12) / 2,
+				align_y=(self.game.window.height / 4 - self.game.window.height / 6) / 2,
 				child=self.v_box10
 			)
 		)
@@ -529,26 +530,38 @@ class View():
 		)
 
 		# Create a box for the military buildable by barracks
-		self.v_box11 = arcade.gui.UIBoxLayout()
+		self.v_box11 = arcade.gui.UIBoxLayout(vertical=False)
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="right",
-				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 6) / 3,
+				align_x=-self.game.window.width / 3 + self.game.window.width * 3 / 12 + (self.game.window.width / 3 - self.game.window.width * 3 / 12) / 2,
 				anchor_y="bottom",
-				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2 + self.game.window.height / 12,
 				child=self.v_box11
 			)
 		)
 
 		# Create a box for the military buildable by barracks
-		self.v_box12 = arcade.gui.UIBoxLayout()
+		self.v_box12 = arcade.gui.UIBoxLayout(vertical=False)
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x="right",
-				align_x=-self.game.window.width / 3 + self.game.window.width / 6 + (self.game.window.width / 3 - self.game.window.width / 6) * 2 / 3,
+				align_x=-self.game.window.width / 3 + self.game.window.width * 3 / 12 + (self.game.window.width / 3 - self.game.window.width * 3 / 12) / 2,
 				anchor_y="bottom",
 				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2,
 				child=self.v_box12
+			)
+		)
+
+		# Create a box for amelioration buildable by barracks
+		self.v_box15 = arcade.gui.UIBoxLayout()
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="right",
+				align_x=-self.game.window.width / 3 + self.game.window.width / 12 + (self.game.window.width / 3 - self.game.window.width / 12) / 2,
+				anchor_y="bottom",
+				align_y=(self.game.window.height / 4 - self.game.window.height * 3 / 12) / 2 + self.game.window.height / 6,
+				child=self.v_box15
 			)
 		)
 
@@ -631,6 +644,7 @@ class View():
 		self.v_box11.clear()
 		self.v_box12.clear()
 		self.v_box14.clear()
+		self.v_box15.clear()
 
 		self.boolean_dynamic_gui = False
 		if selected_list["player"] : # someting is selected
@@ -641,9 +655,9 @@ class View():
 
 			for s in selected_list["player"] :
 				if isinstance(s, Entity) : # add entity info
-					titre = s.get_name().capitalize() + ("" if s.faction == "None" else " [" + s.faction + "] ") # There is a weird graphic bug. Replacing this line by : title = "Wood" also produces the bug so it's likely not due to our code...
+					titre ="  " + s.get_name().capitalize() + ("" if s.faction == "None" else " [" + s.faction + "] ") # There is a weird graphic bug. Replacing this line by : title = "Wood" also produces the bug so it's likely not due to our code...
 					entity_box_stat = arcade.gui.UITextArea(text=titre, width=width / 3, height=height)
-					self.v_box4.add(entity_box_stat.with_space_around(0, 0, 0, 0, arcade.color.DARK_JUNGLE_GREEN))
+					self.v_box4.add(entity_box_stat.with_background(arcade.load_texture(button_texture2)))
 
 					entity_life = arcade.gui.UITextArea(text ="Vie " + str(s.health) + " / " + str(s.max_health), text_color = arcade.color.RED, width=width / 8)
 					self.v_box8.add(entity_life.with_border())
@@ -661,8 +675,8 @@ class View():
 						villager_ressources = arcade.gui.UITextArea(text="Ressources : " + str(s.nb_resources()), text_color=arcade.color.PINK, width=width / 8)
 						self.v_box8.add(villager_ressources.with_border())
 
-						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
-						self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
+						villager_box_action = arcade.gui.UITextArea(text="    Actions", width=width * 2 / 3, height=height)
+						self.v_box7.add(villager_box_action.with_background(arcade.load_texture(button_texture2)))
 
 						storagepit_villager = ConstructButton(aoce_game=self.game, image="Ressources/img/zones/buildables/storagepit.png", text="StoragePit", width=width / 6, height=self.game.window.height / 12)
 						self.v_box5.add(storagepit_villager.with_background(arcade.load_texture(button_texture)))
@@ -682,17 +696,24 @@ class View():
 
 
 					elif isinstance(s, Zone) : # batiment du joueur
-						villager_box_action = arcade.gui.UITextArea(text="Actions", width=width * 2 / 3, height=height)
-						self.v_box7.add(villager_box_action.with_space_around(0, 0, 0, 0, arcade.color.METALLIC_SEAWEED))
-						if isinstance(s, House) :
+						villager_box_action = arcade.gui.UITextArea(text="    Actions", width=width * 2 / 3, height=height)
+						self.v_box7.add(villager_box_action.with_background(arcade.load_texture(button_texture2)))
+
+						if isinstance(s, House) or isinstance(s, StoragePit) or isinstance(s, Granary) :
 							upgrade_button = ActionButton(text="Amélioration", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/upgrade.png", aoce_game=self.game)
 							self.v_box14.add(upgrade_button.with_background(arcade.load_texture(button_texture)))
 
-						if isinstance(s, TownCenter) :
+						elif isinstance(s, TownCenter) :
+							upgrade_button = ActionButton(text="Amélioration", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/upgrade.png", aoce_game=self.game)
+							self.v_box10.add(upgrade_button.with_background(arcade.load_texture(button_texture)))
+
 							villager_button = ActionButton(text="Villageois", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/villager_stand.png", aoce_game=self.game)
 							self.v_box10.add(villager_button.with_background(arcade.load_texture(button_texture)))
 
 						elif isinstance(s, Barracks) :
+							upgrade_button = ActionButton(text="Amélioration", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/upgrade.png", aoce_game=self.game)
+							self.v_box15.add(upgrade_button.with_background(arcade.load_texture(button_texture)))
+
 							militia_button = ActionButton(text="Milice", width=width / 6, height=self.game.window.height / 12, batiment=s, image="Ressources/img/units/militia_stand.png", aoce_game=self.game)
 							self.v_box11.add(militia_button.with_background(arcade.load_texture(button_texture)))
 

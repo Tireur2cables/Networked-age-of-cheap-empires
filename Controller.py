@@ -1,5 +1,6 @@
 # --- Imports ---
 from copy import deepcopy
+from pickle import TRUE
 import arcade
 import time
 from LAUNCH_SETUP import LAUNCH_ENABLE_IA
@@ -9,6 +10,7 @@ from entity.Unit import *
 from entity.Zone import *
 # from game import GameView
 from player import AI, Player
+from views.IAVictoryView import IAVictoryView
 from views.VictoryView import VictoryView
 from views.DefeatView import DefeatView
 
@@ -209,7 +211,7 @@ class Controller():
 						for entity in self.selection[faction]:
 							self.move_entity(entity, grid_position, False)
 					else:
-						print("out of bound!")
+						#print("out of bound!")
 						return
 				elif action == "build":
 					self.order_build(entity, grid_position, *args)
@@ -313,7 +315,7 @@ class Controller():
 	def order_build(self, entity, map_position, building_name):
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
-		if self.game.players[entity.faction].get_resource(zone_to_build_class.cost[0]) >= zone_to_build_class.cost[1]:
+		if self.game.players[entity.faction].can_create(zone_to_build_class) :
 			#Pour le gui, on baisse le flag si on peut finalement construire
 			if entity.faction == "player":
 				self.game.game_view.errorMessage = ""
@@ -321,15 +323,15 @@ class Controller():
 			if isinstance(entity, Villager):
 				# Step 3: Start searching if it is possible to move toward the aimed map_position
 				if not self.game.game_model.map.is_area_on_map(map_position, zone_to_build_class.tile_size):
-					print("out of bound!")
+					#print("out of bound!")
 					return
 
 				if not self.game.game_model.map.is_area_buildable(map_position, zone_to_build_class.tile_size):
-					print("area not available!")
+					#print("area not available!")
 					return
 
 				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1)):
-					print("no space to produce units!")
+					#print("no space to produce units!")
 					return
 
 
@@ -345,9 +347,10 @@ class Controller():
 				else:
 					self.move_entity(entity, map_position - Vector(1, 1))
 			else:
-				print("Not a Villager!")
+				pass
+				#print("Not a Villager!")
 		else:
-			print("not enough resources to order a build!")
+			#print("not enough resources to order a build!")
 			#Pour le GUI, on leve un flag pour le message d erreur
 			if entity.faction == "player":
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
@@ -380,12 +383,8 @@ class Controller():
 
 			if current_player.can_create(producing_zone.class_produced) :
 
-				for key, value in producing_zone.unit_cost.items():
-					if current_player.get_resource(key) < value:
-						return
-
 				producing_zone.is_producing = True
-				for key, value in producing_zone.unit_cost.items():
+				for key, value in producing_zone.class_produced.creation_cost.items():
 					current_player.sub_resource(key, value)
 
 				if producing_zone.faction == "player" : # Shouldn't be used with AI
@@ -408,10 +407,10 @@ class Controller():
 			entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
 			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
-			print(f"aimed_tile : {aimed_tile}")
+			#print(f"aimed_tile : {aimed_tile}")
 			# Step 2: Start moving toward the aimed entity
 			if aimed_tile is not None:
-				print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
+				#print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
 				if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 					entity.is_interacting = True
 				else:
@@ -443,10 +442,10 @@ class Controller():
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
 		# Step 1: Search the closest tile near the zone_found to harvest it.
 		aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
-		print(f"aimed_tile : {aimed_tile}")
+		#print(f"aimed_tile : {aimed_tile}")
 		# Step 2: Start moving toward the aimed entity
 		if aimed_tile :
-			print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
+			#print(f"src and dest : {entity_grid_pos} -> {aimed_tile.grid_position}")
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
@@ -487,25 +486,33 @@ class Controller():
 			if player == "player":
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
+			elif self.partie_player():
+				DefeatView(self.game,player).setup()
+				self.game.window.show_view(DefeatView(self.game, player))
 			else:
-				DefeatView(self.game).setup()
-				self.game.window.show_view(DefeatView(self.game))
+				IAVictoryView(self.game,player).setup()
+				self.game.window.show_view(IAVictoryView(self.game,player))
 		#pass
 
+	def partie_player(self):
+		for player in self.dead_players:
+			if player == "player":
+				return True
+		return False
 # --- On_update (Called every frame) ---
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 
 		# --- Check End Conditions ---
-		dead_players = set()
+		self.dead_players = set()
 		for player in self.players:
 			if player.town_center.is_dead:
 				self.discard_player_from_game(player)
 				player.is_alive = False
-				dead_players.add(player)
+				self.dead_players.add(player)
 
-		for dead_player in dead_players:
+		for dead_player in self.dead_players:
 			self.players.remove(dead_player)
 			del self.game.players[dead_player.player_type]
 
@@ -586,7 +593,7 @@ class Controller():
 
 		# --- Deleting dead entities ---
 		for dead_entity in self.dead_entities:
-			print("DEAD ENTITY DETECTED")
+			#print("DEAD ENTITY DETECTED")
 			self.discard_entity_from_game(dead_entity)
 		self.dead_entities.clear()
 
@@ -620,8 +627,8 @@ class Controller():
 			entity.aimed_entity = None
 
 			if current_player.can_create(worksite.zone_to_build):
-				cost = worksite.zone_to_build.cost
-				current_player.sub_resource(*cost)
+				for res, cost in worksite.zone_to_build.creation_cost.items() :
+					current_player.sub_resource(res, cost)
 				if entity.faction == "player":
 					self.game.game_view.update_resources_gui()
 
@@ -699,7 +706,7 @@ class Controller():
 			player_controlling = self.game.players[unit.faction]
 			opponent_controlling = self.game.players[unit.aimed_entity.faction]
 			unit.action_timer = 0
-			print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
+			#print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
 
 			if unit.faction == "player" : # Shouldn't be used with AI

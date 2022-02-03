@@ -43,6 +43,30 @@ class Model():
 		self.tile_list.clear()
 		self.zone_list.clear()
 
+		self.reset_zone_globals()
+		self.reset_unit_globals()
+
+	def reset_zone_globals(self) :
+		# ICI on doit reset tout ce que les amliorations de batiments peuvent modifier
+		TownCenter.upgrade_level = 0
+		Barracks.upgrade_level = 0
+		StoragePit.upgrade_level = 0
+		StoragePit.creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
+		Granary.upgrade_level = 0
+		Granary.creation_cost = {Res.FOOD : 0, Res.WOOD : 120, Res.GOLD : 0, Res.STONE : 0}
+		House.upgrade_level = 0
+		House.creation_cost = {Res.FOOD : 0, Res.WOOD : 30, Res.GOLD : 0, Res.STONE : 0}
+
+	def reset_unit_globals(self) :
+		# ICI on doit reset tout ce que les amliorations de batiments peuvent modifier
+		Villager.creation_cost = {Res.FOOD : 50, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
+		Militia.creation_time = 21
+		Spearman.creation_time = 22
+		Archer.creation_time = 35
+		Skirmisher.creation_time = 22
+		ScoutCavalry.creation_time = 30
+		Knight.creation_time = 30
+
 	def setup(self, ressources, players, map_seed):
 		self.reset()
 
@@ -55,8 +79,8 @@ class Model():
 		# Set up the villager and add it to the unit_list.
 		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		use_default = LAUNCH_DEFAULT_MAP
-		if use_default:
-			self.map.setup()
+		if use_default :
+			self.map.setup(None)
 		else:
 			self.map.setup(process_array2(seed=self.map_seed, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE), nbr_players=len(self.players)))
 

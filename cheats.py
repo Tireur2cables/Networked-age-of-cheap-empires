@@ -28,12 +28,12 @@ class CheatsInput(arcade.gui.UIInputText):
         self.game.game_view.update_resources_gui()
 
     def Bigdaddy(self):
-        print("Bigdaddy")
+        #print("Bigdaddy")
         bigdaddz = BigDaddy(grid_pos_to_iso(self.game.players["player"].town_center.grid_position - Vector(1, 1)), "player")
         self.game.game_controller.add_entity_to_game(bigdaddz)
 
     def Steroids(self):
-        print("ON STEROIDS!!!")
+        #print("ON STEROIDS!!!")
         cheats_vars.cheat_steroids = not cheats_vars.cheat_steroids
 
     def Lightspeed(self):
@@ -47,7 +47,7 @@ class CheatsInput(arcade.gui.UIInputText):
 
 
     def on_enter_pressed(self) :
-        print(f"Cheatcode entered : {self.text}")
+        #print(f"Cheatcode entered : {self.text}")
         if self.text == "NINJALUI":
             self.Ninjalui()
         elif self.text == "BIGDADDY":
