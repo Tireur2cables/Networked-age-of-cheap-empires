@@ -117,7 +117,7 @@ class Player:
 				self.other_storage.discard(dead_entity)
 
 
-	def get_nb_class_in_unit(self, unit_class):
+	def get_nbr_type_of_units(self, unit_class):
 		count = 0
 		for u in self.my_units:
 			if isinstance(u, unit_class):
@@ -415,13 +415,13 @@ class AI(Player):
 			elif self.mind.get("aimed_entity", None) is None:
 				# print("I WASN'T AIMING AN ENTITY")
 				if self.difficulty == "Facile":
-					if self.get_nb_class_in_unit(Military) >= 30:
+					if len(self.my_military) >= 30:
 						self.send_army()
 				elif self.difficulty == "Moyen":
-					if self.get_nb_class_in_unit(Military) >= 15:
+					if len(self.my_military) >= 15:
 						self.send_army()
 				elif self.difficulty == "Difficile":
-					if self.get_nb_class_in_unit(Military) >= 5:
+					if len(self.my_military) >= 5:
 						self.send_army()
 				elif self.difficulty == "Agressive":
 					self.send_army_agressive()
@@ -436,7 +436,7 @@ class AI(Player):
 				if zone.is_producing:
 					ongoing_actions.add(("produce", zone.class_produced.get_name()))
 				else:
-					if who_is_producing == 0 and isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nb_class_in_unit(Villager) < 10 + self.get_nb_class_in_unit(Military):
+					if who_is_producing == 0 and isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nbr_type_of_units(Villager) < 10 + len(self.my_military):
 						self.game.game_controller.order_zone_units(zone)
 					elif who_is_producing == 1 and isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
 						self.game.game_controller.order_zone_units(zone, "militia")
