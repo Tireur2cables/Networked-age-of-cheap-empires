@@ -35,6 +35,7 @@ class Player:
 		self.my_units = set()
 		self.my_military = set()
 		self.my_zones = set()
+		self.my_worksites = set()
 		self.food_storage = set()
 		self.other_storage = set()
 		self.upgrades = {}
@@ -44,6 +45,7 @@ class Player:
 		self.my_units.clear()
 		self.my_military.clear()
 		self.my_zones.clear()
+		self.my_worksites.clear()
 		self.food_storage.clear()
 		self.other_storage.clear()
 		self.upgrades.clear()
@@ -59,29 +61,25 @@ class Player:
 		self.my_units,
 		self.my_military,
 		self.my_zones,
+		self.my_worksites,
 		self.food_storage,
 		self.other_storage,
 		self.upgrades]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.upgrades = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades = data
 
 	# my_entities
 	def add_entity(self, new_entity):
-		# Abstract/General class
 		if isinstance(new_entity, Unit):
 			self.my_units.add(new_entity)
-
 			self.nb_unit += 1
-
 			if isinstance(new_entity, Military):
 				self.my_military.add(new_entity)
 
 		elif isinstance(new_entity, Buildable):
 			self.my_zones.add(new_entity)
-
-			# Concrete class
 			if isinstance(new_entity, House):
 				self.max_unit += 4
 			elif isinstance(new_entity, TownCenter):
@@ -92,6 +90,9 @@ class Player:
 				self.food_storage.add(new_entity)
 			elif isinstance(new_entity, StoragePit):
 				self.other_storage.add(new_entity)
+
+		elif isinstance(new_entity, WorkSite):
+			self.my_worksites.add(new_entity)
 
 
 	def discard_from_selection(self, dead_entity):
@@ -107,14 +108,21 @@ class Player:
 			self.nb_unit -= 1
 			if isinstance(dead_entity, Military):
 				self.my_military.discard(dead_entity)
+
 		elif isinstance(dead_entity, Buildable):
 			self.my_zones.discard(dead_entity)
 			if isinstance(dead_entity, House):
 				self.max_unit -= 4
-			elif isinstance(dead_entity, StoragePit):
+			elif isinstance(dead_entity, TownCenter):
 				self.food_storage.discard(dead_entity)
-			elif isinstance(dead_entity, Granary):
 				self.other_storage.discard(dead_entity)
+			elif isinstance(dead_entity, Granary):
+				self.food_storage.discard(dead_entity)
+			elif isinstance(dead_entity, StoragePit):
+				self.other_storage.discard(dead_entity)
+
+		elif isinstance(dead_entity, WorkSite):
+			self.my_worksites.discard(dead_entity)
 
 
 	def get_nbr_type_of_units(self, unit_class):

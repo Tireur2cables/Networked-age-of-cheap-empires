@@ -126,7 +126,7 @@ class Controller():
 			self.working_sites.discard(dead_entity)
 
 	def discard_player_from_game(self, player: Player):
-		for entity in player.my_units | player.my_zones:
+		for entity in player.my_units | player.my_zones | player.my_worksites:
 			entity.faction = None
 			self.discard_entity_from_game(entity)
 
