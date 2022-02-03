@@ -35,12 +35,13 @@ class Controller():
 		self.ai = set()
 		self.players = set()
 		self.working_sites = set()
+		self.type_of_game = ""
 
 	def __getstate__(self):
-		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites]
+		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites, self.type_of_game]
 
 	def __setstate__(self, data):
-		self.selection, self.dead_entities, self.ai, self.players, self.working_sites = data
+		self.selection, self.dead_entities, self.ai, self.players, self.working_sites, self.type_of_game = data
 
 	def reset(self):
 		self.selection.clear()
@@ -48,10 +49,12 @@ class Controller():
 		self.ai.clear()
 		self.players.clear()
 		self.working_sites.clear()
+		self.type_of_game = ""
 
-	def setup(self, players_dict: dict):
+	def setup(self, players_dict: dict, type_of_game):
 		self.reset()
 		self.selection["player"] = set()
+		self.type_of_game = type_of_game
 		for key, value in players_dict.items():
 			self.players.add(value)
 			self.selection[key] = set()
@@ -472,43 +475,36 @@ class Controller():
 					self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
 
 	def end_game(self):
-		# print("youpiiii !!!")
-		#Le call est en construction
 		for player in self.game.players:
 			if player == "player":
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
-			elif self.partie_player():
+			elif self.type_of_game == "JvsIA":  # which means a human was playing
 				DefeatView(self.game,player).setup()
 				self.game.window.show_view(DefeatView(self.game, player))
 			else:
 				IAVictoryView(self.game,player).setup()
 				self.game.window.show_view(IAVictoryView(self.game,player))
-		#pass
 
-	def partie_player(self):
-		for player in self.dead_players:
-			if player == "player":
-				return True
-		return False
+
 # --- On_update (Called every frame) ---
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 
 		# --- Check End Conditions ---
-		self.dead_players = set()
+		dead_players = set()
 		for player in self.players:
 			if player.town_center.is_dead:
 				self.discard_player_from_game(player)
 				player.is_alive = False
-				self.dead_players.add(player)
+				dead_players.add(player)
 
-		for dead_player in self.dead_players:
+		for dead_player in dead_players:
 			self.players.remove(dead_player)
 			del self.game.players[dead_player.player_type]
 
-		if len(self.game.players) == 1: #If there is only one player in the game it will call end_game which will call Victory Screen.
+		if len(self.game.players) == 1 and self.type_of_game != "J": #If there is only one player in the game it will call end_game which will call Victory Screen.
 			self.end_game()
 
 		# --- Update AI ---
