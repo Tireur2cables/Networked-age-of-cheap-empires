@@ -203,7 +203,7 @@ class AI(Player):
 
 	def search_enemy_to_attack(self):
 		self.aimed_enemy = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
-		print(self.aimed_enemy)
+		#print(self.aimed_enemy)
 		if random.randint(0, 1) == 0: # 0 : I attack a zone / 1 : I attack a unit
 			for zone in self.aimed_enemy.my_zones:
 				return zone
@@ -217,7 +217,7 @@ class AI(Player):
 		for military in self.my_military:
 			DEBUG_start = time.time()
 			self.game.game_controller.order_attack(military, entity_to_attack)
-			print(f"time: {time.time() - DEBUG_start}")
+			#print(f"time: {time.time() - DEBUG_start}")
 
 	def search_pos_to_build(self, start_position, tile_size):
 		area_found = False

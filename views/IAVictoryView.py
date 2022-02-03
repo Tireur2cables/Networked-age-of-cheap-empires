@@ -5,11 +5,11 @@ from views.CustomButtons import QuitButton, NextViewButton
 from views.MainView import MainView
 
 # --- Constants ---
-BACKGROUND = "./Ressources/img/Defeat2.jpg"
+BACKGROUND = "./Ressources/img/Ia_Match_Victory2.jpg"
 IMAGE_VICTORY = "./Ressources/img/bouton_rouge_age.png"
 
 # View de victoire : on l'affiche quand le joueur remporte la partie
-class DefeatView(arcade.View) :
+class IAVictoryView(arcade.View) :
     def __init__(self,game,winner):
         super().__init__()
         self.game =game
@@ -61,8 +61,8 @@ class DefeatView(arcade.View) :
         self.manager.add(
 			arcade.gui.UIAnchorWidget(
 				anchor_x = "center_x",
-				anchor_y = "bottom",
-                align_y=buttonsize/10,
+				anchor_y = "top",
+                align_y=-buttonsize/10,
 				child = self.v_box1
 			)
 		)

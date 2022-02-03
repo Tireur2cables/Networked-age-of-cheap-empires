@@ -26,8 +26,17 @@ class Map():
 		self.spawn_array = []
 
 
+	def reset(self):
+		self.tile_array.clear()
+		self.objects_array.clear()
+		self.spawn_array.clear()
+
+
 	def setup(self, tile_array):
 		# self.tile_array = [[Tile("grass",x,y,None) for y in range(map_size)] for x in range(map_size)]
+
+		self.reset()
+
 		if tile_array is None:
 			self.tile_array = [[Tile(default_map_2d[grid_x][grid_y], Vector(grid_x, grid_y)) for grid_y in range(self.map_size)] for grid_x in range(self.map_size)]
 		else:

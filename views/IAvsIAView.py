@@ -12,7 +12,7 @@ class IAPreGameView(PreGameView) :
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
-		if self.nbAdv == 9 :
+		if self.nbAdv == 5 :
 			self.nbAdv = 2
 
 	def setupButtons(self) :
