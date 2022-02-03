@@ -316,9 +316,15 @@ class AI(Player):
 
 	def my_zones_contains(self, class_to_search: Zone):
 		for zone in self.my_zones:
-			if isinstance(zone, class_to_search) or (isinstance(zone, WorkSite) and isinstance(zone.zone_to_build, class_to_search)):
+			if isinstance(zone, class_to_search): # TODO: Bug here
 				return True
 		return False
+
+	def worksite_to_build(self, class_to_search: Zone):
+		for worksite in self.my_worksites:
+			if worksite.zone_to_build == class_to_search:
+				return worksite
+		return None
 
 	def correct_mind(self): # Just in case...
 		if (aimed_entity := self.mind.get("aimed_entity", None)) is not None and (aimed_entity.is_dead or not aimed_entity.is_alive()):
@@ -370,12 +376,18 @@ class AI(Player):
 							impossible_actions.add(action)
 
 					elif (action := ("build", "house")) not in (ongoing_actions | impossible_actions) and self.max_unit - self.nb_unit < 2 and self.resources[Res.WOOD] > 30:
-						map_position = self.search_pos_to_build(self.town_center.grid_position, House.tile_size)
-						if map_position is not None:
-							self.game.game_controller.order_build(unit, map_position, "house")
+						worksite = self.worksite_to_build(House)
+
+						if worksite is not None:
+							self.game.game_controller.order_resume_build(unit, worksite)
 							action_found = True
 						else:
-							impossible_actions.add(action)
+							map_position = self.search_pos_to_build(self.town_center.grid_position, House.tile_size)
+							if map_position is not None:
+								self.game.game_controller.order_build(unit, map_position, "house")
+								action_found = True
+							else:
+								impossible_actions.add(action)
 
 					elif (action := ("harvest", "wood")) not in (ongoing_actions | impossible_actions) and self.resources[Res.WOOD] < 100:
 						harvest_zone = self.search_closest_harvest_zone(unit, "wood")
@@ -402,12 +414,18 @@ class AI(Player):
 							impossible_actions.add(action)
 
 					elif self.difficulty != "Pacifique" and (action := ("build", "barracks")) not in (ongoing_actions | impossible_actions) and not self.my_zones_contains(Barracks):
-						map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
-						if map_position is not None:
-							self.game.game_controller.order_build(unit, map_position, "barracks")
+						worksite = self.worksite_to_build(Barracks)
+
+						if worksite is not None:
+							self.game.game_controller.order_resume_build(unit, worksite)
 							action_found = True
 						else:
-							impossible_actions.add(action)
+							map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
+							if map_position is not None:
+								self.game.game_controller.order_build(unit, map_position, "barracks")
+								action_found = True
+							else:
+								impossible_actions.add(action)
 
 					else:
 						action_found = True # This is not necessarely True technically, but this is to prevent infinite loop if no action is possible.
