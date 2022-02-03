@@ -476,7 +476,7 @@ class Controller():
 
 	def end_game(self):
 		for player in self.game.players:
-			if player == "player":
+			if player == "plyer":
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
 			elif self.type_of_game == "JvsIA":  # which means a human was playing
