@@ -27,6 +27,11 @@ class CheatsInput(arcade.gui.UIInputText):
         self.game.players["player"].add_all(10000)
         self.game.game_view.update_resources_gui()
 
+    def Ninjaeux(self):
+        for player in self.game.players.values():
+            player.add_all(10000)
+        self.game.game_view.update_resources_gui()
+
     def Bigdaddy(self):
         #print("Bigdaddy")
         bigdaddz = BigDaddy(grid_pos_to_iso(self.game.players["player"].town_center.grid_position - Vector(1, 1)), "player")
@@ -50,6 +55,8 @@ class CheatsInput(arcade.gui.UIInputText):
         #print(f"Cheatcode entered : {self.text}")
         if self.text == "NINJALUI":
             self.Ninjalui()
+        elif self.text == "NINJAEUX":
+            self.Ninjaeux()
         elif self.text == "BIGDADDY":
             self.Bigdaddy()
         elif self.text == "STEROIDS":
