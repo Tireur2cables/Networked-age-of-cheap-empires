@@ -136,7 +136,7 @@ class TownCenter(Buildable):
 		self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Villager.creation_time # in seconds
 
 	@staticmethod
-	def TownCenter_upgrade():
+	def upgrade():
 		TownCenter.upgrade_level=TownCenter.upgrade_level+1
 		Villager.creation_cost = {Res.FOOD : 30, Res.WOOD : 0, Res.GOLD : 0, Res.STONE : 0}
 
@@ -188,7 +188,7 @@ class Barracks(Buildable):
 			self.unit_cooldown = 3 if LAUNCH_FAST_ACTIONS else Knight.creation_time
 
 	@staticmethod
-	def Barracks_upgrade(self):
+	def upgrade():
 		Barracks.upgrade_level=Barracks.upgrade_level+1
 
 		Militia.creation_time=Militia.creation_time-5
@@ -225,7 +225,7 @@ class StoragePit(Buildable):
 		health=350)
 
 	@staticmethod
-	def StoragePit_upgrade():
+	def upgrade():
 		StoragePit.upgrade_level=StoragePit.upgrade_level+1
 		StoragePit.creation_cost = {Res.FOOD : 0, Res.WOOD : 100, Res.GOLD : 0, Res.STONE : 0}
 
@@ -250,7 +250,7 @@ class Granary(Buildable):
 		health=350)
 
 	@staticmethod
-	def Granary_upgrade():
+	def upgrade():
 		Granary.upgrade_level=Granary.upgrade_level+1
 		Granary.creation_cost = {Res.FOOD : 0, Res.WOOD : 90, Res.GOLD : 0, Res.STONE : 0}
 
@@ -296,7 +296,7 @@ class House(Buildable):
 		health=75)
 
 	@staticmethod
-	def House_upgrade():
+	def upgrade():
 		House.upgrade_level=House.upgrade_level+1
 		House.creation_cost = {Res.FOOD : 0, Res.WOOD : 20, Res.GOLD : 0, Res.STONE : 0}
 
