@@ -333,7 +333,7 @@ class Controller():
 					#print("area not available!")
 					return
 
-				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1)):
+				if zone_to_build_class in (TownCenter, Barracks) and (not self.game.game_model.map.is_area_on_map(map_position - Vector(1, 1), (1, 1)) or not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1))):
 					#print("no space to produce units!")
 					return
 
