@@ -22,9 +22,19 @@ class CheatsInput(arcade.gui.UIInputText):
         self.cheats_list = ['NINJALUI', 'BIGDADDY', 'STEROIDS', 'REVEAL MAP', 'NO FOG']
         self.game = game
         self.triggered = False
+        # restetting variables
+        cheats_vars.cheat_steroids = False
+        cheats_vars.cheat_vitamins = False
+        cheats_vars.cheat_lightspeed = False
+        # cheats_vars.global_save_suffix = "0" --- This shouldn't be resetted as it is used to load a save in the menu
 
     def Ninjalui(self):
         self.game.players["player"].add_all(10000)
+        self.game.game_view.update_resources_gui()
+
+    def Ninjaeux(self):
+        for player in self.game.players.values():
+            player.add_all(10000)
         self.game.game_view.update_resources_gui()
 
     def Bigdaddy(self):
@@ -35,6 +45,9 @@ class CheatsInput(arcade.gui.UIInputText):
     def Steroids(self):
         #print("ON STEROIDS!!!")
         cheats_vars.cheat_steroids = not cheats_vars.cheat_steroids
+
+    def Vitamins(self):
+        cheats_vars.cheat_vitamins = not cheats_vars.cheat_vitamins
 
     def Lightspeed(self):
         cheats_vars.cheat_lightspeed = not cheats_vars.cheat_lightspeed
@@ -50,10 +63,14 @@ class CheatsInput(arcade.gui.UIInputText):
         #print(f"Cheatcode entered : {self.text}")
         if self.text == "NINJALUI":
             self.Ninjalui()
+        elif self.text == "NINJAEUX":
+            self.Ninjaeux()
         elif self.text == "BIGDADDY":
             self.Bigdaddy()
         elif self.text == "STEROIDS":
             self.Steroids()
+        elif self.text == "VITAMINS":
+            self.Vitamins()
         elif self.text == "LIGHTSPEED":
             self.Lightspeed()
         elif "/save" in self.text:

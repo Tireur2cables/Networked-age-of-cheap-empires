@@ -35,12 +35,13 @@ class Controller():
 		self.ai = set()
 		self.players = set()
 		self.working_sites = set()
+		self.type_of_game = ""
 
 	def __getstate__(self):
-		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites]
+		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites, self.type_of_game]
 
 	def __setstate__(self, data):
-		self.selection, self.dead_entities, self.ai, self.players, self.working_sites = data
+		self.selection, self.dead_entities, self.ai, self.players, self.working_sites, self.type_of_game = data
 
 	def reset(self):
 		self.selection.clear()
@@ -48,10 +49,12 @@ class Controller():
 		self.ai.clear()
 		self.players.clear()
 		self.working_sites.clear()
+		self.type_of_game = ""
 
-	def setup(self, players_dict: dict):
+	def setup(self, players_dict: dict, type_of_game):
 		self.reset()
 		self.selection["player"] = set()
+		self.type_of_game = type_of_game
 		for key, value in players_dict.items():
 			self.players.add(value)
 			self.selection[key] = set()
@@ -123,7 +126,7 @@ class Controller():
 			self.working_sites.discard(dead_entity)
 
 	def discard_player_from_game(self, player: Player):
-		for entity in player.my_units | player.my_zones:
+		for entity in player.my_units | player.my_zones | player.my_worksites:
 			entity.faction = None
 			self.discard_entity_from_game(entity)
 
@@ -330,7 +333,7 @@ class Controller():
 					#print("area not available!")
 					return
 
-				if zone_to_build_class in (TownCenter, Barracks) and not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1)):
+				if zone_to_build_class in (TownCenter, Barracks) and (not self.game.game_model.map.is_area_on_map(map_position - Vector(1, 1), (1, 1)) or not self.game.game_model.map.is_area_buildable(map_position - Vector(1, 1), (1, 1))):
 					#print("no space to produce units!")
 					return
 
@@ -381,17 +384,19 @@ class Controller():
 			if isinstance(producing_zone, Barracks) :
 				producing_zone.set_class_produced(entity_produced)
 
-			if current_player.can_create(producing_zone.class_produced) :
-
+			if current_player.can_create(producing_zone.class_produced, producing_zone.get_name()) :
 				producing_zone.is_producing = True
 				for key, value in producing_zone.class_produced.creation_cost.items():
-					current_player.sub_resource(key, value)
+					if isinstance(producing_zone, TownCenter) and key == Res.FOOD and current_player.upgrades.get(producing_zone.get_name(), 0) == 1:
+						current_player.sub_resource(key, value - 20)
+					else:
+						current_player.sub_resource(key, value)
 
 				if producing_zone.faction == "player" : # Shouldn't be used with AI
 					self.game.game_view.update_resources_gui()
 			else :
 				if producing_zone.faction == "player":
-					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+					self.game.game_view.errorMessage = "Vous manquez de ressources pour produire des unités"
 		else :
 			if producing_zone.faction == "player":
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
@@ -429,10 +434,10 @@ class Controller():
 			first_entity_grid_pos = iso_to_grid_pos(last_entity.iso_position)
 			# Step 1: Search the closest tile near the zone_found to harvest it.
 			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(first_entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
-			print(f"aimed_tile : {aimed_tile}")
+			# print(f"aimed_tile : {aimed_tile}")
 			# Step 2: Start moving toward the aimed entity
 			if aimed_tile is not None:
-				print(f"src and dest : {first_entity_grid_pos} -> {aimed_tile.grid_position}")
+				# print(f"src and dest : {first_entity_grid_pos} -> {aimed_tile.grid_position}")
 				self.move_grouped_entities(entity_list, aimed_tile.grid_position)
 
 	def order_repairation(self, entity, aimed_entity) :
@@ -452,71 +457,54 @@ class Controller():
 				self.move_entity(entity, aimed_tile.grid_position)
 
 	def order_upgradebuilding(self, upgradeIt:Buildable):
-		if (upgradeIt.upgrade_cost[upgradeIt.upgrade_level] != None):
+		if isinstance(upgradeIt, (Barracks, House, Granary, StoragePit, TownCenter)): # Dock not implemented
 			current_player = self.game.players[upgradeIt.faction]
-			if all(current_player.resources[k] >= upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k] for k in Res) :
-				for k in Res :
-					current_player.sub_resource(k, upgradeIt.upgrade_cost[upgradeIt.upgrade_level][k])
-				if upgradeIt.faction == "player" : # Shouldn't be used with AI
-					self.game.game_view.update_resources_gui()
-				if isinstance(upgradeIt,Barracks):
-					upgradeIt.Barracks_upgrade()
-				elif isinstance(upgradeIt,House):
-					upgradeIt.House_upgrade()
-				elif isinstance(upgradeIt,Dock):
-					#upgradeIt.Dock_upgrade()
-					pass
-				elif isinstance(upgradeIt,Granary):
-					upgradeIt.Granary_upgrade()
-				elif isinstance(upgradeIt,StoragePit):
-					upgradeIt.StoragePit_upgrade()
-				elif isinstance(upgradeIt,TownCenter):
-					upgradeIt.TownCenter_upgrade()
+			current_level = current_player.upgrades.get(upgradeIt.get_name(), 0)  # If the key doesn't exists, it means we have never upgraded, so level 0 by default
+			if (upgradeIt.upgrade_cost[current_level] != None):
+				if all(current_player.resources[k] >= upgradeIt.upgrade_cost[current_level][k] for k in Res) :
+						for k in Res :
+							current_player.sub_resource(k, upgradeIt.upgrade_cost[current_level][k])
+						if upgradeIt.faction == "player" : # Shouldn't be used with AI
+							self.game.game_view.update_resources_gui()
+						current_player.upgrade(upgradeIt.get_name())
+				else :
+					if upgradeIt.faction == "player":
+						self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
 			else :
 				if upgradeIt.faction == "player":
-					self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
-		else :
-			if upgradeIt.faction == "player":
-				self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
+					self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
 
 	def end_game(self):
-		# print("youpiiii !!!")
-		#Le call est en construction
 		for player in self.game.players:
 			if player == "player":
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
-			elif self.partie_player():
+			elif self.type_of_game == "JvsIA":  # which means a human was playing
 				DefeatView(self.game,player).setup()
 				self.game.window.show_view(DefeatView(self.game, player))
 			else:
 				IAVictoryView(self.game,player).setup()
 				self.game.window.show_view(IAVictoryView(self.game,player))
-		#pass
 
-	def partie_player(self):
-		for player in self.dead_players:
-			if player == "player":
-				return True
-		return False
+
 # --- On_update (Called every frame) ---
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 
 		# --- Check End Conditions ---
-		self.dead_players = set()
+		dead_players = set()
 		for player in self.players:
 			if player.town_center.is_dead:
 				self.discard_player_from_game(player)
 				player.is_alive = False
-				self.dead_players.add(player)
+				dead_players.add(player)
 
-		for dead_player in self.dead_players:
+		for dead_player in dead_players:
 			self.players.remove(dead_player)
 			del self.game.players[dead_player.player_type]
 
-		if len(self.game.players) == 1: #If there is only one player in the game it will call end_game which will call Victory Screen.
+		if len(self.game.players) == 1 and self.type_of_game != "J": #If there is only one player in the game it will call end_game which will call Victory Screen.
 			self.end_game()
 
 		# --- Update AI ---
@@ -557,9 +545,15 @@ class Controller():
 					elif entity.goal == "attack":
 						if isinstance(entity.aimed_entity, Unit):
 							if iso_to_grid_pos(entity.iso_position) == iso_to_grid_pos(entity.aimed_entity.iso_position):
+								# L'entité est arrivée
 								entity.is_interacting = True
-							else:
+							elif (not entity.aimed_entity.is_moving) or entity.faction == "player" or entity.aimed_entity.faction == "player" :
+								# L'entité n'est pas arrivée et l'autre ne bouge pas OU l'une des deux entités appartient à un joueur
 								self.order_attack(entity, entity.aimed_entity)
+							else:
+								# L'entité n'est pas arrivée et l'autre bouge et les 2 appartiennent à des IA
+								# "Temporary" fix to prevent circular/infinite loop of military chasing military...
+								entity.end_goal()
 						else:
 							entity.is_interacting = True
 
@@ -606,7 +600,9 @@ class Controller():
 
 	def repair_zone(self, entity, delta_time) :
 		entity.action_timer += delta_time
-		if entity.action_timer > 1 : # commence à réparer ou continue
+		if cheats_vars.cheat_steroids or cheats_vars.cheat_vitamins or entity.action_timer > 0.5 : # commence à réparer ou continue
+			entity.action_timer = 0
+			# print(f"{entity.aimed_entity.health} < {entity.aimed_entity.max_health}")
 			if entity.aimed_entity.health < entity.aimed_entity.max_health :
 				entity.aimed_entity.health += 1 # repare 1 point de vie
 
@@ -618,7 +614,7 @@ class Controller():
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.aimed_entity.action_timer += delta_time
-		if cheats_vars.cheat_steroids or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
+		if cheats_vars.cheat_steroids or (cheats_vars.cheat_vitamins and entity.aimed_entity.action_timer > 3) or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
 
@@ -626,9 +622,16 @@ class Controller():
 			self.discard_entity_from_game(entity.aimed_entity)
 			entity.aimed_entity = None
 
+			# print(current_player.upgrades, current_player.upgrades.get(worksite.zone_to_build.get_name(), 0))
 			if current_player.can_create(worksite.zone_to_build):
-				for res, cost in worksite.zone_to_build.creation_cost.items() :
-					current_player.sub_resource(res, cost)
+				for res, cost in worksite.zone_to_build.creation_cost.items():
+					if worksite.zone_to_build in (Barracks, StoragePit, Granary) and res == Res.WOOD and current_player.upgrades.get(worksite.zone_to_build.get_name(), 0) == 1:
+						current_player.sub_resource(res, cost - 20)
+					elif worksite.zone_to_build == House and res == Res.WOOD and current_player.upgrades.get(worksite.zone_to_build.get_name(), 0) == 1:
+						current_player.sub_resource(res, cost - 10)
+					else:
+						current_player.sub_resource(res, cost)
+
 				if entity.faction == "player":
 					self.game.game_view.update_resources_gui()
 
@@ -642,7 +645,7 @@ class Controller():
 	# Récupère les resources présentes à chaque seconde, jusqu'à ce que ce soit full. Dans ce cas, il doit retourner au Town Center
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
-		if cheats_vars.cheat_steroids or entity.action_timer > 1:
+		if cheats_vars.cheat_steroids or (cheats_vars.cheat_vitamins and entity.action_timer > 0.3) or entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
@@ -675,7 +678,7 @@ class Controller():
 			entity.resources[resource] = 0
 
 		if entity.faction == "player" :
-			self.game.game_view.trigger_Villager_GUI(self.selection)
+			self.game.game_view.update_villager_resources_gui()
 			self.game.game_view.update_resources_gui()
 
 		can_harvest = entity.go_back_to_harvest()
@@ -685,18 +688,15 @@ class Controller():
 	# Produit une unité et s'arrête
 	def produce_units(self, producing_zone, delta_time):
 		producing_zone.action_timer += delta_time
-		if cheats_vars.cheat_steroids or producing_zone.action_timer > producing_zone.unit_cooldown:
+		if cheats_vars.cheat_steroids or (cheats_vars.cheat_vitamins and producing_zone.action_timer > 3) or producing_zone.action_timer > producing_zone.unit_cooldown:
 			producing_zone.action_timer = 0
 			producing_zone.is_producing = False
 			current_player = self.game.players[producing_zone.faction]
 			if current_player.nb_unit < current_player.max_unit :
-				if current_player.can_create(producing_zone.class_produced) :
-					grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
-					Class_produced = producing_zone.class_produced
-					random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
-					self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
-				elif producing_zone.faction == "player" :
-					self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
+				grid_position = iso_to_grid_pos(producing_zone.iso_position) - Vector(1, 1)
+				Class_produced = producing_zone.class_produced
+				random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
+				self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
 			elif producing_zone.faction == "player":
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
@@ -709,14 +709,14 @@ class Controller():
 			#print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
 
-			if unit.faction == "player" : # Shouldn't be used with AI
-				self.game.game_view.trigger_Villager_GUI(self.selection)
+			if unit.faction == "player" or unit.aimed_entity.faction == "player" : # Shouldn't be used with AI
+				self.game.game_view.update_villager_resources_gui()
 
 			if isinstance(unit.aimed_entity, Unit) and unit.aimed_entity.aimed_entity != unit:
 				self.order_attack(unit.aimed_entity, unit)
 				unit.aimed_entity.is_interacting = True
 
-			if isinstance(opponent_controlling, AI):
+			if isinstance(opponent_controlling, AI) and isinstance(unit.aimed_entity, Zone):
 				opponent_controlling.mind["is_attacked_by"] = unit
 
 			if not alive:

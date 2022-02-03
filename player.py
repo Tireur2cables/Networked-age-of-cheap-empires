@@ -35,16 +35,20 @@ class Player:
 		self.my_units = set()
 		self.my_military = set()
 		self.my_zones = set()
+		self.my_worksites = set()
 		self.food_storage = set()
 		self.other_storage = set()
+		self.upgrades = {}
 
 	def reset(self):
 		self.resources.clear()
 		self.my_units.clear()
 		self.my_military.clear()
 		self.my_zones.clear()
+		self.my_worksites.clear()
 		self.food_storage.clear()
 		self.other_storage.clear()
+		self.upgrades.clear()
 
 
 	def __getstate__(self):
@@ -57,28 +61,25 @@ class Player:
 		self.my_units,
 		self.my_military,
 		self.my_zones,
+		self.my_worksites,
 		self.food_storage,
-		self.other_storage]
+		self.other_storage,
+		self.upgrades]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades = data
 
 	# my_entities
 	def add_entity(self, new_entity):
-		# Abstract/General class
 		if isinstance(new_entity, Unit):
 			self.my_units.add(new_entity)
-
 			self.nb_unit += 1
-
 			if isinstance(new_entity, Military):
 				self.my_military.add(new_entity)
 
 		elif isinstance(new_entity, Buildable):
 			self.my_zones.add(new_entity)
-
-			# Concrete class
 			if isinstance(new_entity, House):
 				self.max_unit += 4
 			elif isinstance(new_entity, TownCenter):
@@ -89,6 +90,9 @@ class Player:
 				self.food_storage.add(new_entity)
 			elif isinstance(new_entity, StoragePit):
 				self.other_storage.add(new_entity)
+
+		elif isinstance(new_entity, WorkSite):
+			self.my_worksites.add(new_entity)
 
 
 	def discard_from_selection(self, dead_entity):
@@ -104,17 +108,24 @@ class Player:
 			self.nb_unit -= 1
 			if isinstance(dead_entity, Military):
 				self.my_military.discard(dead_entity)
+
 		elif isinstance(dead_entity, Buildable):
 			self.my_zones.discard(dead_entity)
 			if isinstance(dead_entity, House):
 				self.max_unit -= 4
-			elif isinstance(dead_entity, StoragePit):
+			elif isinstance(dead_entity, TownCenter):
 				self.food_storage.discard(dead_entity)
+				self.other_storage.discard(dead_entity)
 			elif isinstance(dead_entity, Granary):
+				self.food_storage.discard(dead_entity)
+			elif isinstance(dead_entity, StoragePit):
 				self.other_storage.discard(dead_entity)
 
+		elif isinstance(dead_entity, WorkSite):
+			self.my_worksites.discard(dead_entity)
 
-	def get_nb_class_in_unit(self, unit_class):
+
+	def get_nbr_type_of_units(self, unit_class):
 		count = 0
 		for u in self.my_units:
 			if isinstance(u, unit_class):
@@ -154,8 +165,18 @@ class Player:
 		self.resources[Res.GOLD] += qtyGold
 		self.resources[Res.STONE] += qtyStone
 
-	def can_create(self, type_entity: Entity) -> bool:
-		return all(self.resources[k] >= type_entity.creation_cost[k] for k in Res)
+	def can_create(self, type_entity: Entity, upgrade_type_name=None) -> bool:
+		if upgrade_type_name is None:
+			upgrade_type_name = type_entity.get_name()
+		if type_entity.get_name() == "villager" and self.upgrades.get(upgrade_type_name, 0) == 1:
+			print("hey")
+			return all((self.resources[k] >= type_entity.creation_cost[k] if k != Res.FOOD else self.resources[k] >= type_entity.creation_cost[k] - 20) for k in Res)
+		elif type_entity.get_name() in ("barracks", "storagepit", "granary") and self.upgrades.get(upgrade_type_name, 0) == 1:
+			return all((self.resources[k] >= type_entity.creation_cost[k] if k != Res.WOOD else self.resources[k] >= type_entity.creation_cost[k] - 20) for k in Res)
+		elif type_entity.get_name() == "house" and self.upgrades.get(upgrade_type_name, 0) == 1:
+			return all((self.resources[k] >= type_entity.creation_cost[k] if k != Res.WOOD else self.resources[k] >= type_entity.creation_cost[k] - 10) for k in Res)
+		else:
+			return all(self.resources[k] >= type_entity.creation_cost[k] for k in Res)
 
 	# Resource
 	def get_resource(self, resource):
@@ -170,6 +191,12 @@ class Player:
 	def sub_resource(self, resource, qty_resource):
 		self.resources[resource] -= qty_resource
 
+	# Upgrade
+	def upgrade(self, class_name_to_update):
+		if self.upgrades.get(class_name_to_update, None) is None:
+			self.upgrades[class_name_to_update] = 0
+		self.upgrades[class_name_to_update] += 1
+
 class AI(Player):
 	def __init__(self,
 			game,
@@ -181,7 +208,6 @@ class AI(Player):
 		self.difficulty = difficulty
 		self.mind = {}
 
-		print(self.difficulty)
 
 	def __getstate__(self):
 		return [self.player_type,
@@ -193,15 +219,16 @@ class AI(Player):
 		self.my_units,
 		self.my_military,
 		self.my_zones,
+		self.my_worksites,
 		self.food_storage,
 		self.other_storage,
+		self.upgrades,
 		self.delta_time,
 		self.difficulty,
 		self.mind]
 
-
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.difficulty, self.mind = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades, self.delta_time, self.difficulty, self.mind = data
 
 
 	def reset(self):
@@ -235,13 +262,21 @@ class AI(Player):
 		self.send_army_towards(entity_to_attack)
 
 	def send_army_agressive(self):
-		print("ALATTAQUE")
+		# print("A L'ATTAQUE")
 		if self.mind.get("aimed_player", None) is None:
 			aimed_player = None
 			for player_key, player in self.game.players.items():
 				if player_key != self.player_type:
-					if len(self.my_military) >= 5 + len(player.my_military) or (len(self.my_military) >= 5 and random.randint(0, 30) == 0):
+					if len(self.my_military) >= 5 + len(player.my_military):
 						aimed_player = player
+						break
+
+			if aimed_player is None and len(self.my_military) >= 5 and random.randint(0, 4) == 0:
+				for player_key, player in self.game.players.items():
+					if player_key != self.player_type:
+						aimed_player = player
+						break
+
 			self.mind["aimed_player"] = aimed_player
 
 		if self.mind.get("aimed_player", None) is not None:
@@ -282,9 +317,15 @@ class AI(Player):
 
 	def my_zones_contains(self, class_to_search: Zone):
 		for zone in self.my_zones:
-			if isinstance(zone, class_to_search) or (isinstance(zone, WorkSite) and isinstance(zone.zone_to_build, class_to_search)):
+			if isinstance(zone, class_to_search): # TODO: Bug here
 				return True
 		return False
+
+	def worksite_to_build(self, class_to_search: Zone):
+		for worksite in self.my_worksites:
+			if worksite.zone_to_build == class_to_search:
+				return worksite
+		return None
 
 	def correct_mind(self): # Just in case...
 		if (aimed_entity := self.mind.get("aimed_entity", None)) is not None and (aimed_entity.is_dead or not aimed_entity.is_alive()):
@@ -336,12 +377,18 @@ class AI(Player):
 							impossible_actions.add(action)
 
 					elif (action := ("build", "house")) not in (ongoing_actions | impossible_actions) and self.max_unit - self.nb_unit < 2 and self.resources[Res.WOOD] > 30:
-						map_position = self.search_pos_to_build(self.town_center.grid_position, House.tile_size)
-						if map_position is not None:
-							self.game.game_controller.order_build(unit, map_position, "house")
+						worksite = self.worksite_to_build(House)
+
+						if worksite is not None:
+							self.game.game_controller.order_resume_build(unit, worksite)
 							action_found = True
 						else:
-							impossible_actions.add(action)
+							map_position = self.search_pos_to_build(self.town_center.grid_position, House.tile_size)
+							if map_position is not None:
+								self.game.game_controller.order_build(unit, map_position, "house")
+								action_found = True
+							else:
+								impossible_actions.add(action)
 
 					elif (action := ("harvest", "wood")) not in (ongoing_actions | impossible_actions) and self.resources[Res.WOOD] < 100:
 						harvest_zone = self.search_closest_harvest_zone(unit, "wood")
@@ -368,12 +415,18 @@ class AI(Player):
 							impossible_actions.add(action)
 
 					elif self.difficulty != "Pacifique" and (action := ("build", "barracks")) not in (ongoing_actions | impossible_actions) and not self.my_zones_contains(Barracks):
-						map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
-						if map_position is not None:
-							self.game.game_controller.order_build(unit, map_position, "barracks")
+						worksite = self.worksite_to_build(Barracks)
+
+						if worksite is not None:
+							self.game.game_controller.order_resume_build(unit, worksite)
 							action_found = True
 						else:
-							impossible_actions.add(action)
+							map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
+							if map_position is not None:
+								self.game.game_controller.order_build(unit, map_position, "barracks")
+								action_found = True
+							else:
+								impossible_actions.add(action)
 
 					else:
 						action_found = True # This is not necessarely True technically, but this is to prevent infinite loop if no action is possible.
@@ -388,22 +441,22 @@ class AI(Player):
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
 		if len(self.my_military) > 0 and self.difficulty != "Pacifique":
-			print(self.mind.get("aimed_entity", None))
+			# print(self.mind.get("aimed_entity", None))
 			if self.mind.get("is_attacked_by", None) is not None and self.mind.get("counter_entity", None) is None:
-				print("I'M ATTACKED!!!")
+				# print("I'M ATTACKED!!!")
 				entity_attacking = self.mind["is_attacked_by"]
 				self.mind["counter_entity"] = entity_attacking
 				self.send_army_towards(entity_attacking)
 			elif self.mind.get("aimed_entity", None) is None:
-				print("OK I AIM")
+				# print("I WASN'T AIMING AN ENTITY")
 				if self.difficulty == "Facile":
-					if self.get_nb_class_in_unit(Military) >= 30:
+					if len(self.my_military) >= 30:
 						self.send_army()
 				elif self.difficulty == "Moyen":
-					if self.get_nb_class_in_unit(Military) >= 15:
+					if len(self.my_military) >= 15:
 						self.send_army()
 				elif self.difficulty == "Difficile":
-					if self.get_nb_class_in_unit(Military) >= 5:
+					if len(self.my_military) >= 5:
 						self.send_army()
 				elif self.difficulty == "Agressive":
 					self.send_army_agressive()
@@ -412,12 +465,13 @@ class AI(Player):
 				for military in idle_military:
 					self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
 
+		who_is_producing = random.randint(0, 1)
 		for zone in self.my_zones:
 			if isinstance(zone, (TownCenter, Barracks)):
 				if zone.is_producing:
 					ongoing_actions.add(("produce", zone.class_produced.get_name()))
 				else:
-					if isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nb_class_in_unit(Villager) < 10 + self.get_nb_class_in_unit(Military):
+					if who_is_producing == 0 and isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nbr_type_of_units(Villager) < 10 + len(self.my_military):
 						self.game.game_controller.order_zone_units(zone)
-					elif isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
+					elif who_is_producing == 1 and isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
 						self.game.game_controller.order_zone_units(zone, "militia")

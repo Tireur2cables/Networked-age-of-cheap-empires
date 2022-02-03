@@ -122,11 +122,11 @@ class View():
 			self.v_box1 = arcade.gui.UIBoxLayout()
 
 			player_resources = player.resources
-			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+			resources_tab = [f"    {player.nb_unit}/{player.max_unit} ", f"   {player_resources[Res.FOOD]}", f"   {player_resources[Res.WOOD]}", f"   {player_resources[Res.STONE]}", f"   {player_resources[Res.GOLD]}"]
 
 			# Create a text label, contenant le nombre de ressources disponibles pour le joueur
 			for val in resources_tab :
-				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(255, 255, 255, 255), font_name=('Impact',))
+				label = arcade.gui.UITextArea(0, 0, self.WIDTH_LABEL, self.HEIGHT_LABEL, val, text_color=(255, 255, 255, 255), font_name=('Impact',),font_size=24)
 				self.resource_label_list.append(label)
 				self.v_box1.add(label.with_background(arcade.load_texture(button_texture2)))
 
@@ -203,6 +203,17 @@ class View():
 		# 		tile_outline = self.get_tile_outline(grid_pos_to_iso(tile.grid_position))
 		# 		arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 
+
+		self.sort_list()
+		self.sorted_sprite_list.draw(pixelated=True)
+
+		# if LAUNCH_DEBUG_DISPLAY:
+		# 	for x in range(3):
+		# 		for y in range(3):
+		# 			tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+		# 			arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+		# 			self.draw_grid_position(Vector(x, y))
+
 		for s in self.sorted_sprite_list:
 			if s.entity.selected:
 				if isinstance(s.entity, Zone):
@@ -220,7 +231,7 @@ class View():
 						self.draw_bar(zone.iso_position, zone.amount, zone.max_amount, arcade.color.BLUE, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
 					elif isinstance(zone, (Barracks, TownCenter)) and zone.is_producing:
-						self.draw_bar(zone.iso_position, int(zone.action_timer), int(zone.unit_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
+						self.draw_bar(zone.iso_position, int(zone.action_timer), 3 if cheats_vars.cheat_vitamins else int(zone.unit_cooldown), arcade.color.GREEN, nbr_health_bar=nbr_health_bar)
 						nbr_health_bar +=1
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(s.entity.iso_position)
@@ -239,23 +250,13 @@ class View():
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.BLUE)
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.amount, aimed_entity.max_amount, arcade.color.YELLOW, nbr_health_bar=2)
 						elif isinstance(aimed_entity, WorkSite) and aimed_entity.faction == unit.faction:
-							self.draw_bar(unit.iso_position, int(aimed_entity.action_timer), aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
+							self.draw_bar(unit.iso_position, int(aimed_entity.action_timer), 3 if cheats_vars.cheat_vitamins else aimed_entity.zone_to_build.build_time, arcade.color.BLUE, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Unit):
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 						elif isinstance(aimed_entity, Buildable) and aimed_entity.faction != unit.faction:
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(unit.iso_position)
-
-		self.sort_list()
-		self.sorted_sprite_list.draw(pixelated=True)
-
-		# if LAUNCH_DEBUG_DISPLAY:
-		# 	for x in range(3):
-		# 		for y in range(3):
-		# 			tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
-		# 			arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-		# 			self.draw_grid_position(Vector(x, y))
 
 		# Update the minimap
 		self.minimap.draw()
@@ -373,10 +374,10 @@ class View():
 			self.reset_construct_flags() # permet d'annuler une construction
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
-			if zones_at_point:
-				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
-			elif units_at_point:
+			if units_at_point:
 				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
+			elif zones_at_point:
+				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
 			else:
 				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
 
@@ -624,7 +625,7 @@ class View():
 		if player is not None:
 			player_resources = player.resources
 			# print(player_resources)
-			resources_tab = [f"  = {player.nb_unit}/{player.max_unit} ", f" = {player_resources[Res.FOOD]}", f" = {player_resources[Res.WOOD]}", f" = {player_resources[Res.STONE]}", f" = {player_resources[Res.GOLD]}"]
+			resources_tab = [f"    {player.nb_unit}/{player.max_unit} ", f"   {player_resources[Res.FOOD]}", f"   {player_resources[Res.WOOD]}", f"   {player_resources[Res.STONE]}", f"   {player_resources[Res.GOLD]}"]
 			for label, resource_text in zip(self.resource_label_list, resources_tab):
 				label.text = resource_text
 

@@ -38,7 +38,7 @@ class DefeatView(arcade.View) :
         self.v_box = arcade.gui.UIBoxLayout()
         self.v_box1 = arcade.gui.UIBoxLayout()
 
-        winner_text = arcade.gui.UITextArea(text="      " + self.winner + " est victorieux",width=buttonsize,font_size = 28,text_color= arcade.color.WHITE)
+        winner_text = arcade.gui.UITextArea(text="      " + self.winner + " est victorieux",width=buttonsize,font_size = buttonsize * (21/400),text_color= arcade.color.WHITE) #font_size 28 for 900hieght screen
         self.v_box1.add(winner_text.with_background(texture=arcade.load_texture(IMAGE_VICTORY),top=buttonsize/12,bottom=buttonsize/12))
 
         retour_menu = NextViewButton(self.window,MainView(self.game),text="Menu Principal",width=buttonsize)
