@@ -471,7 +471,7 @@ class AI(Player):
 				if zone.is_producing:
 					ongoing_actions.add(("produce", zone.class_produced.get_name()))
 				else:
-					if who_is_producing == 0 and isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nbr_type_of_units(Villager) < 10 + len(self.my_military):
+					if self.nb_unit < 40 and who_is_producing == 0 and isinstance(zone, TownCenter) and self.resources[Res.FOOD] > 50 and self.get_nbr_type_of_units(Villager) < 10 + len(self.my_military):
 						self.game.game_controller.order_zone_units(zone)
-					elif who_is_producing == 1 and isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
+					elif len(self.my_military) < 20 and who_is_producing == 1 and isinstance(zone, Barracks) and self.resources[Res.FOOD] > 50:
 						self.game.game_controller.order_zone_units(zone, "militia")
