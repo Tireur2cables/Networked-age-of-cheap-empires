@@ -101,17 +101,18 @@ class GameView(arcade.View):
 
 	def create_players(self, players, resources):
 		i = 1
-		for player in players:
+		for player, difficulty in players.items():
 			if "Vous" in player:
 				self.players["player"] = Player(self, "player", resources)
 			else:
-				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", resources)
+				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
 				i += 1
 		#print(self.players)
 
 
 	def setup(self, ressources, players, map_seed):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
+		print(players)
 		self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
 		self.game_model.setup(ressources, self.players.keys(), map_seed)

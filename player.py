@@ -174,11 +174,14 @@ class AI(Player):
 	def __init__(self,
 			game,
 			player_type: str,
+			difficulty,
 			resources: dict) -> None:
 		super().__init__(game, player_type, resources)
 		self.delta_time = 0
-		self.goal = "dev"
-		self.aimed_enemy = None
+		self.difficulty = difficulty
+		self.mind = {}
+
+		print(self.difficulty)
 
 	def __getstate__(self):
 		return [self.player_type,
@@ -193,31 +196,57 @@ class AI(Player):
 		self.food_storage,
 		self.other_storage,
 		self.delta_time,
-		self.goal,
-		self.aimed_enemy]
+		self.difficulty,
+		self.mind]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.goal, self.aimed_enemy = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.difficulty, self.mind = data
 
+
+	def reset(self):
+		self.delta_time = 0
+		self.mind.clear()
+		super().reset()
 
 	def search_enemy_to_attack(self):
-		self.aimed_enemy = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
-		#print(self.aimed_enemy)
+		if self.mind.get("aimed_player", None) is None:
+			self.mind["aimed_player"] = random.choice(tuple(player for player_key, player in self.game.players.items() if player_key != self.player_type))
+			print(self.mind)
+
 		if random.randint(0, 1) == 0: # 0 : I attack a zone / 1 : I attack a unit
-			for zone in self.aimed_enemy.my_zones:
+			for zone in self.mind["aimed_player"].my_zones:
 				return zone
 			# aimed_tile, harvest_zone = self.game.game_model.map.get_closest_tile_nearby_fast(iso_to_grid_pos(self.town_center.iso_position), attacked_zone)
 
-		for unit in self.aimed_enemy.my_units:
+		for unit in self.mind["aimed_player"].my_units:
 			return unit
+
+	def send_army_towards(self, entity):
+		self.mind["aimed_entity"] = entity
+		# for military in self.my_military:
+		# 	# DEBUG_start = time.time()
+		# 	self.game.game_controller.order_attack(military, entity)
+		# 	# print(f"time: {time.time() - DEBUG_start}")
+		self.game.game_controller.order_army_attack(self.my_military, entity)
 
 	def send_army(self):
 		entity_to_attack = self.search_enemy_to_attack()
-		for military in self.my_military:
-			DEBUG_start = time.time()
-			self.game.game_controller.order_attack(military, entity_to_attack)
-			#print(f"time: {time.time() - DEBUG_start}")
+		self.send_army_towards(entity_to_attack)
+
+	def send_army_agressive(self):
+		print("ALATTAQUE")
+		if self.mind.get("aimed_player", None) is None:
+			aimed_player = None
+			for player_key, player in self.game.players.items():
+				if player_key != self.player_type:
+					if len(self.my_military) >= 5 + len(player.my_military) or (len(self.my_military) >= 5 and random.randint(0, 30) == 0):
+						aimed_player = player
+			self.mind["aimed_player"] = aimed_player
+
+		if self.mind.get("aimed_player", None) is not None:
+			self.send_army_towards(self.mind["aimed_player"].town_center)
+
 
 	def search_pos_to_build(self, start_position, tile_size):
 		area_found = False
@@ -257,6 +286,14 @@ class AI(Player):
 				return True
 		return False
 
+	def correct_mind(self): # Just in case...
+		if (aimed_entity := self.mind.get("aimed_entity", None)) is not None and (aimed_entity.is_dead or not aimed_entity.is_alive()):
+			self.mind["is_attacked_by"] = None
+			self.mind["aimed_entity"] = None
+			self.mind["counter_entity"] = None
+			if isinstance(aimed_entity, TownCenter) or ((aimed_player := self.mind.get("aimed_player", None)) is not None and aimed_player.is_alive):
+				self.mind["aimed_player"] = None
+
 	def on_update(self, delta_time):
 
 		if not self.is_alive:
@@ -264,10 +301,12 @@ class AI(Player):
 
 		self.delta_time += delta_time
 
-		if self.delta_time < 0.5:
+		if (self.difficulty in ("Difficile", "Agressive", "Pacifique") and self.delta_time < 1) or (self.difficulty == "Moyen" and self.delta_time < 2) or (self.difficulty == "Facile" and self.delta_time < 3):
 			return
 		else:
 			self.delta_time = 0
+
+		self.correct_mind()
 
 		idle_unit = None
 		ongoing_actions = set()
@@ -328,7 +367,7 @@ class AI(Player):
 						else:
 							impossible_actions.add(action)
 
-					elif (action := ("build", "barracks")) not in (ongoing_actions | impossible_actions) and not self.my_zones_contains(Barracks):
+					elif self.difficulty != "Pacifique" and (action := ("build", "barracks")) not in (ongoing_actions | impossible_actions) and not self.my_zones_contains(Barracks):
 						map_position = self.search_pos_to_build(self.town_center.grid_position, Barracks.tile_size)
 						if map_position is not None:
 							self.game.game_controller.order_build(unit, map_position, "barracks")
@@ -348,8 +387,30 @@ class AI(Player):
 						if harvest_zone is not None:
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
-		if self.get_nb_class_in_unit(Military) > 30 and self.aimed_enemy is None:
-			self.send_army()
+		if len(self.my_military) > 0 and self.difficulty != "Pacifique":
+			print(self.mind.get("aimed_entity", None))
+			if self.mind.get("is_attacked_by", None) is not None and self.mind.get("counter_entity", None) is None:
+				print("I'M ATTACKED!!!")
+				entity_attacking = self.mind["is_attacked_by"]
+				self.mind["counter_entity"] = entity_attacking
+				self.send_army_towards(entity_attacking)
+			elif self.mind.get("aimed_entity", None) is None:
+				print("OK I AIM")
+				if self.difficulty == "Facile":
+					if self.get_nb_class_in_unit(Military) >= 30:
+						self.send_army()
+				elif self.difficulty == "Moyen":
+					if self.get_nb_class_in_unit(Military) >= 15:
+						self.send_army()
+				elif self.difficulty == "Difficile":
+					if self.get_nb_class_in_unit(Military) >= 5:
+						self.send_army()
+				elif self.difficulty == "Agressive":
+					self.send_army_agressive()
+			else:
+				idle_military = set(military for military in self.my_military if military.goal != "attack")
+				for military in idle_military:
+					self.game.game_controller.order_attack(military, self.mind["aimed_entity"])
 
 		for zone in self.my_zones:
 			if isinstance(zone, (TownCenter, Barracks)):

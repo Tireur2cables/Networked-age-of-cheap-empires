@@ -1,4 +1,5 @@
 # --- Imports ---
+from copy import deepcopy
 from pickle import TRUE
 import arcade
 import time
@@ -168,30 +169,37 @@ class Controller():
 # --- Human Orders (Called once) ----
 
 	def human_order_towards_sprites(self, action, faction, sprites_at_point):
-		for entity in self.selection[faction]:
-			if action == "harvest/stock/attack/repair" : # click on batiment
-				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
-				if isinstance(entity, Villager) and zone_found: # harvest ressources
-					self.order_harvest(entity, zone_found)
-				else :
-					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
-					worksite_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(WorkSite,faction))
-					stock_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
-					if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0: #stock zone found and resources to stock
-						self.order_stock_resources(entity, stock_found)
 
-					elif isinstance(entity, Villager) and worksite_found:
-						self.order_resume_build(entity, worksite_found)
-					elif isinstance(entity, Villager) and zone_found: # zone of faction found, ask repairation
-						self.order_repairation(entity, zone_found)
-					else:
-						other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
-						if other_zone_found: # no ally zone
-							self.order_attack(entity, other_zone_found)
-			if action == "attack" : # click on unit
-				unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
-				if unit_found:
-					self.order_attack(entity, unit_found)
+		if action == "army" : # keyboard shortcut to send the whole army
+			entity_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
+			if entity_found:
+				self.order_army_attack(self.game.players["player"].my_military, entity_found)
+		else:
+			for entity in self.selection[faction]:
+				if action == "harvest/stock/attack/repair" : # click on batiment
+					zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Resources))
+					if isinstance(entity, Villager) and zone_found: # harvest ressources
+						self.order_harvest(entity, zone_found)
+					else :
+						zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction))
+						worksite_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both(WorkSite,faction))
+						stock_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((TownCenter, StoragePit, Granary), faction))
+						if isinstance(entity, Villager) and stock_found and entity.nb_resources() != 0: #stock zone found and resources to stock
+							self.order_stock_resources(entity, stock_found)
+
+						elif isinstance(entity, Villager) and worksite_found:
+							self.order_resume_build(entity, worksite_found)
+						elif isinstance(entity, Villager) and zone_found: # zone of faction found, ask repairation
+							self.order_repairation(entity, zone_found)
+						else:
+							other_zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_both((Buildable), faction, reverse=True))
+							if other_zone_found: # no ally zone
+								self.order_attack(entity, other_zone_found)
+				if action == "attack" : # click on unit
+					unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
+					if unit_found:
+						self.order_attack(entity, unit_found)
+
 
 	def human_order_towards_position(self, action, faction, iso_position, *args):
 		grid_position = iso_to_grid_pos(iso_position)
@@ -223,18 +231,39 @@ class Controller():
 
 
 # --- Orders (Called once) ----
-	def move_entity(self, entity, grid_position, fast=True):
-		if fast:
-			path, path_len = self.game.game_model.map.get_path_fast(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
-		else:
-			path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=grid_position)
+	def move_entity(self, entity, end_grid_position, fast=True):
+		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
+		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
 			entity.next_aim()
 		else:
 			return
+
+	def move_grouped_entities(self, entity_list, end_grid_position, fast=True):
+		position_dict = {}
+		for entity in entity_list:
+			start_position = iso_to_grid_pos(entity.iso_position)
+			if position_dict.get(tuple(start_position), None) is None:
+				path, path_len = self.game.game_model.map.get_path(start=start_position, end=end_grid_position)
+				# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
+				# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
+				if path_len > 0:
+					position_dict[tuple(start_position)] = path
+					entity.set_move_action()
+					entity.set_path(path)
+					entity.next_aim()
+				else:
+					position_dict[tuple(start_position)] = ()
+			else:
+				path = position_dict[tuple(start_position)]
+
+				if len(path) > 0:
+					entity.set_move_action()
+					entity.set_path(deepcopy(path))
+					entity.next_aim()
 
 	# Called once when you order an action on a zone
 	def order_harvest(self, entity, zone_to_harvest):
@@ -387,6 +416,25 @@ class Controller():
 				else:
 					self.move_entity(entity, aimed_tile.grid_position)
 
+	def order_army_attack(self, entity_list, aimed_entity):
+		last_entity = None
+		for entity in entity_list:
+			last_entity = entity
+			entity.set_goal("attack")
+			entity.set_aimed_entity(aimed_entity)
+
+		if isinstance(aimed_entity, Unit):
+			self.move_grouped_entities(entity_list, iso_to_grid_pos(aimed_entity.iso_position), False)
+		else:
+			first_entity_grid_pos = iso_to_grid_pos(last_entity.iso_position)
+			# Step 1: Search the closest tile near the zone_found to harvest it.
+			aimed_tile = self.game.game_model.map.get_closest_tile_nearby_fast(first_entity_grid_pos, iso_to_grid_pos(aimed_entity.iso_position))
+			print(f"aimed_tile : {aimed_tile}")
+			# Step 2: Start moving toward the aimed entity
+			if aimed_tile is not None:
+				print(f"src and dest : {first_entity_grid_pos} -> {aimed_tile.grid_position}")
+				self.move_grouped_entities(entity_list, aimed_tile.grid_position)
+
 	def order_repairation(self, entity, aimed_entity) :
 		entity.set_goal("repair")
 		entity.set_aimed_entity(aimed_entity)
@@ -459,7 +507,7 @@ class Controller():
 		# --- Check End Conditions ---
 		self.dead_players = set()
 		for player in self.players:
-			if player.town_center.is_dead == True:
+			if player.town_center.is_dead:
 				self.discard_player_from_game(player)
 				player.is_alive = False
 				self.dead_players.add(player)
@@ -601,8 +649,8 @@ class Controller():
 				harvested = aimed_entity.harvest(entity.damage)
 				if harvested > 0:
 					entity.resources[aimed_entity.get_resource_nbr()] += harvested
-					#print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
-					#print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
+					# print(f"[harvesting] -> {type(entity).__name__} harvested {harvested} {type(aimed_entity).__name__}!")
+					# print(f"[harvesting] -> {type(entity).__name__} has {entity.resources} - max_resources : {entity.max_resource}")
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
@@ -655,6 +703,8 @@ class Controller():
 	def attack_entity(self, unit: Unit, delta_time):
 		unit.action_timer += delta_time
 		if unit.action_timer > 1/unit.rate_fire:
+			player_controlling = self.game.players[unit.faction]
+			opponent_controlling = self.game.players[unit.aimed_entity.faction]
 			unit.action_timer = 0
 			#print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
@@ -666,10 +716,16 @@ class Controller():
 				self.order_attack(unit.aimed_entity, unit)
 				unit.aimed_entity.is_interacting = True
 
-			#print(alive)
+			if isinstance(opponent_controlling, AI):
+				opponent_controlling.mind["is_attacked_by"] = unit
+
 			if not alive:
+				# if isinstance(player_controlling, AI):
+				# 	player_controlling.mind["is_attacked_by"] = None
+				# 	player_controlling.mind["aimed_entity"] = None
+				# 	player_controlling.mind["counter_entity"] = None
+				# 	if isinstance(unit.aimed_entity, TownCenter) or not opponent_controlling.is_alive:
+				# 		player_controlling.mind["aimed_player"] = None
+				# Used to reset the mind of the IA, now it is in the AI on_update function but I left it here just in case
 				unit.end_goal()
 				self.dead_entities.add(unit.aimed_entity)
-				player_controlling = self.game.players[unit.faction]
-				if isinstance(player_controlling, AI):
-					player_controlling.aimed_enemy = None
