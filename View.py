@@ -203,6 +203,17 @@ class View():
 		# 		tile_outline = self.get_tile_outline(grid_pos_to_iso(tile.grid_position))
 		# 		arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
 
+
+		self.sort_list()
+		self.sorted_sprite_list.draw(pixelated=True)
+
+		# if LAUNCH_DEBUG_DISPLAY:
+		# 	for x in range(3):
+		# 		for y in range(3):
+		# 			tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
+		# 			arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
+		# 			self.draw_grid_position(Vector(x, y))
+
 		for s in self.sorted_sprite_list:
 			if s.entity.selected:
 				if isinstance(s.entity, Zone):
@@ -246,16 +257,6 @@ class View():
 							self.draw_bar(aimed_entity.iso_position, aimed_entity.health, aimed_entity.max_health, arcade.color.RED, nbr_health_bar=2)
 					# if LAUNCH_DEBUG_DISPLAY:
 					# 	self.draw_iso_position(unit.iso_position)
-
-		self.sort_list()
-		self.sorted_sprite_list.draw(pixelated=True)
-
-		# if LAUNCH_DEBUG_DISPLAY:
-		# 	for x in range(3):
-		# 		for y in range(3):
-		# 			tile_outline = self.get_tile_outline(grid_pos_to_iso(Vector(x, y)))
-		# 			arcade.draw_polygon_outline(tile_outline, (255, 255, 255))
-		# 			self.draw_grid_position(Vector(x, y))
 
 		# Update the minimap
 		self.minimap.draw()
