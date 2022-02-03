@@ -181,7 +181,6 @@ class AI(Player):
 		self.difficulty = difficulty
 		self.mind = {}
 
-		print(self.difficulty)
 
 	def __getstate__(self):
 		return [self.player_type,
@@ -198,7 +197,6 @@ class AI(Player):
 		self.delta_time,
 		self.difficulty,
 		self.mind]
-
 
 	def __setstate__(self, data):
 		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.food_storage, self.other_storage, self.delta_time, self.difficulty, self.mind = data
@@ -235,7 +233,7 @@ class AI(Player):
 		self.send_army_towards(entity_to_attack)
 
 	def send_army_agressive(self):
-		print("ALATTAQUE")
+		# print("A L'ATTAQUE")
 		if self.mind.get("aimed_player", None) is None:
 			aimed_player = None
 			for player_key, player in self.game.players.items():
@@ -388,14 +386,14 @@ class AI(Player):
 							self.game.game_controller.order_harvest(unit, harvest_zone)
 
 		if len(self.my_military) > 0 and self.difficulty != "Pacifique":
-			print(self.mind.get("aimed_entity", None))
+			# print(self.mind.get("aimed_entity", None))
 			if self.mind.get("is_attacked_by", None) is not None and self.mind.get("counter_entity", None) is None:
-				print("I'M ATTACKED!!!")
+				# print("I'M ATTACKED!!!")
 				entity_attacking = self.mind["is_attacked_by"]
 				self.mind["counter_entity"] = entity_attacking
 				self.send_army_towards(entity_attacking)
 			elif self.mind.get("aimed_entity", None) is None:
-				print("OK I AIM")
+				# print("I WASN'T AIMING AN ENTITY")
 				if self.difficulty == "Facile":
 					if self.get_nb_class_in_unit(Military) >= 30:
 						self.send_army()
