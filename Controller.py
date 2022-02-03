@@ -606,7 +606,7 @@ class Controller():
 
 	def repair_zone(self, entity, delta_time) :
 		entity.action_timer += delta_time
-		if cheats_vars.cheat_steroids or entity.action_timer > 0.5 : # commence à réparer ou continue
+		if cheats_vars.cheat_steroids or cheats_vars.cheat_vitamins or entity.action_timer > 0.5 : # commence à réparer ou continue
 			entity.action_timer = 0
 			# print(f"{entity.aimed_entity.health} < {entity.aimed_entity.max_health}")
 			if entity.aimed_entity.health < entity.aimed_entity.max_health :
@@ -620,7 +620,7 @@ class Controller():
 	# Called every frame
 	def build_zone(self, entity, delta_time):
 		entity.aimed_entity.action_timer += delta_time
-		if cheats_vars.cheat_steroids or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
+		if cheats_vars.cheat_steroids or (cheats_vars.cheat_vitamins and entity.aimed_entity.action_timer > 3) or entity.aimed_entity.action_timer > entity.aimed_entity.zone_to_build.build_time:  # build_time
 			entity.action_timer = 0
 			current_player = self.game.players[entity.faction]
 
@@ -644,7 +644,7 @@ class Controller():
 	# Récupère les resources présentes à chaque seconde, jusqu'à ce que ce soit full. Dans ce cas, il doit retourner au Town Center
 	def harvest_zone(self, entity, delta_time):
 		entity.action_timer += delta_time
-		if cheats_vars.cheat_steroids or entity.action_timer > 1:
+		if cheats_vars.cheat_steroids or (cheats_vars.cheat_vitamins and entity.action_timer > 0.3) or entity.action_timer > 1:
 			entity.action_timer = 0
 			aimed_entity = entity.aimed_entity
 			if not entity.is_full():
@@ -687,7 +687,7 @@ class Controller():
 	# Produit une unité et s'arrête
 	def produce_units(self, producing_zone, delta_time):
 		producing_zone.action_timer += delta_time
-		if cheats_vars.cheat_steroids or producing_zone.action_timer > producing_zone.unit_cooldown:
+		if cheats_vars.cheat_steroids or (cheats_vars.cheat_vitamins and producing_zone.action_timer > 3) or producing_zone.action_timer > producing_zone.unit_cooldown:
 			producing_zone.action_timer = 0
 			producing_zone.is_producing = False
 			current_player = self.game.players[producing_zone.faction]

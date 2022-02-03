@@ -64,6 +64,8 @@ class CheatsInput(arcade.gui.UIInputText):
             self.Bigdaddy()
         elif self.text == "STEROIDS":
             self.Steroids()
+        elif self.text == "VITAMINS":
+            self.Vitamins()
         elif self.text == "LIGHTSPEED":
             self.Lightspeed()
         elif "/save" in self.text:
