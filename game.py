@@ -14,7 +14,7 @@ DEFAULT_SCREEN_WIDTH = 800
 DEFAULT_SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
 
-MUSIC = "./Ressources/music/Marked.mp3"
+MUSIC = "./Ressources/music/NEW_AGE.mp3"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_FULLSCREEN, LAUNCH_MUSIC
