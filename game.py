@@ -45,6 +45,7 @@ class AoCE(arcade.Window):
 		self.GameView = GameView()
 		# # Variables for communications between model, view and controller.
 		# self.toDraw = []
+		self.tactilmod = False
 
 	def on_show(self):
 		# Affiche le main menu
@@ -58,6 +59,10 @@ class AoCE(arcade.Window):
 	def exit(self):
 		self.media_player.delete()
 		arcade.exit()
+
+	def triggerTactil(self) :
+		self.tactilmod = not self.tactilmod
+		self.GameView.tactilmod = self.tactilmod
 
 	# Set fullscreen or defaults : SCREEN_WIDTH x SCREEN_HEIGHT
 	def triggerFullscreen(self) :
@@ -95,6 +100,7 @@ class GameView(arcade.View):
 		self.game_view = View(self)  # Je ne sais pas comment modifier autrement la valeur de "set_mouse_visible"
 		self.game_controller = Controller(self)
 		self.players = dict()
+		self.tactilmod = False # initialised by aoce
 
 	def setMenuView(self, menu_view):
 		self.menu_view = menu_view
@@ -117,7 +123,7 @@ class GameView(arcade.View):
 
 	def setup(self, ressources, players, map_seed):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		print(players)
+		#print(players)
 		human_in_game, ia_in_game = self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
@@ -127,13 +133,13 @@ class GameView(arcade.View):
 			self.game_controller.setup(self.players, "IAvsIA")
 		else:
 			self.game_controller.setup(self.players, "J")
-		self.game_view.setup()
+		self.game_view.setup(self.tactilmod)
 
 	def load_save(self, data):
 		# in data : {'model': game.game_model, 'controller': game.game_controller, 'players': game.players}
 		self.players = data['players']
 		self.game_model = data['model']
-		self.game_view.setup()
+		self.game_view.setup(self.tactilmod)
 		self.game_controller = data['controller']
 
 
