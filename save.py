@@ -1,6 +1,11 @@
-import pickle, json
+# -- Imports --
 
+import pickle
+import json
 import cheats_vars
+
+# save functions
+
 def pickleSaving(game):
 	save_file = "aocesave_" + cheats_vars.global_save_suffix +'.pkl'
 	data = {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
