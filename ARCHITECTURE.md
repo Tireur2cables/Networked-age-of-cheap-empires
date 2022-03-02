@@ -34,14 +34,24 @@ Mais aussi l'objet `GameView`, qui va permettre d'initialiser (ou réinitialiser
 
 Les fichiers ```Model.py```, ```View.py``` et ```Controler.py``` contiennent respectivement les définitions des variables `model`, `view` et `controler` citées précédemment.  
 
-Les dossiers [```entity```](#Dossier-entity), ```map```, ```Ressources```, ```utils``` et ```view``` sont détaillés dans les parties suivantes.  
+Les dossiers [```entity```](#Dossier-entity), [```map```](#Dossier-map), [```Ressources```](#Dossier-Ressources), [```utils```](#Dossier-utils) et [```views```](#Dossier-views) sont détaillés dans les parties suivantes.  
 
 ### Dossier entity
 
+Ce dossier contient la définition des différentes classes d’entités manipulables dans une partie de Age of Cheap Empires. Cela comprend donc toutes les unités, les bâtiments, etc...  
+
 ### Dossier map
+
+Ce dossier contient les définitions de classe nécessaires à l'affichage et la génération des cartes et de la mini carte.
 
 ### Dossier Ressources
 
+Ce dossier contient les images et les sons utilisés dans le projet.  
+
 ### Dossier utils
 
+Ce dossier contient la définitions d'objets ou de fonctions qui sont utiles et utilisés dans plusieurs autres classes du jeu, par exemple la conversion des coordonnées entre map, isométriques et cartésiennes.  
+
 ### Dossier views
+
+Ce dossier contient dans des fichiers `.py` distincts les différentes views (objets de arcade qui représente un affichage différent dans la fenêtre) qui se succéderont lors d'un parcours normal dans le jeu (sauf la vue en jeu qui elle se situe dans le fichier ```view.py``` de la racine).  
