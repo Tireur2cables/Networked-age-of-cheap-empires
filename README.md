@@ -19,7 +19,7 @@ Ceci est une implémentation en Python du jeu Age of Empires, réalisée à l'oc
 
 Nous avons choisis le moteur graphique [`The Arcade Library`](https://api.arcade.academy/en/latest/index.html) pour réaliser la partie affichage graphique de notre jeu.
 
-Vous pouvez retrouver tous les détails concernant l'architecture de notre jeu dans le fichier `ARCHITECTURE.md`.
+Vous pouvez retrouver tous les détails concernant l'architecture de notre jeu dans le fichier [`ARCHITECTURE.md`](./ARCHITECTURE.md).
 
 ## Musique
 
