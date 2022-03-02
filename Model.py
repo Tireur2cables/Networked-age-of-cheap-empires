@@ -77,7 +77,6 @@ class Model():
 
 
 		# Set up the villager and add it to the unit_list.
-		# self.map = Map(self.tile_list, self.zone_list, DEFAULT_MAP_SIZE)
 		use_default = LAUNCH_DEFAULT_MAP
 		if use_default :
 			self.map.setup(None)

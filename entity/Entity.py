@@ -52,39 +52,6 @@ class Entity:
 		self.pierce_armor = pierce_armor
 		self.line_sight = line_sight
 
-	# def __getstate__(self):
-	# 	return [self.iso_position, self.sprite_data, self.faction, self.health, self.max_health, self.damage, self.rate_fire, self.range, self.melee_armor, self.pierce_armor, self.line_sight]
-
-	# def __setstate__(self, data):
-	# 	# Position
-	# 	self.iso_position = data[0]
-
-	# 	# Sprite
-	# 	self.sprite_data = data[1]
-	# 	self.sprite = EntitySprite(self, self.sprite_data, hit_box_algorithm="Simple")
-
-	# 	# Faction
-	# 	self.faction = data[2]
-
-	# 	# Backend
-	# 	self.action_timer = 0
-	# 	self.selected = False
-
-	# 	#
-	# 	## Life
-	# 	#
-	# 	self.health = data[3]
-	# 	self.max_health = data[4]
-	# 	self.damage = data[5]
-	# 	self.is_dead = False
-
-	# 	# Battle
-	# 	self.rate_fire = data[6]
-	# 	self.range = data[7]
-	# 	self.melee_armor = data[8]
-	# 	self.pierce_armor = data[9]
-	# 	self.line_sight = data[10]
-
 	@classmethod
 	def get_name(cls):
 		return cls.__name__.lower()
