@@ -11,13 +11,14 @@
 
 ## Comment lancer le jeu
 
-- ```python3 main.py ```
+- ```python3 main.py ```  
+- ou alors ```./start.sh```
 
 ## Description
 
 Ceci est une implémentation en Python du jeu Age of Empires, réalisée à l'occasion du cours Projet de Programmation durant premier semestre de la 3ème année en filière STI à l'INSA CVL.
 
-Nous avons choisis le moteur graphique `The Arcade Library` pour réaliser la partie affichage graphique de notre jeu. (expliquer pourquoi)
+Nous avons choisis le moteur graphique [`The Arcade Library`](https://api.arcade.academy/en/latest/index.html) pour réaliser la partie affichage graphique de notre jeu.
 
 Vous pouvez retrouver tous les détails concernant l'architecture de notre jeu dans le fichier `ARCHITECTURE.md`.
 
