@@ -1,4 +1,5 @@
 # --- Imports ---
+import os
 # -- arcade --
 import arcade
 from player import AI, Player
@@ -24,6 +25,9 @@ from LAUNCH_SETUP import LAUNCH_FULLSCREEN, LAUNCH_MUSIC
 #########################################################################
 
 class AoCE(arcade.Window):
+
+	ecriture_fd = None
+	lecture_fd = None
 
 	def __init__(self):
 		""" Initializer """
@@ -59,6 +63,8 @@ class AoCE(arcade.Window):
 	def exit(self):
 		self.media_player.delete()
 		arcade.exit()
+		if AoCE.ecriture_fd :
+			os.write(AoCE.ecriture_fd, "STOP".encode())
 
 	def triggerTactil(self) :
 		self.tactilmod = not self.tactilmod
@@ -181,11 +187,9 @@ class GameView(arcade.View):
 
 
 # Main function to launch the game
-def main():
+def main(ecriture_fd = None, lecture_fd = None):
 	""" Main method """
+	AoCE.ecriture_fd = int(ecriture_fd)
+	AoCE.lecture_fd = int(lecture_fd)
 	game = AoCE()
 	arcade.run()
-
-
-if __name__ == "__main__":  # Python syntax that means "if you are launching from this file, run main()", useful if this file is going to be imported.
-	main()

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define ERROR -1
 
@@ -44,6 +45,22 @@ int main(int argc, char const *argv[]) {
 			close(fd_py_to_c[1]);
 			close(fd_c_to_py[0]);
 			printf("Je suis le père (programme C en attente)\n");
+
+			char buff[512];
+			retour = read(fd_py_to_c[0], buff, 511);
+			if (retour == ERROR) error("Erreur de lecture dans le tube");
+			buff[retour] = '\0';
+
+			if (strcmp(buff, "STOP") == 0) {
+				printf("Je me stoppe\n");
+				close(fd_py_to_c[0]);
+				close(fd_c_to_py[1]);
+				exit(EXIT_SUCCESS);
+			}
+			else {
+				printf("buff non reconnu : %s\n", buff);
+			}
+
 		}
 	}
 
