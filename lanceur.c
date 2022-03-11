@@ -10,9 +10,10 @@ int main(int argc, char const *argv[]) {
 	switch (pid) {
 		case -1 : error("Erreur lors du fork");
 		case 0 : {
-			char * launchfile = "./start.sh";
-			char *tab[2] = { launchfile, NULL };
-			execvp(launchfile, tab);
+			char *cmd = "python3";
+			char *launchfile = "main.py";
+			char *tab[3] = { cmd, launchfile, NULL };
+			execvp(cmd, tab);
 		}
 		default : printf("Je suis le père (programme C en attente)\n");
 	}
