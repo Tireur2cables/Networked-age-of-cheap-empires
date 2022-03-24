@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/select.h>
 
 #define ERROR -1
 #define TUBE_SIZE 2
