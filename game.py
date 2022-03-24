@@ -50,6 +50,7 @@ class AoCE(arcade.Window):
 		# # Variables for communications between model, view and controller.
 		# self.toDraw = []
 		self.tactilmod = False
+		self.pseudo = "Default pseudo"
 
 	def on_show(self):
 		# Affiche le main menu
