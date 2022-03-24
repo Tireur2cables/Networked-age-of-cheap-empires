@@ -1,6 +1,6 @@
 # Imports
 import arcade
-from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton
+from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, PlayerButton
 from views.PreGameView import PreGameView
 
 class IAPreGameView(PreGameView) :

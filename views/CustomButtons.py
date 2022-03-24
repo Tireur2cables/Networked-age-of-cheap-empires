@@ -164,6 +164,11 @@ class PlayerButton(arcade.gui.UITextureButton):
 		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Joueur Humain", width=width, height=height)
 		self.sep = " : "
 
+class OnlinePlayerButton(arcade.gui.UITextureButton):
+	def __init__(self, text, width, height):
+		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Joueur en ligne", width=width, height=height)
+		self.sep = " : "
+
 class NumInput(arcade.gui.UIInputText) :
 	def __init__(self, x, y, text, width, height, text_color, limit=None) :
 		super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
