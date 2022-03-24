@@ -5,6 +5,7 @@ from views.CustomButtons import LoadButton, QuitButton, NextViewButton
 from views.SettingsView import SettingsView
 from views.PreGameView import PreGameView
 from views.IAvsIAView import IAPreGameView
+from views.MultiplayerGameView import MultiplayerGameView
 
 # --- Constants ---
 BACKGROUND = "./Ressources/img/background.png"
@@ -43,12 +44,14 @@ class MainView(arcade.View) :
 		start_button = NextViewButton(self.window, PreGameView(self), text="Start Game VS IA", width=buttonsize)
 		self.v_box.add(start_button.with_space_around(bottom=20))
 
-		ia_match_button = NextViewButton(self.window,IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
+		ia_match_button = NextViewButton(self.window, IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
-		# TODO : charger une sauvegarde
-		load_button = LoadButton(self.window, self, text="Charger une sauvegarde", width=buttonsize)
+		load_button = LoadButton(self.window, self, text="Load save", width=buttonsize)
 		self.v_box.add(load_button.with_space_around(bottom=20))
+
+		multiplayer_button = NextViewButton(self.window, MultiplayerGameView(self), text="Multiplayer Game", width=buttonsize)
+		self.v_box.add(multiplayer_button.with_space_around(bottom=20))
 
 		settings_button = NextViewButton(self.window, SettingsView(self), text="Settings", width=buttonsize)
 		self.v_box.add(settings_button.with_space_around(bottom=20))
