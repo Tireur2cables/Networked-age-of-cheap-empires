@@ -1,5 +1,7 @@
 # --- Imports ---
+# -- libs --
 import os
+import random
 # -- arcade --
 import arcade
 from player import AI, Player
@@ -16,6 +18,7 @@ DEFAULT_SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Age Of Cheap Empire"
 
 MUSIC = "./Ressources/music/NEW_AGE.mp3"
+USERNAME_FILE = "./usernames.list"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_FULLSCREEN, LAUNCH_MUSIC
@@ -50,7 +53,17 @@ class AoCE(arcade.Window):
 		# # Variables for communications between model, view and controller.
 		# self.toDraw = []
 		self.tactilmod = False
-		self.pseudo = "Default pseudo"
+		self.pseudo = self.getPseudo();
+		print(self.pseudo)
+
+	def getPseudo(self) :
+		pseudo = "Default pseudo"
+		with open(USERNAME_FILE) as file:
+			tab = file.read().splitlines();
+			pseudo = random.choice(tab)
+			pseudo += str(random.choice(range(0,100)))
+		return pseudo
+
 
 	def on_show(self):
 		# Affiche le main menu
