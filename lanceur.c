@@ -6,6 +6,7 @@
 #include <sys/select.h>
 
 #define ERROR -1
+#define TRUE 1
 #define TUBE_SIZE 2
 #define TUBE_LECT 0
 #define TUBE_ECRI 1
@@ -44,28 +45,34 @@ void launch_communication() {
 
 	printf("Je suis le père (programme C en attente)\n");
 
-	// on créer l'ensembles de file descriptor sur lesquels on attends des messages
-	int max_fd;
-	fd_set set = create_set(&max_fd);
-
-	int retour = select(max_fd + 1, &set, NULL, NULL, NULL);
-	if (retour == ERROR) error("Erreur du select");
-
 	char buff[PACKET_SIZE + 1];
-	// on regarde qui veut nous envoyer un message (python ou sockets)
-	if (FD_ISSET(fd_py_to_c[TUBE_LECT], &set)) // le programme python veut envoyer un message
-		recuperer_packet(buff, fd_py_to_c[TUBE_LECT]);
 
-	// if (FD_ISSET(sock, &set)) // on fera pareil avec les sockets
+	while (TRUE) {
+		// on créer l'ensembles de file descriptor sur lesquels on attends des messages
+		int max_fd;
+		fd_set set = create_set(&max_fd);
 
-	if (strcmp(buff, "STOP") == 0) {
-		printf("Je me stoppe\n");
-		close(fd_py_to_c[TUBE_LECT]);
-		close(fd_c_to_py[TUBE_ECRI]);
-		exit(EXIT_SUCCESS);
-	}
-	else {
-		printf("message non reconnu : %s\n", buff);
+		int retour = select(max_fd + 1, &set, NULL, NULL, NULL);
+		if (retour == ERROR) error("Erreur du select");
+
+		// on regarde qui veut nous envoyer un message (python ou sockets)
+		if (FD_ISSET(fd_py_to_c[TUBE_LECT], &set)) // le programme python veut envoyer un message
+			recuperer_packet(buff, fd_py_to_c[TUBE_LECT]);
+
+		// if (FD_ISSET(sock, &set)) // on fera pareil avec les sockets
+
+		if (strcmp(buff, "STOP") == 0) {
+			printf("Je me stoppe\n");
+			close(fd_py_to_c[TUBE_LECT]);
+			close(fd_c_to_py[TUBE_ECRI]);
+			exit(EXIT_SUCCESS);
+		}
+		else if (strcmp(buff, "INIT") == 0) {
+			printf("Je lance la partie réseau\n");
+		}
+		else {
+			printf("message non reconnu : %s\n", buff);
+		}
 	}
 
 }

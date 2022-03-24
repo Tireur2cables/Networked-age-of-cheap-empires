@@ -10,6 +10,8 @@ class MultiplayerGameView(PreGameView):
 		super().__init__(main_view)
 
 	def setup(self) :
+		# tell the game to activate multiplayer mode
+		self.window.activate_multiplayer()
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
@@ -44,7 +46,7 @@ class MultiplayerGameView(PreGameView):
 		"""
 
 		self.pseudoBox()
-		
+
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
