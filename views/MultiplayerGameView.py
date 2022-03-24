@@ -4,6 +4,8 @@ from player import Player
 from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton
 from views.PreGameView import PreGameView
 
+button_texture = "Ressources/img/button_background.png"
+
 class MultiplayerGameView(PreGameView):
 
 	def __init__(self, main_view) :
@@ -16,13 +18,21 @@ class MultiplayerGameView(PreGameView):
 	def pseudoBox(self):
 		buttonsize = self.window.width / 10 # arbitrary
 
+		bg_pseudo = arcade.load_texture(button_texture)
+		pseudo_area = arcade.gui.UITextArea(
+			x = self.window.width / 6,
+			y = self.window.height / 1.1,
+			width = buttonsize,
+			height = buttonsize / 3,
+			text = "Votre pseudo : " + self.window.pseudo
+			)
+
 		self.manager.add(
-			arcade.gui.UITextArea(
-				x=self.window.width / 10,
-				y=self.window.height * 0.9,
-				width = buttonsize,
-				height = buttonsize,
-				text=self.window.pseudo)
+			arcade.gui.UITexturePane(
+			pseudo_area.with_space_around(left = buttonsize / 3, right = buttonsize / 3),
+			tex = bg_pseudo,
+			padding = (10,10,10,10)
+			)
 		)
 
 	def setupButtons(self) :
@@ -44,7 +54,7 @@ class MultiplayerGameView(PreGameView):
 		"""
 
 		self.pseudoBox()
-		
+
 		# Create a widget to hold the v_box widget, that will center the buttons
 		self.manager.add(
 			arcade.gui.UIAnchorWidget(
