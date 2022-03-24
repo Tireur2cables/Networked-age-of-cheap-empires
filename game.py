@@ -54,7 +54,8 @@ class AoCE(arcade.Window):
 		# self.toDraw = []
 		self.tactilmod = False
 		self.pseudo = self.getPseudo();
-		print(self.pseudo)
+		#print(self.pseudo)
+		self.multiplayer = False
 
 	def getPseudo(self) :
 		pseudo = "Default pseudo"
@@ -64,6 +65,13 @@ class AoCE(arcade.Window):
 			pseudo += str(random.choice(range(0,100)))
 		return pseudo
 
+	def activate_multiplayer(self) :
+		self.multiplayer = True
+		if AoCE.ecriture_fd :
+			os.write(AoCE.ecriture_fd, "INIT".encode())
+		else :
+			print("Erreur impossible de communiquer avec le programme C")
+			self.exit()
 
 	def on_show(self):
 		# Affiche le main menu

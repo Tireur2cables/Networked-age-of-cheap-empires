@@ -12,6 +12,8 @@ class MultiplayerGameView(PreGameView):
 		super().__init__(main_view)
 
 	def setup(self) :
+		# tell the game to activate multiplayer mode
+		self.window.activate_multiplayer()
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 
