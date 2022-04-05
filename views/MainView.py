@@ -18,7 +18,7 @@ class MainView(arcade.View) :
 		self.game_view = game_view
 
 	def setup(self) :
-		pass
+		self.window.desactivate_multiplayer()
 
 	def on_show(self):
 		""" This is run once when we switch to this view """

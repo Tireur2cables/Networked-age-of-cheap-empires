@@ -172,7 +172,6 @@ void handle_new_connection() {
 	else nb_cli++;
 }
 
-
 void recuperer_packet(char buff[PACKET_SIZE + 1], int fd) {
 	retour = read(fd, buff, PACKET_SIZE);
 	if (retour == ERROR) {
@@ -212,6 +211,24 @@ void create_serv() {
 		close(fd_py_to_c[TUBE_LECT]);
 		close(fd_c_to_py[TUBE_ECRI]);
 		error("Erreur de création de la socket!");
+	}
+
+	int val = TRUE;
+	retour = setsockopt(serv_sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+	if (retour == ERROR) {
+		close(fd_py_to_c[TUBE_LECT]);
+		close(fd_c_to_py[TUBE_ECRI]);
+		close(serv_sock);
+		error("Erreur de setsockopt!");
+	}
+
+	val = TRUE;
+	retour = setsockopt(serv_sock, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
+	if (retour == ERROR) {
+		close(fd_py_to_c[TUBE_LECT]);
+		close(fd_c_to_py[TUBE_ECRI]);
+		close(serv_sock);
+		error("Erreur de setsockopt!");
 	}
 
 	struct sockaddr_in serv_addr;
@@ -303,9 +320,14 @@ void close_tube(int tube[TUBE_SIZE]) {
 }
 
 void close_serv() {
-	for (int i = 0; i < MAX_CLI; i++)
-		if (players[i] != ERROR)
+	for (int i = 0; i < MAX_CLI; i++) {
+		if (players[i] != ERROR) {
 			close(players[i]);
+			players[i] = ERROR;
+		}
+	}
 
 	close(serv_sock);
+	serv_sock = ERROR;
+	is_serv_launched = FALSE;
 }

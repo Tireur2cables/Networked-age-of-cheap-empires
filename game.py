@@ -73,6 +73,14 @@ class AoCE(arcade.Window):
 			print("Erreur impossible de communiquer avec le programme C")
 			self.exit()
 
+	def desactivate_multiplayer(self) :
+		self.multiplayer = False
+		if AoCE.ecriture_fd :
+			os.write(AoCE.ecriture_fd, "CANCEL".encode())
+		else :
+			print("Erreur impossible de communiquer avec le programme C")
+			self.exit()
+
 	def on_show(self):
 		# Affiche le main menu
 		start_view = MainView(self.GameView)
