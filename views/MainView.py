@@ -1,11 +1,11 @@
 # --- Imports ---
 import arcade
 from arcade.arcade_types import Color
-from views.CustomButtons import LoadButton, QuitButton, NextViewButton
+from views.CustomButtons import LoadButton, QuitButton, NextViewButton, ListButton
 from views.SettingsView import SettingsView
 from views.PreGameView import PreGameView
 from views.IAvsIAView import IAPreGameView
-from views.MultiplayerGameView import MultiplayerGameView
+from views.MultiplayerCreateView import MultiplayerCreateView
 
 # --- Constants ---
 BACKGROUND = "./Ressources/img/background.png"
@@ -38,6 +38,7 @@ class MainView(arcade.View) :
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
+		self.v_box_online = arcade.gui.UIBoxLayout()
 
 		# Create the buttons
 
@@ -47,11 +48,13 @@ class MainView(arcade.View) :
 		ia_match_button = NextViewButton(self.window, IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
+		join_game = NextViewButton(self.window, MultiplayerCreateView(self), text="Join Multiplayer Game", width=buttonsize)
+		create_game = NextViewButton(self.window, MultiplayerCreateView(self), text="Create Multiplayer Game", width=buttonsize)
+		self.v_box.add(join_game.with_space_around(bottom = 20))
+		self.v_box.add(create_game.with_space_around(bottom = 20))
+
 		load_button = LoadButton(self.window, self, text="Load save", width=buttonsize)
 		self.v_box.add(load_button.with_space_around(bottom=20))
-
-		multiplayer_button = NextViewButton(self.window, MultiplayerGameView(self), text="Multiplayer Game", width=buttonsize)
-		self.v_box.add(multiplayer_button.with_space_around(bottom=20))
 
 		settings_button = NextViewButton(self.window, SettingsView(self), text="Settings", width=buttonsize)
 		self.v_box.add(settings_button.with_space_around(bottom=20))
