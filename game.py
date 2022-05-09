@@ -65,10 +65,19 @@ class AoCE(arcade.Window):
 			pseudo += str(random.choice(range(0,100)))
 		return pseudo
 
-	def activate_multiplayer(self) :
+	def activate_multiplayer_host(self) :
 		self.multiplayer = True
 		if AoCE.ecriture_fd :
 			mess = "INIT " + self.pseudo
+			os.write(AoCE.ecriture_fd, mess.encode())
+		else :
+			print("Erreur impossible de communiquer avec le programme C")
+			self.exit()
+
+	def activate_multiplayer(self) :
+		self.multiplayer = True
+		if AoCE.ecriture_fd :
+			mess = "JOIN " + self.pseudo
 			os.write(AoCE.ecriture_fd, mess.encode())
 		else :
 			print("Erreur impossible de communiquer avec le programme C")

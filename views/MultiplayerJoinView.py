@@ -6,14 +6,14 @@ from views.PreGameView import PreGameView
 
 button_texture = "Ressources/img/button_background.png"
 
-class MultiplayerCreateView(PreGameView):
+class MultiplayerJoinView(PreGameView):
 
 	def __init__(self, main_view) :
 		super().__init__(main_view)
 
 	def setup(self) :
 		# tell the game to activate multiplayer mode
-		self.window.activate_multiplayer_host()
+		self.window.activate_multiplayer()
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 

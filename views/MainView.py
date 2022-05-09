@@ -6,6 +6,7 @@ from views.SettingsView import SettingsView
 from views.PreGameView import PreGameView
 from views.IAvsIAView import IAPreGameView
 from views.MultiplayerCreateView import MultiplayerCreateView
+from views.MultiplayerJoinView import MultiplayerJoinView
 
 # --- Constants ---
 BACKGROUND = "./Ressources/img/background.png"
@@ -48,9 +49,10 @@ class MainView(arcade.View) :
 		ia_match_button = NextViewButton(self.window, IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
-		join_game = NextViewButton(self.window, MultiplayerCreateView(self), text="Join Multiplayer Game", width=buttonsize)
-		create_game = NextViewButton(self.window, MultiplayerCreateView(self), text="Create Multiplayer Game", width=buttonsize)
+		join_game = NextViewButton(self.window, MultiplayerJoinView(self), text="Join Multiplayer Game", width=buttonsize)
 		self.v_box.add(join_game.with_space_around(bottom = 20))
+
+		create_game = NextViewButton(self.window, MultiplayerCreateView(self), text="Create Multiplayer Game", width=buttonsize)
 		self.v_box.add(create_game.with_space_around(bottom = 20))
 
 		load_button = LoadButton(self.window, self, text="Load save", width=buttonsize)

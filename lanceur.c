@@ -42,6 +42,7 @@ void gerer_c_mess(char [PACKET_SIZE + 1], int);
 void create_serv();
 void handle_new_connection();
 void close_serv();
+void join_game();
 
 int fd_py_to_c[TUBE_SIZE];
 int fd_c_to_py[TUBE_SIZE];
@@ -133,7 +134,7 @@ void gerer_c_mess(char buff[PACKET_SIZE + 1], int indice) {
 
 	else {
 		printf("message reçu : %s\n", buff);
-		// transmettre au python
+		send_packet(buff, fd_c_to_py[TUBE_ECRI]); // envoi le message au python directement
 	}
 }
 
@@ -162,11 +163,62 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		}
 	}
 
-	else if (strcmp(buff, "CONNECT") == 0) {
+	else if (strncmp(buff, "JOIN ", 5) == 0) {
 		printf("Je me connecte à la partie\n");
+		if (pseudo[0] == '\0') sscanf(buff, "JOIN %s", pseudo);
+		//create_serv();
+		join_game();
 	}
 
 	else printf("message non reconnu : %s\n", buff);
+}
+
+void join_game() {
+	players[0].sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (players[0].sock == ERROR) {
+		close(fd_py_to_c[TUBE_LECT]);
+		close(fd_c_to_py[TUBE_ECRI]);
+		close_serv();
+		error("Erreur de création de la socket!");
+	}
+	players[0].port = PORT;
+	strcpy(players[0].ip, "127.0.0.1"); // TODO a changer
+
+	struct sockaddr_in serv_addr;
+	socklen_t serv_size = sizeof(serv_addr);
+	bzero(&serv_addr, serv_size);
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(PORT);
+	serv_addr.sin_addr.s_addr = inet_addr(players[0].ip);
+
+	printf("Connection au serveur %s sur le port %d...\n", players[0].ip, PORT);
+
+	int retour = connect(players[0].sock, (struct sockaddr *) &serv_addr, serv_size);
+	if (retour == ERROR) {
+		close(fd_py_to_c[TUBE_LECT]);
+		close(fd_c_to_py[TUBE_ECRI]);
+		close_serv();
+		error("Erreur de connection!");
+	}
+
+	printf("Connecté!\n");
+
+	char buff[PACKET_SIZE + 1];
+	recuperer_packet(buff, players[0].sock);
+	sscanf(buff, "PSEUDO %s", players[0].pseudo);
+
+	sprintf(buff, "PSEUDO %s", pseudo);
+	send_packet(buff, players[0].sock);
+
+	recuperer_packet(buff, players[0].sock);
+	if (strcmp(buff, "FIRST") == 0) {
+		printf("Pas besoin de se connecter à d'autres\n");
+	}
+	else {
+		printf("Je vais me connecter à tous ces autres la :\n%s\n", buff);
+	}
+
 }
 
 void handle_new_connection() {
@@ -194,11 +246,9 @@ void handle_new_connection() {
 				strcpy(players[i].ip, inet_ntoa(((struct sockaddr_in) client_addr).sin_addr));
 				players[i].port = PORT;
 				char buff[PACKET_SIZE + 1];
-				strcpy(buff, pseudo);
+				sprintf(buff, "PSEUDO %s", pseudo);
 				send_packet(buff, players[i].sock);
-				bzero(buff, PACKET_SIZE + 1);
 				recuperer_packet(buff, players[i].sock);
-				printf("added : %d\n", added);
 				added += sscanf(buff, "PSEUDO %s", players[i].pseudo);
 				if (!added) { // erreur de communication = reset et refus du joueur
 					players[i].port = ERROR;
