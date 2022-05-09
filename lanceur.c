@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -17,6 +18,15 @@
 #define PORT 1234
 #define MAX_CLI 3 // 3 autres joueurs en plus de nous
 #define CLOSED_CONECTION 0
+#define IP_LEN 15
+#define PSEUDO_LEN 20 // attention à update si on update les pseudo
+
+typedef struct player {
+	char ip[IP_LEN + 1];
+	int port;
+	char pseudo[PSEUDO_LEN + 1];
+	int sock;
+} player;
 
 int nbdigit(int);
 void close_tube(int [TUBE_SIZE]);
@@ -26,6 +36,7 @@ void launch_communication();
 void launch_python();
 fd_set create_set(int *);
 void recuperer_packet(char [PACKET_SIZE + 1], int);
+void send_packet(char [PACKET_SIZE + 1], int);
 void gerer_py_mess(char [PACKET_SIZE + 1]);
 void gerer_c_mess(char [PACKET_SIZE + 1], int);
 void create_serv();
@@ -38,11 +49,16 @@ int retour;
 int serv_sock;
 int is_serv_launched = FALSE;
 int nb_cli = 0;
-int players[MAX_CLI];
+player players[MAX_CLI];
+char pseudo[PSEUDO_LEN + 1];
+int am_i_host = FALSE;
 
 int main(int argc, char const *argv[]) {
+	// initialisation du pseudo
+	bzero(pseudo, PSEUDO_LEN + 1);
+
 	// initialisation du tableau des joueurs
-	memset(players, ERROR, MAX_CLI * sizeof(int));
+	memset(players, ERROR, MAX_CLI * sizeof(player));
 
 	// initialisation des tubes
 	creer_tubes();
@@ -94,8 +110,8 @@ void launch_communication() {
 				handle_new_connection();
 
 			for (int i = 0; i < MAX_CLI; i++) {
-				if (FD_ISSET(players[i], &set)) {
-					recuperer_packet(buff, players[i]);
+				if (FD_ISSET(players[i].sock, &set)) {
+					recuperer_packet(buff, players[i].sock);
 					gerer_c_mess(buff, i);
 				}
 			}
@@ -106,13 +122,18 @@ void launch_communication() {
 void gerer_c_mess(char buff[PACKET_SIZE + 1], int indice) {
 	// retour ici correspond au nombre de bytes reçus par recuperer packet
 	if (retour == CLOSED_CONECTION) {
-		printf("Joueur %d déconnecté...\n", players[indice]);
-		close(players[indice]);
-		players[indice] = ERROR;
+		printf("Joueur %s déconnecté...\n", players[indice].pseudo);
+		close(players[indice].sock);
+		players[indice].sock = ERROR;
+		players[indice].pseudo[0] = '\0';
+		players[indice].ip[0] = '\0';
+		players[indice].port = ERROR;
 		nb_cli--;
 	}
+
 	else {
 		printf("message reçu : %s\n", buff);
+		// transmettre au python
 	}
 }
 
@@ -125,14 +146,24 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		exit(EXIT_SUCCESS);
 	}
 
-	else if (strcmp(buff, "INIT") == 0) {
+	else if (strncmp(buff, "INIT ", 5) == 0) {
 		printf("Je lance la partie réseau\n");
+		if (pseudo[0] == '\0') sscanf(buff, "INIT %s", pseudo);
+		printf("mon pseudo est : %s\n", pseudo);
 		create_serv();
+		am_i_host = TRUE;
 	}
 
 	else if (strcmp(buff, "CANCEL") == 0) {
-		printf("Je cancel le serveur\n");
-		if (is_serv_launched) close_serv();
+		printf("Je cancel le serveur\n"); // normal que ce soit print au depart on desactive au setup de main view
+		if (is_serv_launched) {
+			close_serv();
+			am_i_host = FALSE;
+		}
+	}
+
+	else if (strcmp(buff, "CONNECT") == 0) {
+		printf("Je me connecte à la partie\n");
 	}
 
 	else printf("message non reconnu : %s\n", buff);
@@ -154,22 +185,54 @@ void handle_new_connection() {
 	printf("Nouveau joueur accepté, sock : %d\n", cli_sock);
 
 	int added = FALSE;
+	int indice = ERROR;
 
 	if (nb_cli != MAX_CLI) {
 		for (int i = 0; i < MAX_CLI; i++) {
-			if (players[i] == ERROR) {
-				players[i] = cli_sock;
-				added = TRUE;
+			if (players[i].sock == ERROR) {
+				players[i].sock = cli_sock;
+				strcpy(players[i].ip, inet_ntoa(((struct sockaddr_in) client_addr).sin_addr));
+				players[i].port = PORT;
+				char buff[PACKET_SIZE + 1];
+				strcpy(buff, pseudo);
+				send_packet(buff, players[i].sock);
+				bzero(buff, PACKET_SIZE + 1);
+				recuperer_packet(buff, players[i].sock);
+				printf("added : %d\n", added);
+				added += sscanf(buff, "PSEUDO %s", players[i].pseudo);
+				if (!added) { // erreur de communication = reset et refus du joueur
+					players[i].port = ERROR;
+					players[i].sock = ERROR;
+					players[i].ip[0] = '\0';
+					players[i].pseudo[0] = '\0';
+				}
+				else indice = i; // on recupere l'indice d'ajout
 				break;
 			}
 		}
 	}
 
 	if (!added) {
-		fprintf(stderr, "Impossible d'ajouter le nouveaux joueur, la partie est pleine!\n");
 		close(cli_sock);
+		fprintf(stderr, "Impossible d'ajouter le nouveaux joueur, la partie est pleine!\n");
 	}
-	else nb_cli++;
+	else {
+		nb_cli++;
+		if (am_i_host) { // createur de la partie
+			char buff[PACKET_SIZE + 1];
+			buff[0] = '\0';
+			if (nb_cli > 1) {
+				for (int i = 0; i < MAX_CLI; i++) {
+					if (i != indice && players[i].sock != ERROR) {
+						strcat(buff, players[i].ip);
+						strcat(buff, " ");
+					}
+				}
+			}
+			else strcpy(buff, "FIRST");
+			send_packet(buff, cli_sock);
+		}
+	}
 }
 
 void recuperer_packet(char buff[PACKET_SIZE + 1], int fd) {
@@ -184,6 +247,16 @@ void recuperer_packet(char buff[PACKET_SIZE + 1], int fd) {
 	else buff[retour] = '\0';
 }
 
+void send_packet(char buff[PACKET_SIZE + 1], int fd) {
+	int retour = write(fd, buff, strlen(buff));
+	if (retour == ERROR) {
+		close(fd_py_to_c[TUBE_ECRI]);
+		close(fd_c_to_py[TUBE_LECT]);
+		if (is_serv_launched) close_serv();
+		error("Erreur d'ecriture");
+	}
+}
+
 fd_set create_set(int *max_fd) {
 	fd_set set;
 	FD_ZERO(&set);
@@ -195,9 +268,9 @@ fd_set create_set(int *max_fd) {
 		if (*max_fd < serv_sock) *max_fd = serv_sock; // on fait en sorte que *max_fd valle toujours la valeur du plus grand
 
 		for (int i = 0; i < MAX_CLI; i++) {
-			if (players[i] != ERROR) {
-				FD_SET(players[i], &set);
-				if (*max_fd < players[i]) *max_fd = players[i];
+			if (players[i].sock != ERROR) {
+				FD_SET(players[i].sock, &set);
+				if (*max_fd < players[i].sock) *max_fd = players[i].sock;
 			}
 		}
 	}
@@ -321,9 +394,12 @@ void close_tube(int tube[TUBE_SIZE]) {
 
 void close_serv() {
 	for (int i = 0; i < MAX_CLI; i++) {
-		if (players[i] != ERROR) {
-			close(players[i]);
-			players[i] = ERROR;
+		if (players[i].sock != ERROR) {
+			close(players[i].sock);
+			players[i].sock = ERROR;
+			players[i].ip[0] = '\0';
+			players[i].pseudo[0] = '\0';
+			players[i].port = ERROR;
 		}
 	}
 

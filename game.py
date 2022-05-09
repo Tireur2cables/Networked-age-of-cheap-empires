@@ -68,7 +68,8 @@ class AoCE(arcade.Window):
 	def activate_multiplayer(self) :
 		self.multiplayer = True
 		if AoCE.ecriture_fd :
-			os.write(AoCE.ecriture_fd, "INIT".encode())
+			mess = "INIT " + self.pseudo
+			os.write(AoCE.ecriture_fd, mess.encode())
 		else :
 			print("Erreur impossible de communiquer avec le programme C")
 			self.exit()
