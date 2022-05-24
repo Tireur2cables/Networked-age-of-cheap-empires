@@ -30,7 +30,7 @@ class Controller():
 		self.game = aoce_game
 
 		# Selection (will contain elements of type Entity)
-		self.selection = dict()  # self.section ---> convert to a dict, the key is "player" or "ai_1" or "ai_2" or ...
+		self.selection = dict()  # self.section ---> convert to a dict, the key is self.game.window.pseudo or "ai_1" or "ai_2" or ...
 		self.dead_entities = set()
 		self.ai = set()
 		self.players = set()
@@ -53,7 +53,7 @@ class Controller():
 
 	def setup(self, players_dict: dict, type_of_game):
 		self.reset()
-		self.selection["player"] = set()
+		self.selection[self.game.window.pseudo] = set()
 		self.type_of_game = type_of_game
 		for key, value in players_dict.items():
 			self.players.add(value)
@@ -176,7 +176,7 @@ class Controller():
 		if action == "army" : # keyboard shortcut to send the whole army
 			entity_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
 			if entity_found:
-				self.order_army_attack(self.game.players["player"].my_military, entity_found)
+				self.order_army_attack(self.game.players[self.game.window.pseudo].my_military, entity_found)
 		else:
 			for entity in self.selection[faction]:
 				if action == "harvest/stock/attack/repair" : # click on batiment
@@ -320,7 +320,7 @@ class Controller():
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
 		if self.game.players[entity.faction].can_create(zone_to_build_class) :
 			#Pour le gui, on baisse le flag si on peut finalement construire
-			if entity.faction == "player":
+			if entity.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = ""
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
@@ -355,7 +355,7 @@ class Controller():
 		else:
 			#print("not enough resources to order a build!")
 			#Pour le GUI, on leve un flag pour le message d erreur
-			if entity.faction == "player":
+			if entity.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
 	# Called once
@@ -392,13 +392,13 @@ class Controller():
 					else:
 						current_player.sub_resource(key, value)
 
-				if producing_zone.faction == "player" : # Shouldn't be used with AI
+				if producing_zone.faction == self.game.window.pseudo : # Shouldn't be used with AI
 					self.game.game_view.update_resources_gui()
 			else :
-				if producing_zone.faction == "player":
+				if producing_zone.faction == self.game.window.pseudo:
 					self.game.game_view.errorMessage = "Vous manquez de ressources pour produire des unités"
 		else :
-			if producing_zone.faction == "player":
+			if producing_zone.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
@@ -464,19 +464,19 @@ class Controller():
 				if all(current_player.resources[k] >= upgradeIt.upgrade_cost[current_level][k] for k in Res) :
 						for k in Res :
 							current_player.sub_resource(k, upgradeIt.upgrade_cost[current_level][k])
-						if upgradeIt.faction == "player" : # Shouldn't be used with AI
+						if upgradeIt.faction == self.game.window.pseudo : # Shouldn't be used with AI
 							self.game.game_view.update_resources_gui()
 						current_player.upgrade(upgradeIt.get_name())
 				else :
-					if upgradeIt.faction == "player":
+					if upgradeIt.faction == self.game.window.pseudo:
 						self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
 			else :
-				if upgradeIt.faction == "player":
+				if upgradeIt.faction == self.game.window.pseudo:
 					self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
 
 	def end_game(self):
 		for player in self.game.players:
-			if player == "player":
+			if player == self.game.window.pseudo:
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
 			elif self.type_of_game == "JvsIA":  # which means a human was playing
@@ -547,7 +547,7 @@ class Controller():
 							if iso_to_grid_pos(entity.iso_position) == iso_to_grid_pos(entity.aimed_entity.iso_position):
 								# L'entité est arrivée
 								entity.is_interacting = True
-							elif (not entity.aimed_entity.is_moving) or entity.faction == "player" or entity.aimed_entity.faction == "player" :
+							elif (not entity.aimed_entity.is_moving) or entity.faction == self.game.window.pseudo or entity.aimed_entity.faction == self.game.window.pseudo :
 								# L'entité n'est pas arrivée et l'autre ne bouge pas OU l'une des deux entités appartient à un joueur
 								self.order_attack(entity, entity.aimed_entity)
 							else:
@@ -606,7 +606,7 @@ class Controller():
 			if entity.aimed_entity.health < entity.aimed_entity.max_health :
 				entity.aimed_entity.health += 1 # repare 1 point de vie
 
-				if entity.faction == "player" :
+				if entity.faction == self.game.window.pseudo :
 					self.game.game_view.update_resources_gui()
 			else : # fin de la réparation
 				entity.end_goal()
@@ -632,11 +632,11 @@ class Controller():
 					else:
 						current_player.sub_resource(res, cost)
 
-				if entity.faction == "player":
+				if entity.faction == self.game.window.pseudo:
 					self.game.game_view.update_resources_gui()
 
 				self.add_entity_to_game(worksite.create_zone())
-			elif entity.faction == "player" :
+			elif entity.faction == self.game.window.pseudo :
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
 			entity.end_goal()
@@ -657,7 +657,7 @@ class Controller():
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
-				if entity.faction == "player" :
+				if entity.faction == self.game.window.pseudo :
 					self.game.game_view.update_villager_resources_gui()
 			else: # the entity is full and needs to go back to the town center.
 				entity.set_goal("stock")
@@ -677,7 +677,7 @@ class Controller():
 			self.game.players[entity.faction].add_resource(resource, entity.resources[resource])
 			entity.resources[resource] = 0
 
-		if entity.faction == "player" :
+		if entity.faction == self.game.window.pseudo :
 			self.game.game_view.update_villager_resources_gui()
 			self.game.game_view.update_resources_gui()
 
@@ -697,7 +697,7 @@ class Controller():
 				Class_produced = producing_zone.class_produced
 				random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
 				self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
-			elif producing_zone.faction == "player":
+			elif producing_zone.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def attack_entity(self, unit: Unit, delta_time):
@@ -709,7 +709,7 @@ class Controller():
 			#print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
 
-			if unit.faction == "player" or unit.aimed_entity.faction == "player" : # Shouldn't be used with AI
+			if unit.faction == self.game.window.pseudo or unit.aimed_entity.faction == self.game.window.pseudo : # Shouldn't be used with AI
 				self.game.game_view.update_villager_resources_gui()
 
 			if isinstance(unit.aimed_entity, Unit) and unit.aimed_entity.aimed_entity != unit:
