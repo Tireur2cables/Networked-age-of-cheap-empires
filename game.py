@@ -147,6 +147,7 @@ class GameView(arcade.View):
 		self.game_controller = Controller(self)
 		self.players = dict()
 		self.tactilmod = False # initialised by aoce
+		self.num = 0
 
 	def setMenuView(self, menu_view):
 		self.menu_view = menu_view
@@ -156,8 +157,9 @@ class GameView(arcade.View):
 		human_in_game = False
 		ia_in_game = False
 		for player, difficulty in players.items():
-			if "Vous" in player:
-				self.players["player"] = Player(self, "player", resources)
+			#print(paleyr, difficulty)
+			if "Joueur Humain" in difficulty or "Joueur en ligne" in difficulty :
+				self.players[player] = Player(self, player, resources)
 				human_in_game = True
 			else:
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
@@ -172,13 +174,15 @@ class GameView(arcade.View):
 		#print(players)
 		human_in_game, ia_in_game = self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
-		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		if human_in_game and ia_in_game:
 			self.game_controller.setup(self.players, "JvsIA")
 		elif ia_in_game:
 			self.game_controller.setup(self.players, "IAvsIA")
-		else:
+		elif human_in_game and len(self.players) == 1:
 			self.game_controller.setup(self.players, "J")
+		else:
+			self.game_controller.setup(self.players, "JvsJ")
+		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup(self.tactilmod)
 
 	def load_save(self, data):
