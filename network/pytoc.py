@@ -10,11 +10,11 @@
 
 
 # QUESTIONS POUR BATTAGLINI :
-# - Peut-on recevoir plusieurs paquets d'un coup ?
-        # - Si oui, comment les traiter ?
-        # - Idées : Taille en début de message, comparer avec la taille reçue, si différent, erreur.
-        # - Doit-on mettre en place un checksum ?
-# - Doit-on implémenter une pile de paquets pour les traiter chronologiquement ?
+# - Peut-on recevoir plusieurs paquets d'un coup ? OUI
+        # - Si oui, comment les traiter ? File / Rappeler la fonction si début paquet
+        # - Idées : Taille en début de message, comparer avec la taille reçue, si différent, continuer de lire.
+        # - Doit-on mettre en place un checksum ? OUI Comment le faire ?
+# - Doit-on implémenter une file de paquets pour les traiter chronologiquement ? OUI
 
 
 import os
@@ -71,14 +71,14 @@ def interpret(packet):
             # (Call Controller.human_order_towards_position("move", faction, iso_position):)
             # Call Controller.move_entity(entity, end_position)
             print("[<--] Received move order : " + packet.data)
-
         case "BUILD":
             # (Call Controller.human_order_towards_position("build", faction, iso_position):)
             # Call Controller.order_build(entity, map_position)
             # Installer une construction ou un site de construction
             print("[<--] Received build order : " + packet.data)
             pass        
-        case 404:
+        case "CREATE_UNIT":
+
             pass
 # def forge():
     
