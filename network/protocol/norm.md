@@ -1,15 +1,13 @@
-
-
 Logic of Game Commands : 
-X) Hello, I am Player1, I want to interact with Villager.1234, who owns this ?
-X) Hello, I am Player2, i own Villager.1234.
+    X) Hello, I am Player1, I want to interact with Villager.1234, who owns this ?
+    X) Hello, I am Player2, i own Villager.1234.
 
 X) I am Player1, requesting contract on Villager.1234
 X) I am Player2, leaving you contract on Villager.1234
 
-5) I am Player1,acknowledge contract on X for 10sec
-Actions...
-6) I am Player1,finished contract on X for 10sec
+    5) I am Player1,acknowledge contract on X for 10sec
+    Actions...
+    6) I am Player1,finished contract on X for 10sec
 
 
 
@@ -38,6 +36,3 @@ Between 1 and 4
 
 DATA : 
 Déviation des infos d'actions effectutées par le client et envoi sur le réseau
-
-
-
