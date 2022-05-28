@@ -16,11 +16,7 @@
         # - Doit-on mettre en place un checksum ? OUI Comment le faire ?
 # - Doit-on implémenter une file de paquets pour les traiter chronologiquement ? OUI
 
-
 import os
-from game import AoCE
-readThis = AoCE.lecture_fd
-writeThis = AoCE.ecriture_fd
 
 class Packet():
     def __init__(self, ID, IO, PID, data):
@@ -43,18 +39,18 @@ def packetify(packetString):
 
 
 
-def send(packetString):
+def send(packetString, writeDesc):
     # Send the string of a packet to C handler
-    if writeThis:
-        os.write(writeThis, packetString.encode())
+    if writeDesc:
+        os.write(writeDesc, packetString.encode())
     else :
         print("[!] Error : Cannot send message. No connection to C handler.")
 
 
-def receive_string():
+def receive_string(readDesc):
     # receive packet string from C handler
-    if readThis:
-        packetString = os.read(readThis)
+    if readDesc:
+        packetString = os.read(readDesc)
         return packetString
     else :
         print("[!] Error : Cannot receive message. No connection to C handler.")
@@ -76,10 +72,10 @@ def interpret(packet):
             # Call Controller.order_build(entity, map_position)
             # Installer une construction ou un site de construction
             print("[<--] Received build order : " + packet.data)
-            pass        
+            pass
         case "CREATE_UNIT":
 
             pass
 # def forge():
-    
+
 #     pass

@@ -389,7 +389,7 @@ void launch_python() {
 	close(fd_c_to_py[TUBE_ECRI]);
 
 	// préparation des arguments
-	char *cmd = "python3";
+	char *cmd = "python3.10";
 	char *launchfile = "main.py";
 
 	int len = nbdigit(fd_py_to_c[TUBE_ECRI]);

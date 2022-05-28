@@ -1,6 +1,5 @@
 # --- Imports ---
 # -- libs --
-import os
 import random
 # -- arcade --
 import arcade
@@ -11,6 +10,8 @@ from views.MainView import MainView
 from Model import Model
 from Controller import Controller
 from View import View
+# -- network --
+from network.pytoc import *
 
 # --- Constants ---
 DEFAULT_SCREEN_WIDTH = 800
@@ -67,29 +68,34 @@ class AoCE(arcade.Window):
 
 	def activate_multiplayer_host(self) :
 		self.multiplayer = True
-		if AoCE.ecriture_fd :
-			mess = "INIT " + self.pseudo
-			os.write(AoCE.ecriture_fd, mess.encode())
-		else :
-			print("Erreur impossible de communiquer avec le programme C")
-			self.exit()
+		mess = "INIT " + self.pseudo
+		send(AoCE.ecriture_fd, mess)
+		# if AoCE.ecriture_fd :
+		# 	mess = "INIT " + self.pseudo
+		# 	os.write(AoCE.ecriture_fd, mess.encode())
+		# else :
+		# 	print("Erreur impossible de communiquer avec le programme C")
+		# 	self.exit()
 
 	def activate_multiplayer(self) :
 		self.multiplayer = True
-		if AoCE.ecriture_fd :
-			mess = "JOIN " + self.pseudo
-			os.write(AoCE.ecriture_fd, mess.encode())
-		else :
-			print("Erreur impossible de communiquer avec le programme C")
-			self.exit()
+		mess = "JOIN " + self.pseudo
+		send(mess, AoCE.ecriture_fd)
+		# if AoCE.ecriture_fd :
+		# 	mess = "JOIN " + self.pseudo
+		# 	os.write(AoCE.ecriture_fd, mess.encode())
+		# else :
+		# 	print("Erreur impossible de communiquer avec le programme C")
+		# 	self.exit()
 
 	def desactivate_multiplayer(self) :
 		self.multiplayer = False
-		if AoCE.ecriture_fd :
-			os.write(AoCE.ecriture_fd, "CANCEL".encode())
-		else :
-			print("Erreur impossible de communiquer avec le programme C")
-			self.exit()
+		send("CANCEL", AoCE.ecriture_fd)
+		# if AoCE.ecriture_fd :
+		# 	os.write(AoCE.ecriture_fd, "CANCEL".encode())
+		# else :
+		# 	print("Erreur impossible de communiquer avec le programme C")
+		# 	self.exit()
 
 	def on_show(self):
 		# Affiche le main menu
@@ -103,8 +109,9 @@ class AoCE(arcade.Window):
 	def exit(self):
 		self.media_player.delete()
 		arcade.exit()
-		if AoCE.ecriture_fd :
-			os.write(AoCE.ecriture_fd, "STOP".encode())
+		send("STOP", ecriture_fd)
+		# if AoCE.ecriture_fd :
+		# 	os.write(AoCE.ecriture_fd, "STOP".encode())
 
 	def triggerTactil(self) :
 		self.tactilmod = not self.tactilmod
@@ -182,6 +189,7 @@ class GameView(arcade.View):
 			self.game_controller.setup(self.players, "J")
 		else:
 			self.game_controller.setup(self.players, "JvsJ")
+
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup(self.tactilmod)
 
