@@ -7,6 +7,7 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <time.h>
 
 #define ERROR -1
 #define TRUE 1
@@ -165,15 +166,18 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 
 	else if (strncmp(buff, "JOIN ", 5) == 0) {
 		printf("Je me connecte à la partie\n");
-		if (pseudo[0] == '\0') sscanf(buff, "JOIN %s", pseudo);
-		//create_serv();
-		join_game();
+		char ip[IP_LEN + 1];
+		//printf("Reçu: %s\n", buff);
+		if (sscanf(buff, "JOIN %s %s", pseudo, ip) != 2) recuperer_packet(buff, fd_py_to_c[TUBE_LECT]);
+		printf("Message reçu: %s", buff);
+		printf("IP: %s\n", ip);
+		join_game(ip);
 	}
 
 	else printf("message non reconnu : %s\n", buff);
 }
 
-void join_game() {
+void join_game(char ip[IP_LEN + 1]) {
 	players[0].sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (players[0].sock == ERROR) {
 		close(fd_py_to_c[TUBE_LECT]);
@@ -182,7 +186,7 @@ void join_game() {
 		error("Erreur de création de la socket!");
 	}
 	players[0].port = PORT;
-	strcpy(players[0].ip, "127.0.0.1"); // TODO a changer
+	strcpy(players[0].ip, ip);
 
 	struct sockaddr_in serv_addr;
 	socklen_t serv_size = sizeof(serv_addr);
@@ -388,7 +392,7 @@ void launch_python() {
 	close(fd_c_to_py[TUBE_ECRI]);
 
 	// préparation des arguments
-	char *cmd = "python3";
+	char *cmd = "python3.10";
 	char *launchfile = "main.py";
 
 	int len = nbdigit(fd_py_to_c[TUBE_ECRI]);

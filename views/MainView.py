@@ -34,6 +34,7 @@ class MainView(arcade.View) :
 		self.setupButtons()
 
 	def setupButtons(self):
+
 		# def button size
 		buttonsize = self.window.width / 6 # arbitrary
 
@@ -49,8 +50,8 @@ class MainView(arcade.View) :
 		ia_match_button = NextViewButton(self.window, IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
-		join_game = NextViewButton(self.window, MultiplayerJoinView(self), text="Join Multiplayer Game", width=buttonsize)
-		self.v_box.add(join_game.with_space_around(bottom = 20))
+		join_game_button = NextViewButton(self.window, MultiplayerJoinView(self), text="Join Multiplayer Game", width=buttonsize)
+		self.v_box.add(join_game_button.with_space_around(bottom=20))
 
 		create_game = NextViewButton(self.window, MultiplayerCreateView(self), text="Create Multiplayer Game", width=buttonsize)
 		self.v_box.add(create_game.with_space_around(bottom = 20))

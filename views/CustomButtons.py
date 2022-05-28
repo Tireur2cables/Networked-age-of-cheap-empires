@@ -86,11 +86,6 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 		self.pregameview = pregameview
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		ia = {}
-		for padding in self.pregameview.ia_box.children :
-			name, diff = padding.child.text.split(padding.child.sep)
-			ia[name] = diff
-
 		ressources = {}
 		tab = [Res.FOOD, Res.WOOD, Res.STONE, Res.GOLD]
 		indice = 0
