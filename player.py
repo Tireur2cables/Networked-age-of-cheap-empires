@@ -39,6 +39,7 @@ class Player:
 		self.food_storage = set()
 		self.other_storage = set()
 		self.upgrades = {}
+		self.units_by_id = []
 
 	def reset(self):
 		self.resources.clear()
@@ -49,6 +50,10 @@ class Player:
 		self.food_storage.clear()
 		self.other_storage.clear()
 		self.upgrades.clear()
+		self.nb_unit = 0
+		self.max_unit = 4
+		self.is_alive = True
+		self.units_by_id.clear()
 
 
 	def __getstate__(self):
@@ -75,6 +80,7 @@ class Player:
 		if isinstance(new_entity, Unit):
 			self.my_units.add(new_entity)
 			self.nb_unit += 1
+			self.units_by_id.append(new_entity)
 			if isinstance(new_entity, Military):
 				self.my_military.add(new_entity)
 
@@ -106,6 +112,7 @@ class Player:
 		if isinstance(dead_entity, Unit):
 			self.my_units.discard(dead_entity)
 			self.nb_unit -= 1
+			self.units_by_id.remove(dead_entity)
 			if isinstance(dead_entity, Military):
 				self.my_military.discard(dead_entity)
 

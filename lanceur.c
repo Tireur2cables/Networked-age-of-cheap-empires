@@ -170,7 +170,7 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		join_game();
 	}
 
-	else printf("message non reconnu : %s\n", buff);
+	/*else printf("message non reconnu : %s\n", buff);*/
 }
 
 void join_game() {
@@ -282,6 +282,7 @@ void handle_new_connection() {
 			else strcpy(buff, "FIRST");
 			send_packet(buff, cli_sock);
 		}
+		//send_packet(players[indice].pseudo, fd_c_to_py);
 	}
 }
 
