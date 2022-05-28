@@ -3,6 +3,7 @@ import arcade
 from player import Player
 from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchOnlineGameButton, OnlinePlayerButton
 from views.PreGameView import PreGameView
+from network.pytoc import *
 
 button_texture = "Ressources/img/button_background.png"
 
@@ -10,6 +11,7 @@ class MultiplayerCreateView(PreGameView):
 
 	def __init__(self, main_view) :
 		super().__init__(main_view)
+		self.count = 0
 
 	def setup(self) :
 		# tell the game to activate multiplayer mode
@@ -105,3 +107,11 @@ class MultiplayerCreateView(PreGameView):
 				child = self.launch_box
 			)
 		)
+
+	def on_update(self, delta_time) :
+		self.count += 1
+		if (self.count == 30) :
+			s = receive_string(self.window.lecture_fd)
+			if s :
+				print(s)
+			self.count = 0

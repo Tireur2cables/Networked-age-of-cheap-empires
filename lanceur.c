@@ -286,7 +286,7 @@ void handle_new_connection() {
 			else strcpy(buff, "FIRST");
 			send_packet(buff, cli_sock);
 		}
-		//send_packet(players[indice].pseudo, fd_c_to_py);
+		send_packet(players[indice].pseudo, fd_c_to_py);
 	}
 }
 
