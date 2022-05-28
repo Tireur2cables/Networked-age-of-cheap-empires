@@ -55,7 +55,6 @@ class AoCE(arcade.Window):
 		# self.toDraw = []
 		self.tactilmod = False
 		self.pseudo = self.getPseudo();
-		#print(self.pseudo)
 		self.multiplayer = False
 		self.ecriture_fd = AoCE.ecriture_fd
 		self.lecture_fd = AoCE.lecture_fd
@@ -71,38 +70,20 @@ class AoCE(arcade.Window):
 	def activate_multiplayer_host(self) :
 		self.multiplayer = True
 		mess = "INIT " + self.pseudo
-		send(AoCE.ecriture_fd, mess)
-		# if AoCE.ecriture_fd :
-		# 	mess = "INIT " + self.pseudo
-		# 	os.write(AoCE.ecriture_fd, mess.encode())
-		# else :
-		# 	print("Erreur impossible de communiquer avec le programme C")
-		# 	self.exit()
+		send(mess, AoCE.ecriture_fd)
 
 	def activate_multiplayer(self) :
 		self.multiplayer = True
 		mess = "JOIN " + self.pseudo
 		send(mess, AoCE.ecriture_fd)
-		# if AoCE.ecriture_fd :
-		# 	mess = "JOIN " + self.pseudo
-		# 	os.write(AoCE.ecriture_fd, mess.encode())
-		# else :
-		# 	print("Erreur impossible de communiquer avec le programme C")
-		# 	self.exit()
 
 	def desactivate_multiplayer(self) :
 		self.multiplayer = False
 		send("CANCEL", AoCE.ecriture_fd)
-		# if AoCE.ecriture_fd :
-		# 	os.write(AoCE.ecriture_fd, "CANCEL".encode())
-		# else :
-		# 	print("Erreur impossible de communiquer avec le programme C")
-		# 	self.exit()
 
 	def on_show(self):
 		# Affiche le main menu
 		start_view = MainView(self.GameView)
-		#print("test")
 		self.GameView.setMenuView(start_view)
 		start_view.setup() # useless : mainview.setup is empty
 		self.show_view(start_view)
@@ -111,9 +92,7 @@ class AoCE(arcade.Window):
 	def exit(self):
 		self.media_player.delete()
 		arcade.exit()
-		send("STOP", ecriture_fd)
-		# if AoCE.ecriture_fd :
-		# 	os.write(AoCE.ecriture_fd, "STOP".encode())
+		send("STOP", AoCE.ecriture_fd)
 
 	def triggerTactil(self) :
 		self.tactilmod = not self.tactilmod
