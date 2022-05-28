@@ -145,7 +145,6 @@ class GameView(arcade.View):
 		human_in_game = False
 		ia_in_game = False
 		for player, difficulty in players.items():
-			#print(paleyr, difficulty)
 			if "Joueur Humain" in difficulty or "Joueur en ligne" in difficulty :
 				self.players[player] = Player(self, player, resources)
 				human_in_game = True
@@ -153,13 +152,11 @@ class GameView(arcade.View):
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
 				i += 1
 				ia_in_game = True
-		#print(self.players)
 		return human_in_game, ia_in_game
 
 
 	def setup(self, ressources, players, map_seed):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		#print(players)
 		human_in_game, ia_in_game = self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
 		if human_in_game and ia_in_game:

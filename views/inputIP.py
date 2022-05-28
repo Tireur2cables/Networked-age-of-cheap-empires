@@ -2,12 +2,13 @@ from asyncio import sleep
 from multiprocessing.connection import wait
 import arcade
 import arcade.gui
-import os
 import cheats_vars
 
 from entity.Unit import BigDaddy
 from utils.isometric import grid_pos_to_iso
 from utils.vector import Vector
+
+from network.pytoc import *
 
 """
 Additionally, you should have a few commands to influence the AI, force it to launch
@@ -30,9 +31,8 @@ class InputIP(arcade.gui.UIInputText):
     def on_event(self, event):
         super().on_event(event)
         if len(self.text)>= 1 and "\n" == self.text[-1]:
-            if self.window.ecriture_fd:
-                txt = "JOIN " + self.window.pseudo + " " + self.text
-                os.write(self.window.ecriture_fd, txt.encode())
+
+            txt = "JOIN " + self.window.pseudo + " " + self.text
+            send(txt, self.window.ecriture_fd)
             self.reset_text()
-            # print("lol")
         # ce qu'il faut faire pour se connecter
