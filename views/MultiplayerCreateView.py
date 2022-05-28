@@ -1,7 +1,7 @@
 # Imports
 import arcade
 from player import Player
-from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton
+from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchOnlineGameButton, OnlinePlayerButton
 from views.PreGameView import PreGameView
 
 button_texture = "Ressources/img/button_background.png"
@@ -86,7 +86,7 @@ class MultiplayerCreateView(PreGameView):
 
 		self.launch_box.add(num_enem_button.with_space_around(bottom=20))
 		"""
-		launch_button = LaunchGameButton(
+		launch_button = LaunchOnlineGameButton(
 			self.window,
 			self.main_view.game_view,
 			self,

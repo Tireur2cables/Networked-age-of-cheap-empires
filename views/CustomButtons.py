@@ -92,7 +92,35 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 		for texture_pane in self.pregameview.name_input_ressources :
 			ressources[tab[indice]] = int(texture_pane.child.text)
 			indice += 1
+
+		ia = {}
+		for padding in self.pregameview.ia_box.children :
+			name, diff = padding.child.text.split(padding.child.sep)
+			ia[name] = diff
 		self.nextView.setup(ressources, ia, int(self.pregameview.map_pane.child.text))
+		self.window.show_view(self.nextView)
+
+# Button to return to the main menu
+class LaunchOnlineGameButton(arcade.gui.UITextureButton) :
+	def __init__(self, window, nextView, pregameview, text, width) :
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
+		self.window = window
+		self.nextView = nextView
+		self.pregameview = pregameview
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		ressources = {}
+		tab = [Res.FOOD, Res.WOOD, Res.STONE, Res.GOLD]
+		indice = 0
+		for texture_pane in self.pregameview.name_input_ressources :
+			ressources[tab[indice]] = int(texture_pane.child.text)
+			indice += 1
+
+		players = {}
+		for padding in self.pregameview.players_box.children :
+			name, diff = padding.child.text.split(padding.child.sep)
+			players[name] = diff
+		self.nextView.setup(ressources, players, int(self.pregameview.map_pane.child.text))
 		self.window.show_view(self.nextView)
 
 # Button to display things or not
