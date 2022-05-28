@@ -50,8 +50,11 @@ def send(packetString, writeDesc):
 def receive_string(readDesc):
     # receive packet string from C handler
     if readDesc:
-        packetString = os.read(readDesc, 512)
-        return packetString
+        try :
+            packetString = os.read(readDesc, 512)
+            return packetString.decode()
+        except OSError as e:
+            pass
     else :
         print("[!] Error : Cannot receive message. No connection to C handler.")
 

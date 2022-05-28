@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <fcntl.h>
 
 #define ERROR -1
 #define TRUE 1
@@ -122,8 +123,10 @@ void launch_communication() {
 }
 
 void gerer_c_mess(char buff[PACKET_SIZE + 1], int indice) {
-	// retour ici correspond au nombre de bytes reçus par recuperer packet
+	// retour ici correspond au nombre de bytes reçus par recuperer_packet
 	if (retour == CLOSED_CONECTION) {
+		sprintf(buff, "DECO %s", players[indice].pseudo);
+		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 		printf("Joueur %s déconnecté...\n", players[indice].pseudo);
 		close(players[indice].sock);
 		players[indice].sock = ERROR;
@@ -272,9 +275,8 @@ void handle_new_connection() {
 	}
 	else {
 		nb_cli++;
+		char buff[PACKET_SIZE + 1];
 		if (am_i_host) { // createur de la partie
-			char buff[PACKET_SIZE + 1];
-			buff[0] = '\0';
 			if (nb_cli > 1) {
 				for (int i = 0; i < MAX_CLI; i++) {
 					if (i != indice && players[i].sock != ERROR) {
@@ -286,7 +288,8 @@ void handle_new_connection() {
 			else strcpy(buff, "FIRST");
 			send_packet(buff, cli_sock);
 		}
-		send_packet(players[indice].pseudo, fd_c_to_py);
+		sprintf(buff, "NEW %s", players[indice].pseudo);
+		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 	}
 }
 
@@ -391,6 +394,9 @@ void launch_python() {
 	// fermer les parties de tubes inutiles
 	close(fd_py_to_c[TUBE_LECT]);
 	close(fd_c_to_py[TUBE_ECRI]);
+
+	// passer la lecture en non bloquant
+	fcntl(fd_c_to_py[TUBE_LECT], F_SETFL, O_NONBLOCK);
 
 	// préparation des arguments
 	char *cmd = "python3.10";
