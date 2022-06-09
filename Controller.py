@@ -239,7 +239,7 @@ class Controller():
 		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
-		print("entity moved")
+		print("entity moving")
 		thisIsApacket = Packet("MOVE_UNIT","DICT",self.game.window.pseudo, str(end_grid_position))
 		send(thisIsApacket.stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
@@ -288,7 +288,11 @@ class Controller():
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
+				print("entity harvesting")
+				harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, str(aimed_tile.grid_position))
+				send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 				self.move_entity(entity, aimed_tile.grid_position, False)
+
 
 	def order_search_stock_resources(self, entity, resource_nbr):
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)

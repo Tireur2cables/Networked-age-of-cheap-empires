@@ -48,7 +48,7 @@ def send(packetString, writeDesc):
     # Send the string of a packet to C handler
     if writeDesc:
         os.write(writeDesc, packetString.encode())
-        print("Hey I sent a packet : " + packetString)
+        print("Packet sent : " + packetString)
     else :
         print("[!] Error : Cannot send message. No connection to C handler.")
 
@@ -76,6 +76,10 @@ def interpret(packet):
 
         case "CREATE_UNIT":
             
+            pass
+
+        case "HARVEST":
+
             pass
 
         case "MOVE_UNIT":
