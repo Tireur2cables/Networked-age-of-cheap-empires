@@ -123,7 +123,7 @@ void launch_communication() {
 }
 
 void gerer_c_mess(char buff[PACKET_SIZE + 1], int indice) {
-	// retour ici correspond au nombre de bytes reçus par recuperer_packet
+	// retour buffici correspond au nombre de bytes reçus par recuperer_packet
 	if (retour == CLOSED_CONECTION) {
 		sprintf(buff, "DECO %s", players[indice].pseudo);
 		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
@@ -270,6 +270,7 @@ void join_game(char ip[IP_LEN + 1]) {
 				sprintf(buff, "PSEUDO %s", pseudo);
 				send_packet(buff, players[1].sock);
 				printf("Pseudo du joueur 1: %s\n", players[1].pseudo);
+				bzero(buff, PACKET_SIZE+1);
 				sprintf(buff, "NEW %s", players[1].pseudo);
 				send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 			}
