@@ -106,6 +106,7 @@ class MultiplayerCreateView(PreGameView):
 		if (self.count == 30) : # changer si trop rapide ou trop long
 			s = receive_string(self.window.lecture_fd)
 			if s :
+				print(s)
 				flag, pseudo = s.split(" ")
 				match flag :
 					case "NEW" : self.add_player(pseudo)
