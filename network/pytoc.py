@@ -18,6 +18,10 @@
 
 import os
 
+
+
+
+
 class Packet():
     def __init__(self, ID, IO, PID, data):
         self.ID = ID
@@ -25,16 +29,16 @@ class Packet():
         self.PID = PID
         self.data = data
 
-def stringify(self):
-    # Return a string of a packet
-    # Field separator is \t
-    # Packet separator is \n
-    return self.ID+"\t"+self.IO+"\t"+self.PID+"\t"+self.data+"\n"
+    def stringify(self):
+        # Return a string of a packet
+        # Field separator is \t
+        # Packet separator is \n
+        return self.ID+"\t"+self.IO+"\t"+self.PID+"\t"+self.data+"\n"
 
-def packetify(packetString):
-    packetString.split("\t")
-    packetString[3].split("\n")
-    return Packet(packetString[0], packetString[1], packetString[2], packetString[3][0])
+    def packetify(packetString):
+        packetString.split("\t")
+        packetString[3].split("\n")
+        return Packet(packetString[0], packetString[1], packetString[2], packetString[3][0])
 
 
 
@@ -43,6 +47,7 @@ def send(packetString, writeDesc):
     # Send the string of a packet to C handler
     if writeDesc:
         os.write(writeDesc, packetString.encode())
+        print("Hey I sent a packet : " + packetString)
     else :
         print("[!] Error : Cannot send message. No connection to C handler.")
 
@@ -82,3 +87,18 @@ def interpret(packet):
 # def forge():
 
 #     pass
+
+
+packetQueue = []
+
+paquetdemerde = Packet("ID", "IO", "0", "TEMALATAILLEDELADATA")
+
+
+paquetdemerde1= Packet("ID", "IO", "1", "TEMALATAILLEDELADATA")
+paquetdemerde2= Packet("ID", "IO", "2", "TEMALATAILLEDELADATA")
+packetQueue.insert(-1,paquetdemerde)
+packetQueue.insert(-1,paquetdemerde1)
+packetQueue.insert(-1,paquetdemerde2)
+
+packet = packetQueue.pop()
+print(packet.PID)

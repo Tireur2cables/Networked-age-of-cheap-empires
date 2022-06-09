@@ -13,6 +13,7 @@ from player import AI, Player
 from views.IAVictoryView import IAVictoryView
 from views.VictoryView import VictoryView
 from views.DefeatView import DefeatView
+from network.pytoc import *
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -238,6 +239,9 @@ class Controller():
 		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
+		print("entity moved")
+		thisIsApacket = Packet("MOVE_UNIT","DICT","000","this is data")
+		send(thisIsApacket.stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
