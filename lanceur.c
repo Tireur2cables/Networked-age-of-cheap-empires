@@ -175,6 +175,7 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		printf("Message reçu: %s", buff);
 		printf("IP: %s\n", ip);
 		join_game(ip);
+		//create_serv();
 	}
 
 	/*else printf("message non reconnu : %s\n", buff);*/
@@ -224,9 +225,76 @@ void join_game(char ip[IP_LEN + 1]) {
 	}
 	else {
 		printf("Je vais me connecter à tous ces autres la :\n%s\n", buff);
-	}
 
-}
+		char ip1[IP_LEN+1];
+		char ip2[IP_LEN+1];
+		int nb = sscanf(buff, "%s %s", ip1, ip2);
+
+		players[1].sock = socket(AF_INET, SOCK_STREAM, 0);
+		if (players[1].sock == ERROR) {
+			close(fd_py_to_c[TUBE_LECT]);
+			close(fd_c_to_py[TUBE_ECRI]);
+			close_serv();
+			error("Erreur de création de la socket!");
+		}
+		players[1].port = PORT;
+		strcpy(players[1].ip, ip1);
+		struct sockaddr_in serv_addr;
+		socklen_t serv_size = sizeof(serv_addr);
+		bzero(&serv_addr, serv_size);
+		serv_addr.sin_family = AF_INET;
+		serv_addr.sin_port = htons(PORT);
+		serv_addr.sin_addr.s_addr = inet_addr(players[1].ip);
+
+		if (nb == 1) {
+			int connexion = connect(players[1].sock, (struct sockaddr *) &serv_addr, serv_size);
+			if (connexion == ERROR) {
+				close(fd_py_to_c[TUBE_LECT]);
+				close(fd_c_to_py[TUBE_ECRI]);
+				close_serv();
+				error("Erreur de connection!");
+			}
+			else {
+				printf("Connecté à l'autre joueur !\n");
+			}
+		}
+		else if (nb > 1) {
+			players[2].sock = socket(AF_INET, SOCK_STREAM, 0);
+			if (players[2].sock == ERROR) {
+				close(fd_py_to_c[TUBE_LECT]);
+				close(fd_c_to_py[TUBE_ECRI]);
+				close_serv();
+				error("Erreur de création de la socket!");
+			}
+			players[2].port = PORT;
+			strcpy(players[2].ip, ip2);
+
+			struct sockaddr_in serv_addr;
+			socklen_t serv_size = sizeof(serv_addr);
+			bzero(&serv_addr, serv_size);
+
+			serv_addr.sin_family = AF_INET;
+			serv_addr.sin_port = htons(PORT);
+			serv_addr.sin_addr.s_addr = inet_addr(players[2].ip);
+
+			int connexion = connect(players[1].sock, (struct sockaddr *) &serv_addr, serv_size);
+			int connexion2 = connect(players[2].sock, (struct sockaddr *) &serv_addr, serv_size);
+			if (connexion == ERROR) {
+				close(fd_py_to_c[TUBE_LECT]);
+				close(fd_c_to_py[TUBE_ECRI]);
+				close_serv();
+				error("Erreur de connection!");
+			}
+			if (connexion2 == ERROR) {
+				close(fd_py_to_c[TUBE_LECT]);
+				close(fd_c_to_py[TUBE_ECRI]);
+				close_serv();
+				error("Erreur de connection!");
+			}
+			printf("Connecté aux autres joueurs !");
+		}
+		}
+	}
 
 void handle_new_connection() {
 	struct sockaddr_in client_addr;
@@ -276,6 +344,7 @@ void handle_new_connection() {
 	else {
 		nb_cli++;
 		char buff[PACKET_SIZE + 1];
+		buff[0] = '\0';
 		if (am_i_host) { // createur de la partie
 			if (nb_cli > 1) {
 				for (int i = 0; i < MAX_CLI; i++) {
@@ -286,6 +355,10 @@ void handle_new_connection() {
 				}
 			}
 			else strcpy(buff, "FIRST");
+			send_packet(buff, cli_sock);
+		}
+		else {
+			strcpy(buff, "FIRST");
 			send_packet(buff, cli_sock);
 		}
 		sprintf(buff, "NEW %s", players[indice].pseudo);
