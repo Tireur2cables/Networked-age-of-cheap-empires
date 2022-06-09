@@ -143,6 +143,9 @@ class GameView(arcade.View):
 		i = 1
 		human_in_game = False
 		ia_in_game = False
+		for name in resources :
+			txt = "RES " + name + " " + str(resources[name])
+			send(txt, AoCE.ecriture_fd)
 		for player, difficulty in players.items():
 			if "Joueur Humain" in difficulty[0] or "Joueur en ligne" in difficulty[0] :
 				self.players[player] = Player(self, player, resources, difficulty[1])
