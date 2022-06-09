@@ -156,13 +156,13 @@ class GameView(arcade.View):
 			else :
 				n = "STONE"
 
-			txt = "RES " + n + " " + str(resources[name])
+			txt = "RES " + n + " " + str(resources[name]) + "\n"
 			send(txt, AoCE.ecriture_fd)
 		for player, difficulty in players.items():
 			if "Joueur Humain" in difficulty[0] or "Joueur en ligne" in difficulty[0] :
 				self.players[player] = Player(self, player, resources, difficulty[1])
 				human_in_game = True
-				txt = "CR " + player + " " + str(difficulty[1])  #difficulty[1] == numéro du joueur
+				txt = "CR " + player + " " + str(difficulty[1]) + "\n"  #difficulty[1] == numéro du joueur
 				send(txt, AoCE.ecriture_fd)
 			else:
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
@@ -183,7 +183,7 @@ class GameView(arcade.View):
 			self.game_controller.setup(self.players, "J")
 		else:
 			self.game_controller.setup(self.players, "JvsJ")
-			send(str(map_seed), AoCE.ecriture_fd)
+			send(str(map_seed) + "\n", AoCE.ecriture_fd)
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup(self.tactilmod)
 
