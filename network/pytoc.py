@@ -24,17 +24,17 @@ import os
 
 
 class Packet():
-    def __init__(self, ID, IO, PID, data):
+    def __init__(self, ID, IO, PNAME, data):
         self.ID = ID
         self.IO = IO
-        self.PID = PID
+        self.PNAME = PNAME
         self.data = data
 
     def stringify(self):
         # Return a string of a packet
         # Field separator is \t
         # Packet separator is \n
-        return self.ID+"\t"+self.IO+"\t"+self.PID+"\t"+self.data+"\n"
+        return self.ID+"\t"+self.IO+"\t"+self.PNAME+"\t"+self.data+"\n"
 
     def packetify(packetString):
         packetString.split("\t")
@@ -116,4 +116,4 @@ packetQueue.insert(-1,paquetdemerde1)
 packetQueue.insert(-1,paquetdemerde2)
 
 packet = packetQueue.pop()
-print(packet.PID)
+print(packet.PNAME)

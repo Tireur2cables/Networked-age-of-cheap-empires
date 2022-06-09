@@ -240,7 +240,7 @@ class Controller():
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		print("entity moved")
-		thisIsApacket = Packet("MOVE_UNIT","DICT","000","this is data")
+		thisIsApacket = Packet("MOVE_UNIT","DICT",self.game.window.pseudo, str(end_grid_position))
 		send(thisIsApacket.stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
