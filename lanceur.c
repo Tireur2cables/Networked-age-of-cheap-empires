@@ -175,7 +175,7 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		printf("Message reçu: %s", buff);
 		printf("IP: %s\n", ip);
 		join_game(ip);
-		//create_serv();
+		create_serv();
 	}
 
 	else {
