@@ -222,7 +222,11 @@ void join_game(char ip[IP_LEN + 1]) {
 	char buff[PACKET_SIZE + 1];
 	recuperer_packet(buff, players[0].sock);
 	sscanf(buff, "PSEUDO %s", players[0].pseudo);
+<<<<<<< HEAD
 	sprintf(buff, "NEW %s\n", players[0].pseudo);
+=======
+	sprintf(buff, "NEW\t%s", players[0].pseudo);
+>>>>>>> aaefecf (NEW \t)
 	send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 	sprintf(buff, "PSEUDO %s", pseudo);
 	send_packet(buff, players[0].sock);
@@ -267,7 +271,7 @@ void join_game(char ip[IP_LEN + 1]) {
 				char buff[PACKET_SIZE + 1];
 				recuperer_packet(buff, players[1].sock);
 				sscanf(buff, "PSEUDO %s", players[1].pseudo);
-				sprintf(buff, "NEW %s", players[1].pseudo);
+				sprintf(buff, "NEW\t%s", players[1].pseudo);
 				send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 				sprintf(buff, "PSEUDO %s", pseudo);
 				send_packet(buff, players[1].sock);
