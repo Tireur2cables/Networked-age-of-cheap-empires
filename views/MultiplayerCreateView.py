@@ -1,8 +1,9 @@
 # Imports
 import arcade
 from player import Player
-from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton
+from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchOnlineGameButton, OnlinePlayerButton
 from views.PreGameView import PreGameView
+from network.pytoc import *
 
 button_texture = "Ressources/img/button_background.png"
 
@@ -10,6 +11,7 @@ class MultiplayerCreateView(PreGameView):
 
 	def __init__(self, main_view) :
 		super().__init__(main_view)
+		self.count = 0
 
 	def setup(self) :
 		# tell the game to activate multiplayer mode
@@ -47,14 +49,6 @@ class MultiplayerCreateView(PreGameView):
 		you_civil_button = OnlinePlayerButton(text=self.window.pseudo, width=buttonsize * 2, height=buttonsize / 4)
 		self.players_box.add(you_civil_button.with_space_around(bottom=20))
 
-		"""
-		name = ["IA1", "IA2", "IA3 ", "IA4", "IA5", "IA6", "IA7", "IA8"]
-
-		for i in range(self.nbAdv) :
-			ia_button = SelctDifButton(text=name[i], size=buttonsize, name=name[i])
-			self.ia_box.add(ia_button.with_space_around(bottom=20))
-		"""
-
 		self.pseudoBox()
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -68,6 +62,17 @@ class MultiplayerCreateView(PreGameView):
 			)
 		)
 
+	def add_player(self, pseudo) :
+		buttonsize = self.window.width / 6 # arbitrary
+		new_civil_button = OnlinePlayerButton(text=pseudo, width=buttonsize * 2, height=buttonsize / 4)
+		self.players_box.add(new_civil_button.with_space_around(bottom=20))
+
+	def remove_player(self, pseudo) :
+		for button in self.players_box.children :
+			if button.child.text == pseudo + " : Joueur en ligne" :
+				self.players_box.remove(button)
+				break
+
 	#Button to start the game
 	def launch_game(self) :
 		# def button size
@@ -75,18 +80,8 @@ class MultiplayerCreateView(PreGameView):
 
 		# Create a vertical BoxGroup to align buttons
 		self.launch_box = arcade.gui.UIBoxLayout()
-		"""
-		# Create the button
-		num_enem_button = NextViewButton(
-			self.window,
-			MultiplayerGameView(self.main_view, self.nbAdv + 1),
-			text="Nombre d'IA : " + str(self.nbAdv),
-			width=buttonsize * (3 / 2)
-		)
 
-		self.launch_box.add(num_enem_button.with_space_around(bottom=20))
-		"""
-		launch_button = LaunchGameButton(
+		launch_button = LaunchOnlineGameButton(
 			self.window,
 			self.main_view.game_view,
 			self,
@@ -105,3 +100,15 @@ class MultiplayerCreateView(PreGameView):
 				child = self.launch_box
 			)
 		)
+
+	def on_update(self, delta_time) :
+		self.count += 1
+		if (self.count == 30) : # changer si trop rapide ou trop long
+			s = receive_string(self.window.lecture_fd)
+			if s :
+				flag, pseudo = s.split(" ")
+				match flag :
+					case "NEW" : self.add_player(pseudo)
+					case "DECO" : self.remove_player(pseudo)
+					case _: print(s)
+			self.count = 0

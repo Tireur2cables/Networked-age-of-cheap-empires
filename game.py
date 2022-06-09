@@ -55,8 +55,9 @@ class AoCE(arcade.Window):
 		# self.toDraw = []
 		self.tactilmod = False
 		self.pseudo = self.getPseudo();
-		#print(self.pseudo)
 		self.multiplayer = False
+		self.ecriture_fd = AoCE.ecriture_fd
+		self.lecture_fd = AoCE.lecture_fd
 
 	def getPseudo(self) :
 		pseudo = "Default pseudo"
@@ -69,38 +70,20 @@ class AoCE(arcade.Window):
 	def activate_multiplayer_host(self) :
 		self.multiplayer = True
 		mess = "INIT " + self.pseudo
-		send(AoCE.ecriture_fd, mess)
-		# if AoCE.ecriture_fd :
-		# 	mess = "INIT " + self.pseudo
-		# 	os.write(AoCE.ecriture_fd, mess.encode())
-		# else :
-		# 	print("Erreur impossible de communiquer avec le programme C")
-		# 	self.exit()
+		send(mess, AoCE.ecriture_fd)
 
 	def activate_multiplayer(self) :
 		self.multiplayer = True
 		mess = "JOIN " + self.pseudo
 		send(mess, AoCE.ecriture_fd)
-		# if AoCE.ecriture_fd :
-		# 	mess = "JOIN " + self.pseudo
-		# 	os.write(AoCE.ecriture_fd, mess.encode())
-		# else :
-		# 	print("Erreur impossible de communiquer avec le programme C")
-		# 	self.exit()
 
 	def desactivate_multiplayer(self) :
 		self.multiplayer = False
 		send("CANCEL", AoCE.ecriture_fd)
-		# if AoCE.ecriture_fd :
-		# 	os.write(AoCE.ecriture_fd, "CANCEL".encode())
-		# else :
-		# 	print("Erreur impossible de communiquer avec le programme C")
-		# 	self.exit()
 
 	def on_show(self):
 		# Affiche le main menu
 		start_view = MainView(self.GameView)
-		#print("test")
 		self.GameView.setMenuView(start_view)
 		start_view.setup() # useless : mainview.setup is empty
 		self.show_view(start_view)
@@ -109,9 +92,7 @@ class AoCE(arcade.Window):
 	def exit(self):
 		self.media_player.delete()
 		arcade.exit()
-		send("STOP", ecriture_fd)
-		# if AoCE.ecriture_fd :
-		# 	os.write(AoCE.ecriture_fd, "STOP".encode())
+		send("STOP", AoCE.ecriture_fd)
 
 	def triggerTactil(self) :
 		self.tactilmod = not self.tactilmod
@@ -164,7 +145,6 @@ class GameView(arcade.View):
 		human_in_game = False
 		ia_in_game = False
 		for player, difficulty in players.items():
-			#print(paleyr, difficulty)
 			if "Joueur Humain" in difficulty or "Joueur en ligne" in difficulty :
 				self.players[player] = Player(self, player, resources)
 				human_in_game = True
@@ -172,13 +152,11 @@ class GameView(arcade.View):
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
 				i += 1
 				ia_in_game = True
-		#print(self.players)
 		return human_in_game, ia_in_game
 
 
 	def setup(self, ressources, players, map_seed):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		#print(players)
 		human_in_game, ia_in_game = self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
 		if human_in_game and ia_in_game:
@@ -189,7 +167,7 @@ class GameView(arcade.View):
 			self.game_controller.setup(self.players, "J")
 		else:
 			self.game_controller.setup(self.players, "JvsJ")
-
+			send(str(map_seed), AoCE.ecriture_fd)
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup(self.tactilmod)
 

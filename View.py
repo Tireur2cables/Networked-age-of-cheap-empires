@@ -596,13 +596,16 @@ class View():
 		# Create a vertical BoxGroup to align buttons
 		self.v_box3 = arcade.gui.UIBoxLayout()
 
+		l = []
 		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
+		l.append(retour_button)
 		# Create the save button
 		save_button = SaveButton(self.game, text="Save Game", width=buttonsize)
+		if not self.game.window.multiplayer : l.append(save_button)
 		# {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
 		# Create the option button
-		option_button = ListButton(self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
+		option_button = ListButton(self.v_box3, l, text="Option", width=buttonsize)
 		self.v_box3.add(option_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons

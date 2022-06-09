@@ -7,6 +7,8 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <time.h>
+#include <fcntl.h>
 
 #define ERROR -1
 #define TRUE 1
@@ -121,8 +123,10 @@ void launch_communication() {
 }
 
 void gerer_c_mess(char buff[PACKET_SIZE + 1], int indice) {
-	// retour ici correspond au nombre de bytes reçus par recuperer packet
+	// retour ici correspond au nombre de bytes reçus par recuperer_packet
 	if (retour == CLOSED_CONECTION) {
+		sprintf(buff, "DECO %s", players[indice].pseudo);
+		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 		printf("Joueur %s déconnecté...\n", players[indice].pseudo);
 		close(players[indice].sock);
 		players[indice].sock = ERROR;
@@ -165,15 +169,18 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 
 	else if (strncmp(buff, "JOIN ", 5) == 0) {
 		printf("Je me connecte à la partie\n");
-		if (pseudo[0] == '\0') sscanf(buff, "JOIN %s", pseudo);
-		//create_serv();
-		join_game();
+		char ip[IP_LEN + 1];
+		//printf("Reçu: %s\n", buff);
+		if (sscanf(buff, "JOIN %s %s", pseudo, ip) != 2) recuperer_packet(buff, fd_py_to_c[TUBE_LECT]);
+		printf("Message reçu: %s", buff);
+		printf("IP: %s\n", ip);
+		join_game(ip);
 	}
 
 	/*else printf("message non reconnu : %s\n", buff);*/
 }
 
-void join_game() {
+void join_game(char ip[IP_LEN + 1]) {
 	players[0].sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (players[0].sock == ERROR) {
 		close(fd_py_to_c[TUBE_LECT]);
@@ -182,7 +189,7 @@ void join_game() {
 		error("Erreur de création de la socket!");
 	}
 	players[0].port = PORT;
-	strcpy(players[0].ip, "127.0.0.1"); // TODO a changer
+	strcpy(players[0].ip, ip);
 
 	struct sockaddr_in serv_addr;
 	socklen_t serv_size = sizeof(serv_addr);
@@ -268,9 +275,8 @@ void handle_new_connection() {
 	}
 	else {
 		nb_cli++;
+		char buff[PACKET_SIZE + 1];
 		if (am_i_host) { // createur de la partie
-			char buff[PACKET_SIZE + 1];
-			buff[0] = '\0';
 			if (nb_cli > 1) {
 				for (int i = 0; i < MAX_CLI; i++) {
 					if (i != indice && players[i].sock != ERROR) {
@@ -282,7 +288,8 @@ void handle_new_connection() {
 			else strcpy(buff, "FIRST");
 			send_packet(buff, cli_sock);
 		}
-		//send_packet(players[indice].pseudo, fd_c_to_py);
+		sprintf(buff, "NEW %s", players[indice].pseudo);
+		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 	}
 }
 
@@ -387,6 +394,9 @@ void launch_python() {
 	// fermer les parties de tubes inutiles
 	close(fd_py_to_c[TUBE_LECT]);
 	close(fd_c_to_py[TUBE_ECRI]);
+
+	// passer la lecture en non bloquant
+	fcntl(fd_c_to_py[TUBE_LECT], F_SETFL, O_NONBLOCK);
 
 	// préparation des arguments
 	char *cmd = "python3.10";
