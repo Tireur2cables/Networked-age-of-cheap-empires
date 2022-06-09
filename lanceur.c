@@ -412,6 +412,7 @@ void recuperer_packet(char buff[PACKET_SIZE + 1], int fd) {
 }
 
 void send_packet(char buff[PACKET_SIZE + 1], int fd) {
+	usleep(100000);
 	int retour = write(fd, buff, strlen(buff));
 	if (retour == ERROR) {
 		close(fd_py_to_c[TUBE_ECRI]);
