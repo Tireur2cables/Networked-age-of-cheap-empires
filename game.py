@@ -147,6 +147,8 @@ class GameView(arcade.View):
 			if "Joueur Humain" in difficulty[0] or "Joueur en ligne" in difficulty[0] :
 				self.players[player] = Player(self, player, resources, difficulty[1])
 				human_in_game = True
+				txt = "CR " + player + " " + str(difficulty[1])
+				send(txt, AoCE.ecriture_fd)
 			else:
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
 				i += 1

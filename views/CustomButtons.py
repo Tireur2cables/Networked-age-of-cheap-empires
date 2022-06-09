@@ -4,6 +4,7 @@ from arcade.arcade_types import Color
 import arcade.gui
 from save import pickleLoading, pickleSaving
 from entity.Unit import *
+from network.pytoc import *
 
 # Constants
 from CONSTANTS import Resource as Res

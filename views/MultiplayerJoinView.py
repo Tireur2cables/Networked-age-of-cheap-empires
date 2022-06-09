@@ -4,6 +4,7 @@ from player import Player
 from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton
 from views.PreGameView import PreGameView
 from views.inputIP import InputIP
+from network.pytoc import *
 
 button_texture = "Ressources/img/button_background.png"
 
@@ -11,11 +12,13 @@ class MultiplayerJoinView(PreGameView):
 
 	def __init__(self, main_view) :
 		super().__init__(main_view)
+		self.count = 0
 
 	def setup(self) :
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
 		self.join_game = 0
+		self.count = 0
 
 
 	def ip_box(self):
