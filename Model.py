@@ -86,7 +86,7 @@ class Model():
 		for pos_spawn in self.map.spawn_array:
 			if self.game.game_controller.type_of_game == "JvsJ" :
 				for player in self.game.game_controller.players:
-					if player.num==pos_spawn[1]:
+					if str(player.num)==pos_spawn[1]:
 						faction = player.player_type
 			elif self.game.window.pseudo in self.players:
 				faction = self.game.window.pseudo if pos_spawn[1] == "0" else "ai_" + pos_spawn[1]
