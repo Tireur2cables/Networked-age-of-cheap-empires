@@ -222,7 +222,6 @@ void join_game(char ip[IP_LEN + 1]) {
 	char buff[PACKET_SIZE + 1];
 	recuperer_packet(buff, players[0].sock);
 	sscanf(buff, "PSEUDO %s", players[0].pseudo);
-
 	sprintf(buff, "PSEUDO %s", pseudo);
 	send_packet(buff, players[0].sock);
 
@@ -263,6 +262,14 @@ void join_game(char ip[IP_LEN + 1]) {
 			}
 			else {
 				printf("Connecté à l'autre joueur !\n");
+				char buff[PACKET_SIZE + 1];
+				recuperer_packet(buff, players[1].sock);
+				sscanf(buff, "PSEUDO %s", players[1].pseudo);
+				sprintf(buff, "PSEUDO %s", pseudo);
+				send_packet(buff, players[1].sock);
+
+				sprintf(buff, "NEW %s", players[1].pseudo);
+				send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 			}
 		}
 		else if (nb > 1) {
@@ -299,9 +306,26 @@ void join_game(char ip[IP_LEN + 1]) {
 				error("Erreur de connection!");
 			}
 			printf("Connecté aux autres joueurs !");
-		}
+
+			char buff[PACKET_SIZE + 1];
+			recuperer_packet(buff, players[1].sock);
+			sscanf(buff, "PSEUDO %s", players[1].pseudo);
+			sprintf(buff, "PSEUDO %s", pseudo);
+			send_packet(buff, players[1].sock);
+
+			sprintf(buff, "NEW %s", players[1].pseudo);
+			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
+
+			recuperer_packet(buff, players[2].sock);
+			sscanf(buff, "PSEUDO %s", players[2].pseudo);
+			sprintf(buff, "PSEUDO %s", pseudo);
+			send_packet(buff, players[2].sock);
+
+			sprintf(buff, "NEW %s", players[2].pseudo);
+			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 		}
 	}
+}
 
 void handle_new_connection() {
 	struct sockaddr_in client_addr;
