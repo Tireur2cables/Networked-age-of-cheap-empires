@@ -178,7 +178,14 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		//create_serv();
 	}
 
-	/*else printf("message non reconnu : %s\n", buff);*/
+	else {
+		for (size_t i = 0; i < MAX_CLI; i++) {
+			if (players[i].sock != ERROR) {
+				printf("message reçu du python : %s\n", buff);
+				send_packet(buff, players[i].sock);
+			}
+		}
+	}
 }
 
 void join_game(char ip[IP_LEN + 1]) {

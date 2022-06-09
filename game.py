@@ -13,6 +13,8 @@ from View import View
 # -- network --
 from network.pytoc import *
 
+from CONSTANTS import Resource as res
+
 # --- Constants ---
 DEFAULT_SCREEN_WIDTH = 800
 DEFAULT_SCREEN_HEIGHT = 600
@@ -143,6 +145,19 @@ class GameView(arcade.View):
 		i = 1
 		human_in_game = False
 		ia_in_game = False
+		for name in resources :
+			n = ""
+			if name == res.FOOD :
+				n = "FOOD"
+			elif name == res.WOOD :
+				n = "WOOD"
+			elif name == res.GOLD :
+				n = "GOLD"
+			else :
+				n = "STONE"
+
+			txt = "RES " + n + " " + str(resources[name])
+			send(txt, AoCE.ecriture_fd)
 		for player, difficulty in players.items():
 			if "Joueur Humain" in difficulty[0] or "Joueur en ligne" in difficulty[0] :
 				self.players[player] = Player(self, player, resources, difficulty[1])
