@@ -172,10 +172,10 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		char ip[IP_LEN + 1];
 		//printf("Reçu: %s\n", buff);
 		if (sscanf(buff, "JOIN %s %s", pseudo, ip) != 2) recuperer_packet(buff, fd_py_to_c[TUBE_LECT]);
-		printf("Message reçu: %s", buff);
-		printf("IP: %s\n", ip);
+		//printf("Message reçu: %s", buff);
+		//printf("IP: %s\n", ip);
 		join_game(ip);
-		//create_serv();
+		create_serv();
 	}
 
 	else {
@@ -237,7 +237,7 @@ void join_game(char ip[IP_LEN + 1]) {
 		char ip1[IP_LEN+1];
 		char ip2[IP_LEN+1];
 		int nb = sscanf(buff, "%s %s", ip1, ip2);
-
+		printf("%d\n", nb);
 		players[1].sock = socket(AF_INET, SOCK_STREAM, 0);
 		if (players[1].sock == ERROR) {
 			close(fd_py_to_c[TUBE_LECT]);
