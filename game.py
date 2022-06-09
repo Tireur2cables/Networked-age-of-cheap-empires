@@ -135,7 +135,6 @@ class GameView(arcade.View):
 		self.game_controller = Controller(self)
 		self.players = dict()
 		self.tactilmod = False # initialised by aoce
-		self.num = 0
 
 	def setMenuView(self, menu_view):
 		self.menu_view = menu_view
@@ -145,8 +144,8 @@ class GameView(arcade.View):
 		human_in_game = False
 		ia_in_game = False
 		for player, difficulty in players.items():
-			if "Joueur Humain" in difficulty or "Joueur en ligne" in difficulty :
-				self.players[player] = Player(self, player, resources)
+			if "Joueur Humain" in difficulty[0] or "Joueur en ligne" in difficulty[0] :
+				self.players[player] = Player(self, player, resources, difficulty[1])
 				human_in_game = True
 			else:
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)

@@ -15,6 +15,7 @@
         # - Idées : Taille en début de message, comparer avec la taille reçue, si différent, continuer de lire.
         # - Doit-on mettre en place un checksum ? OUI Comment le faire ?
 # - Doit-on implémenter une file de paquets pour les traiter chronologiquement ? OUI
+# Faire ça tous les X "on_update", et les traiter dans l'ordre de la file,
 
 import os
 
@@ -66,24 +67,38 @@ def receive_string(readDesc):
 def interpret(packet):
     # Interpret the packet and return a list of instructions
     match packet.ID:
+
         case "SEED":
             # Call Game.setup() and View.setup(), sending seed as arg
             seed=packet.data
             print("[<--] Received seed : " + seed)
             # AoCE.setup(seed)
+
+        case "CREATE_UNIT":
+            
+            pass
+
         case "MOVE_UNIT":
             # (Call Controller.human_order_towards_position("move", faction, iso_position):)
             # Call Controller.move_entity(entity, end_position)
+            # Structure of packet.data :
+            #   - faction
+            #   - iso_position
+            #   - entity : Use tuple in Game.get_units_by_id()
+            #   - end_position
             print("[<--] Received move order : " + packet.data)
+
         case "BUILD":
             # (Call Controller.human_order_towards_position("build", faction, iso_position):)
             # Call Controller.order_build(entity, map_position)
             # Installer une construction ou un site de construction
+            # Structure of packet.data :
+            #   - faction
+            #   - iso_position
+            
             print("[<--] Received build order : " + packet.data)
             pass
-        case "CREATE_UNIT":
 
-            pass
 # def forge():
 
 #     pass

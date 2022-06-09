@@ -105,3 +105,26 @@ class MultiplayerJoinView(PreGameView):
 				child = self.launch_box
 			)
 		)
+
+	def add_player(self, pseudo) :
+		buttonsize = self.window.width / 6 # arbitrary
+		new_civil_button = OnlinePlayerButton(text=pseudo, width=buttonsize * 2, height=buttonsize / 4)
+		self.players_box.add(new_civil_button.with_space_around(bottom=20))
+
+	def remove_player(self, pseudo) :
+		for button in self.players_box.children :
+			if button.child.text == pseudo + " : Joueur en ligne" :
+				self.players_box.remove(button)
+				break
+
+	def on_update(self, delta_time) :
+		self.count += 1
+		if (self.count == 30) : # changer si trop rapide ou trop long
+			s = receive_string(self.window.lecture_fd)
+			if s :
+				flag, pseudo = s.split(" ")
+				match flag :
+					case "NEW" : self.add_player(pseudo)
+					case "DECO" : self.remove_player(pseudo)
+					case _: print(s)
+			self.count = 0

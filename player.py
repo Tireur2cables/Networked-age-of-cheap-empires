@@ -13,7 +13,8 @@ class Player:
 	def __init__(self,
 				game,#: GameView,
 				player_type: str,
-				resources: dict) -> None:
+				resources: dict,
+				num) -> None:
 		"""
 		Create a player.
 
@@ -40,6 +41,7 @@ class Player:
 		self.other_storage = set()
 		self.upgrades = {}
 		self.units_by_id = []
+		self.num = num
 
 	def reset(self):
 		self.resources.clear()
@@ -54,6 +56,7 @@ class Player:
 		self.max_unit = 4
 		self.is_alive = True
 		self.units_by_id.clear()
+		self.num = 0
 
 
 	def __getstate__(self):
@@ -69,11 +72,12 @@ class Player:
 		self.my_worksites,
 		self.food_storage,
 		self.other_storage,
-		self.upgrades]
+		self.upgrades,
+		self.num]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades = data, self.num
 
 	# my_entities
 	def add_entity(self, new_entity):
@@ -210,7 +214,7 @@ class AI(Player):
 			player_type: str,
 			difficulty,
 			resources: dict) -> None:
-		super().__init__(game, player_type, resources)
+		super().__init__(game, player_type, resources, -1)
 		self.delta_time = 0
 		self.difficulty = difficulty
 		self.mind = {}

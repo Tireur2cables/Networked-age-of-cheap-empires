@@ -117,9 +117,11 @@ class LaunchOnlineGameButton(arcade.gui.UITextureButton) :
 			indice += 1
 
 		players = {}
+		indice = 0
 		for padding in self.pregameview.players_box.children :
 			name, diff = padding.child.text.split(padding.child.sep)
-			players[name] = diff
+			players[name] = (diff, indice)
+			indice += 1
 		self.nextView.setup(ressources, players, int(self.pregameview.map_pane.child.text))
 		self.window.show_view(self.nextView)
 
