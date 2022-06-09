@@ -222,6 +222,8 @@ void join_game(char ip[IP_LEN + 1]) {
 	char buff[PACKET_SIZE + 1];
 	recuperer_packet(buff, players[0].sock);
 	sscanf(buff, "PSEUDO %s", players[0].pseudo);
+	sprintf(buff, "NEW %s", players[0].pseudo);
+	send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 	sprintf(buff, "PSEUDO %s", pseudo);
 	send_packet(buff, players[0].sock);
 
@@ -267,7 +269,7 @@ void join_game(char ip[IP_LEN + 1]) {
 				sscanf(buff, "PSEUDO %s", players[1].pseudo);
 				sprintf(buff, "PSEUDO %s", pseudo);
 				send_packet(buff, players[1].sock);
-
+				printf("Pseudo du joueur 1: %s\n", players[1].pseudo);
 				sprintf(buff, "NEW %s", players[1].pseudo);
 				send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 			}
@@ -312,7 +314,7 @@ void join_game(char ip[IP_LEN + 1]) {
 			sscanf(buff, "PSEUDO %s", players[1].pseudo);
 			sprintf(buff, "PSEUDO %s", pseudo);
 			send_packet(buff, players[1].sock);
-
+			printf("Pseudo du joueur 1: %s\n", players[1].pseudo);
 			sprintf(buff, "NEW %s", players[1].pseudo);
 			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 
@@ -320,7 +322,7 @@ void join_game(char ip[IP_LEN + 1]) {
 			sscanf(buff, "PSEUDO %s", players[2].pseudo);
 			sprintf(buff, "PSEUDO %s", pseudo);
 			send_packet(buff, players[2].sock);
-
+			printf("Pseudo du joueur 2: %s\n", players[2].pseudo);
 			sprintf(buff, "NEW %s", players[2].pseudo);
 			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 		}
