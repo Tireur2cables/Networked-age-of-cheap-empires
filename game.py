@@ -13,6 +13,8 @@ from View import View
 # -- network --
 from network.pytoc import *
 
+from CONSTANTS import Resource as res
+
 # --- Constants ---
 DEFAULT_SCREEN_WIDTH = 800
 DEFAULT_SCREEN_HEIGHT = 600
