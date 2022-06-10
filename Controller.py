@@ -508,14 +508,6 @@ class Controller():
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
-		#cheats_vars.global_listen_clock += 1
-		# if ((cheats_vars.global_listen_clock % 10) == 0):
-		# 	print("tick")
-		# 	time.sleep(1)
-		# 	receive_string(self.game.windo	w.lecture_fd)
-
-		# if (cheats_vars.global_listen_clock == 100):
-		# 	strr = Packet("ATTACK","DICT",self.game.window.pseudo, "wazaaaaaaaaaaa")
 
 		self.count += 1
 		if (self.count == 30) : # changer si trop rapide ou trop long
