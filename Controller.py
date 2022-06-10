@@ -330,7 +330,8 @@ class Controller():
 	def order_build(self, entity, map_position, building_name):
 		#print(str(str(map_position)+"\t"+str(building_name)))
 		if self.game.window.multiplayer :
-			send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(entity.iso_position) + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)
+			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+			send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(ix) + ";" + str(iy) + ";" + str(map_position.x)+ ";" + str(map_position.y)+ ";" +str(building_name)))).stringify(),self.game.window.ecriture_fd)
 
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
@@ -419,7 +420,9 @@ class Controller():
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
 		if self.game.window.multiplayer :
-			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(entity.iso_position) + ";" + str(aimed_entity.iso_position)))).stringify(),self.game.window.ecriture_fd)
+			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y)))).stringify(),self.game.window.ecriture_fd))
+			
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
 		entity.set_aimed_entity(aimed_entity)
