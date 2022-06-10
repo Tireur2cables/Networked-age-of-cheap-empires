@@ -60,6 +60,7 @@ class AoCE(arcade.Window):
 		self.multiplayer = False
 		self.ecriture_fd = AoCE.ecriture_fd
 		self.lecture_fd = AoCE.lecture_fd
+		self.host = False
 
 	def getPseudo(self) :
 		pseudo = "Default pseudo"
@@ -145,25 +146,27 @@ class GameView(arcade.View):
 		i = 1
 		human_in_game = False
 		ia_in_game = False
-		for name in resources :
-			n = ""
-			if name == res.FOOD :
-				n = "FOOD"
-			elif name == res.WOOD :
-				n = "WOOD"
-			elif name == res.GOLD :
-				n = "GOLD"
-			else :
-				n = "STONE"
+		if self.window.host :
+			for name in resources :
+				n = ""
+				if name == res.FOOD :
+					n = "FOOD"
+				elif name == res.WOOD :
+					n = "WOOD"
+				elif name == res.GOLD :
+					n = "GOLD"
+				else :
+					n = "STONE"
 
-			txt = "RES\t" + n + "\t" + str(resources[name]) + "\n"
-			send(txt, AoCE.ecriture_fd)
+				txt = "RES\t" + n + "\t" + str(resources[name]) + "\n"
+				send(txt, AoCE.ecriture_fd)
 		for player, difficulty in players.items():
 			if "Joueur Humain" in difficulty[0] or "Joueur en ligne" in difficulty[0] :
 				self.players[player] = Player(self, player, resources, difficulty[1])
 				human_in_game = True
-				txt = "CR\t" + player + "\t" + str(difficulty[1]) + "\n"  #difficulty[1] == numéro du joueur
-				send(txt, AoCE.ecriture_fd)
+				if self.window.host :
+					txt = "CR\t" + player + "\t" + str(difficulty[1]) + "\n"  #difficulty[1] == numéro du joueur
+					send(txt, AoCE.ecriture_fd)
 			else:
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
 				i += 1
@@ -173,6 +176,11 @@ class GameView(arcade.View):
 
 	def setup(self, ressources, players, map_seed):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
+		for player in players :
+			if players[player][0] == self.window.pseudo :
+				if players[player][1] == 0 :
+					self.window.host = True
+				break
 		human_in_game, ia_in_game = self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
 		if human_in_game and ia_in_game:
@@ -183,7 +191,9 @@ class GameView(arcade.View):
 			self.game_controller.setup(self.players, "J")
 		else:
 			self.game_controller.setup(self.players, "JvsJ")
-			send("SEED" + "\t" + str(map_seed) + "\n", AoCE.ecriture_fd)
+			if self.window.host :
+				send("SEED" + "\t" + str(map_seed) + "\n", AoCE.ecriture_fd)
+				send("START" + "\n", AoCE.ecriture_fd)
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup(self.tactilmod)
 
