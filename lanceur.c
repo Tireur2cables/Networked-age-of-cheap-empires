@@ -181,7 +181,7 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 	else {
 		for (size_t i = 0; i < MAX_CLI; i++) {
 			if (players[i].sock != ERROR) {
-				printf("message reçu du python : %s\n", buff);
+				//printf("message reçu du python : %s\n", buff);
 				send_packet(buff, players[i].sock);
 			}
 		}
@@ -412,7 +412,7 @@ void recuperer_packet(char buff[PACKET_SIZE + 1], int fd) {
 }
 
 void send_packet(char buff[PACKET_SIZE + 1], int fd) {
-	usleep(100000);
+	//usleep(100000);
 	int retour = write(fd, buff, strlen(buff));
 	if (retour == ERROR) {
 		close(fd_py_to_c[TUBE_ECRI]);

@@ -121,12 +121,11 @@ class MultiplayerJoinView(PreGameView):
 	def on_update(self, delta_time) :
 		self.count += 1
 		if (self.count == 30) : # changer si trop rapide ou trop long
-			s = receive_string(self.window.lecture_fd)
-			if s :
-				print(s)
-				flag, pseudo = s.split("\t")
-				match flag :
-					case "NEW" : self.add_player(pseudo)
-					case "DECO" : self.remove_player(pseudo)
-					case _: print(s)
+			p = receive_string(self.window.lecture_fd, False)
+			if p :
+				print(p.stringify())
+				match p.ID :
+					case "NEW" : self.add_player(p.IO)
+					case "DECO" : self.remove_player(p.IO)
+					case _: print(p.stringify())
 			self.count = 0

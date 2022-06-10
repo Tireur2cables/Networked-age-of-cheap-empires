@@ -36,10 +36,13 @@ class Packet():
 		# Packet separator is \n
 		return self.ID+"\t"+self.IO+"\t"+self.PNAME+"\t"+self.data+"\n"
 
-	def packetify(packetString):
-		packetString.split("\t")
-		packetString[3].split("\n")
-		return Packet(packetString[0], packetString[1], packetString[2], packetString[3][0])
+def packetify(packetString):
+	tab = packetString.split("\t")
+	#packetString[3].split("\n")
+	diff = 4 - len(tab)
+	for i in range(max(diff, 0)) :
+		tab.append("")
+	return Packet(tab[0], tab[1], tab[2], tab[3])
 
 
 
@@ -53,15 +56,25 @@ def send(packetString, writeDesc):
 		print("[!] Error : Cannot send message. No connection to C handler.")
 
 
-def receive_string(readDesc):
+def receive_string(readDesc, block = True):
     # receive packet string from C handler
 	if readDesc:
-		try :
-			packetString = os.read(readDesc, 512)
-			packetString = packetString.decode()
-			return packetString
-		except OSError as e:
-			pass
+		if len(packetQueue) > 0 :
+			return packetQueue.pop()
+		else :
+			try :
+				packetString = ""
+				while len(packetString) == 0 or packetString[-1] != "\n" :
+					packetString += os.read(readDesc, 512).decode()
+					if len(packetString) == 0 and not block :
+						break
+				if len(packetString) > 0 :
+					s = packetString.split("\n")
+					for p in s :
+						packetQueue.insert(-1, packetify(p))
+
+			except OSError as e:
+				pass
 	else :
 		print("[!] Error : Cannot receive message. No connection to C handler.")
 
