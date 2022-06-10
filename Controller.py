@@ -240,7 +240,8 @@ class Controller():
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		print("entity moving")
-		send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
+		if self.game.window.multiplayer :
+			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -288,8 +289,9 @@ class Controller():
 				entity.is_interacting = True
 			else:
 				print("entity harvesting")
-				harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(aimed_tile.grid_position)))
-				send(harvestPacket.stringify(),self.game.window.ecriture_fd)
+				if self.game.window.multiplayer :
+					harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(aimed_tile.grid_position)))
+					send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 				self.move_entity(entity, aimed_tile.grid_position, False)
 
 
@@ -324,7 +326,8 @@ class Controller():
 	# Called once
 	def order_build(self, entity, map_position, building_name):
 		print(str(str(map_position)+"\t"+str(building_name)))
-		send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)
+		if self.game.window.multiplayer :
+			send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)
 
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
@@ -412,7 +415,8 @@ class Controller():
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
-		send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
+		if self.game.window.multiplayer :
+			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
 		entity.set_aimed_entity(aimed_entity)
@@ -516,7 +520,8 @@ class Controller():
 		# 	brrr = packetify(strr.stringify())
 		# 	print("ID : " + brrr.ID + "\nIO : " + brrr.IO+ "\nPNAME : " + brrr.PNAME+ "\ndata : " + brrr.data )
 		# 	thisIsApacket = "belle beuteu"
-		# 	send(thisIsApacket,self.game.window.lecture_fd)
+		#	if self.game.window.multiplayer :
+		#		 	send(thisIsApacket,self.game.window.lecture_fd)
 
 		# --- Check End Conditions ---
 		dead_players = set()
