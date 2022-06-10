@@ -207,14 +207,14 @@ void join_game(char ip[IP_LEN + 1]) {
 	serv_addr.sin_port = htons(PORT);
 	serv_addr.sin_addr.s_addr = inet_addr(players[0].ip);
 
-	printf("Connection au serveur %s sur le port %d...\n", players[0].ip, PORT);
+	printf("Connexion au serveur %s sur le port %d...\n", players[0].ip, PORT);
 
 	int retour = connect(players[0].sock, (struct sockaddr *) &serv_addr, serv_size);
 	if (retour == ERROR) {
 		close(fd_py_to_c[TUBE_LECT]);
 		close(fd_c_to_py[TUBE_ECRI]);
 		close_serv();
-		error("Erreur de connection!");
+		error("Erreur de connexion!");
 	}
 
 	printf("Connecté!\n");
@@ -260,7 +260,7 @@ void join_game(char ip[IP_LEN + 1]) {
 				close(fd_py_to_c[TUBE_LECT]);
 				close(fd_c_to_py[TUBE_ECRI]);
 				close_serv();
-				error("Erreur de connection!");
+				error("Erreur de connexion!");
 			}
 			else {
 				printf("Connecté à l'autre joueur !\n");
@@ -299,13 +299,13 @@ void join_game(char ip[IP_LEN + 1]) {
 				close(fd_py_to_c[TUBE_LECT]);
 				close(fd_c_to_py[TUBE_ECRI]);
 				close_serv();
-				error("Erreur de connection!");
+				error("Erreur de connexion!");
 			}
 			if (connexion2 == ERROR) {
 				close(fd_py_to_c[TUBE_LECT]);
 				close(fd_c_to_py[TUBE_ECRI]);
 				close_serv();
-				error("Erreur de connection!");
+				error("Erreur de connexion!");
 			}
 			printf("Connecté aux autres joueurs !");
 
