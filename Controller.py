@@ -293,7 +293,7 @@ class Controller():
 				#print("entity harvesting")
 				if self.game.window.multiplayer :
 					ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-					harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position)))
+					harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position.x)+ ";" + str(aimed_tile.grid_position.y)))
 					send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 				self.move_entity(entity, aimed_tile.grid_position, False)
 
@@ -513,9 +513,8 @@ class Controller():
 		self.count += 1
 		if (self.count == 30) : # changer si trop rapide ou trop long
 			packet_action = receive_string(self.game.window.lecture_fd, False)
-			print(packet_action.stringify())
+			print(packet_action)
 			if packet_action != "":
-				print(packet_action.stringify())
 				interpret(packet_action)
 			count = 0
 
