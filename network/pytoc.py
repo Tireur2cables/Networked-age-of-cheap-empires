@@ -118,6 +118,9 @@ def interpret(packet):
 			#   - faction
 			#   - iso_position
 
+			#SYNTAXE : "BUILD","DICT",self.game.window.pseudo, str(map_position+"\t"+building_name)
+			#DATA : map_pos et building_name séparés par une tabulation
+
 			print("[<--] Received build order : " + packet.data)
 
 packetQueue = []
