@@ -517,8 +517,8 @@ class Controller():
 
 		# if (cheats_vars.global_listen_clock == 100):
 		# 	strr = Packet("ATTACK","DICT",self.game.window.pseudo, "wazaaaaaaaaaaa")
-		print(p.stringify())
-		interpret(p.stringify())
+		print(packet_action.stringify())
+		interpret(packet_action.stringify())
 
 		# --- Check End Conditions ---
 		dead_players = set()
