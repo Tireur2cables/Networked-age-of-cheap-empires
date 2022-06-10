@@ -261,15 +261,16 @@ void join_game(char ip[IP_LEN + 1]) {
 		}
 
 		printf("Connecté à l'autre joueur !\n");
-		bzero(buff, PACKET_SIZE + 1);
-		recuperer_packet(buff, players[1].sock);
-		sscanf(buff, "PSEUDO %s", players[1].pseudo);
-		bzero(buff, PACKET_SIZE + 1);
-		sprintf(buff, "NEW\t%s\n", players[1].pseudo);
-		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
-		bzero(buff, PACKET_SIZE + 1);
-		sprintf(buff, "PSEUDO %s", pseudo);
-		send_packet(buff, players[1].sock);
+		char buff1[PACKET_SIZE + 1];
+		bzero(buff1, PACKET_SIZE + 1);
+		recuperer_packet(buff1, players[1].sock);
+		sscanf(buff1, "PSEUDO %s", players[1].pseudo);
+		bzero(buff1, PACKET_SIZE + 1);
+		sprintf(buff1, "NEW\t%s\n", players[1].pseudo);
+		send_packet(buff1, fd_c_to_py[TUBE_ECRI]);
+		bzero(buff1, PACKET_SIZE + 1);
+		sprintf(buff1, "PSEUDO %s", pseudo);
+		send_packet(buff1, players[1].sock);
 
 		if (nb > 1) {
 			players[2].sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -296,15 +297,16 @@ void join_game(char ip[IP_LEN + 1]) {
 			}
 			printf("Connecté au deuxieme !");
 
-			bzero(buff, PACKET_SIZE + 1);
-			recuperer_packet(buff, players[2].sock);
-			sscanf(buff, "PSEUDO %s", players[2].pseudo);
-			bzero(buff, PACKET_SIZE + 1);
-			sprintf(buff, "PSEUDO %s", pseudo);
-			send_packet(buff, players[2].sock);
-			bzero(buff, PACKET_SIZE + 1);
-			sprintf(buff, "NEW\t%s\n", players[2].pseudo);
-			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
+			char buff2[PACKET_SIZE + 1];
+			bzero(buff2, PACKET_SIZE + 1);
+			recuperer_packet(buff2, players[2].sock);
+			sscanf(buff2, "PSEUDO %s", players[2].pseudo);
+			bzero(buff2, PACKET_SIZE + 1);
+			sprintf(buff2, "PSEUDO %s", pseudo);
+			send_packet(buff2, players[2].sock);
+			bzero(buff2, PACKET_SIZE + 1);
+			sprintf(buff2, "NEW\t%s\n", players[2].pseudo);
+			send_packet(buff2, fd_c_to_py[TUBE_ECRI]);
 		}
 	}
 }
