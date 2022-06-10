@@ -292,7 +292,8 @@ class Controller():
 			else:
 				#print("entity harvesting")
 				if self.game.window.multiplayer :
-					harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (str(entity.iso_position) + ";" + str(aimed_tile.grid_position)))
+					ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+					harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position)))
 					send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 				self.move_entity(entity, aimed_tile.grid_position, False)
 
