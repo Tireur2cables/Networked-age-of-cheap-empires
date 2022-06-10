@@ -176,11 +176,9 @@ class GameView(arcade.View):
 
 	def setup(self, ressources, players, map_seed):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		for player in players :
-			if players[player][0] == self.window.pseudo :
-				if players[player][1] == 0 :
-					self.window.host = True
-				break
+		if players[self.window.pseudo][1] == 0 :
+			self.window.host = True
+		print(self.window.host)
 		human_in_game, ia_in_game = self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
 		if human_in_game and ia_in_game:
