@@ -32,8 +32,7 @@ class MultiplayerJoinView(PreGameView):
 			height=buttonsize
 			)
 		self.manager.add(join_game)
-
-		join_game.reset_text()
+		
 		return join_game
 
 	def pseudoBox(self):

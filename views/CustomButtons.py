@@ -57,7 +57,7 @@ class InputIP(arcade.gui.UIInputText):
         # cheats_vars.global_save_suffix = "0" --- This shouldn't be resetted as it is used to load a save in the menu
 
     def reset_text(self):
-        self.text = "Entrez une IP"
+        self.text = ""
 
     def on_event(self, event):
         super().on_event(event)
