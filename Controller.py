@@ -513,6 +513,7 @@ class Controller():
 		self.count += 1
 		if (self.count == 30) : # changer si trop rapide ou trop long
 			packet_action = receive_string(self.game.window.lecture_fd, False)
+			print(packet_action.stringify())
 			if packet_action != "":
 				print(packet_action.stringify())
 				interpret(packet_action)
