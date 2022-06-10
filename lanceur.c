@@ -220,10 +220,13 @@ void join_game(char ip[IP_LEN + 1]) {
 	printf("Connecté!\n");
 
 	char buff[PACKET_SIZE + 1];
+	bzero(buff, PACKET_SIZE + 1);
 	recuperer_packet(buff, players[0].sock);
 	sscanf(buff, "PSEUDO %s", players[0].pseudo);
+	bzero(buff, PACKET_SIZE + 1);
 	sprintf(buff, "NEW\t%s\n", players[0].pseudo);
 	send_packet(buff, fd_c_to_py[TUBE_ECRI]);
+	bzero(buff, PACKET_SIZE + 1);
 	sprintf(buff, "PSEUDO %s", pseudo);
 	send_packet(buff, players[0].sock);
 
