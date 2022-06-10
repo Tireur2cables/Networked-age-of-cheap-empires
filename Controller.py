@@ -508,15 +508,7 @@ class Controller():
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 		packet_action = receive_string(self.game.window.lecture_fd, False)
-		#cheats_vars.global_listen_clock += 1
-
-		# if ((cheats_vars.global_listen_clock % 10) == 0):
-		# 	print("tick")
-		# 	time.sleep(1)
-		# 	receive_string(self.game.windo	w.lecture_fd)
-
-		# if (cheats_vars.global_listen_clock == 100):
-		# 	strr = Packet("ATTACK","DICT",self.game.window.pseudo, "wazaaaaaaaaaaa")
+	
 		print(p.stringify())
 		interpret(p.stringify())
 
