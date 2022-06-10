@@ -125,7 +125,7 @@ void launch_communication() {
 void gerer_c_mess(char buff[PACKET_SIZE + 1], int indice) {
 	// retour ici correspond au nombre de bytes reçus par recuperer_packet
 	if (retour == CLOSED_CONECTION) {
-		sprintf(buff, "DECO %s", players[indice].pseudo);
+		sprintf(buff, "DECO\t%s\n", players[indice].pseudo);
 		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 		printf("Joueur %s déconnecté...\n", players[indice].pseudo);
 		close(players[indice].sock);
@@ -175,7 +175,7 @@ void gerer_py_mess(char buff[PACKET_SIZE + 1]) {
 		//printf("Message reçu: %s", buff);
 		//printf("IP: %s\n", ip);
 		join_game(ip);
-		//create_serv();
+		create_serv();
 	}
 
 	else {
@@ -222,7 +222,7 @@ void join_game(char ip[IP_LEN + 1]) {
 	char buff[PACKET_SIZE + 1];
 	recuperer_packet(buff, players[0].sock);
 	sscanf(buff, "PSEUDO %s", players[0].pseudo);
-	sprintf(buff, "NEW\t%s", players[0].pseudo);
+	sprintf(buff, "NEW\t%s\n", players[0].pseudo);
 	send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 	sprintf(buff, "PSEUDO %s", pseudo);
 	send_packet(buff, players[0].sock);
@@ -267,7 +267,7 @@ void join_game(char ip[IP_LEN + 1]) {
 				char buff[PACKET_SIZE + 1];
 				recuperer_packet(buff, players[1].sock);
 				sscanf(buff, "PSEUDO %s", players[1].pseudo);
-				sprintf(buff, "NEW\t%s", players[1].pseudo);
+				sprintf(buff, "NEW\t%s\n", players[1].pseudo);
 				send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 				sprintf(buff, "PSEUDO %s", pseudo);
 				send_packet(buff, players[1].sock);
@@ -315,7 +315,7 @@ void join_game(char ip[IP_LEN + 1]) {
 			sprintf(buff, "PSEUDO %s", pseudo);
 			send_packet(buff, players[1].sock);
 			//printf("Pseudo du joueur 1: %s\n", players[1].pseudo);
-			sprintf(buff, "NEW\t%s", players[1].pseudo);
+			sprintf(buff, "NEW\t%s\n", players[1].pseudo);
 			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 
 			recuperer_packet(buff, players[2].sock);
@@ -323,7 +323,7 @@ void join_game(char ip[IP_LEN + 1]) {
 			sprintf(buff, "PSEUDO %s", pseudo);
 			send_packet(buff, players[2].sock);
 			//printf("Pseudo du joueur 2: %s\n", players[2].pseudo);
-			sprintf(buff, "NEW\t%s", players[2].pseudo);
+			sprintf(buff, "NEW\t%s\n", players[2].pseudo);
 			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 		}
 	}
@@ -394,7 +394,7 @@ void handle_new_connection() {
 			strcpy(buff, "FIRST");
 			send_packet(buff, cli_sock);
 		}
-		sprintf(buff, "NEW\t%s", players[indice].pseudo);
+		sprintf(buff, "NEW\t%s\n", players[indice].pseudo);
 		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 	}
 }

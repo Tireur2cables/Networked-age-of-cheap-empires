@@ -1,9 +1,8 @@
 # Imports
 import arcade
 from player import Player
-from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton
+from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton, InputIP
 from views.PreGameView import PreGameView
-from views.inputIP import InputIP
 from network.pytoc import *
 
 button_texture = "Ressources/img/button_background.png"
@@ -34,7 +33,6 @@ class MultiplayerJoinView(PreGameView):
 			)
 		self.manager.add(join_game)
 
-		join_game.reset_text()
 		return join_game
 
 	def pseudoBox(self):
@@ -126,7 +124,7 @@ class MultiplayerJoinView(PreGameView):
 			s = receive_string(self.window.lecture_fd)
 			if s :
 				print(s)
-				flag, pseudo = s.split(" ")
+				flag, pseudo = s.split("\t")
 				match flag :
 					case "NEW" : self.add_player(pseudo)
 					case "DECO" : self.remove_player(pseudo)
