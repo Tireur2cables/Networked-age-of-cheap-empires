@@ -37,8 +37,7 @@ class Packet():
 		return self.ID+"\t"+self.IO+"\t"+self.PNAME+"\t"+self.data+"\n"
 
 def packetify(packetString):
-	tab = packetString.split("\t")
-	#packetString[3].split("\n")
+	tab = str(packetString).split("\t")
 	diff = 4 - len(tab)
 	for i in range(max(diff, 0)) :
 		tab.append("")
@@ -97,6 +96,8 @@ def interpret(packet):
 
 		case "HARVEST":
             # order_harverst() from controller.py
+			#SYNTAXE : harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, str(aimed_tile.grid_position))
+
 
 			pass
 
@@ -120,6 +121,13 @@ def interpret(packet):
 
 			#SYNTAXE : "BUILD","DICT",self.game.window.pseudo, str(map_position+"\t"+building_name)
 			#DATA : map_pos et building_name séparés par une tabulation
+
+			print("[<--] Received build order : " + packet.data)
+
+
+		case "ATTACK":
+			#SYNTAXE : send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
+			#avec les entity.pos communiquées, on retrouve les bonnes unités en parcourant le tableau des entities
 
 			print("[<--] Received build order : " + packet.data)
 

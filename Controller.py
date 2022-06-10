@@ -323,8 +323,8 @@ class Controller():
 
 	# Called once
 	def order_build(self, entity, map_position, building_name):
-		print(str(map_position+"\t"+building_name))
-		send((Packet("BUILD","DICT",self.game.window.pseudo, str(map_position+"\t"+building_name))).stringify(),self.game.window.ecriture_fd)
+		print(str(str(map_position)+"\t"+str(building_name)))
+		send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(map_position)+"\t"+str(building_name)))).stringify(),self.game.window.ecriture_fd)
 
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
@@ -412,6 +412,7 @@ class Controller():
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
+		send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
 		entity.set_aimed_entity(aimed_entity)
@@ -502,14 +503,18 @@ class Controller():
 	def on_update(self, delta_time):
 		""" Movement and game logic """
 
-		# cheats_vars.global_listen_clock += 1
+		#cheats_vars.global_listen_clock += 1
 
 		# if ((cheats_vars.global_listen_clock % 10) == 0):
 		# 	print("tick")
 		# 	time.sleep(1)
-		# 	receive_string(self.game.window.lecture_fd)
+		# 	receive_string(self.game.windo	w.lecture_fd)
 
 		# if (cheats_vars.global_listen_clock == 100):
+		# 	strr = Packet("ATTACK","DICT",self.game.window.pseudo, "wazaaaaaaaaaaa")
+		# 	print(strr.stringify())
+		# 	brrr = packetify(strr.stringify())
+		# 	print("ID : " + brrr.ID + "\nIO : " + brrr.IO+ "\nPNAME : " + brrr.PNAME+ "\ndata : " + brrr.data )
 		# 	thisIsApacket = "belle beuteu"
 		# 	send(thisIsApacket,self.game.window.lecture_fd)
 
