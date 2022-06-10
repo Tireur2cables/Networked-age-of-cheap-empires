@@ -77,9 +77,10 @@ def receive_string(readDesc, block = True):
 					return packetString
 
 			except OSError as e:
-				pass
+				return ""
 	else :
 		print("[!] Error : Cannot receive message. No connection to C handler.")
+		return ""
 
 def interpret(packet):
 	# Interpret the packet and return a list of instructions
