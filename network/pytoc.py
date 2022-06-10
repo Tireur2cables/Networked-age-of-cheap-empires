@@ -100,7 +100,7 @@ def interpret(packet):
 
 		case "HARVEST":
             # order_harverst() from controller.py
-			#SYNTAXE : harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, str(aimed_tile.grid_position))
+			#SYNTAXE : Packet("HARVEST","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(aimed_tile.grid_position)))
 
 
 			pass
@@ -113,6 +113,9 @@ def interpret(packet):
 			#   - iso_position
 			#   - entity : Use tuple in Game.get_units_by_id()
 			#   - end_position
+
+			# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
+
 			print("[<--] Received move order : " + packet.data)
 
 		case "BUILD":
@@ -123,15 +126,14 @@ def interpret(packet):
 			#   - faction
 			#   - iso_position
 
-			#SYNTAXE : "BUILD","DICT",self.game.window.pseudo, str(map_position+"\t"+building_name)
+			# SYNTAXE : send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)			#avec les entity.pos communiquées, on retrouve les bonnes unités en parcourant le tableau des entities
 			#DATA : map_pos et building_name séparés par une tabulation
 
 			print("[<--] Received build order : " + packet.data)
 
 
 		case "ATTACK":
-			#SYNTAXE : send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
-			#avec les entity.pos communiquées, on retrouve les bonnes unités en parcourant le tableau des entities
+			# SYNTAXE : send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
 
 			print("[<--] Received build order : " + packet.data)
 
