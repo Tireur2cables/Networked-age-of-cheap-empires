@@ -239,7 +239,7 @@ class Controller():
 		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
-		print("entity moving")
+		#print("entity moving")
 		if self.game.window.multiplayer :
 			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
@@ -288,7 +288,7 @@ class Controller():
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
-				print("entity harvesting")
+				#print("entity harvesting")
 				if self.game.window.multiplayer :
 					harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(aimed_tile.grid_position)))
 					send(harvestPacket.stringify(),self.game.window.ecriture_fd)
@@ -325,7 +325,7 @@ class Controller():
 
 	# Called once
 	def order_build(self, entity, map_position, building_name):
-		print(str(str(map_position)+"\t"+str(building_name)))
+		#print(str(str(map_position)+"\t"+str(building_name)))
 		if self.game.window.multiplayer :
 			send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)
 

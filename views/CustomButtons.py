@@ -118,7 +118,7 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 		ia = {}
 		for padding in self.pregameview.ia_box.children :
 			name, diff = padding.child.text.split(padding.child.sep)
-			ia[name] = diff
+			ia[name] = (diff, 0)
 		self.nextView.setup(ressources, ia, int(self.pregameview.map_pane.child.text))
 		self.window.show_view(self.nextView)
 
