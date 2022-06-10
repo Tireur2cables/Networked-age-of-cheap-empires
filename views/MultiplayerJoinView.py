@@ -1,9 +1,8 @@
 # Imports
 import arcade
 from player import Player
-from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton
+from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton, InputIP
 from views.PreGameView import PreGameView
-from views.inputIP import InputIP
 from network.pytoc import *
 
 button_texture = "Ressources/img/button_background.png"

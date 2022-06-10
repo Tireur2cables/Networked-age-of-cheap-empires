@@ -47,6 +47,27 @@ class LoadButton(arcade.gui.UITextureButton):
 		self.nextView.load_save(data)
 		self.window.show_view(self.nextView)
 
+# InputText to connect to another players
+class InputIP(arcade.gui.UIInputText):
+
+    def __init__(self, window, x, y, text, font_name, font_size,  width, height) :
+        super().__init__(x=x, y=y, text=text, font_name=font_name, font_size=font_size, width=width, height=height)
+        self.window = window
+        # restetting variables
+        # cheats_vars.global_save_suffix = "0" --- This shouldn't be resetted as it is used to load a save in the menu
+
+    def reset_text(self):
+        self.text = "Entrez une IP"
+
+    def on_event(self, event):
+        super().on_event(event)
+        if len(self.text)>= 1 and "\n" == self.text[-1]:
+
+            txt = "JOIN " + self.window.pseudo + " " + self.text
+            send(txt, self.window.ecriture_fd)
+            self.reset_text()
+        # ce qu'il faut faire pour se connecter
+
 # Button to return to the main menu
 class NextViewButton(arcade.gui.UITextureButton) :
 	def __init__(self, window, nextView, text, width) :
