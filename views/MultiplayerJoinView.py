@@ -2,23 +2,58 @@
 import arcade
 from player import Player
 from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton, InputIP
-from views.PreGameView import PreGameView
 from network.pytoc import *
 
+BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint5.jpg"
 button_texture = "Ressources/img/button_background.png"
 
-class MultiplayerJoinView(PreGameView):
+class MultiplayerJoinView(arcade.View):
 
-	def __init__(self, main_view) :
-		super().__init__(main_view)
+	def __init__(self, main_view, nbAdv=0) :
+		super().__init__()
+		self.main_view = main_view
+		self.nbAdv = nbAdv
 		self.count = 0
 
 	def setup(self) :
 		# add an UIManager to handle the UI.
 		self.manager = arcade.gui.UIManager()
+		if self.nbAdv == 4:
+			self.nbAdv = 0
 		self.join_game = 0
 		self.count = 0
 
+	def on_show(self):
+		""" This is run once when we switch to this view """
+
+		# ajoute l'image de background
+		self.texture = arcade.load_texture(BACKGROUND_PREGAME)
+
+		self.manager.enable()
+
+		self.setupButtons()
+		self.retourButton()
+
+	# Boutton retour
+	def retourButton(self):
+		buttonsize = self.window.width / 10 # arbitrary
+
+		# Create a vertical BoxGroup to align buttons
+		self.retour_box = arcade.gui.UIBoxLayout()
+
+		retour_button = NextViewButton(self.window, self.main_view, text="Retour", width=buttonsize)
+		self.retour_box.add(retour_button)
+
+		# Create a widget to hold the v_box widget, that will center the buttons
+		self.manager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x = "left",
+				align_x = buttonsize*(0.1), # arbitrary
+				anchor_y = "top",
+				align_y= -buttonsize*(0.1), # arbitrary
+				child = self.retour_box
+			)
+		)
 
 	def ip_box(self):
 
@@ -81,31 +116,14 @@ class MultiplayerJoinView(PreGameView):
 		)
 		self.manager.add(self.input_box)
 
-	#Button to start the game
-	def launch_game(self):
-		# def button size
-		buttonsize = self.window.width / 6 # arbitrary
+	def on_draw(self):
+		""" Draw this view """
+		arcade.start_render()
+		self.texture.draw_sized(self.window.width / 2, self.window.height / 2, self.window.width, self.window.height)
+		self.manager.draw()
 
-		# Create a vertical BoxGroup to align buttons
-		self.launch_box = arcade.gui.UIBoxLayout()
-		launch_button = LaunchGameButton(
-			self.window,
-			self.main_view.game_view,
-			self,
-			text="Lancer la partie",
-			width=buttonsize * (3 / 2)
-		)
-		self.launch_box.add(launch_button.with_space_around(bottom=20))
-		# Create a widget to hold the v_box widget, that will center the buttonsS
-		self.manager.add(
-			arcade.gui.UIAnchorWidget(
-				anchor_x = "right",
-				align_x = -buttonsize * (0.2),
-				anchor_y = "center_y",
-				align_y= -buttonsize,
-				child = self.launch_box
-			)
-		)
+	def on_hide_view(self) :
+		self.manager.disable()
 
 	def add_player(self, pseudo) :
 		buttonsize = self.window.width / 6 # arbitrary
