@@ -241,7 +241,7 @@ class Controller():
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		#print("entity moving")
 		if self.game.window.multiplayer :
-			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
+			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(entity.iso_position) + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -327,7 +327,7 @@ class Controller():
 	def order_build(self, entity, map_position, building_name):
 		#print(str(str(map_position)+"\t"+str(building_name)))
 		if self.game.window.multiplayer :
-			send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)
+			send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(entity.iso_position) + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)
 
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
@@ -416,7 +416,7 @@ class Controller():
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
 		if self.game.window.multiplayer :
-			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
+			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(entity.iso_position) + ";" + str(aimed_entity.iso_position)))).stringify(),self.game.window.ecriture_fd)
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
 		entity.set_aimed_entity(aimed_entity)
