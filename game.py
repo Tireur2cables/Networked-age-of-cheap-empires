@@ -183,7 +183,7 @@ class GameView(arcade.View):
 			self.game_controller.setup(self.players, "J")
 		else:
 			self.game_controller.setup(self.players, "JvsJ")
-			send(str(map_seed) + "\n", AoCE.ecriture_fd)
+			send("SEED" + "\t" + str(map_seed) + "\n", AoCE.ecriture_fd)
 		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup(self.tactilmod)
 
