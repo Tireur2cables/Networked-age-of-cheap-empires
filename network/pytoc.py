@@ -58,6 +58,7 @@ def receive_string(readDesc):
     if readDesc:
         try :
             packetString = os.read(readDesc, 512)
+            print(packetString.decode())
             return packetString.decode()
         except OSError as e:
             pass
