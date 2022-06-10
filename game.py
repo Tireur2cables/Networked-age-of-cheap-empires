@@ -16,8 +16,8 @@ from network.pytoc import *
 from CONSTANTS import Resource as res
 
 # --- Constants ---
-DEFAULT_SCREEN_WIDTH = 800
-DEFAULT_SCREEN_HEIGHT = 600
+DEFAULT_SCREEN_WIDTH = 1280
+DEFAULT_SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Age Of Cheap Empire"
 
 MUSIC = "./Ressources/music/NEW_AGE.mp3"

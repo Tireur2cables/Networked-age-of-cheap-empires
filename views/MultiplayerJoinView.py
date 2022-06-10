@@ -148,7 +148,9 @@ class MultiplayerJoinView(arcade.View):
 			if p :
 				#print(p.stringify())
 				match p.ID :
-					case "NEW" : self.add_player(p.IO)
+					case "NEW" :
+						print(p.stringify())
+						self.add_player(p.IO)
 					case "DECO" : self.remove_player(p.IO)
 					case "RES" :
 						match p.IO :
