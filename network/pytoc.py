@@ -124,7 +124,8 @@ def interpret(packet):
 
 			# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
 
-			print("[<--] Received move order : " + packet.data)
+			print("[<--] Received move order : X =" + start_x + " Y = " + start_y + " -> X = " + end_x + " Y = " + end_y)
+
 
 		case "BUILD":
 			# (Call Controller.human_order_towards_position("build", faction, iso_position):)
