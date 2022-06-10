@@ -507,9 +507,7 @@ class Controller():
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
-		packet_action = receive_string(self.game.window.lecture_fd, False)
 		#cheats_vars.global_listen_clock += 1
-
 		# if ((cheats_vars.global_listen_clock % 10) == 0):
 		# 	print("tick")
 		# 	time.sleep(1)
@@ -517,8 +515,16 @@ class Controller():
 
 		# if (cheats_vars.global_listen_clock == 100):
 		# 	strr = Packet("ATTACK","DICT",self.game.window.pseudo, "wazaaaaaaaaaaa")
-		print(packet_action.stringify())
-		interpret(packet_action.stringify())
+
+		self.count += 1
+		if (self.count == 30) : # changer si trop rapide ou trop long
+			packet_action = receive_string(self.game.window.lecture_fd, False)
+			if packet_action != "":
+				print(packet_action.stringify())
+				interpret(packet_action.stringify())
+			count = 0
+
+
 
 		# --- Check End Conditions ---
 		dead_players = set()
