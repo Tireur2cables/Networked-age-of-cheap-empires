@@ -32,7 +32,7 @@ class MultiplayerJoinView(PreGameView):
 			height=buttonsize
 			)
 		self.manager.add(join_game)
-		
+
 		return join_game
 
 	def pseudoBox(self):
@@ -124,7 +124,7 @@ class MultiplayerJoinView(PreGameView):
 			s = receive_string(self.window.lecture_fd)
 			if s :
 				print(s)
-				flag, pseudo = s.split(" ")
+				flag, pseudo = s.split("\t")
 				match flag :
 					case "NEW" : self.add_player(pseudo)
 					case "DECO" : self.remove_player(pseudo)
