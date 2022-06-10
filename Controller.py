@@ -240,8 +240,7 @@ class Controller():
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		print("entity moving")
-		thisIsApacket = Packet("MOVE_UNIT","DICT",self.game.window.pseudo, str(end_grid_position))
-		send(thisIsApacket.stringify(),self.game.window.ecriture_fd)
+		send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, str(end_grid_position))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -324,6 +323,9 @@ class Controller():
 
 	# Called once
 	def order_build(self, entity, map_position, building_name):
+		print(str(map_position+"\t"+building_name))
+		send((Packet("BUILD","DICT",self.game.window.pseudo, str(map_position+"\t"+building_name))).stringify(),self.game.window.ecriture_fd)
+
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
 		if self.game.players[entity.faction].can_create(zone_to_build_class) :
