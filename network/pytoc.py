@@ -59,7 +59,9 @@ def receive_string(readDesc, block = True):
     # receive packet string from C handler
 	if readDesc:
 		if len(packetQueue) > 0 :
-			return packetQueue.pop(0)
+			p = packetQueue.pop(0)
+			print("je prend ça de la file", p.stringify())
+			return p
 		else :
 			try :
 				packetString = ""
@@ -72,7 +74,10 @@ def receive_string(readDesc, block = True):
 					s = packetString.split("\n")
 					for p in s :
 						packetQueue.append(packetify(p))
-					return packetQueue.pop(0)
+						print("Ajout dans la file", p)
+					p = packetQueue.pop(0)
+					print("je prend ça de la file", p.stringify())
+					return p
 				else :
 					return packetString
 
