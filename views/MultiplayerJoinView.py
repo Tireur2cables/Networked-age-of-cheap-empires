@@ -4,6 +4,7 @@ from player import Player
 from views.CustomButtons import NumInput, SelctDifButton, NextViewButton, LaunchGameButton, OnlinePlayerButton, InputIP
 from network.pytoc import *
 
+from CONSTANTS import Resource as Res
 BACKGROUND_PREGAME = "./Ressources/img/FondAgePaint5.jpg"
 button_texture = "Ressources/img/button_background.png"
 
@@ -22,6 +23,9 @@ class MultiplayerJoinView(arcade.View):
 			self.nbAdv = 0
 		self.join_game = 0
 		self.count = 0
+		self.resources = {}
+		self.seed = 0
+		self.players = {}
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -145,5 +149,13 @@ class MultiplayerJoinView(arcade.View):
 				match p.ID :
 					case "NEW" : self.add_player(p.IO)
 					case "DECO" : self.remove_player(p.IO)
+					case "RES" :
+						match p.IO :
+							case "FOOD": self.resources[Res.FOOD] = p.PNAME
+							case "WOOD": self.resources[Res.WOOD] = p.PNAME
+							case "STONE": self.resources[Res.STONE] = p.PNAME
+							case "GOLD": self.resources[Res.GOLD] = p.PNAME
+					case "SEED" : self.seed = p.IO
+					case "CR" : self.players[p.IO] = ("Joueur en ligne", p.PNAME)
 					case _: print(p.stringify())
 			self.count = 0
