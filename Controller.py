@@ -507,7 +507,7 @@ class Controller():
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
-
+		packet_action = receive_string(self.game.window.lecture_fd, False)
 		#cheats_vars.global_listen_clock += 1
 
 		# if ((cheats_vars.global_listen_clock % 10) == 0):
@@ -517,12 +517,8 @@ class Controller():
 
 		# if (cheats_vars.global_listen_clock == 100):
 		# 	strr = Packet("ATTACK","DICT",self.game.window.pseudo, "wazaaaaaaaaaaa")
-		# 	print(strr.stringify())
-		# 	brrr = packetify(strr.stringify())
-		# 	print("ID : " + brrr.ID + "\nIO : " + brrr.IO+ "\nPNAME : " + brrr.PNAME+ "\ndata : " + brrr.data )
-		# 	thisIsApacket = "belle beuteu"
-		#	if self.game.window.multiplayer :
-		#		 	send(thisIsApacket,self.game.window.lecture_fd)
+	 	print(p.stringify())
+		pytoc.interpret(p.stringify())
 
 		# --- Check End Conditions ---
 		dead_players = set()
