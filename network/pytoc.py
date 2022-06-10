@@ -137,16 +137,16 @@ def interpret(packet):
 
 packetQueue = []
 
-paquetdemerde = Packet("ID", "IO", "0", "TEMALATAILLEDELADATA")
+# paquetdemerde = Packet("ID", "IO", "0", "TEMALATAILLEDELADATA")
 
 
-paquetdemerde1= Packet("ID", "IO", "1", "TEMALATAILLEDELADATA")
-paquetdemerde2= Packet("ID", "IO", "2", "TEMALATAILLEDELADATA")
-packetQueue.insert(-1,paquetdemerde)
-packetQueue.insert(-1,paquetdemerde1)
-packetQueue.insert(-1,paquetdemerde2)
+# paquetdemerde1= Packet("ID", "IO", "1", "TEMALATAILLEDELADATA")
+# paquetdemerde2= Packet("ID", "IO", "2", "TEMALATAILLEDELADATA")
+# packetQueue.insert(-1,paquetdemerde)
+# packetQueue.insert(-1,paquetdemerde1)
+# packetQueue.insert(-1,paquetdemerde2)
 
-packet = packetQueue.pop()
-packet = packetQueue.pop()
-packet = packetQueue.pop()
-print(len(packetQueue))
+# packet = packetQueue.pop()
+# packet = packetQueue.pop()
+# packet = packetQueue.pop()
+# print(len(packetQueue))
