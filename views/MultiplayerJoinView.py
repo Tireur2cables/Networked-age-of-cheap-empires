@@ -26,6 +26,7 @@ class MultiplayerJoinView(arcade.View):
 		self.resources = {}
 		self.seed = 0
 		self.players = {}
+		self.window.multiplayer = True
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
