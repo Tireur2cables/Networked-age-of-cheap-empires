@@ -145,7 +145,7 @@ class MultiplayerJoinView(arcade.View):
 		if (self.count == 30) : # changer si trop rapide ou trop long
 			p = receive_string(self.window.lecture_fd, False)
 			if p :
-				print(p.stringify())
+				#print(p.stringify())
 				match p.ID :
 					case "NEW" : self.add_player(p.IO)
 					case "DECO" : self.remove_player(p.IO)
