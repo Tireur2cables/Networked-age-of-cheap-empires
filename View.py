@@ -304,14 +304,14 @@ class View():
 	def on_show(self):
 		""" This is run once when we switch to this view """
 		town_center_pos = self.game.players[self.game.window.pseudo].town_center.grid_position
-		town_center_pos_sur_la_carte = (town_center_pos.x, town_center_pos.y)
+		town_center_pos_sur_la_carte = grid_xy_to_iso(town_center_pos.x, town_center_pos.y)
 		print(town_center_pos_sur_la_carte)
 		# print("La position de mon TownCenter est :", (town_center_pos_iso))
 		self.camera = arcade.Camera(self.game.window.width, self.game.window.height)
 		# initial_x, initial_y = (self.player.spawn_pos[0], self.player.spawn_pos[1])
 		initial_x, initial_y = town_center_pos_sur_la_carte
 		self.camera_x = initial_x - self.game.window.width / 2
-		self.camera_y = initial_y - self.game.window.height / 4
+		self.camera_y = initial_y - self.game.window.height / 2
 		#coords of the mouse in the middle of the screen by default (and will be update when the mouse will move)
 		self.mouse_x = self.game.window.width / 2
 		self.mouse_y = self.game.window.height / 2
