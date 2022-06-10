@@ -37,6 +37,7 @@ class Controller():
 		self.players = set()
 		self.working_sites = set()
 		self.type_of_game = ""
+		self.count = 0
 
 	def __getstate__(self):
 		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites, self.type_of_game]
