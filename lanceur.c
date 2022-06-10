@@ -234,10 +234,8 @@ void join_game(char ip[IP_LEN + 1]) {
 	else {
 		printf("Je vais me connecter à tous ces autres la :\n%s\n", buff);
 
-		char ip1[IP_LEN+1];
-		char ip2[IP_LEN+1];
-		int nb = sscanf(buff, "%s %s", ip1, ip2);
-		printf("%d\n", nb);
+		int nb = sscanf(buff, "%s %s", players[1].ip, players[2].ip);
+		//printf("%d\n", nb);
 		players[1].sock = socket(AF_INET, SOCK_STREAM, 0);
 		if (players[1].sock == ERROR) {
 			close(fd_py_to_c[TUBE_LECT]);
@@ -246,7 +244,6 @@ void join_game(char ip[IP_LEN + 1]) {
 			error("Erreur de création de la socket!");
 		}
 		players[1].port = PORT;
-		strcpy(players[1].ip, ip1);
 		struct sockaddr_in serv_addr;
 		socklen_t serv_size = sizeof(serv_addr);
 		bzero(&serv_addr, serv_size);
@@ -254,27 +251,26 @@ void join_game(char ip[IP_LEN + 1]) {
 		serv_addr.sin_port = htons(PORT);
 		serv_addr.sin_addr.s_addr = inet_addr(players[1].ip);
 
-		if (nb == 1) {
-			int connexion = connect(players[1].sock, (struct sockaddr *) &serv_addr, serv_size);
-			if (connexion == ERROR) {
-				close(fd_py_to_c[TUBE_LECT]);
-				close(fd_c_to_py[TUBE_ECRI]);
-				close_serv();
-				error("Erreur de connexion!");
-			}
-			else {
-				printf("Connecté à l'autre joueur !\n");
-				char buff[PACKET_SIZE + 1];
-				recuperer_packet(buff, players[1].sock);
-				sscanf(buff, "PSEUDO %s", players[1].pseudo);
-				sprintf(buff, "NEW\t%s\n", players[1].pseudo);
-				send_packet(buff, fd_c_to_py[TUBE_ECRI]);
-				sprintf(buff, "PSEUDO %s", pseudo);
-				send_packet(buff, players[1].sock);
-				//printf("Pseudo du joueur 1: %s\n", players[1].pseudo);
-			}
+		int connexion = connect(players[1].sock, (struct sockaddr *) &serv_addr, serv_size);
+		if (connexion == ERROR) {
+			close(fd_py_to_c[TUBE_LECT]);
+			close(fd_c_to_py[TUBE_ECRI]);
+			close_serv();
+			error("Erreur de connexion!");
 		}
-		else if (nb > 1) {
+
+		printf("Connecté à l'autre joueur !\n");
+		bzero(buff, PACKET_SIZE + 1);
+		recuperer_packet(buff, players[1].sock);
+		sscanf(buff, "PSEUDO %s", players[1].pseudo);
+		bzero(buff, PACKET_SIZE + 1);
+		sprintf(buff, "NEW\t%s\n", players[1].pseudo);
+		send_packet(buff, fd_c_to_py[TUBE_ECRI]);
+		bzero(buff, PACKET_SIZE + 1);
+		sprintf(buff, "PSEUDO %s", pseudo);
+		send_packet(buff, players[1].sock);
+
+		if (nb > 1) {
 			players[2].sock = socket(AF_INET, SOCK_STREAM, 0);
 			if (players[2].sock == ERROR) {
 				close(fd_py_to_c[TUBE_LECT]);
@@ -283,7 +279,6 @@ void join_game(char ip[IP_LEN + 1]) {
 				error("Erreur de création de la socket!");
 			}
 			players[2].port = PORT;
-			strcpy(players[2].ip, ip2);
 
 			struct sockaddr_in serv_addr;
 			socklen_t serv_size = sizeof(serv_addr);
@@ -293,36 +288,22 @@ void join_game(char ip[IP_LEN + 1]) {
 			serv_addr.sin_port = htons(PORT);
 			serv_addr.sin_addr.s_addr = inet_addr(players[2].ip);
 
-			int connexion = connect(players[1].sock, (struct sockaddr *) &serv_addr, serv_size);
 			int connexion2 = connect(players[2].sock, (struct sockaddr *) &serv_addr, serv_size);
-			if (connexion == ERROR) {
-				close(fd_py_to_c[TUBE_LECT]);
-				close(fd_c_to_py[TUBE_ECRI]);
-				close_serv();
-				error("Erreur de connexion!");
-			}
 			if (connexion2 == ERROR) {
 				close(fd_py_to_c[TUBE_LECT]);
 				close(fd_c_to_py[TUBE_ECRI]);
 				close_serv();
 				error("Erreur de connexion!");
 			}
-			printf("Connecté aux autres joueurs !");
+			printf("Connecté au deuxieme !");
 
-			char buff[PACKET_SIZE + 1];
-			recuperer_packet(buff, players[1].sock);
-			sscanf(buff, "PSEUDO %s", players[1].pseudo);
-			sprintf(buff, "PSEUDO %s", pseudo);
-			send_packet(buff, players[1].sock);
-			//printf("Pseudo du joueur 1: %s\n", players[1].pseudo);
-			sprintf(buff, "NEW\t%s\n", players[1].pseudo);
-			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
-
+			bzero(buff, PACKET_SIZE + 1);
 			recuperer_packet(buff, players[2].sock);
 			sscanf(buff, "PSEUDO %s", players[2].pseudo);
+			bzero(buff, PACKET_SIZE + 1);
 			sprintf(buff, "PSEUDO %s", pseudo);
 			send_packet(buff, players[2].sock);
-			//printf("Pseudo du joueur 2: %s\n", players[2].pseudo);
+			bzero(buff, PACKET_SIZE + 1);
 			sprintf(buff, "NEW\t%s\n", players[2].pseudo);
 			send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 		}
