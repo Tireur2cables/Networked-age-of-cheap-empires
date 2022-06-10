@@ -77,10 +77,15 @@ def interpret(packet):
 			# AoCE.setup(seed)
 
 		case "CREATE_UNIT":
+            # jdis ptet de la d mais pour moi c'est
+            # on call add_entity_to_game() from controller.py
+			print("[<--] Received unit : " + packet.data)
+
 			pass
 
 		case "HARVEST":
-
+            # order_harverst() from controller.py
+            
 			pass
 
 		case "MOVE_UNIT":
