@@ -514,7 +514,7 @@ class Controller():
 			packet_action = receive_string(self.game.window.lecture_fd, False)
 			if packet_action != "":
 				print(packet_action.stringify())
-				interpret(packet_action.stringify())
+				interpret(packet_action)
 			count = 0
 
 
