@@ -158,7 +158,7 @@ class MultiplayerJoinView(arcade.View):
 					case "SEED" : self.seed = p.IO
 					case "CR" : self.players[p.IO] = ("Joueur en ligne", p.PNAME)
 					case "START":
-						self.main_view.game_view.setup(self.resources, self.resources, int(self.seed))
+						self.main_view.game_view.setup(self.resources, self.players, int(self.seed))
 						self.window.show_view(self.main_view.game_view)
 					case _: print(p.stringify())
 			self.count = 0
