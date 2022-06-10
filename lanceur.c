@@ -244,8 +244,6 @@ void join_game(char ip[IP_LEN + 1]) {
 			error("Erreur de création de la socket!");
 		}
 		players[1].port = PORT;
-		struct sockaddr_in serv_addr;
-		socklen_t serv_size = sizeof(serv_addr);
 		bzero(&serv_addr, serv_size);
 		serv_addr.sin_family = AF_INET;
 		serv_addr.sin_port = htons(PORT);
@@ -280,8 +278,6 @@ void join_game(char ip[IP_LEN + 1]) {
 			}
 			players[2].port = PORT;
 
-			struct sockaddr_in serv_addr;
-			socklen_t serv_size = sizeof(serv_addr);
 			bzero(&serv_addr, serv_size);
 
 			serv_addr.sin_family = AF_INET;
