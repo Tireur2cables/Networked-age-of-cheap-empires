@@ -241,7 +241,8 @@ class Controller():
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		#print("entity moving")
 		if self.game.window.multiplayer :
-			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(entity.iso_position) + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
+			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(end_grid_position.x)+ ";" + str(end_grid_position.y)))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
