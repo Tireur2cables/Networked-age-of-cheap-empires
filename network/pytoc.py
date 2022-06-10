@@ -84,6 +84,8 @@ def receive_string(readDesc, block = True):
 
 def interpret(packet):
 	# Interpret the packet and return a list of instructions
+	print(packet)
+	print(packet.ID)
 	match packet.ID:
 
 		case "SEED":
@@ -120,7 +122,7 @@ def interpret(packet):
 			end_x=datatab[2]
 			end_y=datatab[3]
 			# entity=datatab[4]
-			Controller.find_entity_in_sprites()
+			# Controller.find_entity_in_sprites()
 			#Controller.move_entity(entity, end)
 
 			# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
