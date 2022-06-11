@@ -197,7 +197,7 @@ class Controller():
 						unit_found = player.units_by_id[num]
 						break
 				print(unit_found)
-				order_build(unit_found, Vector(int(end_x), int(end_y)), batiment):
+				order_build(unit_found, Vector(int(end_x), int(end_y)), batiment)
 
 				print("[<--] Received build order : " + packet.data)
 
