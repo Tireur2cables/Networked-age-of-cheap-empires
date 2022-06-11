@@ -132,8 +132,7 @@ class Controller():
 				end_y=datatab[3]
 				num = int(datatab[4])
 				# entity=datatab[4]
-				pos_iso = grid_xy_to_iso(int(end_x), int(end_y))
-				pos = iso_to_cart(pos_iso[0], pos_iso[1])
+				pos = grid_xy_to_iso(int(end_x), int(end_y))
 				print("on a ça", pos)
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
 				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
@@ -392,18 +391,18 @@ class Controller():
 		if aimed_tile is not None:
 			entity.set_goal("harvest")
 			entity.set_aimed_entity(zone_to_harvest)
+			if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+				for player in self.players :
+					if player.player_type == entity.faction :
+						num = player.units_by_id.index(entity)
+						break
+				ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+				harvestPacket = Packet("HARVEST", "DICT", self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(zone_to_harvest.grid_position.x)+ ";" + str(zone_to_harvest.grid_position.y) + ";" + str(num)))
+				send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
 				#print("entity harvesting")
-				if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
-					for player in self.players :
-						if player.player_type == entity.faction :
-							num = player.units_by_id.index(entity)
-							break
-					ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-					harvestPacket = Packet("HARVEST", "DICT", self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position.x)+ ";" + str(aimed_tile.grid_position.y) + ";" + str(num)))
-					send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 				self.move_entity(entity, aimed_tile.grid_position, False)
 
 
