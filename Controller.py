@@ -52,6 +52,7 @@ class Controller():
 		self.players.clear()
 		self.working_sites.clear()
 		self.type_of_game = ""
+		self.count = 0
 
 	def setup(self, players_dict: dict, type_of_game):
 		self.reset()
@@ -62,6 +63,7 @@ class Controller():
 			self.selection[key] = set()
 			if "ai" in key:
 				self.ai.add(value)
+		self.count = 0
 
 # --- Utility methods ---
 	@staticmethod
