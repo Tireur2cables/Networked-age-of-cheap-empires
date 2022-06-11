@@ -65,7 +65,7 @@ class MultiplayerJoinView(arcade.View):
 		buttonsize = self.window.width / 5
 		join_game = InputIP(self.window, self.window.width/3,
 		 	self.window.height/1.65,
-			text="90.92.185.45",
+			text="Entrez un IP",
 			font_name="calibri",
 			font_size=40,
 			width=buttonsize,
