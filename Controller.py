@@ -551,7 +551,7 @@ class Controller():
 
 			if current_player.can_create(producing_zone.class_produced, producing_zone.get_name()) :
 				producing_zone.is_producing = True
-				if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+				if self.game.window.multiplayer and self.game.window.pseudo == producing_zone.faction :
 					for key, value in producing_zone.class_produced.creation_cost.items():
 						if isinstance(producing_zone, TownCenter) and key == Res.FOOD and current_player.upgrades.get(producing_zone.get_name(), 0) == 1:
 							current_player.sub_resource(key, value - 20)
