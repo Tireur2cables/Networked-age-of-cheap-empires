@@ -197,7 +197,7 @@ class Controller():
 				#		unit_found = player.units_by_id[num]
 				#		break
 				# print(unit_found)
-				# order_build(self, entity, map_position, building_name):
+				# order_build(self, unit_found, map_position, batiment):
 
 				print("[<--] Received build order : " + packet.data)
 
