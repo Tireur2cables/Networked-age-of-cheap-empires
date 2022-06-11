@@ -34,7 +34,7 @@ class Packet():
 		# Return a string of a packet
 		# Field separator is \t
 		# Packet separator is \n
-		return self.ID+"\t"+self.IO+"\t"+self.PNAME+"\t"+self.data+"\n"
+		return str(str(self.ID)+"\t"+str(self.IO)+"\t"+str(self.PNAME)+"\t"+str(self.data)+"\n")
 
 def packetify(packetString):
 	tab = str(packetString).split("\t")
@@ -66,7 +66,7 @@ def receive_string(readDesc, block = True):
 			try :
 				packetString = ""
 				while len(packetString) == 0 or packetString[-1] != "\n" :
-					#print("ici : " + packetString)
+					print("ici : " + packetString)
 					packetString += os.read(readDesc, 512).decode()
 					if len(packetString) == 0 and not block :
 						break
