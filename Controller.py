@@ -114,12 +114,11 @@ class Controller():
 				# on call add_entity_to_game() from controller.py
 				print("[<--] Received unit : " + packet.data)
 				datatab = packet.data.split(";")
-				start_x=datatab[0]
-				start_y=datatab[1]
-				end_x=datatab[2]
-				end_y=datatab[3]
+				bat_x=datatab[0]
+				bat_y=datatab[1]
+				unit = str(datatab[2])
 
-				pos = grid_xy_to_iso(int(end_x), int(end_y))
+				pos = grid_xy_to_iso(int(bat_x), int(bat_y))
 
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
 				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
