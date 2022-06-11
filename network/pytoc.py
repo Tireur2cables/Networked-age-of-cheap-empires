@@ -34,6 +34,7 @@ class Packet():
 		# Return a string of a packet
 		# Field separator is \t
 		# Packet separator is \n
+		# Data separator is ;
 		return str(str(self.ID)+"\t"+str(self.IO)+"\t"+str(self.PNAME)+"\t"+str(self.data)+"\n")
 
 def packetify(packetString):
