@@ -109,12 +109,6 @@ class Controller():
 		print(packet.ID)
 		match packet.ID:
 
-			case "SEED":
-				# Call Game.setup() and View.setup(), sending seed as arg
-				seed=packet.data
-				print("[<--] Received seed : " + seed)
-				# AoCE.setup(seed)
-
 			case "CREATE_UNIT":
 				# jdis ptet de la d mais pour moi c'est
 				# on call add_entity_to_game() from controller.py
@@ -204,7 +198,26 @@ class Controller():
 
 			case "ATTACK":
 				# SYNTAXE : send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
-
+				datatab = packet.data.split(";")
+				start_x=datatab[0]
+				start_y=datatab[1]
+				end_x=datatab[2]
+				end_y=datatab[3]
+				num1 = int(datatab[4])
+				faction2 = datatab[5]
+				num2 = int(datatab[6])
+				# entity=datatab[4]
+				# pos = grid_xy_to_iso(int(end_x), int(end_y))
+				# #print("on a ça", pos)
+				# sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
+				# zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
+				for player in self.players :
+					if player.player_type == packet.PNAME :
+						unit_found1 = player.units_by_id[num1]
+					if player.player_type == faction2 :
+						unit_found2 = player.units_by_id[num2]
+				print(unit_found1)
+				self.order_attack(unit_found1, unit_found2)
 				print("[<--] Received build order : " + packet.data)
 
 
@@ -545,9 +558,15 @@ class Controller():
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
+		for player in self.players :
+			if player.player_type == entity.faction :
+				num1 = player.units_by_id.index(entity)
+			elif player.player_type == aimed_entity.faction :
+				num2 = player.units_by_id.index(aimed_entity)
+
 		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y)))).stringify(),self.game.window.ecriture_fd))
+			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y) + ";" + str(num1) + ";" + aimed_entity.faction + ";" + str(num2)))).stringify(),self.game.window.ecriture_fd))
 
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
