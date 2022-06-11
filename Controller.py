@@ -132,7 +132,8 @@ class Controller():
 				end_y=datatab[3]
 				num = int(datatab[4])
 				# entity=datatab[4]
-				pos = iso_to_cart(grid_xy_to_iso(int(end_x), int(end_y)))
+				pos_iso = grid_xy_to_iso(int(end_x), int(end_y))
+				pos = iso_to_cart(pos_iso[0], pos_iso[1])
 				print("on a ça", pos)
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
 				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
