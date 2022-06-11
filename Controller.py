@@ -185,6 +185,19 @@ class Controller():
 
 				# SYNTAXE : send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)			#avec les entity.pos communiquées, on retrouve les bonnes unités en parcourant le tableau des entities
 				#DATA : map_pos et building_name séparés par une tabulation
+				# BUILD	DICT	Caterwaul2	12;8;15;5;storagepit
+				# datatab = packet.data.split(";")
+				# start_x=datatab[0]
+				# start_y=datatab[1]
+				# end_x=datatab[2]
+				# end_y=datatab[3]
+				# num = int(datatab[4])
+				# for player in self.players :
+				#	if player.player_type == packet.PNAME :
+				#		unit_found = player.units_by_id[num]
+				#		break
+				# print(unit_found)
+				# order_build(self, entity, map_position, building_name):
 
 				print("[<--] Received build order : " + packet.data)
 
