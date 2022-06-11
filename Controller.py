@@ -119,7 +119,7 @@ class Controller():
 				unit = str(datatab[2])
 				zone = str(datatab[3])
 
-				pos = grid_xy_to_iso(int(bat_x), int(bat_y))
+				pos = (int(bat_x), int(bat_y))
 				print("on a ça", pos)
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
 				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
@@ -557,7 +557,7 @@ class Controller():
 					else:
 						current_player.sub_resource(key, value)
 
-					ix,iy= producing_zone.grid_position.x, producing_zone.grid_position.y
+					ix,iy= producing_zone.iso_position.x + producing_zone.sprite_data.x_offset, producing_zone.iso_position.y + producing_zone.sprite_data.y_offset
 					send(Packet("CREATE_UNIT", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(entity_produced) + ";" + str(producing_zone)))).stringify(), self.game.window.ecriture_fd)
 					# ICI
 
