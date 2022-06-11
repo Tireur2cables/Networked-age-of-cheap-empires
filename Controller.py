@@ -551,15 +551,16 @@ class Controller():
 
 			if current_player.can_create(producing_zone.class_produced, producing_zone.get_name()) :
 				producing_zone.is_producing = True
-				for key, value in producing_zone.class_produced.creation_cost.items():
-					if isinstance(producing_zone, TownCenter) and key == Res.FOOD and current_player.upgrades.get(producing_zone.get_name(), 0) == 1:
-						current_player.sub_resource(key, value - 20)
-					else:
-						current_player.sub_resource(key, value)
+				if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+					for key, value in producing_zone.class_produced.creation_cost.items():
+						if isinstance(producing_zone, TownCenter) and key == Res.FOOD and current_player.upgrades.get(producing_zone.get_name(), 0) == 1:
+							current_player.sub_resource(key, value - 20)
+						else:
+							current_player.sub_resource(key, value)
 
-					ix,iy= producing_zone.iso_position.x + producing_zone.sprite_data.x_offset, producing_zone.iso_position.y + producing_zone.sprite_data.y_offset
-					send(Packet("CREATE_UNIT", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(entity_produced) + ";" + str(producing_zone)))).stringify(), self.game.window.ecriture_fd)
-					# ICI
+						ix,iy= producing_zone.iso_position.x + producing_zone.sprite_data.x_offset, producing_zone.iso_position.y + producing_zone.sprite_data.y_offset
+						send(Packet("CREATE_UNIT", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(entity_produced) + ";" + str(producing_zone)))).stringify(), self.game.window.ecriture_fd)
+						# ICI
 
 				if producing_zone.faction == self.game.window.pseudo : # Shouldn't be used with AI
 					self.game.game_view.update_resources_gui()
