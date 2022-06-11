@@ -375,7 +375,7 @@ class View():
 					self.game.game_controller.select(self.game.window.pseudo, closest_unit_sprites)
 				else:
 					closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
-					print("on veut ça", mouse_position_in_game)
+					#print("on veut ça", mouse_position_in_game)
 					if closest_zone_sprites:
 						self.game.game_controller.select_zone(self.game.window.pseudo, closest_zone_sprites)
 					else:
