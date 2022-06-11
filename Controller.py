@@ -117,12 +117,13 @@ class Controller():
 				bat_x=datatab[0]
 				bat_y=datatab[1]
 				unit = str(datatab[2])
+				zone = str(datatab[3])
 
 				pos = grid_xy_to_iso(int(bat_x), int(bat_y))
 
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
 				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
-				self.order_zone_units(zone_found, unit)
+				self.order_zone_units(zone, unit)
 				pass
 
 			case "HARVEST":
@@ -558,7 +559,7 @@ class Controller():
 						current_player.sub_resource(key, value)
 
 					ix,iy= iso_to_grid_xy(producing_zone.iso_position.x, producing_zone.iso_position.y)
-					send(Packet("CREATE_UNIT", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(entity_produced)))).stringify(), self.game.window.ecriture_fd)
+					send(Packet("CREATE_UNIT", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(entity_produced) + ";" + str(producing_zone)))).stringify(), self.game.window.ecriture_fd)
 					# ICI
 
 				if producing_zone.faction == self.game.window.pseudo : # Shouldn't be used with AI
