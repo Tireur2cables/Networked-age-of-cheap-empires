@@ -123,6 +123,7 @@ class Controller():
 
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
 				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
+				self.order_zone_units(sprites_at_point, zone_found)
 				pass
 
 			case "HARVEST":
@@ -557,6 +558,8 @@ class Controller():
 					else:
 						current_player.sub_resource(key, value)
 
+					ix,iy= iso_to_grid_xy(producing_zone.iso_position.x, producing_zone.iso_position.y)
+					send(Packet("CREATE_UNIT", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(entity_produced)))).stringify(), self.game.window.ecriture_fd)
 					# ICI
 
 				if producing_zone.faction == self.game.window.pseudo : # Shouldn't be used with AI
