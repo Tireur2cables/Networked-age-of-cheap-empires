@@ -409,8 +409,9 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		if symbol == arcade.key.ENTER:
-			self.cheatsinput.on_enter_pressed()
-			self.triggerCheatInput()
+			if not self.game.window.multiplayer:
+				self.cheatsinput.on_enter_pressed()
+				self.triggerCheatInput()
 		if symbol == arcade.key.F1: # cheat window
 			self.triggerCheatInput()
 		if symbol == arcade.key.A and (modifier & arcade.key.MOD_CTRL):
