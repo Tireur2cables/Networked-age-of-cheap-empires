@@ -125,7 +125,21 @@ class Controller():
 			case "HARVEST":
 				# order_harverst() from controller.py
 				#SYNTAXE : Packet("HARVEST","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(aimed_tile.grid_position)))
-
+				datatab = packet.data.split(";")
+				start_x=datatab[0]
+				start_y=datatab[1]
+				end_x=datatab[2]
+				end_y=datatab[3]
+				# entity=datatab[4]
+				pos = (int(start_x), int(start_y))
+				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
+				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
+				for player in self.players :
+					if player.player_type == packet.PNAME :
+						unit_found = player.units_by_id[num]
+						break
+				print(unit_found)
+				self.order_harvest(unit_found, zone_found)
 
 				pass
 
