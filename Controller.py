@@ -380,9 +380,9 @@ class Controller():
 				entity.is_interacting = True
 			else:
 				#print("entity harvesting")
-				if self.game.window.multiplayer :
+				if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
 					ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-					harvestPacket = Packet("HARVEST","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position.x)+ ";" + str(aimed_tile.grid_position.y)))
+					harvestPacket = Packet("HARVEST", "DICT", self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position.x)+ ";" + str(aimed_tile.grid_position.y)))
 					send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 				self.move_entity(entity, aimed_tile.grid_position, False)
 
@@ -418,7 +418,7 @@ class Controller():
 	# Called once
 	def order_build(self, entity, map_position, building_name):
 		#print(str(str(map_position)+"\t"+str(building_name)))
-		if self.game.window.multiplayer :
+		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
 			send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(ix) + ";" + str(iy) + ";" + str(map_position.x)+ ";" + str(map_position.y)+ ";" +str(building_name)))).stringify(),self.game.window.ecriture_fd)
 
@@ -508,7 +508,7 @@ class Controller():
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
-		if self.game.window.multiplayer :
+		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
 			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y)))).stringify(),self.game.window.ecriture_fd))
 
