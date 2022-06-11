@@ -152,7 +152,7 @@ class Controller():
 						unit_found = player.units_by_id[num]
 						break
 				print(unit_found)
-				self.move_entity(unit_found, (int(end_x), int(end_y)))
+				self.move_entity(unit_found, Vector(int(end_x), int(end_y)))
 
 				# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
 
@@ -326,7 +326,7 @@ class Controller():
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		#print("entity moving")
-		if self.game.window.multiplayer :
+		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
 			for player in self.players :
 				if player.player_type == entity.faction :
