@@ -831,6 +831,8 @@ class Controller():
 			items_to_store = (Res.GOLD, Res.STONE, Res.WOOD)
 
 		for resource in items_to_store:
+			print(type(resource), type(entity.resources[resource]))
+			print(resource, entity.resources[resource])
 			self.game.players[entity.faction].add_resource(resource, entity.resources[resource])
 			entity.resources[resource] = 0
 
