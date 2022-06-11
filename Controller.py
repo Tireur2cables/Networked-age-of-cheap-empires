@@ -143,7 +143,9 @@ class Controller():
 				end_x=datatab[2]
 				end_y=datatab[3]
 				# entity=datatab[4]
-				self.find_entity_in_sprites(self.game.game_view.get_closest_sprites(map_xy_to_iso(start_x,start_y),self.game.game_view.sorted_sprite_list,Unit), self.filter_type(Unit))
+				pos = map_xy_to_iso(start_x, start_y)
+				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
+				self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
 				#Controller.move_entity(entity, end)
 
 				# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
