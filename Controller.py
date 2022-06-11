@@ -332,7 +332,7 @@ class Controller():
 				if player.player_type == entity.faction :
 					num = player.units_by_id.index(entity)
 					break
-			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(end_grid_position[0])+ ";" + str(end_grid_position[1]) + ";" + str(num)))).stringify(),self.game.window.ecriture_fd)
+			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(end_grid_position.x)+ ";" + str(end_grid_position.y) + ";" + str(num)))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
