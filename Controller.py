@@ -142,10 +142,13 @@ class Controller():
 				start_y=datatab[1]
 				end_x=datatab[2]
 				end_y=datatab[3]
+				num = datatab[4]
 				# entity=datatab[4]
-				pos = grid_xy_to_iso(int(start_x), int(start_y))
-				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
-				unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
+				# pos = grid_xy_to_iso(int(start_x), int(start_y))
+				# sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
+				# unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
+				unit_found = self.players[packet.PNAME].units_by_id[num]
+				print(unit_found)
 				self.move_entity(unit_found, (int(end_x), int(end_y)))
 
 				# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
@@ -322,7 +325,8 @@ class Controller():
 		#print("entity moving")
 		if self.game.window.multiplayer :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(end_grid_position.x)+ ";" + str(end_grid_position.y)))).stringify(),self.game.window.ecriture_fd)
+			num = self.players[entity.faction].units_by_id.index(entity)
+			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(end_grid_position.x)+ ";" + str(end_grid_position.y) + ";" + num))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
