@@ -154,10 +154,10 @@ class MultiplayerJoinView(arcade.View):
 					case "DECO" : self.remove_player(p.IO)
 					case "RES" :
 						match p.IO :
-							case "FOOD": self.resources[Res.FOOD] = p.PNAME
-							case "WOOD": self.resources[Res.WOOD] = p.PNAME
-							case "STONE": self.resources[Res.STONE] = p.PNAME
-							case "GOLD": self.resources[Res.GOLD] = p.PNAME
+							case "FOOD": self.resources[Res.FOOD] = int(p.PNAME)
+							case "WOOD": self.resources[Res.WOOD] = int(p.PNAME)
+							case "STONE": self.resources[Res.STONE] = int(p.PNAME)
+							case "GOLD": self.resources[Res.GOLD] = int(p.PNAME)
 					case "SEED" : self.seed = p.IO
 					case "CR" : self.players[p.IO] = ("Joueur en ligne", p.PNAME)
 					case "START":
