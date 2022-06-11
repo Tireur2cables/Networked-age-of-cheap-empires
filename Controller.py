@@ -422,7 +422,7 @@ class Controller():
 		if self.game.window.multiplayer :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
 			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y)))).stringify(),self.game.window.ecriture_fd))
-			
+
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
 		entity.set_aimed_entity(aimed_entity)
@@ -516,10 +516,10 @@ class Controller():
 		self.count += 1
 		if (self.count == 30) : # changer si trop rapide ou trop long
 			packet_action = receive_string(self.game.window.lecture_fd, False)
-			print(packet_action)
+			#print(packet_action)
 			if packet_action != "":
 				interpret(packet_action)
-			count = 0
+			self.count = 0
 
 
 

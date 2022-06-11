@@ -305,7 +305,7 @@ class View():
 		""" This is run once when we switch to this view """
 		town_center_pos = self.game.players[self.game.window.pseudo].town_center.grid_position
 		town_center_pos_sur_la_carte = grid_xy_to_iso(town_center_pos.x, town_center_pos.y)
-		print(town_center_pos_sur_la_carte)
+		#print(town_center_pos_sur_la_carte)
 		# print("La position de mon TownCenter est :", (town_center_pos_iso))
 		self.camera = arcade.Camera(self.game.window.width, self.game.window.height)
 		# initial_x, initial_y = (self.player.spawn_pos[0], self.player.spawn_pos[1])
