@@ -566,7 +566,7 @@ class Controller():
 
 		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-			send((Packet("ATTACK","DICT",self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y) + ";" + str(num1) + ";" + aimed_entity.faction + ";" + str(num2)))).stringify(),self.game.window.ecriture_fd))
+			send(Packet("ATTACK", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y) + ";" + str(num1) + ";" + aimed_entity.faction + ";" + str(num2)))).stringify(), self.game.window.ecriture_fd)
 
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
