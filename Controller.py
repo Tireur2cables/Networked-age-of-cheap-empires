@@ -130,6 +130,7 @@ class Controller():
 				start_y=datatab[1]
 				end_x=datatab[2]
 				end_y=datatab[3]
+				num = int(datatab[4])
 				# entity=datatab[4]
 				pos = (int(start_x), int(start_y))
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
@@ -157,7 +158,6 @@ class Controller():
 				end_x=datatab[2]
 				end_y=datatab[3]
 				num = int(datatab[4])
-				# entity=datatab[4]
 				# pos = grid_xy_to_iso(int(start_x), int(start_y))
 				# sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
 				# unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
@@ -341,7 +341,7 @@ class Controller():
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		#print("entity moving")
 		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
-			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+			ix,iy= iso_to_grid_xy(entitymove_entity.iso_position.x, entity.iso_position.y)
 			for player in self.players :
 				if player.player_type == entity.faction :
 					num = player.units_by_id.index(entity)
@@ -395,8 +395,12 @@ class Controller():
 			else:
 				#print("entity harvesting")
 				if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+					for player in self.players :
+						if player.player_type == entity.faction :
+							num = player.units_by_id.index(entity)
+							break
 					ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-					harvestPacket = Packet("HARVEST", "DICT", self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position.x)+ ";" + str(aimed_tile.grid_position.y)))
+					harvestPacket = Packet("HARVEST", "DICT", self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(aimed_tile.grid_position.x)+ ";" + str(aimed_tile.grid_position.y) + ";" + str(num)))
 					send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 				self.move_entity(entity, aimed_tile.grid_position, False)
 
