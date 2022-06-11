@@ -341,7 +341,7 @@ class Controller():
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
 		#print("entity moving")
 		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
-			ix,iy= iso_to_grid_xy(entitymove_entity.iso_position.x, entity.iso_position.y)
+			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
 			for player in self.players :
 				if player.player_type == entity.faction :
 					num = player.units_by_id.index(entity)
