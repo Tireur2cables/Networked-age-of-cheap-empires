@@ -133,8 +133,9 @@ class Controller():
 				num = int(datatab[4])
 				# entity=datatab[4]
 				pos = (int(start_x), int(start_y))
-				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
-				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
+				print(pos)
+				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
+				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
 				for player in self.players :
 					if player.player_type == packet.PNAME :
 						unit_found = player.units_by_id[num]

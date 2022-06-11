@@ -386,6 +386,7 @@ class View():
 			self.reset_construct_flags() # permet d'annuler une construction
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+			print("on veut ça", mouse_position_in_game)
 			if units_at_point:
 				self.game.game_controller.human_order_towards_sprites("attack", self.game.window.pseudo, units_at_point)
 			elif zones_at_point:
