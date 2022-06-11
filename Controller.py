@@ -548,6 +548,8 @@ class Controller():
 					else:
 						current_player.sub_resource(key, value)
 
+					# ICI
+
 				if producing_zone.faction == self.game.window.pseudo : # Shouldn't be used with AI
 					self.game.game_view.update_resources_gui()
 			else :
