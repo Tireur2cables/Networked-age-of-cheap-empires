@@ -185,13 +185,14 @@ class Controller():
 
 				# SYNTAXE : send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)			#avec les entity.pos communiquées, on retrouve les bonnes unités en parcourant le tableau des entities
 				#DATA : map_pos et building_name séparés par une tabulation
-				# BUILD	DICT	Caterwaul2	12;8;15;5;storagepit
+				# BUILD	DICT	Caterwaul2	12;8;15;5;storagepit;num
 				# datatab = packet.data.split(";")
 				# start_x=datatab[0]
 				# start_y=datatab[1]
 				# end_x=datatab[2]
 				# end_y=datatab[3]
-				# num = int(datatab[4])
+				# batiment = datatab[4]
+				# num = int(datatab[5])
 				# for player in self.players :
 				#	if player.player_type == packet.PNAME :
 				#		unit_found = player.units_by_id[num]
@@ -453,7 +454,11 @@ class Controller():
 		#print(str(str(map_position)+"\t"+str(building_name)))
 		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
 			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
-			send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(ix) + ";" + str(iy) + ";" + str(map_position.x)+ ";" + str(map_position.y)+ ";" +str(building_name)))).stringify(),self.game.window.ecriture_fd)
+			for player in self.players :
+				if player.player_type == entity.faction :
+					num = player.units_by_id.index(entity)
+					break
+			send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(ix) + ";" + str(iy) + ";" + str(map_position.x)+ ";" + str(map_position.y)+ ";" +str(building_name)+ ";" +str(num)))).stringify(),self.game.window.ecriture_fd)
 
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
