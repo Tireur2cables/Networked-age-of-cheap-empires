@@ -67,7 +67,7 @@ def receive_string(readDesc, block = True):
 			try :
 				packetString = ""
 				while len(packetString) == 0 or packetString[-1] != "\n" :
-					print("ici : " + packetString)
+					# print("ici : " + packetString)
 					packetString += os.read(readDesc, 512).decode()
 					if len(packetString) == 0 and not block :
 						break
