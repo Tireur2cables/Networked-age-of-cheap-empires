@@ -142,7 +142,7 @@ class Controller():
 				start_y=datatab[1]
 				end_x=datatab[2]
 				end_y=datatab[3]
-				num = datatab[4]
+				num = int(datatab[4])
 				# entity=datatab[4]
 				# pos = grid_xy_to_iso(int(start_x), int(start_y))
 				# sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
