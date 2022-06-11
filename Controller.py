@@ -98,6 +98,81 @@ class Controller():
 
 
 
+
+
+
+
+
+	def interpret(self, packet):
+		# Interpret the packet and return a list of instructions
+		print(packet)
+		print(packet.ID)
+		match packet.ID:
+
+			case "SEED":
+				# Call Game.setup() and View.setup(), sending seed as arg
+				seed=packet.data
+				print("[<--] Received seed : " + seed)
+				# AoCE.setup(seed)
+
+			case "CREATE_UNIT":
+				# jdis ptet de la d mais pour moi c'est
+				# on call add_entity_to_game() from controller.py
+				print("[<--] Received unit : " + packet.data)
+
+				pass
+
+			case "HARVEST":
+				# order_harverst() from controller.py
+				#SYNTAXE : Packet("HARVEST","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(aimed_tile.grid_position)))
+
+
+				pass
+
+			case "MOVE_UNIT":
+				# (Call Controller.human_order_towards_position("move", faction, iso_position):)
+				# Call Controller.move_entity(entity, end_position)
+				# Structure of packet.data :
+				#   - faction
+				#   - iso_position
+				#   - entity : Use tuple in Game.get_units_by_id()
+				#   - end_position
+				datatab = packet.data.split(";")
+				start_x=datatab[0]
+				start_y=datatab[1]
+				end_x=datatab[2]
+				end_y=datatab[3]
+				# entity=datatab[4]
+				self.find_entity_in_sprites(self.game.game_view.get_closest_sprites(map_xy_to_iso(start_x,start_y),self.game.game_view.sorted_sprite_list,Unit), self.filter_type(Unit))
+				#Controller.move_entity(entity, end)
+
+				# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
+
+				print("[<--] Received move order : X =" + start_x + " Y = " + start_y + " -> X = " + end_x + " Y = " + end_y)
+
+
+			case "BUILD":
+				# (Call Controller.human_order_towards_position("build", faction, iso_position):)
+				# Call Controller.order_build(entity, map_position)
+				# Installer une construction ou un site de construction
+				# Structure of packet.data :
+				#   - faction
+				#   - iso_position
+
+				# SYNTAXE : send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)			#avec les entity.pos communiquées, on retrouve les bonnes unités en parcourant le tableau des entities
+				#DATA : map_pos et building_name séparés par une tabulation
+
+				print("[<--] Received build order : " + packet.data)
+
+
+			case "ATTACK":
+				# SYNTAXE : send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
+
+				print("[<--] Received build order : " + packet.data)
+
+
+
+
 # --- Adding/Discarding entities ---
 
 	def add_entity_to_game(self, new_entity):
