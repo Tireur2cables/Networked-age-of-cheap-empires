@@ -120,10 +120,10 @@ class Controller():
 				zone = str(datatab[3])
 
 				pos = grid_xy_to_iso(int(bat_x), int(bat_y))
-
+				print("on a ça", pos)
 				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
 				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
-				self.order_zone_units(zone, unit)
+				self.order_zone_units(zone_found, unit)
 				pass
 
 			case "HARVEST":

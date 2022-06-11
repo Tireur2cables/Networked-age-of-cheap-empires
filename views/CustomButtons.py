@@ -255,6 +255,7 @@ class ActionButton(arcade.gui.UITextureButton) :
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		if self.text == "Villageois" :
 			self.aoce_game.game_controller.order_zone_units(self.batiment, Villager.get_name())
+			print("on veut ça", self.batiment.iso_position.x, self.batiment.iso_position.y)
 		elif self.text == "Milice" :
 			self.aoce_game.game_controller.order_zone_units(self.batiment, Militia.get_name())
 		elif self.text == "Lancier" :
