@@ -1,6 +1,7 @@
 Un "Packet" est une classe comportant les attributs suivants : 
 
-ID : Chaîne de caractères indiquant le type d'informations transmises dans le champ DATA*
+ID : Chaîne de caractères indiquant le type d'informations transmises dans le champ DATA
+
     - "NEW" / "DECO" : Connexion / Déconnexion de la salle d'attente
     - "RES" : Initialisation des ressources de départ
     - "SEED" : Transmission de la seed d'Initialisation du monde
