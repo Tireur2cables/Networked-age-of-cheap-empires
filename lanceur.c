@@ -222,12 +222,12 @@ void join_game(char ip[IP_LEN + 1]) {
 	char buff[PACKET_SIZE + 1];
 	bzero(buff, PACKET_SIZE + 1);
 	recuperer_packet(buff, players[0].sock);
-	sscanf(buff, "PSEUDO %s", players[0].pseudo);
+	sscanf(buff, "PSEUDO %s\n", players[0].pseudo);
 	bzero(buff, PACKET_SIZE + 1);
 	sprintf(buff, "NEW\t%s\n", players[0].pseudo);
 	send_packet(buff, fd_c_to_py[TUBE_ECRI]);
 	bzero(buff, PACKET_SIZE + 1);
-	sprintf(buff, "PSEUDO %s", pseudo);
+	sprintf(buff, "PSEUDO %s\n", pseudo);
 	send_packet(buff, players[0].sock);
 
 	recuperer_packet(buff, players[0].sock);
@@ -264,12 +264,12 @@ void join_game(char ip[IP_LEN + 1]) {
 		char buff1[PACKET_SIZE + 1];
 		bzero(buff1, PACKET_SIZE + 1);
 		recuperer_packet(buff1, players[1].sock);
-		sscanf(buff1, "PSEUDO %s", players[1].pseudo);
+		sscanf(buff1, "PSEUDO %s\n", players[1].pseudo);
 		bzero(buff1, PACKET_SIZE + 1);
 		sprintf(buff1, "NEW\t%s\n", players[1].pseudo);
 		send_packet(buff1, fd_c_to_py[TUBE_ECRI]);
 		bzero(buff1, PACKET_SIZE + 1);
-		sprintf(buff1, "PSEUDO %s", pseudo);
+		sprintf(buff1, "PSEUDO %s\n", pseudo);
 		send_packet(buff1, players[1].sock);
 
 		if (nb > 1) {
@@ -300,9 +300,9 @@ void join_game(char ip[IP_LEN + 1]) {
 			char buff2[PACKET_SIZE + 1];
 			bzero(buff2, PACKET_SIZE + 1);
 			recuperer_packet(buff2, players[2].sock);
-			sscanf(buff2, "PSEUDO %s", players[2].pseudo);
+			sscanf(buff2, "PSEUDO %s\n", players[2].pseudo);
 			bzero(buff2, PACKET_SIZE + 1);
-			sprintf(buff2, "PSEUDO %s", pseudo);
+			sprintf(buff2, "PSEUDO %s\n", pseudo);
 			send_packet(buff2, players[2].sock);
 			bzero(buff2, PACKET_SIZE + 1);
 			sprintf(buff2, "NEW\t%s\n", players[2].pseudo);
@@ -336,10 +336,10 @@ void handle_new_connection() {
 				strcpy(players[i].ip, inet_ntoa(((struct sockaddr_in) client_addr).sin_addr));
 				players[i].port = PORT;
 				char buff[PACKET_SIZE + 1];
-				sprintf(buff, "PSEUDO %s", pseudo);
+				sprintf(buff, "PSEUDO %s\n", pseudo);
 				send_packet(buff, players[i].sock);
 				recuperer_packet(buff, players[i].sock);
-				added += sscanf(buff, "PSEUDO %s", players[i].pseudo);
+				added += sscanf(buff, "PSEUDO %s\n", players[i].pseudo);
 				if (!added) { // erreur de communication = reset et refus du joueur
 					players[i].port = ERROR;
 					players[i].sock = ERROR;
