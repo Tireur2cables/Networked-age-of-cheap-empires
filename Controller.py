@@ -13,6 +13,7 @@ from player import AI, Player
 from views.IAVictoryView import IAVictoryView
 from views.VictoryView import VictoryView
 from views.DefeatView import DefeatView
+from network.pytoc import *
 
 # --- Constants ---
 from CONSTANTS import DEFAULT_MAP_SIZE, Resource
@@ -30,12 +31,13 @@ class Controller():
 		self.game = aoce_game
 
 		# Selection (will contain elements of type Entity)
-		self.selection = dict()  # self.section ---> convert to a dict, the key is "player" or "ai_1" or "ai_2" or ...
+		self.selection = dict()  # self.section ---> convert to a dict, the key is self.game.window.pseudo or "ai_1" or "ai_2" or ...
 		self.dead_entities = set()
 		self.ai = set()
 		self.players = set()
 		self.working_sites = set()
 		self.type_of_game = ""
+		self.count = 0
 
 	def __getstate__(self):
 		return [self.selection, self.dead_entities, self.ai, self.players, self.working_sites, self.type_of_game]
@@ -50,16 +52,18 @@ class Controller():
 		self.players.clear()
 		self.working_sites.clear()
 		self.type_of_game = ""
+		self.count = 0
 
 	def setup(self, players_dict: dict, type_of_game):
 		self.reset()
-		self.selection["player"] = set()
+		self.selection[self.game.window.pseudo] = set()
 		self.type_of_game = type_of_game
 		for key, value in players_dict.items():
 			self.players.add(value)
 			self.selection[key] = set()
 			if "ai" in key:
 				self.ai.add(value)
+		self.count = 0
 
 # --- Utility methods ---
 	@staticmethod
@@ -91,6 +95,140 @@ class Controller():
 			if e and filter(e):
 				return e
 		return None
+
+
+
+
+
+
+
+
+	def interpret(self, packet):
+		# Interpret the packet and return a list of instructions
+		print(packet)
+		print(packet.ID)
+		match packet.ID:
+
+			case "CREATE_UNIT":
+				# jdis ptet de la d mais pour moi c'est
+				# on call add_entity_to_game() from controller.py
+				print("[<--] Received unit : " + packet.data)
+				datatab = packet.data.split(";")
+				bat_x=datatab[0]
+				bat_y=datatab[1]
+				unit = str(datatab[2])
+				zone = str(datatab[3])
+
+				pos = (int(bat_x), int(bat_y))
+				#print("on a ça", pos)
+				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
+				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
+				self.order_zone_units(zone_found, unit)
+
+			case "HARVEST":
+				# order_harverst() from controller.py
+				#SYNTAXE : Packet("HARVEST","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(aimed_tile.grid_position)))
+				datatab = packet.data.split(";")
+				start_x=datatab[0]
+				start_y=datatab[1]
+				end_x=datatab[2]
+				end_y=datatab[3]
+				num = int(datatab[4])
+				# entity=datatab[4]
+				pos = (int(end_x), int(end_y))
+				#print("on a ça", pos)
+				sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
+				zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
+				for player in self.players :
+					if player.player_type == packet.PNAME :
+						unit_found = player.units_by_id[num]
+						break
+				#print(unit_found)
+				self.order_harvest(unit_found, zone_found)
+
+				pass
+
+			case "MOVE_UNIT":
+				# (Call Controller.human_order_towards_position("move", faction, iso_position):)
+				# Call Controller.move_entity(entity, end_position)
+				# Structure of packet.data :
+				#   - faction
+				#   - iso_position
+				#   - entity : Use tuple in Game.get_units_by_id()
+				#   - end_position
+				datatab = packet.data.split(";")
+				start_x=datatab[0]
+				start_y=datatab[1]
+				end_x=datatab[2]
+				end_y=datatab[3]
+				num = int(datatab[4])
+				# pos = grid_xy_to_iso(int(start_x), int(start_y))
+				# sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Unit)
+				# unit_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Unit))
+				for player in self.players :
+					if player.player_type == packet.PNAME :
+						unit_found = player.units_by_id[num]
+						break
+				print(unit_found)
+				self.move_entity(unit_found, Vector(int(end_x), int(end_y)))
+
+				# SYNTAXE : send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (entity.iso_position + ";" + str(end_grid_position)))).stringify(),self.game.window.ecriture_fd)
+
+				print("[<--] Received move order : X =" + start_x + " Y = " + start_y + " -> X = " + end_x + " Y = " + end_y)
+
+
+			case "BUILD":
+				# (Call Controller.human_order_towards_position("build", faction, iso_position):)
+				# Call Controller.order_build(entity, map_position)
+				# Installer une construction ou un site de construction
+				# Structure of packet.data :
+				#   - faction
+				#   - iso_position
+
+				# SYNTAXE : send((Packet("BUILD","DICT",self.game.window.pseudo, str(entity.iso_position + ";" + str(map_position)+";"+str(building_name)))).stringify(),self.game.window.ecriture_fd)			#avec les entity.pos communiquées, on retrouve les bonnes unités en parcourant le tableau des entities
+				#DATA : map_pos et building_name séparés par une tabulation
+				# BUILD	DICT	Caterwaul2	12;8;15;5;storagepit;num
+				datatab = packet.data.split(";")
+				start_x=datatab[0]
+				start_y=datatab[1]
+				end_x=datatab[2]
+				end_y=datatab[3]
+				batiment = datatab[4]
+				num = int(datatab[5])
+				for player in self.players :
+					if player.player_type == packet.PNAME :
+						unit_found = player.units_by_id[num]
+						break
+				print(unit_found)
+				self.order_build(unit_found, Vector(int(end_x), int(end_y)), batiment)
+
+				print("[<--] Received build order : " + packet.data)
+
+
+			case "ATTACK":
+				# SYNTAXE : send((Packet("ATTACK","DICT",self.game.window.pseudo, str(entity.iso_position+"\t"+aimed_entity.iso_position))).stringify(),self.game.window.ecriture_fd)
+				datatab = packet.data.split(";")
+				start_x=datatab[0]
+				start_y=datatab[1]
+				end_x=datatab[2]
+				end_y=datatab[3]
+				num1 = int(datatab[4])
+				faction2 = datatab[5]
+				num2 = int(datatab[6])
+				# entity=datatab[4]
+				# pos = grid_xy_to_iso(int(end_x), int(end_y))
+				# #print("on a ça", pos)
+				# sprites_at_point = self.game.game_view.get_closest_sprites(pos, self.game.game_view.sorted_sprite_list, Zone)
+				# zone_found = self.find_entity_in_sprites(sprites_at_point, self.filter_type(Zone))
+				for player in self.players :
+					if player.player_type == packet.PNAME :
+						unit_found1 = player.units_by_id[num1]
+					if player.player_type == faction2 :
+						unit_found2 = player.units_by_id[num2]
+				print(unit_found1)
+				self.order_attack(unit_found1, unit_found2)
+				print("[<--] Received build order : " + packet.data)
+
 
 
 
@@ -176,7 +314,7 @@ class Controller():
 		if action == "army" : # keyboard shortcut to send the whole army
 			entity_found = self.find_entity_in_sprites(sprites_at_point, self.filter_faction(faction, reverse=True))
 			if entity_found:
-				self.order_army_attack(self.game.players["player"].my_military, entity_found)
+				self.order_army_attack(self.game.players[self.game.window.pseudo].my_military, entity_found)
 		else:
 			for entity in self.selection[faction]:
 				if action == "harvest/stock/attack/repair" : # click on batiment
@@ -238,6 +376,14 @@ class Controller():
 		path, path_len = self.game.game_model.map.get_path(start=iso_to_grid_pos(entity.iso_position), end=end_grid_position)
 		# get_path_fast is a lot faster, but the pathfinding is a little more "stupid" and you need a little more to guide the units around obstacles
 		# get_path_fast was unstable and added a lot of bugs so it's not used anymore.
+		#print("entity moving")
+		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+			for player in self.players :
+				if player.player_type == entity.faction :
+					num = player.units_by_id.index(entity)
+					break
+			send((Packet("MOVE_UNIT","DICT",self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(end_grid_position.x)+ ";" + str(end_grid_position.y) + ";" + str(num)))).stringify(),self.game.window.ecriture_fd)
 		if path_len > 0:
 			entity.set_move_action()
 			entity.set_path(path)
@@ -281,10 +427,20 @@ class Controller():
 		if aimed_tile is not None:
 			entity.set_goal("harvest")
 			entity.set_aimed_entity(zone_to_harvest)
+			if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+				for player in self.players :
+					if player.player_type == entity.faction :
+						num = player.units_by_id.index(entity)
+						break
+				ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+				harvestPacket = Packet("HARVEST", "DICT", self.game.window.pseudo, (str(ix) + ";" + str(iy) + ";" + str(zone_to_harvest.iso_position.x + zone_to_harvest.sprite_data.x_offset)+ ";" + str(zone_to_harvest.iso_position.y + zone_to_harvest.sprite_data.y_offset) + ";" + str(num)))
+				send(harvestPacket.stringify(),self.game.window.ecriture_fd)
 			if aimed_tile.grid_position == entity_grid_pos: # Dans ce cas c'est que nous sommes déjà arrivé
 				entity.is_interacting = True
 			else:
+				#print("entity harvesting")
 				self.move_entity(entity, aimed_tile.grid_position, False)
+
 
 	def order_search_stock_resources(self, entity, resource_nbr):
 		entity_grid_pos = iso_to_grid_pos(entity.iso_position)
@@ -316,11 +472,20 @@ class Controller():
 
 	# Called once
 	def order_build(self, entity, map_position, building_name):
+		#print(str(str(map_position)+"\t"+str(building_name)))
+		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+			for player in self.players :
+				if player.player_type == entity.faction :
+					num = player.units_by_id.index(entity)
+					break
+			send((Packet("BUILD","DICT",self.game.window.pseudo, str(str(ix) + ";" + str(iy) + ";" + str(map_position.x)+ ";" + str(map_position.y)+ ";" +str(building_name)+ ";" +str(num)))).stringify(),self.game.window.ecriture_fd)
+
 		# Step 1: Create a worksite with the building_name
 		zone_to_build_class = WorkSite.get_zone_class(building_name)
 		if self.game.players[entity.faction].can_create(zone_to_build_class) :
 			#Pour le gui, on baisse le flag si on peut finalement construire
-			if entity.faction == "player":
+			if entity.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = ""
 			# Step 2: Search for an entity that can build: a Villager.
 			if isinstance(entity, Villager):
@@ -355,7 +520,7 @@ class Controller():
 		else:
 			#print("not enough resources to order a build!")
 			#Pour le GUI, on leve un flag pour le message d erreur
-			if entity.faction == "player":
+			if entity.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
 	# Called once
@@ -386,22 +551,37 @@ class Controller():
 
 			if current_player.can_create(producing_zone.class_produced, producing_zone.get_name()) :
 				producing_zone.is_producing = True
-				for key, value in producing_zone.class_produced.creation_cost.items():
-					if isinstance(producing_zone, TownCenter) and key == Res.FOOD and current_player.upgrades.get(producing_zone.get_name(), 0) == 1:
-						current_player.sub_resource(key, value - 20)
-					else:
-						current_player.sub_resource(key, value)
+				if self.game.window.multiplayer and self.game.window.pseudo == producing_zone.faction :
+					for key, value in producing_zone.class_produced.creation_cost.items():
+						if isinstance(producing_zone, TownCenter) and key == Res.FOOD and current_player.upgrades.get(producing_zone.get_name(), 0) == 1:
+							current_player.sub_resource(key, value - 20)
+						else:
+							current_player.sub_resource(key, value)
 
-				if producing_zone.faction == "player" : # Shouldn't be used with AI
+						ix,iy= producing_zone.iso_position.x + producing_zone.sprite_data.x_offset, producing_zone.iso_position.y + producing_zone.sprite_data.y_offset
+						send(Packet("CREATE_UNIT", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(entity_produced) + ";" + str(producing_zone)))).stringify(), self.game.window.ecriture_fd)
+						# ICI
+
+				if producing_zone.faction == self.game.window.pseudo : # Shouldn't be used with AI
 					self.game.game_view.update_resources_gui()
 			else :
-				if producing_zone.faction == "player":
+				if producing_zone.faction == self.game.window.pseudo:
 					self.game.game_view.errorMessage = "Vous manquez de ressources pour produire des unités"
 		else :
-			if producing_zone.faction == "player":
+			if producing_zone.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def order_attack(self, entity: Unit, aimed_entity: Entity):
+		for player in self.players :
+			if player.player_type == entity.faction :
+				num1 = player.units_by_id.index(entity)
+			elif player.player_type == aimed_entity.faction :
+				num2 = player.units_by_id.index(aimed_entity)
+
+		if self.game.window.multiplayer and self.game.window.pseudo == entity.faction :
+			ix,iy= iso_to_grid_xy(entity.iso_position.x, entity.iso_position.y)
+			send(Packet("ATTACK", "DICT", self.game.window.pseudo, str(str(str(ix) + ";" + str(iy) + ";" + str(aimed_entity.iso_position.x) + ";" + str(aimed_entity.iso_position.y) + ";" + str(num1) + ";" + aimed_entity.faction + ";" + str(num2)))).stringify(), self.game.window.ecriture_fd)
+
 		# print(f"{entity} ---> VS {aimed_unit}")
 		entity.set_goal("attack")
 		entity.set_aimed_entity(aimed_entity)
@@ -464,19 +644,19 @@ class Controller():
 				if all(current_player.resources[k] >= upgradeIt.upgrade_cost[current_level][k] for k in Res) :
 						for k in Res :
 							current_player.sub_resource(k, upgradeIt.upgrade_cost[current_level][k])
-						if upgradeIt.faction == "player" : # Shouldn't be used with AI
+						if upgradeIt.faction == self.game.window.pseudo : # Shouldn't be used with AI
 							self.game.game_view.update_resources_gui()
 						current_player.upgrade(upgradeIt.get_name())
 				else :
-					if upgradeIt.faction == "player":
+					if upgradeIt.faction == self.game.window.pseudo:
 						self.game.game_view.errorMessage = "Vous manquez de ressources pour améliorer"
 			else :
-				if upgradeIt.faction == "player":
+				if upgradeIt.faction == self.game.window.pseudo:
 					self.game.game_view.errorMessage = "Vous avez déjà amélioré ce batiment"
 
 	def end_game(self):
 		for player in self.game.players:
-			if player == "player":
+			if player == self.game.window.pseudo:
 				VictoryView(self.game).setup()
 				self.game.window.show_view(VictoryView(self.game))
 			elif self.type_of_game == "JvsIA":  # which means a human was playing
@@ -491,6 +671,16 @@ class Controller():
 
 	def on_update(self, delta_time):
 		""" Movement and game logic """
+
+		self.count += 1
+		if (self.count == 30) : # changer si trop rapide ou trop long
+			packet_action = receive_string(self.game.window.lecture_fd, False)
+			#print(packet_action)
+			if packet_action != "":
+				self.interpret(packet_action)
+			self.count = 0
+
+
 
 		# --- Check End Conditions ---
 		dead_players = set()
@@ -547,7 +737,7 @@ class Controller():
 							if iso_to_grid_pos(entity.iso_position) == iso_to_grid_pos(entity.aimed_entity.iso_position):
 								# L'entité est arrivée
 								entity.is_interacting = True
-							elif (not entity.aimed_entity.is_moving) or entity.faction == "player" or entity.aimed_entity.faction == "player" :
+							elif (not entity.aimed_entity.is_moving) or entity.faction == self.game.window.pseudo or entity.aimed_entity.faction == self.game.window.pseudo :
 								# L'entité n'est pas arrivée et l'autre ne bouge pas OU l'une des deux entités appartient à un joueur
 								self.order_attack(entity, entity.aimed_entity)
 							else:
@@ -606,7 +796,7 @@ class Controller():
 			if entity.aimed_entity.health < entity.aimed_entity.max_health :
 				entity.aimed_entity.health += 1 # repare 1 point de vie
 
-				if entity.faction == "player" :
+				if entity.faction == self.game.window.pseudo :
 					self.game.game_view.update_resources_gui()
 			else : # fin de la réparation
 				entity.end_goal()
@@ -632,11 +822,11 @@ class Controller():
 					else:
 						current_player.sub_resource(res, cost)
 
-				if entity.faction == "player":
+				if entity.faction == self.game.window.pseudo:
 					self.game.game_view.update_resources_gui()
 
 				self.add_entity_to_game(worksite.create_zone())
-			elif entity.faction == "player" :
+			elif entity.faction == self.game.window.pseudo :
 				self.game.game_view.errorMessage = "Vous manquez de ressources pour construire"
 
 			entity.end_goal()
@@ -657,7 +847,7 @@ class Controller():
 				elif harvested == -1: # The zone is totaly harvested.
 					entity.end_goal()
 					self.dead_entities.add(aimed_entity)
-				if entity.faction == "player" :
+				if entity.faction == self.game.window.pseudo :
 					self.game.game_view.update_villager_resources_gui()
 			else: # the entity is full and needs to go back to the town center.
 				entity.set_goal("stock")
@@ -674,10 +864,12 @@ class Controller():
 			items_to_store = (Res.GOLD, Res.STONE, Res.WOOD)
 
 		for resource in items_to_store:
+			print(type(resource), type(entity.resources[resource]))
+			print(resource, entity.resources[resource])
 			self.game.players[entity.faction].add_resource(resource, entity.resources[resource])
 			entity.resources[resource] = 0
 
-		if entity.faction == "player" :
+		if entity.faction == self.game.window.pseudo :
 			self.game.game_view.update_villager_resources_gui()
 			self.game.game_view.update_resources_gui()
 
@@ -697,7 +889,7 @@ class Controller():
 				Class_produced = producing_zone.class_produced
 				random_factor = 0 if LAUNCH_DISABLE_RANDOM_PLACEMENT else Vector(random.randint(-8, 8), random.randint(-8, 8))
 				self.add_entity_to_game(Class_produced(grid_pos_to_iso(grid_position) + random_factor, producing_zone.faction))
-			elif producing_zone.faction == "player":
+			elif producing_zone.faction == self.game.window.pseudo:
 				self.game.game_view.errorMessage = "Vous manquez de places pour cette population"
 
 	def attack_entity(self, unit: Unit, delta_time):
@@ -709,7 +901,7 @@ class Controller():
 			#print(f"[{unit.faction}: fighting] my health = {unit.health} - enemy health = {unit.aimed_entity.health}")
 			alive = unit.aimed_entity.lose_health(unit.damage)
 
-			if unit.faction == "player" or unit.aimed_entity.faction == "player" : # Shouldn't be used with AI
+			if unit.faction == self.game.window.pseudo or unit.aimed_entity.faction == self.game.window.pseudo : # Shouldn't be used with AI
 				self.game.game_view.update_villager_resources_gui()
 
 			if isinstance(unit.aimed_entity, Unit) and unit.aimed_entity.aimed_entity != unit:

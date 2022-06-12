@@ -13,7 +13,8 @@ class Player:
 	def __init__(self,
 				game,#: GameView,
 				player_type: str,
-				resources: dict) -> None:
+				resources: dict,
+				num) -> None:
 		"""
 		Create a player.
 
@@ -39,6 +40,8 @@ class Player:
 		self.food_storage = set()
 		self.other_storage = set()
 		self.upgrades = {}
+		self.units_by_id = []
+		self.num = num
 
 	def reset(self):
 		self.resources.clear()
@@ -49,6 +52,11 @@ class Player:
 		self.food_storage.clear()
 		self.other_storage.clear()
 		self.upgrades.clear()
+		self.nb_unit = 0
+		self.max_unit = 4
+		self.is_alive = True
+		self.units_by_id.clear()
+		self.num = 0
 
 
 	def __getstate__(self):
@@ -64,17 +72,19 @@ class Player:
 		self.my_worksites,
 		self.food_storage,
 		self.other_storage,
-		self.upgrades]
+		self.upgrades,
+		self.num]
 
 
 	def __setstate__(self, data):
-		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades = data
+		self.player_type, self.is_alive, self.resources, self.nb_unit, self.max_unit, self.town_center, self.my_units, self.my_military, self.my_zones, self.my_worksites, self.food_storage, self.other_storage, self.upgrades = data, self.num
 
 	# my_entities
 	def add_entity(self, new_entity):
 		if isinstance(new_entity, Unit):
 			self.my_units.add(new_entity)
 			self.nb_unit += 1
+			self.units_by_id.append(new_entity)
 			if isinstance(new_entity, Military):
 				self.my_military.add(new_entity)
 
@@ -106,6 +116,7 @@ class Player:
 		if isinstance(dead_entity, Unit):
 			self.my_units.discard(dead_entity)
 			self.nb_unit -= 1
+			self.units_by_id.remove(dead_entity)
 			if isinstance(dead_entity, Military):
 				self.my_military.discard(dead_entity)
 
@@ -203,7 +214,7 @@ class AI(Player):
 			player_type: str,
 			difficulty,
 			resources: dict) -> None:
-		super().__init__(game, player_type, resources)
+		super().__init__(game, player_type, resources, -1)
 		self.delta_time = 0
 		self.difficulty = difficulty
 		self.mind = {}

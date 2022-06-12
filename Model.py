@@ -84,12 +84,16 @@ class Model():
 			self.map.setup(process_array2(seed=self.map_seed, size=(DEFAULT_MAP_SIZE, DEFAULT_MAP_SIZE), nbr_players=len(self.players)))
 
 		for pos_spawn in self.map.spawn_array:
-			if "player" in self.players:
-				faction = "player" if pos_spawn[1] == "0" else "ai_" + pos_spawn[1]
-				self.game.game_controller.add_entity_to_game(TownCenter(pos_spawn[0], faction))
+			if self.game.game_controller.type_of_game == "JvsJ" :
+				for player in self.game.game_controller.players:
+					if str(player.num)==pos_spawn[1]:
+						faction = player.player_type
+			elif self.game.window.pseudo in self.players:
+				faction = self.game.window.pseudo if pos_spawn[1] == "0" else "ai_" + pos_spawn[1]
 			else:
 				faction = f"ai_{int(pos_spawn[1]) + 1}"
-				self.game.game_controller.add_entity_to_game(TownCenter(pos_spawn[0], faction))
+
+			self.game.game_controller.add_entity_to_game(TownCenter(pos_spawn[0], faction))
 
 			start_villagers = (Villager(grid_pos_to_iso(pos_spawn[0] - Vector(1, 1)), faction),
 				Villager(grid_pos_to_iso(pos_spawn[0] - Vector(0, 1)), faction),

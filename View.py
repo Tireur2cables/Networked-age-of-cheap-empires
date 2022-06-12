@@ -119,7 +119,9 @@ class View():
 		self.HEIGHT_LABEL = self.minimap.size[1] / 5 # in order to have same height as minimap at the end
 		self.WIDTH_LABEL = (self.game.window.width / 2) - self.minimap.size[0] - self.HEIGHT_LABEL # moitié - minimap - image
 
-		player = self.game.players.get("player")
+		player = self.game.players.get(self.game.window.pseudo)
+		#print(self.game.players)
+		#print(player)
 		if player is not None:
 			# Create a vertical BoxGroup to align buttons
 			self.v_box1 = arcade.gui.UIBoxLayout()
@@ -301,12 +303,15 @@ class View():
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
-
+		town_center_pos = self.game.players[self.game.window.pseudo].town_center.grid_position
+		town_center_pos_sur_la_carte = grid_xy_to_iso(town_center_pos.x, town_center_pos.y)
+		#print(town_center_pos_sur_la_carte)
+		# print("La position de mon TownCenter est :", (town_center_pos_iso))
 		self.camera = arcade.Camera(self.game.window.width, self.game.window.height)
-		initial_x, initial_y = (0, 0)
-		self.camera_x = initial_x
-		self.camera_y = initial_y
-
+		# initial_x, initial_y = (self.player.spawn_pos[0], self.player.spawn_pos[1])
+		initial_x, initial_y = town_center_pos_sur_la_carte
+		self.camera_x = initial_x - self.game.window.width / 2
+		self.camera_y = initial_y - self.game.window.height / 2
 		#coords of the mouse in the middle of the screen by default (and will be update when the mouse will move)
 		self.mouse_x = self.game.window.width / 2
 		self.mouse_y = self.game.window.height / 2
@@ -362,18 +367,19 @@ class View():
 		elif button == arcade.MOUSE_BUTTON_LEFT and not self.right_click_mode :
 			#Si le bouton maisno a ete selectionne, la prochaine fois qu on click gauche, le villageois constuira une maison.
 			if self.build_request:
-				self.game.game_controller.human_order_towards_position("build", "player", mouse_position_in_game, self.build_request)
+				self.game.game_controller.human_order_towards_position("build", self.game.window.pseudo, mouse_position_in_game, self.build_request)
 				self.build_request = ""
 			else:
 				closest_unit_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 				if closest_unit_sprites:
-					self.game.game_controller.select("player", closest_unit_sprites)
+					self.game.game_controller.select(self.game.window.pseudo, closest_unit_sprites)
 				else:
 					closest_zone_sprites = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+					#print("on veut ça", mouse_position_in_game)
 					if closest_zone_sprites:
-						self.game.game_controller.select_zone("player", closest_zone_sprites)
+						self.game.game_controller.select_zone(self.game.window.pseudo, closest_zone_sprites)
 					else:
-						self.game.game_controller.clear_faction_selection("player")
+						self.game.game_controller.clear_faction_selection(self.game.window.pseudo)
 				# draw interactive ui of selected
 				self.trigger_Villager_GUI(self.game.game_controller.selection)
 
@@ -381,12 +387,13 @@ class View():
 			self.reset_construct_flags() # permet d'annuler une construction
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
+			#print("on veut ça", mouse_position_in_game)
 			if units_at_point:
-				self.game.game_controller.human_order_towards_sprites("attack", "player", units_at_point)
+				self.game.game_controller.human_order_towards_sprites("attack", self.game.window.pseudo, units_at_point)
 			elif zones_at_point:
-				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", "player", zones_at_point)
+				self.game.game_controller.human_order_towards_sprites("harvest/stock/attack/repair", self.game.window.pseudo, zones_at_point)
 			else:
-				self.game.game_controller.human_order_towards_position("move", "player", mouse_position_in_game)
+				self.game.game_controller.human_order_towards_position("move", self.game.window.pseudo, mouse_position_in_game)
 
 			if self.right_click_mode :
 				self.tactile_button.reset()
@@ -402,17 +409,18 @@ class View():
 	def on_key_press(self, symbol, modifier):
 		mouse_position_in_game = Vector(self.mouse_x + self.camera.position.x, self.mouse_y + self.camera.position.y)
 		if symbol == arcade.key.ENTER:
-			self.cheatsinput.on_enter_pressed()
-			self.triggerCheatInput()
+			if not self.game.window.multiplayer:
+				self.cheatsinput.on_enter_pressed()
+				self.triggerCheatInput()
 		if symbol == arcade.key.F1: # cheat window
 			self.triggerCheatInput()
 		if symbol == arcade.key.A and (modifier & arcade.key.MOD_CTRL):
 			units_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Unit)
 			zones_at_point = self.get_closest_sprites(mouse_position_in_game, self.sorted_sprite_list, Zone)
 			if zones_at_point:
-				self.game.game_controller.human_order_towards_sprites("army", "player", zones_at_point)
+				self.game.game_controller.human_order_towards_sprites("army", self.game.window.pseudo, zones_at_point)
 			elif units_at_point:
-				self.game.game_controller.human_order_towards_sprites("army", "player", units_at_point)
+				self.game.game_controller.human_order_towards_sprites("army", self.game.window.pseudo, units_at_point)
 
 	def get_closest_sprites(self, mouse_position_in_game, sprite_list, type):
 		sprites_at_point = tuple(s for s in arcade.get_sprites_at_point(tuple(mouse_position_in_game), sprite_list) if isinstance(s.entity, type))
@@ -594,13 +602,16 @@ class View():
 		# Create a vertical BoxGroup to align buttons
 		self.v_box3 = arcade.gui.UIBoxLayout()
 
+		l = []
 		# Create the exit button
 		retour_button = NextViewButton(self.game.window, self.game.menu_view, text="Menu", width=buttonsize)
+		l.append(retour_button)
 		# Create the save button
 		save_button = SaveButton(self.game, text="Save Game", width=buttonsize)
+		if not self.game.window.multiplayer : l.append(save_button)
 		# {'players': game.players, 'model': game.game_model, 'controller': game.game_controller}
 		# Create the option button
-		option_button = ListButton(self.v_box3, [save_button, retour_button], text="Option", width=buttonsize)
+		option_button = ListButton(self.v_box3, l, text="Option", width=buttonsize)
 		self.v_box3.add(option_button)
 
 		# Create a widget to hold the v_box widget, that will center the buttons
@@ -646,7 +657,7 @@ class View():
 		self.coord_label.fit_content()
 
 	def update_resources_gui(self):
-		player = self.game.players.get("player")
+		player = self.game.players.get(self.game.window.pseudo)
 		if player is not None:
 			player_resources = player.resources
 			# print(player_resources)
@@ -673,13 +684,13 @@ class View():
 		self.v_box15.clear()
 
 		self.boolean_dynamic_gui = False
-		if selected_list["player"] : # someting is selected
+		if selected_list[self.game.window.pseudo] : # someting is selected
 			self.boolean_dynamic_gui = True
 
 			width = self.game.window.width / 2 # other half of the screen
 			height = self.minimap.size[1] # same as minimap
 
-			for s in selected_list["player"] :
+			for s in selected_list[self.game.window.pseudo] :
 				if isinstance(s, Entity) : # add entity info
 					titre ="  " + s.get_name().capitalize() + ("" if s.faction == "None" else " [" + s.faction + "] ") # There is a weird graphic bug. Replacing this line by : title = "Wood" also produces the bug so it's likely not due to our code...
 					entity_box_stat = arcade.gui.UITextArea(text=titre, width=width / 3, height=height)
@@ -695,7 +706,7 @@ class View():
 					ressources_restantes = arcade.gui.UITextArea(text="Ressources : " + str(s.amount) + " / " + str(s.max_amount), text_color=arcade.color.GREEN, width=width / 8)
 					self.v_box8.add(ressources_restantes.with_border())
 
-				elif s.faction == "player" : # ouvre les actions seulement si la selection nnous appartient
+				elif s.faction == self.game.window.pseudo : # ouvre les actions seulement si la selection nnous appartient
 
 					if isinstance(s, Villager) : # add villager options
 						villager_ressources = arcade.gui.UITextArea(text="Ressources : " + str(s.nb_resources()), text_color=arcade.color.PINK, width=width / 8)

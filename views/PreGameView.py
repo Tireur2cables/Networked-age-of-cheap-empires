@@ -64,7 +64,7 @@ class PreGameView(arcade.View) :
 		self.ia_box = arcade.gui.UIBoxLayout()
 
 		# Create the buttons of incrementation
-		you_civil_button = PlayerButton(text="Vous", width=buttonsize * 2, height=buttonsize / 4)
+		you_civil_button = PlayerButton(text=self.window.pseudo, width=buttonsize * 2, height=buttonsize / 4)
 		self.ia_box.add(you_civil_button.with_space_around(bottom=20))
 
 		name = ["IA1", "IA2", "IA3", "IA4", "IA5", "IA6", "IA7"]

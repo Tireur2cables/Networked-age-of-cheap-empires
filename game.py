@@ -1,5 +1,6 @@
 # --- Imports ---
-import os
+# -- libs --
+import random
 # -- arcade --
 import arcade
 from player import AI, Player
@@ -9,13 +10,18 @@ from views.MainView import MainView
 from Model import Model
 from Controller import Controller
 from View import View
+# -- network --
+from network.pytoc import *
+
+from CONSTANTS import Resource as res
 
 # --- Constants ---
-DEFAULT_SCREEN_WIDTH = 800
-DEFAULT_SCREEN_HEIGHT = 600
+DEFAULT_SCREEN_WIDTH = 1280
+DEFAULT_SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Age Of Cheap Empire"
 
 MUSIC = "./Ressources/music/NEW_AGE.mp3"
+USERNAME_FILE = "./usernames.list"
 
 # --- Launch setup ---
 from LAUNCH_SETUP import LAUNCH_FULLSCREEN, LAUNCH_MUSIC
@@ -34,7 +40,7 @@ class AoCE(arcade.Window):
 		# Call the initializer of arcade.Window
 		super().__init__(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, SCREEN_TITLE, resizable=False, fullscreen=LAUNCH_FULLSCREEN, vsync=True)
 		#arcade.set_background_color(arcade.csscolor.WHITE)
-		self.set_update_rate(1/60)#set maximum fps
+		self.set_update_rate(1/30)#set maximum fps
 
 		# Show the mouse cursor
 		self.set_mouse_visible(True)
@@ -50,11 +56,38 @@ class AoCE(arcade.Window):
 		# # Variables for communications between model, view and controller.
 		# self.toDraw = []
 		self.tactilmod = False
+		self.pseudo = self.getPseudo();
+		self.multiplayer = False
+		self.ecriture_fd = AoCE.ecriture_fd
+		self.lecture_fd = AoCE.lecture_fd
+		self.host = False
+
+	def getPseudo(self) :
+		pseudo = "Default pseudo"
+		with open(USERNAME_FILE) as file:
+			tab = file.read().splitlines();
+			pseudo = random.choice(tab)
+			pseudo += str(random.choice(range(0,100)))
+		return pseudo
+
+	def activate_multiplayer_host(self) :
+		self.multiplayer = True
+		self.host = True
+		mess = "INIT " + self.pseudo
+		send(mess, AoCE.ecriture_fd)
+
+	def activate_multiplayer(self) :
+		self.multiplayer = True
+		mess = "JOIN " + self.pseudo
+		send(mess, AoCE.ecriture_fd)
+
+	def desactivate_multiplayer(self) :
+		self.multiplayer = False
+		send("CANCEL", AoCE.ecriture_fd)
 
 	def on_show(self):
 		# Affiche le main menu
 		start_view = MainView(self.GameView)
-		#print("test")
 		self.GameView.setMenuView(start_view)
 		start_view.setup() # useless : mainview.setup is empty
 		self.show_view(start_view)
@@ -63,8 +96,7 @@ class AoCE(arcade.Window):
 	def exit(self):
 		self.media_player.delete()
 		arcade.exit()
-		if AoCE.ecriture_fd :
-			os.write(AoCE.ecriture_fd, "STOP".encode())
+		send("STOP", AoCE.ecriture_fd)
 
 	def triggerTactil(self) :
 		self.tactilmod = not self.tactilmod
@@ -115,30 +147,51 @@ class GameView(arcade.View):
 		i = 1
 		human_in_game = False
 		ia_in_game = False
+		if self.window.host :
+			for name in resources :
+				n = ""
+				if name == res.FOOD :
+					n = "FOOD"
+				elif name == res.WOOD :
+					n = "WOOD"
+				elif name == res.GOLD :
+					n = "GOLD"
+				else :
+					n = "STONE"
+
+				txt = "RES\t" + n + "\t" + str(resources[name]) + "\n"
+				send(txt, AoCE.ecriture_fd)
 		for player, difficulty in players.items():
-			if "Vous" in player:
-				self.players["player"] = Player(self, "player", resources)
+			#print(player, difficulty)
+			if "Joueur Humain" in difficulty[0] or "Joueur en ligne" in difficulty[0] :
+				self.players[player] = Player(self, player, resources, difficulty[1])
 				human_in_game = True
+				if self.window.host :
+					txt = "CR\t" + player + "\t" + str(difficulty[1]) + "\n"  #difficulty[1] == numéro du joueur
+					send(txt, AoCE.ecriture_fd)
 			else:
 				self.players[f"ai_{i}"] = AI(self, f"ai_{i}", difficulty, resources)
 				i += 1
 				ia_in_game = True
-		#print(self.players)
 		return human_in_game, ia_in_game
 
 
 	def setup(self, ressources, players, map_seed):
 		""" Set up the game and initialize the variables. (Re-called when we want to restart the game without exiting it)."""
-		#print(players)
 		human_in_game, ia_in_game = self.create_players(players, ressources)
 		# self.players = {"player": Player(self, "player", ressources), "ai_1": AI(self, "ai_1", ressources)}
-		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		if human_in_game and ia_in_game:
 			self.game_controller.setup(self.players, "JvsIA")
 		elif ia_in_game:
 			self.game_controller.setup(self.players, "IAvsIA")
-		else:
+		elif human_in_game and len(self.players) == 1:
 			self.game_controller.setup(self.players, "J")
+		else:
+			self.game_controller.setup(self.players, "JvsJ")
+			if self.window.host :
+				send("SEED" + "\t" + str(map_seed) + "\n", AoCE.ecriture_fd)
+				send("START" + "\n", AoCE.ecriture_fd)
+		self.game_model.setup(ressources, self.players.keys(), map_seed)
 		self.game_view.setup(self.tactilmod)
 
 	def load_save(self, data):

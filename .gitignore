@@ -1,3 +1,6 @@
 __pycache__/
 *.pkl
 LAUNCH_SETUP.py
+.idea/
+lanceur
+lanceur.o

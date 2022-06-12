@@ -1,10 +1,12 @@
 # --- Imports ---
 import arcade
 from arcade.arcade_types import Color
-from views.CustomButtons import LoadButton, QuitButton, NextViewButton
+from views.CustomButtons import LoadButton, QuitButton, NextViewButton, ListButton
 from views.SettingsView import SettingsView
 from views.PreGameView import PreGameView
 from views.IAvsIAView import IAPreGameView
+from views.MultiplayerCreateView import MultiplayerCreateView
+from views.MultiplayerJoinView import MultiplayerJoinView
 
 # --- Constants ---
 BACKGROUND = "./Ressources/img/background.png"
@@ -17,7 +19,7 @@ class MainView(arcade.View) :
 		self.game_view = game_view
 
 	def setup(self) :
-		pass
+		self.window.desactivate_multiplayer()
 
 	def on_show(self):
 		""" This is run once when we switch to this view """
@@ -32,22 +34,29 @@ class MainView(arcade.View) :
 		self.setupButtons()
 
 	def setupButtons(self):
+
 		# def button size
 		buttonsize = self.window.width / 6 # arbitrary
 
 		# Create a vertical BoxGroup to align buttons
 		self.v_box = arcade.gui.UIBoxLayout()
+		self.v_box_online = arcade.gui.UIBoxLayout()
 
 		# Create the buttons
 
 		start_button = NextViewButton(self.window, PreGameView(self), text="Start Game VS IA", width=buttonsize)
 		self.v_box.add(start_button.with_space_around(bottom=20))
 
-		ia_match_button = NextViewButton(self.window,IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
+		ia_match_button = NextViewButton(self.window, IAPreGameView(self), text="IA VS IA Game",width=buttonsize)
 		self.v_box.add(ia_match_button.with_space_around(bottom=20))
 
-		# TODO : charger une sauvegarde
-		load_button = LoadButton(self.window, self, text="Charger une sauvegarde", width=buttonsize)
+		join_game_button = NextViewButton(self.window, MultiplayerJoinView(self), text="Join Multiplayer Game", width=buttonsize)
+		self.v_box.add(join_game_button.with_space_around(bottom=20))
+
+		create_game = NextViewButton(self.window, MultiplayerCreateView(self), text="Create Multiplayer Game", width=buttonsize)
+		self.v_box.add(create_game.with_space_around(bottom = 20))
+
+		load_button = LoadButton(self.window, self, text="Load save", width=buttonsize)
 		self.v_box.add(load_button.with_space_around(bottom=20))
 
 		settings_button = NextViewButton(self.window, SettingsView(self), text="Settings", width=buttonsize)

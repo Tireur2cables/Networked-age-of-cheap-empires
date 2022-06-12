@@ -4,6 +4,7 @@ from arcade.arcade_types import Color
 import arcade.gui
 from save import pickleLoading, pickleSaving
 from entity.Unit import *
+from network.pytoc import *
 
 # Constants
 from CONSTANTS import Resource as Res
@@ -46,6 +47,27 @@ class LoadButton(arcade.gui.UITextureButton):
 		self.nextView.load_save(data)
 		self.window.show_view(self.nextView)
 
+# InputText to connect to another players
+class InputIP(arcade.gui.UIInputText):
+
+    def __init__(self, window, x, y, text, font_name, font_size,  width, height) :
+        super().__init__(x=x, y=y, text=text, font_name=font_name, font_size=font_size, width=width, height=height)
+        self.window = window
+        # restetting variables
+        # cheats_vars.global_save_suffix = "0" --- This shouldn't be resetted as it is used to load a save in the menu
+
+    def reset_text(self):
+        self.text = ""
+
+    def on_event(self, event):
+        super().on_event(event)
+        if len(self.text)>= 1 and "\n" == self.text[-1]:
+
+            txt = "JOIN " + self.window.pseudo + " " + self.text
+            send(txt, self.window.ecriture_fd)
+            self.reset_text()
+        # ce qu'il faut faire pour se connecter
+
 # Button to return to the main menu
 class NextViewButton(arcade.gui.UITextureButton) :
 	def __init__(self, window, nextView, text, width) :
@@ -86,18 +108,43 @@ class LaunchGameButton(arcade.gui.UITextureButton) :
 		self.pregameview = pregameview
 
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
-		ia = {}
-		for padding in self.pregameview.ia_box.children :
-			name, diff = padding.child.text.split(padding.child.sep)
-			ia[name] = diff
-
 		ressources = {}
 		tab = [Res.FOOD, Res.WOOD, Res.STONE, Res.GOLD]
 		indice = 0
 		for texture_pane in self.pregameview.name_input_ressources :
 			ressources[tab[indice]] = int(texture_pane.child.text)
 			indice += 1
+
+		ia = {}
+		for padding in self.pregameview.ia_box.children :
+			name, diff = padding.child.text.split(padding.child.sep)
+			ia[name] = (diff, 0)
 		self.nextView.setup(ressources, ia, int(self.pregameview.map_pane.child.text))
+		self.window.show_view(self.nextView)
+
+# Button to return to the main menu
+class LaunchOnlineGameButton(arcade.gui.UITextureButton) :
+	def __init__(self, window, nextView, pregameview, text, width) :
+		super().__init__(texture=arcade.load_texture(button_texture), text=text, width=width)
+		self.window = window
+		self.nextView = nextView
+		self.pregameview = pregameview
+
+	def on_click(self, event: arcade.gui.UIOnClickEvent) :
+		ressources = {}
+		tab = [Res.FOOD, Res.WOOD, Res.STONE, Res.GOLD]
+		indice = 0
+		for texture_pane in self.pregameview.name_input_ressources :
+			ressources[tab[indice]] = int(texture_pane.child.text)
+			indice += 1
+
+		players = {}
+		indice = 0
+		for padding in self.pregameview.players_box.children :
+			name, diff = padding.child.text.split(padding.child.sep)
+			players[name] = (diff, indice)
+			indice += 1
+		self.nextView.setup(ressources, players, int(self.pregameview.map_pane.child.text))
 		self.window.show_view(self.nextView)
 
 # Button to display things or not
@@ -164,6 +211,11 @@ class PlayerButton(arcade.gui.UITextureButton):
 		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Joueur Humain", width=width, height=height)
 		self.sep = " : "
 
+class OnlinePlayerButton(arcade.gui.UITextureButton):
+	def __init__(self, text, width, height):
+		super().__init__(texture=arcade.load_texture(button_texture), text=text + " : Joueur en ligne", width=width, height=height)
+		self.sep = " : "
+
 class NumInput(arcade.gui.UIInputText) :
 	def __init__(self, x, y, text, width, height, text_color, limit=None) :
 		super().__init__(x=x, y=y, text=text, width=width, height=height, text_color=text_color)
@@ -203,6 +255,7 @@ class ActionButton(arcade.gui.UITextureButton) :
 	def on_click(self, event: arcade.gui.UIOnClickEvent) :
 		if self.text == "Villageois" :
 			self.aoce_game.game_controller.order_zone_units(self.batiment, Villager.get_name())
+			#print("on veut ça", self.batiment.iso_position.x, self.batiment.iso_position.y)
 		elif self.text == "Milice" :
 			self.aoce_game.game_controller.order_zone_units(self.batiment, Militia.get_name())
 		elif self.text == "Lancier" :
