@@ -1,38 +1,26 @@
-Logic of Game Commands : 
-    X) Hello, I am Player1, I want to interact with Villager.1234, who owns this ?
-    X) Hello, I am Player2, i own Villager.1234.
+Un "Packet" est une classe comportant les attributs suivants : 
 
-X) I am Player1, requesting contract on Villager.1234
-X) I am Player2, leaving you contract on Villager.1234
+ID : Chaîne de caractères indiquant le type d'informations transmises dans le champ DATA*
+    - "NEW" / "DECO" : Connexion / Déconnexion de la salle d'attente
+    - "RES" : Initialisation des ressources de départ
+    - "SEED" : Transmission de la seed d'Initialisation du monde
+    - "START" : Signale le lancement de la partie
 
-    5) I am Player1,acknowledge contract on X for 10sec
-    Actions...
-    6) I am Player1,finished contract on X for 10sec
-
-
-
-ID : 
-
-0-9 : Service Information
-0 : Client Disconnect
-1 : Client Subscription : First packet sent to the already connected clients, clients answer with their clientID; We take the lowest, non taken number between 1 and 4.
-2 : Ready to start game (synchronized and received game seed & map position)
-3 : Map Seed Transmission
-4 : 
-
-10-19 : Basic Actions
-10 : Moving Unit
-11 : Placing a Buildable
-12 : 
-
+    - "CREATE_UNIT" pour créer une Unité (ex.: Villageois)
+    - "HARVEST" pour récolter des ressources (ex.: Récolter des pommes)
+    - "MOVE_UNIT" pour déplacer une Unité
+    - "BUILD" pour construire un bâtiment (classe Buildable)
+    - "ATTACK" pour qu'une unité en attaque une autre 
 
 IO : 
-PING : Asking for infos (service info)
-PONG : Answering (service info)
-DICT : Dictator infos (in-game)
+PING : Demande d'informations ou envoi d'instruction (inutilisé)
+PONG : Réponse à demande ou Accusé réception (inutilisé)
+DICT : Instructions imposées (principalement pour les actions in-game)
 
-PlayerID:
-Between 1 and 4
+PlayerID (PNAME): Chaîne de caractères correspondant au nom du joueur dans la partie
 
 DATA : 
-Déviation des infos d'actions effectutées par le client et envoi sur le réseau
+Données diverses, traitées de manière conditionnelles en fonction du champ ID.
+Les différentes données dans ce champ sont séparées par le caractère ';'
+
+Un "Packet" est sérialisé dans le format suivant : ID+'\t'+IO+'\t'+PlayerID+'\t'+DATA+'\n'
