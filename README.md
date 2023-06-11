@@ -2,7 +2,7 @@
 
 ## Origin
 
-Ce repos est un fork de notre [première implémentation](https://gitlab.com/Tireur2cables/ageofcheapempire) jouable uniquement en Humain contre IA.  
+Ce repos est un fork de notre [première implémentation](https://github.com/Tireur2cables/age-of-cheap-empires) jouable uniquement en Humain contre IA.  
 
 ## Prérequis pour lancer le jeu
 
